@@ -14,6 +14,23 @@
 - Local frontend: http://localhost:8081
 - Local API: http://localhost:3813
 
+## Local Development
+
+Secrets: **Doppler** (workspace: Sergei MSP, project: `avito-georgia`, config: `dev`)
+
+```bash
+doppler login      # один раз на машину
+doppler setup --project avito-georgia --config dev --no-interactive
+cd api && doppler run -- npm run dev
+npx expo start --web
+```
+
+Управление секретами:
+```bash
+doppler secrets --project avito-georgia --config dev
+doppler secrets set KEY=value --project avito-georgia --config dev
+```
+
 ## Development
 ```bash
 npx expo start --web
