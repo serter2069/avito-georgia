@@ -35,9 +35,9 @@ jobs:
 
       - name: Deploy frontend
         run: |
-          rsync -av --delete dist/ /var/www/avito-georgia/public/
-          sudo chown -R github-runner:www-data /var/www/avito-georgia/public/
-          sudo chmod -R g+rw /var/www/avito-georgia/public/
+          rsync -av --delete dist/ /var/www/avito-georgia/web/
+          sudo chown -R github-runner:www-data /var/www/avito-georgia/web/
+          sudo chmod -R g+rw /var/www/avito-georgia/web/
 
   deploy-api:
     runs-on: self-hosted
