@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-frontend:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web
+        run: npx expo export --platform web
+
+      - name: Generate version.json
+        run: |
+          cat > dist/version.json << EOF
+          {
+            "version": "$(git rev-parse --short HEAD)",
+            "commit": "$(git rev-parse HEAD)",
+            "branch": "${{ github.ref_name }}",
+            "deployed": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "message": "$(git log -1 --pretty=%s | head -c 100)"
+          }
+          EOF
+
+      - name: Deploy frontend
+        run: |
+          rsync -av --delete dist/ /var/www/avito-georgia/public/
+          sudo chown -R github-runner:www-data /var/www/avito-georgia/public/
+          sudo chmod -R g+rw /var/www/avito-georgia/public/
+
+  deploy-api:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy API
+        run: |
+          rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
+            api/ /var/www/avito-georgia/api/
+          cd /var/www/avito-georgia/api && npm ci && npx prisma generate && npm run build
+          sudo pm2 restart avito-georgia-api || sudo pm2 start dist/index.js --name avito-georgia-api
+          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/
+          sudo chmod -R g+rw /var/www/avito-georgia/api/

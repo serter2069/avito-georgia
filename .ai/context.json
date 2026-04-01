@@ -1,0 +1,14 @@
+{
+  "project_name": "avito-georgia",
+  "staging_url": "https://avito-georgia.smartlaunchhub.com",
+  "local_url": "http://localhost:8081",
+  "api_url": "http://localhost:3813",
+  "github": "https://github.com/serter2069/avito-georgia",
+  "server_path": "/var/www/avito-georgia",
+  "pm2_name": "avito-georgia-api",
+  "stack": "expo-web + express + prisma + postgresql",
+  "database": {
+    "remote": "postgresql://avito_user:***@91.98.205.156:5432/avito_georgia_db",
+    "note": "DB is REMOTE ONLY."
+  }
+}

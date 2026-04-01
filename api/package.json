@@ -1,0 +1,32 @@
+{
+  "name": "avito-georgia-api",
+  "version": "1.0.0",
+  "description": "Avito Georgia API",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "npx prisma generate && tsc",
+    "start": "node dist/index.js",
+    "db:migrate": "npx prisma migrate dev",
+    "db:push": "npx prisma db push",
+    "db:generate": "npx prisma generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.5",
+    "prisma": "^5.22.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
