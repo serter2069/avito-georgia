@@ -1,359 +1,446 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Авито Грузия — Brand Preview</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Rubik:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #EBEBEB;
-      font-family: Inter, sans-serif;
-      padding: 40px 32px;
-      min-height: 100vh;
-    }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-    .page-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #111;
-      letter-spacing: -0.5px;
-      margin-bottom: 6px;
-    }
-    .page-header .subtitle {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 4px;
-    }
-    .page-header .url {
-      font-size: 13px;
-      color: #999;
-      font-family: monospace;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
-      body { padding: 24px 16px; }
-    }
-
-    .variant {
-      background: var(--bg);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      font-family: var(--font), sans-serif;
-      color: var(--text);
-    }
-
-    /* ── Header bar ── */
-    .v-header {
-      background: var(--bg);
-      padding: 20px 24px 16px;
-      border-bottom: 1px solid rgba(0,0,0,0.07);
-    }
-    .v-num {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .v-name {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--primary);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .v-font-label {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* ── Swatches ── */
-    .v-swatches {
-      display: flex;
-      gap: 6px;
-      padding: 14px 24px;
-      background: var(--bg);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-    }
-    .swatch {
-      flex: 1;
-      height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding-bottom: 4px;
-    }
-    .swatch span {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      mix-blend-mode: multiply;
-      opacity: 0.6;
-    }
-
-    /* ── Hero ── */
-    .v-hero {
-      position: relative;
-      height: 190px;
-      overflow: hidden;
-    }
-    .v-hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .v-hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: var(--primary);
-      opacity: 0.72;
-    }
-    .v-hero-content {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 20px 22px;
-    }
-    .v-hero-tag {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.75);
-      margin-bottom: 6px;
-    }
-    .v-hero-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #fff;
-      line-height: 1.25;
-      margin-bottom: 14px;
-      max-width: 260px;
-    }
-    .v-hero-btns {
-      display: flex;
-      gap: 8px;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: var(--btn-text);
-      font-family: var(--font), sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .btn-outline {
-      background: transparent;
-      color: #fff;
-      font-family: var(--font), sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1.5px solid rgba(255,255,255,0.55);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    /* ── Cards ── */
-    .v-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      padding: 16px 24px;
-      background: var(--bg);
-    }
-    .card {
-      background: var(--surface);
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(0,0,0,0.07);
-    }
-    .card-img {
-      height: 80px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .card-icon {
-      font-size: 28px;
-      opacity: 0.9;
-    }
-    .card-badge {
-      position: absolute;
-      top: 7px;
-      left: 7px;
-      background: var(--accent);
-      color: var(--btn-text);
-      font-size: 9px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 20px;
-      letter-spacing: 0.3px;
-    }
-    .card-body {
-      padding: 10px 11px 12px;
-    }
-    .card-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .card-sub {
-      font-size: 10.5px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .card-price {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    /* ── Mood ── */
-    .v-mood {
-      padding: 10px 24px 16px;
-      background: var(--bg);
-      font-size: 12px;
-      font-style: italic;
-      color: var(--muted);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Авито Грузия — Brand Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #E8E6E3;
+  font-family: Inter, sans-serif;
+  padding: 32px 24px;
+  min-height: 100vh;
+}
+h1 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1A1918;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #6B6560;
+  margin-bottom: 32px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.variant {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06);
+  background: var(--bg);
+  font-family: var(--font), Inter, sans-serif;
+}
+.v-header {
+  background: var(--bg);
+  padding: 16px 20px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.v-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: Inter, sans-serif;
+  letter-spacing: 0.5px;
+}
+.v-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 2px;
+  letter-spacing: -0.3px;
+  font-family: var(--font), Inter, sans-serif;
+}
+.v-domain {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.v-font-label {
+  text-align: right;
+  font-size: 10px;
+  color: var(--muted);
+  font-family: Inter, sans-serif;
+  line-height: 1.5;
+}
+.v-font-label strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: var(--font), Inter, sans-serif;
+}
+.v-swatches {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.swatch-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.swatch-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.10);
+  flex-shrink: 0;
+}
+.swatch-hex {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  letter-spacing: -0.3px;
+}
+.swatch-label {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: Inter, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.v-hero {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+}
+.v-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.v-hero-overlay {
+  position: absolute;
+  inset: 0;
+}
+.v-hero-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 18px;
+}
+.v-hero-tag {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  margin-bottom: 6px;
+  font-family: Inter, sans-serif;
+}
+.v-hero-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+  font-family: var(--font), Inter, sans-serif;
+  margin-bottom: 10px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.v-hero-btns {
+  display: flex;
+  gap: 8px;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font), Inter, sans-serif;
+}
+.btn-secondary {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.50);
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font), Inter, sans-serif;
+  backdrop-filter: blur(4px);
+}
+.v-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: var(--bg);
+}
+.v-card {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-right: 1px solid rgba(0,0,0,0.06);
+}
+.v-card-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--accent);
+  font-family: Inter, sans-serif;
+  margin-bottom: 6px;
+}
+.v-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 4px;
+  font-family: var(--font), Inter, sans-serif;
+}
+.v-card-text {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.v-badge {
+  display: inline-block;
+  margin-top: 8px;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-family: Inter, sans-serif;
+  letter-spacing: 0.3px;
+}
+.v-typo {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+.v-typo-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font), Inter, sans-serif;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.v-typo-body {
+  font-size: 12px;
+  color: #111111;
+  line-height: 1.55;
+  margin-bottom: 6px;
+}
+.v-typo-mood {
+  font-size: 10px;
+  color: var(--accent);
+  font-style: italic;
+  font-family: var(--font), Inter, sans-serif;
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
-<div class="page-header">
-  <h1>Авито Грузия — Brand Preview</h1>
-  <div class="subtitle">10 style variants · All minimalist &amp; light</div>
-  <div class="url">avito-georgia.smartlaunchhub.com</div>
-</div>
+<h1>Авито Грузия — Brand Preview</h1>
+<p class="subtitle">avito-georgia.com · 10 color variants · 2025 trends</p>
 
 <div class="grid" id="grid"></div>
 
 <script>
-const HERO_IMG = 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=900&q=75&fit=crop';
+const IMAGE = 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=900&q=75&fit=crop';
 
 const variants = [
-  { n:1, name:'Tbilisi Sun',      primary:'#D63B2E', accent:'#F5A623', bg:'#FAF7F2', surface:'#FFFFFF', text:'#1C1C1C', muted:'#8A7D72', font:'Nunito',           btnText:'#1C1C1C', mood:'warm, market, energy' },
-  { n:2, name:'Georgian Fresh',   primary:'#006B7A', accent:'#FF6B35', bg:'#F5FAFA', surface:'#FFFFFF', text:'#0D2B30', muted:'#6A8C91', font:'Inter',            btnText:'#FFFFFF', mood:'modern, clean, city' },
-  { n:3, name:'Citrus Bold',      primary:'#C04010', accent:'#FFC030', bg:'#FFFFFF', surface:'#FFF8F0', text:'#1A0A00', muted:'#8A7060', font:'Rubik',            btnText:'#1A0A00', mood:'bold, dynamic, street' },
-  { n:4, name:'Mediterranean',    primary:'#0077B6', accent:'#C4632A', bg:'#F5F9FF', surface:'#FFFFFF', text:'#0A1F33', muted:'#6A88A8', font:'Poppins',          btnText:'#FFFFFF', mood:'warm, coastal' },
-  { n:5, name:'Bold Red',         primary:'#CC2020', accent:'#FFB800', bg:'#FFFFFF', surface:'#FFF9F0', text:'#1A0000', muted:'#8A6060', font:'DM Sans',          btnText:'#1A0000', mood:'confident, energetic' },
-  { n:6, name:'Spring Bloom',     primary:'#1E7A42', accent:'#E85A3A', bg:'#F8FFF9', surface:'#FFFFFF', text:'#0A1F12', muted:'#5A8A6A', font:'Nunito Sans',      btnText:'#FFFFFF', mood:'fresh, local, natural' },
-  { n:7, name:'Rose Market',      primary:'#B83050', accent:'#C8900A', bg:'#FFF8F2', surface:'#FFFFFF', text:'#1A0810', muted:'#8A6070', font:'Lora',             btnText:'#FFFFFF', mood:'elegant, premium' },
-  { n:8, name:'Modern Indigo',    primary:'#3730A3', accent:'#F59E0B', bg:'#FAFAFE', surface:'#FFFFFF', text:'#0F0E2A', muted:'#6B70A8', font:'Manrope',          btnText:'#1A0A00', mood:'tech, young, urban' },
-  { n:9, name:'Steel Urban',      primary:'#1A2B4A', accent:'#FF7020', bg:'#F4F6FA', surface:'#FFFFFF', text:'#0A1020', muted:'#6A7898', font:'Work Sans',        btnText:'#FFFFFF', mood:'trust, clear, urban' },
-  { n:10, name:'Emerald Georgia', primary:'#0A6B2E', accent:'#CC1010', bg:'#F5FBF7', surface:'#FFFFFF', text:'#050F08', muted:'#508060', font:'Plus Jakarta Sans', btnText:'#FFFFFF', mood:'Georgian colors' },
+  {
+    num: '01', name: 'Georgian Warm', mood: 'Terracotta market',
+    bg: '#FAF6F0', primary: '#1A1410', accent: '#C4502A',
+    muted: '#9A8070', overlayRgb: '26,20,16',
+    font: 'Nunito',
+    headline: 'Купи и продай в Грузии',
+    tag: 'Объявления Грузия',
+    card: { label: 'Авто', title: 'Toyota Camry 2021', text: '45 000 ₾ · Тбилиси' },
+    badge: 'Новое объявление'
+  },
+  {
+    num: '02', name: 'Teal Batumi', mood: 'Coastal city',
+    bg: '#F2F8FA', primary: '#0A2840', accent: '#0A7B8A',
+    muted: '#6A8898', overlayRgb: '10,40,64',
+    font: 'Inter',
+    headline: 'Маркетплейс всей Грузии',
+    tag: 'Объявления Грузия',
+    card: { label: 'Недвижимость', title: 'Квартира в Батуми', text: '120 000 $ · Батуми' },
+    badge: 'Горячее предложение'
+  },
+  {
+    num: '03', name: 'Clay Gold', mood: 'Bazaar earthen',
+    bg: '#FAF3E8', primary: '#2A180A', accent: '#C87A28',
+    muted: '#9A7850', overlayRgb: '42,24,10',
+    font: 'Rubik',
+    headline: 'Bazaar — ბაზრობა',
+    tag: 'Объявления Грузия',
+    card: { label: 'Электроника', title: 'iPhone 15 Pro', text: '3 200 ₾ · Тбилиси' },
+    badge: 'Срочно'
+  },
+  {
+    num: '04', name: 'Nature', mood: 'Caucasus green',
+    bg: '#F4FAF5', primary: '#182A18', accent: '#3A8850',
+    muted: '#6A8A70', overlayRgb: '24,42,24',
+    font: 'DM Sans',
+    headline: 'Найди всё в Грузии',
+    tag: 'Объявления Грузия',
+    card: { label: 'Работа', title: 'Менеджер по продажам', text: '2 500 ₾/мес · Кутаиси' },
+    badge: 'Вакансия'
+  },
+  {
+    num: '05', name: 'Coral City', mood: 'Energy, warmth',
+    bg: '#FFF4F0', primary: '#1A0A08', accent: '#C84030',
+    muted: '#9A7070', overlayRgb: '26,10,8',
+    font: 'Outfit',
+    headline: 'Tbilisi Marketplace',
+    tag: 'Объявления Грузия',
+    card: { label: 'Техника', title: 'MacBook Pro M3', text: '5 800 ₾ · Тбилиси' },
+    badge: 'Торг'
+  },
+  {
+    num: '06', name: 'Stone Red', mood: 'Bold Georgian',
+    bg: '#F8F5F3', primary: '#2A1818', accent: '#A83028',
+    muted: '#8A7070', overlayRgb: '42,24,24',
+    font: 'Manrope',
+    headline: 'Грузинский классифайд',
+    tag: 'Объявления Грузия',
+    card: { label: 'Дом', title: 'Частный дом с садом', text: '85 000 $ · Мцхета' },
+    badge: 'Проверено'
+  },
+  {
+    num: '07', name: 'Rose Market', mood: 'Warm premium',
+    bg: '#FFF6F2', primary: '#2A1008', accent: '#B84838',
+    muted: '#9A7868', overlayRgb: '42,16,8',
+    font: 'Lora',
+    headline: 'Premium объявления Грузии',
+    tag: 'Объявления Грузия',
+    card: { label: 'Премиум', title: 'Мерседес E-Class', text: '78 000 $ · Тбилиси' },
+    badge: 'Premium'
+  },
+  {
+    num: '08', name: 'Modern Blue', mood: 'Tech urban',
+    bg: '#F4F6FA', primary: '#0A1A38', accent: '#2060C8',
+    muted: '#7A8AAA', overlayRgb: '10,26,56',
+    font: 'Plus Jakarta Sans',
+    headline: 'Цифровой рынок Грузии',
+    tag: 'Объявления Грузия',
+    card: { label: 'Услуги', title: 'Дизайн логотипа', text: '300 ₾ · Онлайн' },
+    badge: 'Услуга'
+  },
+  {
+    num: '09', name: 'Amber Urban', mood: 'Sunny, approachable',
+    bg: '#FAF8F2', primary: '#1A1808', accent: '#C89820',
+    muted: '#9A9060', overlayRgb: '26,24,8',
+    font: 'Work Sans',
+    headline: 'Солнечная Грузия — покупай, продавай',
+    tag: 'Объявления Грузия',
+    card: { label: 'Мото', title: 'Honda CB500F 2022', text: '8 500 ₾ · Рустави' },
+    badge: 'Хорошее состояние'
+  },
+  {
+    num: '10', name: 'Emerald', mood: 'Georgian colors',
+    bg: '#F3FAF5', primary: '#0A2818', accent: '#1A8840',
+    muted: '#5A8870', overlayRgb: '10,40,24',
+    font: 'Nunito Sans',
+    headline: 'Georgia Marketplace',
+    tag: 'Объявления Грузия',
+    card: { label: 'Туризм', title: 'Тур по Кахетии', text: '450 ₾/чел · Сигнахи' },
+    badge: 'Местный гид'
+  }
 ];
 
-const cards = [
-  { badge:'Недвижимость', icon:'🏠', title:'2-комн. квартира, Тбилиси', sub:'Ваке · 72 м² · 4/9 эт.', price:'85 000 $' },
-  { badge:'Авто',         icon:'🚗', title:'Toyota Camry 2020',          sub:'65 000 км · Автомат',   price:'28 000 $' },
-];
+const grid = document.getElementById('grid');
 
-const swatchLabels = (v) => [v.primary, v.accent, v.bg, v.surface, v.muted];
-
-function hex2rgb(h) {
-  const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
-  return [r,g,b];
-}
-function luminance(h) {
-  const [r,g,b] = hex2rgb(h).map(c => { c/=255; return c<=0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4); });
-  return 0.2126*r + 0.7152*g + 0.0722*b;
-}
-function swatchTextColor(h) {
-  return luminance(h) > 0.35 ? '#444' : '#fff';
-}
-
-function buildVariant(v) {
-  const swatches = swatchLabels(v).map(hex => `
-    <div class="swatch" style="background:${hex};">
-      <span style="color:${swatchTextColor(hex)}">${hex.toUpperCase()}</span>
-    </div>`).join('');
-
-  const cardHtml = cards.map(c => `
-    <div class="card">
-      <div class="card-img">
-        <div class="card-badge">${c.badge}</div>
-        <div class="card-icon">${c.icon}</div>
-      </div>
-      <div class="card-body">
-        <div class="card-title">${c.title}</div>
-        <div class="card-sub">${c.sub}</div>
-        <div class="card-price">${c.price}</div>
-      </div>
-    </div>`).join('');
-
+variants.forEach(v => {
   const el = document.createElement('div');
   el.className = 'variant';
-  el.style.cssText = [
-    `--primary:${v.primary}`,`--accent:${v.accent}`,`--bg:${v.bg}`,
-    `--surface:${v.surface}`,`--text:${v.text}`,`--muted:${v.muted}`,
-    `--font:${v.font}`,`--btn-text:${v.btnText}`,
-  ].join(';');
+  el.style.cssText = `--bg:${v.bg};--primary:${v.primary};--accent:${v.accent};--muted:${v.muted};--font:'${v.font}';`;
+
+  const swatches = [
+    { color: v.primary, label: 'primary' },
+    { color: v.accent, label: 'accent' },
+    { color: v.bg, label: 'bg' },
+    { color: '#FFFFFF', label: 'surface' },
+    { color: '#111111', label: 'text' },
+  ];
 
   el.innerHTML = `
     <div class="v-header">
-      <div class="v-num">Variant ${String(v.n).padStart(2,'0')}</div>
-      <div class="v-name">${v.name}</div>
-      <div class="v-font-label">Font: ${v.font}</div>
+      <div>
+        <div class="v-num">${v.num}</div>
+        <div class="v-name">${v.name}</div>
+        <div class="v-domain">avito-georgia.com</div>
+      </div>
+      <div class="v-font-label">
+        <strong>${v.font}</strong>
+        <span>Typography</span>
+      </div>
     </div>
-    <div class="v-swatches">${swatches}</div>
+    <div class="v-swatches">
+      ${swatches.map(s => `
+        <div class="swatch-item">
+          <div class="swatch-circle" style="background:${s.color}"></div>
+          <div class="swatch-hex">${s.color}</div>
+          <div class="swatch-label">${s.label}</div>
+        </div>
+      `).join('')}
+    </div>
     <div class="v-hero">
-      <img src="${HERO_IMG}" alt="Тбилиси" loading="lazy">
-      <div class="v-hero-overlay"></div>
+      <img src="${IMAGE}" alt="Tbilisi" loading="lazy">
+      <div class="v-hero-overlay" style="background:linear-gradient(to top, rgba(${v.overlayRgb},0.82) 0%, rgba(${v.overlayRgb},0.20) 70%)"></div>
       <div class="v-hero-content">
-        <div class="v-hero-tag">Тбилиси · Батуми · Кутаиси</div>
-        <div class="v-hero-title">Всё что нужно — рядом в Грузии</div>
+        <div class="v-hero-tag">${v.tag}</div>
+        <div class="v-hero-title">${v.headline}</div>
         <div class="v-hero-btns">
-          <button class="btn-primary">Подать объявление</button>
-          <button class="btn-outline">Смотреть все</button>
+          <button class="btn-primary">Смотреть объявления</button>
+          <button class="btn-secondary">Подать объявление</button>
         </div>
       </div>
     </div>
-    <div class="v-cards">${cardHtml}</div>
-    <div class="v-mood">${v.mood}</div>
+    <div class="v-bottom">
+      <div class="v-card">
+        <div class="v-card-label">${v.card.label}</div>
+        <div class="v-card-title">${v.card.title}</div>
+        <div class="v-card-text">${v.card.text}</div>
+        <div class="v-badge">${v.badge}</div>
+      </div>
+      <div class="v-typo">
+        <div class="v-typo-heading">Объявления Грузии</div>
+        <div class="v-typo-body">Купи и продай всё: авто, недвижимость, электронику и услуги по всей Грузии.</div>
+        <div class="v-typo-mood">*mood: ${v.mood}*</div>
+      </div>
+    </div>
   `;
 
-  return el;
-}
-
-const grid = document.getElementById('grid');
-variants.forEach(v => grid.appendChild(buildVariant(v)));
+  grid.appendChild(el);
+});
 </script>
 </body>
 </html>
