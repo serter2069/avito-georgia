@@ -442,5 +442,189 @@ variants.forEach(v => {
   grid.appendChild(el);
 });
 </script>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- DESIGN SYSTEM — SELECTED BRAND: GEORGIAN WARM       -->
+<!-- ════════════════════════════════════════════════════ -->
+<style>
+.ds-wrap {
+  max-width: 1100px;
+  margin: 64px auto 0;
+  font-family: 'Nunito', Inter, sans-serif;
+}
+.ds-divider { border: none; border-top: 2px solid #1A1410; margin-bottom: 48px; }
+.ds-header-block { display: flex; align-items: baseline; gap: 20px; margin-bottom: 48px; flex-wrap: wrap; }
+.ds-main-title { font-size: 30px; font-weight: 800; color: #1A1410; letter-spacing: -0.5px; }
+.ds-main-sub { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #C4502A; }
+.ds-section { margin-bottom: 48px; }
+.ds-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+  color: #9A8070; border-bottom: 1px solid #E8D8CC; padding-bottom: 8px; margin-bottom: 24px;
+}
+.ds-colors { display: flex; flex-wrap: wrap; gap: 8px; }
+.ds-chip { width: 120px; }
+.ds-swatch { height: 52px; border-radius: 5px; border: 1px solid rgba(0,0,0,0.07); }
+.ds-clabel { font-size: 11px; font-weight: 700; color: #1A1410; margin-top: 5px; }
+.ds-cval { font-size: 10px; color: #9A8070; font-family: monospace; }
+.ds-type-row { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #F5EDE6; }
+.ds-type-row:last-child { border: none; }
+.ds-type-meta { font-size: 10px; color: #9A8070; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+.ds-t-h1 { font-family: 'Nunito', sans-serif; font-size: 38px; font-weight: 800; color: #1A1410; line-height: 1.15; letter-spacing: -0.5px; }
+.ds-t-h2 { font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 700; color: #1A1410; line-height: 1.25; }
+.ds-t-h3 { font-family: 'Nunito', sans-serif; font-size: 19px; font-weight: 700; color: #1A1410; }
+.ds-t-body { font-family: 'Nunito', sans-serif; font-size: 16px; color: #1A1410; line-height: 1.65; }
+.ds-t-small { font-family: 'Nunito', sans-serif; font-size: 14px; color: #9A8070; }
+.ds-t-cap { font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #9A8070; }
+.ds-spacing { display: flex; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
+.ds-sp-item { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.ds-sp-bar { width: 36px; background: #C4502A; opacity: 0.45; border-radius: 2px; }
+.ds-sp-lbl { font-size: 10px; color: #9A8070; font-family: monospace; }
+.ds-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
+.ds-row-lbl { font-size: 10px; color: #9A8070; font-weight: 700; width: 72px; flex-shrink: 0; letter-spacing: 0.5px; text-transform: uppercase; }
+.ds-btn { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; padding: 9px 20px; border-radius: 8px; border: none; cursor: pointer; letter-spacing: 0.2px; }
+.ds-btn-sm { font-size: 12px; padding: 6px 14px; }
+.ds-btn-primary { background: #1A1410; color: #FAF6F0; }
+.ds-btn-accent { background: #C4502A; color: #fff; }
+.ds-btn-secondary { background: transparent; color: #1A1410; border: 2px solid #1A1410; }
+.ds-btn-ghost { background: transparent; color: #9A8070; border: 2px solid #E8D8CC; }
+.ds-btn-danger { background: #C0392B; color: #fff; }
+.ds-btn-disabled { background: #E8D8CC; color: #9A8070; cursor: not-allowed; opacity: 0.55; }
+.ds-inputs { display: flex; flex-wrap: wrap; gap: 20px; }
+.ds-input-block { display: flex; flex-direction: column; gap: 4px; width: 240px; }
+.ds-input-lbl { font-size: 11px; font-weight: 700; color: #3D2A20; }
+.ds-input { font-family: 'Nunito', sans-serif; font-size: 14px; color: #1A1410; background: #fff; border: 2px solid #E8D8CC; border-radius: 8px; padding: 9px 12px; width: 100%; outline: none; }
+.ds-input-focus { border-color: #C4502A; box-shadow: 0 0 0 3px rgba(196,80,42,0.12); }
+.ds-input-err { border-color: #C0392B; }
+.ds-input-errmsg { font-size: 11px; color: #C0392B; font-weight: 600; }
+.ds-input-disabled { background: #F5EDE6; color: #9A8070; }
+.ds-cards { display: flex; flex-wrap: wrap; gap: 20px; }
+.ds-card { width: 260px; border-radius: 12px; overflow: hidden; background: #fff; }
+.ds-card-default { border: 1px solid #E8D8CC; }
+.ds-card-elevated { box-shadow: 0 4px 20px rgba(26,20,16,0.12); }
+.ds-card-outlined { background: transparent; border: 2px solid #1A1410; }
+.ds-card-img {
+  height: 120px;
+  background: linear-gradient(135deg, #F5EDE6 0%, #E8D8CC 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: #9A8070;
+}
+.ds-card-body { padding: 16px; }
+.ds-card-over { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #C4502A; margin-bottom: 4px; }
+.ds-card-title { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #1A1410; margin-bottom: 4px; }
+.ds-card-text { font-size: 12px; color: #9A8070; line-height: 1.5; margin-bottom: 12px; }
+.ds-card-footer { display: flex; align-items: center; justify-content: space-between; }
+.ds-card-price { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; color: #1A1410; }
+.ds-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
+.ds-badge-a { background: rgba(196,80,42,0.12); color: #C4502A; }
+.ds-badge-s { background: rgba(39,125,48,0.10); color: #2E7D30; }
+.ds-badge-n { background: #F5EDE6; color: #9A8070; }
+</style>
+
+<div class="ds-wrap">
+  <hr class="ds-divider">
+  <div class="ds-header-block">
+    <div class="ds-main-title">Design System</div>
+    <div class="ds-main-sub">Georgian Warm · Selected Brand · Stage 5</div>
+  </div>
+
+  <div class="ds-section">
+    <div class="ds-section-label">Color Tokens</div>
+    <div class="ds-colors">
+      <div class="ds-chip"><div class="ds-swatch" style="background:#FAF6F0;"></div><div class="ds-clabel">Background</div><div class="ds-cval">#FAF6F0</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#F5EDE6;"></div><div class="ds-clabel">Surface</div><div class="ds-cval">#F5EDE6</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#1A1410;"></div><div class="ds-clabel">Primary</div><div class="ds-cval">#1A1410</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#3D2A20;"></div><div class="ds-clabel">Secondary</div><div class="ds-cval">#3D2A20</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#C4502A;"></div><div class="ds-clabel">Accent</div><div class="ds-cval">#C4502A</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#E06840;"></div><div class="ds-clabel">Accent Light</div><div class="ds-cval">#E06840</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#9A8070;"></div><div class="ds-clabel">Text Muted</div><div class="ds-cval">#9A8070</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#E8D8CC;"></div><div class="ds-clabel">Border</div><div class="ds-cval">#E8D8CC</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#C0392B;"></div><div class="ds-clabel">Error</div><div class="ds-cval">#C0392B</div></div>
+      <div class="ds-chip"><div class="ds-swatch" style="background:#2E7D30;"></div><div class="ds-clabel">Success</div><div class="ds-cval">#2E7D30</div></div>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <div class="ds-section-label">Typography — Nunito</div>
+    <div class="ds-type-row"><div class="ds-type-meta">H1 · Nunito 800 · 38px</div><div class="ds-t-h1">Купи и продай в Грузии</div></div>
+    <div class="ds-type-row"><div class="ds-type-meta">H2 · Nunito 700 · 26px</div><div class="ds-t-h2">Тысячи объявлений каждый день</div></div>
+    <div class="ds-type-row"><div class="ds-type-meta">H3 · Nunito 700 · 19px</div><div class="ds-t-h3">Авто, недвижимость, электроника</div></div>
+    <div class="ds-type-row"><div class="ds-type-meta">Body · 16px · lh 1.65</div><div class="ds-t-body">Авито Грузия — самая большая доска объявлений в Грузии. Удобный поиск, безопасные сделки, поддержка на русском и грузинском.</div></div>
+    <div class="ds-type-row"><div class="ds-type-meta">Small · 14px</div><div class="ds-t-small">Более 50 000 объявлений. Новые позиции появляются каждый час.</div></div>
+    <div class="ds-type-row"><div class="ds-type-meta">Caption · 11px · uppercase</div><div class="ds-t-cap">Marketplace Грузии · 2026</div></div>
+  </div>
+
+  <div class="ds-section">
+    <div class="ds-section-label">Spacing Scale</div>
+    <div class="ds-spacing">
+      <div class="ds-sp-item"><div class="ds-sp-bar" style="height:4px;"></div><div class="ds-sp-lbl">xs 4px</div></div>
+      <div class="ds-sp-item"><div class="ds-sp-bar" style="height:8px;"></div><div class="ds-sp-lbl">sm 8px</div></div>
+      <div class="ds-sp-item"><div class="ds-sp-bar" style="height:16px;"></div><div class="ds-sp-lbl">md 16px</div></div>
+      <div class="ds-sp-item"><div class="ds-sp-bar" style="height:24px;"></div><div class="ds-sp-lbl">lg 24px</div></div>
+      <div class="ds-sp-item"><div class="ds-sp-bar" style="height:32px;"></div><div class="ds-sp-lbl">xl 32px</div></div>
+      <div class="ds-sp-item"><div class="ds-sp-bar" style="height:48px;"></div><div class="ds-sp-lbl">2xl 48px</div></div>
+      <div class="ds-sp-item"><div class="ds-sp-bar" style="height:64px;"></div><div class="ds-sp-lbl">3xl 64px</div></div>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <div class="ds-section-label">Button Component</div>
+    <div class="ds-row"><div class="ds-row-lbl">Primary</div><button class="ds-btn ds-btn-primary">Разместить объявление</button><button class="ds-btn ds-btn-sm ds-btn-primary">Подробнее</button></div>
+    <div class="ds-row"><div class="ds-row-lbl">Accent</div><button class="ds-btn ds-btn-accent">Написать продавцу</button><button class="ds-btn ds-btn-sm ds-btn-accent">Купить</button></div>
+    <div class="ds-row"><div class="ds-row-lbl">Secondary</div><button class="ds-btn ds-btn-secondary">Все объявления</button><button class="ds-btn ds-btn-sm ds-btn-secondary">Фильтр</button></div>
+    <div class="ds-row"><div class="ds-row-lbl">Ghost</div><button class="ds-btn ds-btn-ghost">Сохранить</button></div>
+    <div class="ds-row"><div class="ds-row-lbl">Danger</div><button class="ds-btn ds-btn-danger">Удалить объявление</button></div>
+    <div class="ds-row"><div class="ds-row-lbl">Disabled</div><button class="ds-btn ds-btn-disabled" disabled>Продано</button></div>
+  </div>
+
+  <div class="ds-section">
+    <div class="ds-section-label">Input Component</div>
+    <div class="ds-inputs">
+      <div class="ds-input-block"><div class="ds-input-lbl">Default</div><input class="ds-input" type="text" placeholder="Поиск по объявлениям..."></div>
+      <div class="ds-input-block"><div class="ds-input-lbl">Focus</div><input class="ds-input ds-input-focus" type="text" value="Toyota Camry Тбилиси"></div>
+      <div class="ds-input-block"><div class="ds-input-lbl">Error</div><input class="ds-input ds-input-err" type="text" value="abc"><div class="ds-input-errmsg">Введите корректную цену</div></div>
+      <div class="ds-input-block"><div class="ds-input-lbl">Disabled</div><input class="ds-input ds-input-disabled" type="text" value="Продано" disabled></div>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <div class="ds-section-label">Card Component</div>
+    <div class="ds-cards">
+      <div class="ds-card ds-card-default">
+        <div class="ds-card-img">🚗</div>
+        <div class="ds-card-body">
+          <div class="ds-card-over">Авто</div>
+          <div class="ds-card-title">Toyota Camry 2021</div>
+          <div class="ds-card-text">Тбилиси · 45 000 км · Автомат</div>
+          <div class="ds-card-footer"><div class="ds-card-price">45 000 ₾</div><span class="ds-badge ds-badge-a">Новое</span></div>
+        </div>
+      </div>
+      <div class="ds-card ds-card-elevated">
+        <div class="ds-card-img">🏠</div>
+        <div class="ds-card-body">
+          <div class="ds-card-over">Недвижимость</div>
+          <div class="ds-card-title">Квартира в Батуми</div>
+          <div class="ds-card-text">2 комнаты · 60 м² · 5 мин до моря</div>
+          <div class="ds-card-footer"><div class="ds-card-price">85 000 $</div><span class="ds-badge ds-badge-s">Срочно</span></div>
+        </div>
+      </div>
+      <div class="ds-card ds-card-outlined">
+        <div class="ds-card-img" style="background:transparent;">📱</div>
+        <div class="ds-card-body">
+          <div class="ds-card-over">Электроника</div>
+          <div class="ds-card-title">iPhone 15 Pro Max</div>
+          <div class="ds-card-text">256 GB · Space Black · Гарантия</div>
+          <div class="ds-card-footer"><div class="ds-card-price">3 200 ₾</div><span class="ds-badge ds-badge-n">Б/у</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding-top:24px;border-top:1px solid #E8D8CC;margin-bottom:48px;">
+    <div style="font-size:10px;color:#9A8070;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;">
+      Avito Georgia · Georgian Warm · Stage 5: BRAND_STYLE · Radius: sm 4px / md 8px / lg 12px · Font: Nunito
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
