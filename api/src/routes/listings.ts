@@ -86,11 +86,29 @@ router.get('/', async (req: Request, res: Response) => {
   const take = limit;
   const skip = (page - 1) * take;
   const userId = qs(req.query.userId);
+
+  // Resolve category: accept either a cuid (starts with 'c', 25+ chars) or a slug
+  let categoryId: string | undefined;
+  if (category) {
+    const isCuid = /^c[a-z0-9]{24,}$/.test(category);
+    if (isCuid) {
+      categoryId = category;
+    } else {
+      const cat = await prisma.category.findFirst({ where: { slug: category } });
+      if (cat) {
+        categoryId = cat.id;
+      } else {
+        res.json({ listings: [], total: 0, page, limit: take });
+        return;
+      }
+    }
+  }
+
   const where: Prisma.ListingWhereInput = {
     status: 'active',
     OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : {}),
-    ...(category ? { categoryId: category } : {}),
+    ...(categoryId ? { categoryId } : {}),
     ...(city ? { cityId: city } : {}),
     ...(userId ? { userId } : {}),
     ...(price_min || price_max
