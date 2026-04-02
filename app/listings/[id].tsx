@@ -119,16 +119,33 @@ export default function ListingDetailScreen() {
       router.push('/(auth)');
       return;
     }
-    if (!listing?.user?.id || contactLoading) return;
+    if (!id || !listing?.user?.id || contactLoading) return;
+
+    const listingId = Array.isArray(id) ? id[0] : id;
 
     setContactLoading(true);
-    const res = await api.post<{ threadId: string }>('/threads', { otherUserId: listing.user.id });
-    setContactLoading(false);
+    try {
+      // Check for an existing thread for this listing before creating a new one
+      const threadsRes = await api.get<Array<{ id: string; listing: { id: string } | null }>>('/threads');
+      if (threadsRes.ok && threadsRes.data) {
+        const existing = threadsRes.data.find((t) => t.listing?.id === listingId);
+        if (existing) {
+          router.push(`/dashboard/messages/${existing.id}`);
+          return;
+        }
+      }
 
-    if (res.ok && res.data) {
-      router.push(`/dashboard/messages/${res.data.threadId}`);
+      // No existing thread — send first message to create one
+      const createRes = await api.post<{ threadId: string }>(`/threads/${listingId}/message`, {
+        text: 'Здравствуйте! Интересует ваше объявление.',
+      });
+      if (createRes.ok && createRes.data?.threadId) {
+        router.push(`/dashboard/messages/${createRes.data.threadId}`);
+      }
+    } finally {
+      setContactLoading(false);
     }
-  }, [user, listing, contactLoading, router]);
+  }, [user, id, listing, contactLoading, router]);
 
   const handleShare = useCallback(async () => {
     if (!listing) return;
