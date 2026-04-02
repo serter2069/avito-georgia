@@ -125,6 +125,57 @@ export async function apiRequest<T = unknown>(
   }
 }
 
+// Multipart upload — sends FormData without Content-Type (browser sets boundary)
+export async function apiUpload<T = unknown>(
+  path: string,
+  formData: FormData,
+): Promise<ApiResponse<T>> {
+  const token = await getAccessToken();
+
+  const headers: Record<string, string> = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
+  let res: Response;
+
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+  } catch (err) {
+    return { ok: false, error: 'Network error', status: 0 };
+  }
+
+  if (res.status === 401) {
+    const refreshed = await refreshTokens();
+    if (refreshed) {
+      const newToken = await getAccessToken();
+      headers.Authorization = `Bearer ${newToken}`;
+      try {
+        res = await fetch(`${BASE_URL}${path}`, {
+          method: 'POST',
+          headers,
+          body: formData,
+        });
+      } catch (err) {
+        return { ok: false, error: 'Network error after refresh', status: 0 };
+      }
+    } else {
+      await clearTokens();
+      return { ok: false, error: 'Unauthorized', status: 401 };
+    }
+  }
+
+  try {
+    const data = await res.json();
+    return { ok: res.ok, data: data as T, status: res.status };
+  } catch {
+    return { ok: res.ok, status: res.status };
+  }
+}
+
 // Convenience methods
 export const api = {
   get: <T = unknown>(path: string) => apiRequest<T>(path, { method: 'GET' }),

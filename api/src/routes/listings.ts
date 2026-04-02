@@ -17,6 +17,37 @@ function qs(val: unknown): string | undefined {
   return undefined;
 }
 
+// GET /api/listings/my — authenticated user's own listings (all statuses)
+router.get('/my', requireAuth, async (req: Request, res: Response) => {
+  const userId = req.user!.userId;
+  const status = qs(req.query.status); // 'active' | 'sold' | 'removed' or undefined for all
+  const limit = Math.min(parseInt(qs(req.query.limit) || '20', 10), 50);
+  const page = parseInt(qs(req.query.page) || '1', 10);
+  const skip = (page - 1) * limit;
+
+  const where: Prisma.ListingWhereInput = {
+    userId,
+    ...(status ? { status: status as any } : {}),
+  };
+
+  const [listings, total] = await Promise.all([
+    prisma.listing.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip,
+      include: {
+        photos: { orderBy: { order: 'asc' }, take: 1 },
+        city: { select: { id: true, nameRu: true } },
+        category: { select: { id: true, name: true } },
+      },
+    }),
+    prisma.listing.count({ where }),
+  ]);
+
+  res.json({ listings, total, page, limit });
+});
+
 // GET /api/listings/map?city= — MUST be before /:id
 router.get('/map', async (req: Request, res: Response) => {
   const city = qs(req.query.city);
