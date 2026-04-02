@@ -6,3 +6,194 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum ListingStatus {
+  active
+  sold
+  removed
+}
+
+enum PromotionType {
+  top
+  highlight
+  unlimited
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  avatarUrl String?
+  role      String   @default("user")
+  locale    String   @default("ru")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  otpCodes     OtpCode[]
+  listings     Listing[]
+  favorites    Favorite[]
+  sentMessages Message[]           @relation("MessageSender")
+  threads      ThreadParticipant[]
+  payments     Payment[]
+  promotions   Promotion[]
+}
+
+// Auth: OTP only — no password field on User
+model OtpCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([code])
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  name         String
+  slug         String     @unique
+  customFields Json?
+  parentId     String?
+  parent       Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children     Category[] @relation("CategoryChildren")
+  listings     Listing[]
+}
+
+model City {
+  id        String     @id @default(cuid())
+  name      String
+  nameRu    String
+  nameEn    String
+  nameKa    String
+  lat       Float?
+  lng       Float?
+  districts District[]
+  listings  Listing[]
+}
+
+model District {
+  id       String    @id @default(cuid())
+  name     String
+  cityId   String
+  city     City      @relation(fields: [cityId], references: [id])
+  listings Listing[]
+}
+
+model Listing {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  price       Float?
+  currency    String        @default("GEL")
+  status      ListingStatus @default(active)
+  views       Int           @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id])
+  cityId     String
+  city       City      @relation(fields: [cityId], references: [id])
+  districtId String?
+  district   District? @relation(fields: [districtId], references: [id])
+
+  photos     ListingPhoto[]
+  favorites  Favorite[]
+  promotions Promotion[]
+  threads    Thread[]
+
+  @@index([status])
+  @@index([expiresAt])
+  @@index([userId])
+  @@index([categoryId])
+  @@index([cityId])
+}
+
+model ListingPhoto {
+  id        String  @id @default(cuid())
+  url       String
+  order     Int     @default(0)
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Thread {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants ThreadParticipant[]
+  messages     Message[]
+}
+
+model ThreadParticipant {
+  id       String @id @default(cuid())
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id])
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+
+  @@unique([threadId, userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  threadId  String
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  senderId  String
+  sender    User     @relation("MessageSender", fields: [senderId], references: [id])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+}
+
+model Promotion {
+  id            String        @id @default(cuid())
+  promotionType PromotionType
+  expiresAt     DateTime?
+  createdAt     DateTime      @default(now())
+  listingId     String
+  listing       Listing       @relation(fields: [listingId], references: [id])
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  amount     Float
+  currency   String        @default("GEL")
+  status     PaymentStatus @default(pending)
+  provider   String?
+  externalId String?
+  createdAt  DateTime      @default(now())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+}
