@@ -72,6 +72,28 @@ const resources = {
       jobs: 'Работа',
       other: 'Другое',
 
+      // Home
+      newListings: 'Новые объявления',
+      viewAll: 'Смотреть все',
+      searchPlaceholder: 'Поиск объявлений...',
+
+      // Search & Filters
+      filters: 'Фильтры',
+      priceFrom: 'Цена от',
+      priceTo: 'Цена до',
+      apply: 'Применить',
+      reset: 'Сбросить',
+      nothingFound: 'Ничего не найдено',
+      tryDifferentSearch: 'Попробуйте изменить параметры поиска',
+      loadMore: 'Загрузить ещё',
+
+      // Sort
+      sort: 'Сортировка',
+      sortDate: 'По дате',
+      sortPriceAsc: 'Дешевле',
+      sortPriceDesc: 'Дороже',
+      sortViews: 'По просмотрам',
+
       // Footer
       about: 'О нас',
       terms: 'Условия',
@@ -142,6 +164,25 @@ const resources = {
       jobs: 'Jobs',
       other: 'Other',
 
+      newListings: 'New Listings',
+      viewAll: 'View all',
+      searchPlaceholder: 'Search listings...',
+
+      filters: 'Filters',
+      priceFrom: 'Price from',
+      priceTo: 'Price to',
+      apply: 'Apply',
+      reset: 'Reset',
+      nothingFound: 'Nothing found',
+      tryDifferentSearch: 'Try different search parameters',
+      loadMore: 'Load more',
+
+      sort: 'Sort',
+      sortDate: 'By date',
+      sortPriceAsc: 'Cheapest',
+      sortPriceDesc: 'Most expensive',
+      sortViews: 'By views',
+
       about: 'About',
       terms: 'Terms',
       privacy: 'Privacy',
@@ -210,6 +251,25 @@ const resources = {
       services: 'სერვისები',
       jobs: 'სამუშაო',
       other: 'სხვა',
+
+      newListings: 'ახალი განცხადებები',
+      viewAll: 'ყველას ნახვა',
+      searchPlaceholder: 'განცხადებების ძიება...',
+
+      filters: 'ფილტრები',
+      priceFrom: 'ფასი -დან',
+      priceTo: 'ფასი -მდე',
+      apply: 'გამოყენება',
+      reset: 'გასუფთავება',
+      nothingFound: 'ვერაფერი მოიძებნა',
+      tryDifferentSearch: 'სცადეთ სხვა საძიებო პარამეტრები',
+      loadMore: 'მეტის ჩატვირთვა',
+
+      sort: 'სორტირება',
+      sortDate: 'თარიღით',
+      sortPriceAsc: 'იაფი',
+      sortPriceDesc: 'ძვირი',
+      sortViews: 'ნახვებით',
 
       about: 'ჩვენ შესახებ',
       terms: 'პირობები',
