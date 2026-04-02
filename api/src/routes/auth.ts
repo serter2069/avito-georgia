@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
 import { sendOtpEmail } from '../lib/mail';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
@@ -138,6 +139,17 @@ router.post('/refresh', async (req: Request, res: Response) => {
   } catch {
     res.status(401).json({ error: 'Invalid or expired refresh token' });
   }
+});
+
+// GET /api/auth/me — return current user from JWT
+router.get('/me', requireAuth, async (req: Request, res: Response) => {
+  const userId = req.user!.userId;
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, role: true, name: true, createdAt: true },
+  });
+  if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+  res.json({ user });
 });
 
 export default router;
