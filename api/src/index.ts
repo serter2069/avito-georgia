@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { startCleanupCron } from './cron/cleanup';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 app.listen(PORT, () => {
   console.log(`Avito Georgia API running on port ${PORT}`);
+  startCleanupCron();
 });
 
 export default app;

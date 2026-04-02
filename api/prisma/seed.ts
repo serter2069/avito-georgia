@@ -10,9 +10,20 @@ const cities = [
   { id: 'zugdidi', name: 'Zugdidi', nameRu: 'Зугдиди', nameEn: 'Zugdidi', nameKa: 'ზუგდიდი', lat: 42.5088, lng: 41.8708 },
   { id: 'gori', name: 'Gori', nameRu: 'Гори', nameEn: 'Gori', nameKa: 'გორი', lat: 41.9858, lng: 44.1119 },
   { id: 'poti', name: 'Poti', nameRu: 'Поти', nameEn: 'Poti', nameKa: 'ფოთი', lat: 42.1500, lng: 41.6667 },
+  { id: 'kobuleti', name: 'Kobuleti', nameRu: 'Кобулети', nameEn: 'Kobuleti', nameKa: 'ქობულეთი', lat: 41.8200, lng: 41.7800 },
   { id: 'telavi', name: 'Telavi', nameRu: 'Телави', nameEn: 'Telavi', nameKa: 'თელავი', lat: 41.9169, lng: 45.4736 },
   { id: 'akhaltsikhe', name: 'Akhaltsikhe', nameRu: 'Ахалцихе', nameEn: 'Akhaltsikhe', nameKa: 'ახალციხე', lat: 41.6394, lng: 42.9839 },
   { id: 'mtskheta', name: 'Mtskheta', nameRu: 'Мцхета', nameEn: 'Mtskheta', nameKa: 'მცხეთა', lat: 41.8452, lng: 44.7200 },
+];
+
+const tbilisiDistricts = [
+  'Vake', 'Saburtalo', 'Didube', 'Nadzaladevi',
+  'Gldani', 'Isani', 'Samgori', 'Chughureti',
+  'Mtatsminda', 'Krtsanisi',
+];
+
+const batumiDistricts = [
+  'Old Batumi', 'New Boulevard', 'Goneli', 'Bagrationi', 'Makhinjauri',
 ];
 
 const categories = [
@@ -36,6 +47,26 @@ async function main() {
       update: {},
       create: city,
     });
+  }
+
+  console.log('Seeding Tbilisi districts...');
+  for (const districtName of tbilisiDistricts) {
+    const existing = await prisma.district.findFirst({
+      where: { name: districtName, cityId: 'tbilisi' },
+    });
+    if (!existing) {
+      await prisma.district.create({ data: { name: districtName, cityId: 'tbilisi' } });
+    }
+  }
+
+  console.log('Seeding Batumi districts...');
+  for (const districtName of batumiDistricts) {
+    const existing = await prisma.district.findFirst({
+      where: { name: districtName, cityId: 'batumi' },
+    });
+    if (!existing) {
+      await prisma.district.create({ data: { name: districtName, cityId: 'batumi' } });
+    }
   }
 
   console.log('Seeding categories...');
