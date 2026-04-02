@@ -2,12 +2,17 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  // Accept token from Authorization header (native) or httpOnly cookie (web)
   const header = req.headers.authorization;
-  if (!header?.startsWith('Bearer ')) {
+  const token: string | undefined = header?.startsWith('Bearer ')
+    ? header.slice(7)
+    : req.cookies?.accessToken;
+
+  if (!token) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  const token = header.slice(7);
+
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
       userId: string;
