@@ -146,6 +146,23 @@ router.patch('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
       currency, categoryId, cityId, districtId,
     },
   });
+  // Price-drop notification
+  if (price !== undefined && listing.price !== null) {
+    const newPrice = parseFloat(price);
+    if (!isNaN(newPrice) && newPrice < listing.price) {
+      const favoriters = await prisma.favorite.findMany({ where: { listingId: id }, select: { userId: true } });
+      if (favoriters.length > 0) {
+        await prisma.notification.createMany({
+          data: favoriters.map(f => ({
+            userId: f.userId,
+            type: 'price_drop',
+            listingId: id,
+            payload: { oldPrice: listing.price, newPrice, currency: updated.currency },
+          })),
+        });
+      }
+    }
+  }
   res.json(updated);
 });
 
