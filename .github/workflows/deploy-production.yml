@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Production
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
 jobs:
   deploy-frontend:
     runs-on: self-hosted
+    environment: production
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +42,7 @@ jobs:
 
   deploy-api:
     runs-on: self-hosted
+    environment: production
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
