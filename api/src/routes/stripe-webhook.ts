@@ -54,9 +54,16 @@ router.post('/', async (req: Request, res: Response) => {
           data: { status: 'completed' },
         });
 
-        // Create promotion
+        // Create promotion (idempotency: skip if active promotion already exists)
         const days = DAYS_MAP[type];
         if (listingId && days != null) {
+          const existingPromo = await prisma.promotion.findFirst({
+            where: { userId, listingId, promotionType: type as PromotionType, isActive: true },
+          });
+          if (existingPromo) {
+            console.log(`[stripe-webhook] Skipped duplicate promotion ${type} for listing ${listingId}`);
+            break;
+          }
           const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
           await prisma.promotion.create({
             data: {
@@ -94,6 +101,14 @@ router.post('/', async (req: Request, res: Response) => {
           data: { status: 'completed' },
         });
 
+        // Create unlimited_sub promotion (idempotency: skip if active sub already exists)
+        const existingSub = await prisma.promotion.findFirst({
+          where: { userId, listingId: '', promotionType: 'unlimited_sub', isActive: true },
+        });
+        if (existingSub) {
+          console.log(`[stripe-webhook] Skipped duplicate unlimited_sub for user ${userId}`);
+          break;
+        }
         // Create unlimited_sub promotion (no expiry — managed by subscription)
         await prisma.promotion.create({
           data: {
