@@ -58,14 +58,9 @@ jobs:
             api/ /var/www/avito-georgia/api/
           cd /var/www/avito-georgia/api && npm ci
           cd /var/www/avito-georgia/api && DATABASE_URL="${DATABASE_URL}" npm run build
-          sudo DATABASE_URL="${DATABASE_URL}" \
-            JWT_SECRET="${JWT_SECRET}" \
-            JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}" \
-            DEV_AUTH="${DEV_AUTH}" \
-            SMTP_HOST="${SMTP_HOST}" \
-            SMTP_PORT="${SMTP_PORT}" \
-            SMTP_FROM="${SMTP_FROM}" \
-            pm2 restart avito-georgia-api || \
+          # Stop existing pm2 process (ignore error if not running yet)
+          sudo pm2 delete avito-georgia-api 2>/dev/null || true
+          # Start fresh with current env vars so all secrets are loaded
           sudo DATABASE_URL="${DATABASE_URL}" \
             JWT_SECRET="${JWT_SECRET}" \
             JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}" \
@@ -75,7 +70,6 @@ jobs:
             SMTP_FROM="${SMTP_FROM}" \
             pm2 start /var/www/avito-georgia/api/dist/index.js \
               --name avito-georgia-api \
-              --cwd /var/www/avito-georgia/api \
-              --env production
+              --cwd /var/www/avito-georgia/api
           sudo chown -R github-runner:www-data /var/www/avito-georgia/api/
           sudo chmod -R g+rw /var/www/avito-georgia/api/
