@@ -8,9 +8,13 @@ datasource db {
 }
 
 enum ListingStatus {
+  draft
+  pending_moderation
   active
   sold
   removed
+  rejected
+  expired
 }
 
 enum PromotionType {
