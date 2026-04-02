@@ -27,24 +27,38 @@ enum PaymentStatus {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  name         String?
-  phone        String?
-  avatarUrl    String?
-  role         String    @default("user")
-  locale       String    @default("ru")
-  otpCode      String?
-  otpExpiresAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  avatarUrl String?
+  role      String   @default("user")
+  locale    String   @default("ru")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  otpCodes     OtpCode[]
   listings     Listing[]
   favorites    Favorite[]
-  sentMessages Message[]          @relation("MessageSender")
+  sentMessages Message[]           @relation("MessageSender")
   threads      ThreadParticipant[]
   payments     Payment[]
   promotions   Promotion[]
+}
+
+// Auth: OTP only — no password field on User
+model OtpCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([code])
 }
 
 model Category {
@@ -53,8 +67,8 @@ model Category {
   slug         String     @unique
   customFields Json?
   parentId     String?
-  parent       Category?  @relation("CategoryParent", fields: [parentId], references: [id])
-  children     Category[] @relation("CategoryParent")
+  parent       Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children     Category[] @relation("CategoryChildren")
   listings     Listing[]
 }
 
@@ -103,6 +117,12 @@ model Listing {
   favorites  Favorite[]
   promotions Promotion[]
   threads    Thread[]
+
+  @@index([status])
+  @@index([expiresAt])
+  @@index([userId])
+  @@index([categoryId])
+  @@index([cityId])
 }
 
 model ListingPhoto {
@@ -156,14 +176,14 @@ model Favorite {
 }
 
 model Promotion {
-  id        String        @id @default(cuid())
-  type      PromotionType
-  expiresAt DateTime?
-  createdAt DateTime      @default(now())
-  listingId String
-  listing   Listing       @relation(fields: [listingId], references: [id])
-  userId    String
-  user      User          @relation(fields: [userId], references: [id])
+  id            String        @id @default(cuid())
+  promotionType PromotionType
+  expiresAt     DateTime?
+  createdAt     DateTime      @default(now())
+  listingId     String
+  listing       Listing       @relation(fields: [listingId], references: [id])
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
 }
 
 model Payment {
