@@ -29,7 +29,8 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.1",
     "socket.io": "^4.8.3",
-    "stripe": "^21.0.1"
+    "stripe": "^21.0.1",
+    "xss": "^1.0.15"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
