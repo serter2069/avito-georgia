@@ -57,6 +57,7 @@ export default function ListingDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
 
   // Fetch listing once on mount
   useEffect(() => {
@@ -113,16 +114,21 @@ export default function ListingDetailScreen() {
     setFavoriteLoading(false);
   }, [user, id, isFavorited, favoriteLoading, router]);
 
-  const handleContactSeller = useCallback(() => {
+  const handleContactSeller = useCallback(async () => {
     if (!user) {
       router.push('/(auth)');
       return;
     }
-    // Navigate to chat with seller (chat route to be implemented)
-    if (listing?.user?.id) {
-      router.push(`/listings`);
+    if (!listing?.user?.id || contactLoading) return;
+
+    setContactLoading(true);
+    const res = await api.post<{ threadId: string }>('/threads', { otherUserId: listing.user.id });
+    setContactLoading(false);
+
+    if (res.ok && res.data) {
+      router.push(`/dashboard/messages/${res.data.threadId}`);
     }
-  }, [user, listing, router]);
+  }, [user, listing, contactLoading, router]);
 
   const handleShare = useCallback(async () => {
     if (!listing) return;
@@ -302,9 +308,10 @@ export default function ListingDetailScreen() {
 
             <View className="flex-1">
               <Button
-                title={t('contactSeller')}
+                title={contactLoading ? t('loading') : t('contactSeller')}
                 onPress={handleContactSeller}
                 size="md"
+                disabled={contactLoading}
               />
             </View>
           </>

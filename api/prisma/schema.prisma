@@ -142,14 +142,19 @@ model ListingPhoto {
 }
 
 model Thread {
-  id        String   @id @default(cuid())
-  listingId String
-  listing   Listing  @relation(fields: [listingId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  listingId      String?
+  listing        Listing? @relation(fields: [listingId], references: [id])
+  // For direct (non-listing) threads: sorted participant IDs ensure uniqueness
+  participant1Id String?
+  participant2Id String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   participants ThreadParticipant[]
   messages     Message[]
+
+  @@unique([participant1Id, participant2Id])
 }
 
 model ThreadParticipant {
