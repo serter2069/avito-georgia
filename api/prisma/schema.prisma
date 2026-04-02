@@ -44,6 +44,8 @@ model User {
   threads      ThreadParticipant[]
   payments     Payment[]
   promotions   Promotion[]
+  reports      Report[]             @relation("Reports")
+  reportedBy   Report[]             @relation("ReportedUser")
 }
 
 // Auth: OTP only — no password field on User
@@ -117,6 +119,7 @@ model Listing {
   favorites  Favorite[]
   promotions Promotion[]
   threads    Thread[]
+  reports    Report[]
 
   @@index([status])
   @@index([expiresAt])
@@ -197,4 +200,21 @@ model Payment {
   createdAt  DateTime      @default(now())
   userId     String
   user       User          @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id           String   @id @default(cuid())
+  reporterId   String
+  reporter     User     @relation("Reports", fields: [reporterId], references: [id])
+  listingId    String?
+  listing      Listing? @relation(fields: [listingId], references: [id])
+  targetUserId String?
+  targetUser   User?    @relation("ReportedUser", fields: [targetUserId], references: [id])
+  reason       String
+  description  String?
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+
+  @@index([reporterId])
+  @@index([status])
 }
