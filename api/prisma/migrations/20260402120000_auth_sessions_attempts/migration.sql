@@ -1,8 +1,8 @@
 -- Add attempts tracking to OtpCode for brute-force protection
-ALTER TABLE "OtpCode" ADD COLUMN "attempts" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "OtpCode" ADD COLUMN IF NOT EXISTS "attempts" INTEGER NOT NULL DEFAULT 0;
 
 -- Create Session table for DB-backed refresh tokens (sliding window)
-CREATE TABLE "Session" (
+CREATE TABLE IF NOT EXISTS "Session" (
     "id"           TEXT NOT NULL,
     "userId"       TEXT NOT NULL,
     "refreshToken" TEXT NOT NULL,
@@ -13,10 +13,15 @@ CREATE TABLE "Session" (
 );
 
 -- Indexes
-CREATE UNIQUE INDEX "Session_refreshToken_key" ON "Session"("refreshToken");
-CREATE INDEX "Session_userId_idx" ON "Session"("userId");
-CREATE INDEX "Session_refreshToken_idx" ON "Session"("refreshToken");
+CREATE UNIQUE INDEX IF NOT EXISTS "Session_refreshToken_key" ON "Session"("refreshToken");
+CREATE INDEX IF NOT EXISTS "Session_userId_idx" ON "Session"("userId");
+CREATE INDEX IF NOT EXISTS "Session_refreshToken_idx" ON "Session"("refreshToken");
 
--- Foreign key
-ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey"
-    FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- Foreign key (use DO block for idempotency since ALTER TABLE ADD CONSTRAINT has no IF NOT EXISTS)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Session_userId_fkey') THEN
+        ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
