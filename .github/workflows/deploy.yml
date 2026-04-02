@@ -49,7 +49,7 @@ jobs:
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
           cd /var/www/avito-georgia/api && npm ci
-          cd /var/www/avito-georgia/api && doppler run --project avito-georgia --config prd -- npm run build
-          sudo pm2 restart avito-georgia-api || sudo pm2 start /var/www/avito-georgia/api/dist/index.js --name avito-georgia-api --cwd /var/www/avito-georgia/api
+          cd /var/www/avito-georgia/api && DATABASE_URL="${{ secrets.DATABASE_URL }}" npm run build
+          sudo DATABASE_URL="${{ secrets.DATABASE_URL }}" pm2 restart avito-georgia-api || sudo pm2 start /var/www/avito-georgia/api/dist/index.js --name avito-georgia-api --cwd /var/www/avito-georgia/api --env production
           sudo chown -R github-runner:www-data /var/www/avito-georgia/api/
           sudo chmod -R g+rw /var/www/avito-georgia/api/
