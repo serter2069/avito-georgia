@@ -81,11 +81,32 @@ router.get('/', async (req: Request, res: Response) => {
         photos: { orderBy: { order: 'asc' }, take: 3 },
         city: { select: { id: true, nameRu: true } },
         category: { select: { id: true, name: true } },
+        promotions: {
+          where: { isActive: true },
+          select: { promotionType: true, expiresAt: true },
+        },
       },
     }),
     prisma.listing.count({ where }),
   ]);
-  res.json({ listings, total, page, limit: take });
+
+  // Sort: promoted (top_*) listings first, then by original sort order
+  const TOP_TYPES = new Set(['top_1d', 'top_3d', 'top_7d']);
+  const enriched = listings.map((l) => {
+    const activePromos = l.promotions || [];
+    const isTop = activePromos.some((p) => TOP_TYPES.has(p.promotionType));
+    const isHighlighted = activePromos.some((p) => p.promotionType === 'highlight');
+    return { ...l, isPromoted: isTop, isHighlighted };
+  });
+
+  // Stable sort: promoted first, then original order preserved
+  enriched.sort((a, b) => {
+    if (a.isPromoted && !b.isPromoted) return -1;
+    if (!a.isPromoted && b.isPromoted) return 1;
+    return 0;
+  });
+
+  res.json({ listings: enriched, total, page, limit: take });
 });
 
 // GET /api/listings/:id
