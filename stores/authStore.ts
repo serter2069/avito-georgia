@@ -29,8 +29,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isReady: false,
 
   setAuth: async (user, accessToken, refreshToken) => {
+    // Set state synchronously first so navigation guards see the user immediately
+    set({ user, accessToken, isReady: true });
     await setTokens(accessToken, refreshToken);
-    set({ user, accessToken });
   },
 
   logout: async () => {
