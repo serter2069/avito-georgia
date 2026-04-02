@@ -6,6 +6,7 @@ import { Header } from '../../components/layout/Header';
 import { CitySelector, City } from '../../components/common/CitySelector';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
 import { CategoryType } from '../../components/common/CategoryIcon';
+import { CategoryFilters, CustomField, FilterValues } from '../../components/filters/CategoryFilters';
 import { api } from '../../lib/api';
 
 const CATEGORIES: CategoryType[] = [
@@ -18,6 +19,13 @@ const CATEGORIES: CategoryType[] = [
   'jobs',
   'other',
 ];
+
+// Map frontend CategoryType to DB slug
+const CATEGORY_SLUG: Partial<Record<CategoryType, string>> = {
+  transport: 'transport',
+  realEstate: 'real-estate',
+  jobs: 'jobs',
+};
 
 type SortOption = 'createdAt_desc' | 'price_asc' | 'price_desc' | 'views_desc';
 
@@ -50,6 +58,13 @@ interface ApiListing {
   isHighlighted?: boolean;
 }
 
+interface ApiCategory {
+  id: string;
+  name: string;
+  slug: string;
+  customFields: CustomField[] | null;
+}
+
 function mapListing(l: ApiListing): Listing {
   return {
     id: l.id,
@@ -80,11 +95,33 @@ export default function ListingsScreen() {
   const [sortBy, setSortBy] = useState<SortOption>('createdAt_desc');
   const [showSort, setShowSort] = useState(false);
 
+  // Category-specific filters from API
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
+  const [customFilterValues, setCustomFilterValues] = useState<FilterValues>({});
+
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  // Fetch customFields when category changes
+  useEffect(() => {
+    const slug = selectedCategory ? CATEGORY_SLUG[selectedCategory] : undefined;
+    if (!slug) {
+      setCustomFields([]);
+      setCustomFilterValues({});
+      return;
+    }
+    // Find category in /api/categories list (already loaded or fetch fresh)
+    api.get<ApiCategory[]>('/categories').then((res) => {
+      if (res.ok && res.data) {
+        const cat = res.data.find((c) => c.slug === slug);
+        setCustomFields(cat?.customFields || []);
+        setCustomFilterValues({});
+      }
+    });
+  }, [selectedCategory]);
 
   const fetchListings = useCallback(async (p: number, reset: boolean) => {
     const parts: string[] = [];
@@ -92,6 +129,10 @@ export default function ListingsScreen() {
     if (selectedCity !== 'all') parts.push(`city=${selectedCity}`);
     parts.push(`sort=${sortBy}`);
     parts.push(`page=${p}`);
+    // Append custom filter values as query params
+    Object.entries(customFilterValues).forEach(([key, val]) => {
+      if (val) parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(val)}`);
+    });
     const query = `/listings?${parts.join('&')}`;
 
     if (reset) setLoading(true);
@@ -109,13 +150,13 @@ export default function ListingsScreen() {
 
     setLoading(false);
     setLoadingMore(false);
-  }, [selectedCategory, selectedCity, sortBy]);
+  }, [selectedCategory, selectedCity, sortBy, customFilterValues]);
 
   // Reset and fetch when filters change
   useEffect(() => {
     setPage(1);
     fetchListings(1, true);
-  }, [selectedCategory, selectedCity, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedCategory, selectedCity, sortBy, customFilterValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLoadMore = () => {
     if (loadingMore || listings.length >= total) return;
@@ -191,6 +232,15 @@ export default function ListingsScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
+
+      {/* Category-specific filters (shown when category has customFields) */}
+      {customFields.length > 0 && (
+        <CategoryFilters
+          customFields={customFields}
+          values={customFilterValues}
+          onChange={setCustomFilterValues}
+        />
+      )}
 
       {/* Sort + count */}
       <View className="px-4 py-2 flex-row items-center justify-between">
