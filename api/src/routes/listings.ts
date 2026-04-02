@@ -3,7 +3,7 @@ import multer from 'multer';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
-import { requireAuth, AuthRequest } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
@@ -106,7 +106,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // POST /api/listings
-router.post('/', requireAuth, async (req: AuthRequest, res: Response) => {
+router.post('/', requireAuth, async (req: Request, res: Response) => {
   const { title, description, price, currency = 'GEL', categoryId, cityId, districtId } = req.body;
   if (!title || !categoryId || !cityId) {
     res.status(400).json({ error: 'title, categoryId, cityId required' }); return;
@@ -132,7 +132,7 @@ router.post('/', requireAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // PATCH /api/listings/:id
-router.patch('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
+router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const listing = await prisma.listing.findUnique({ where: { id } });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
@@ -150,7 +150,7 @@ router.patch('/:id', requireAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // PATCH /api/listings/:id/status
-router.patch('/:id/status', requireAuth, async (req: AuthRequest, res: Response) => {
+router.patch('/:id/status', requireAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const listing = await prisma.listing.findUnique({ where: { id } });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
@@ -164,7 +164,7 @@ router.patch('/:id/status', requireAuth, async (req: AuthRequest, res: Response)
 });
 
 // POST /api/listings/:id/renew
-router.post('/:id/renew', requireAuth, async (req: AuthRequest, res: Response) => {
+router.post('/:id/renew', requireAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const listing = await prisma.listing.findUnique({ where: { id } });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
@@ -181,7 +181,7 @@ const photosWithIds = Prisma.validator<Prisma.ListingInclude>()({
 });
 type ListingWithPhotos = Prisma.ListingGetPayload<{ include: typeof photosWithIds }>;
 
-router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: AuthRequest, res: Response) => {
+router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const listingWithPhotos = await prisma.listing.findUnique({
     where: { id },
@@ -207,7 +207,7 @@ router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: 
 });
 
 // DELETE /api/listings/:id/photos/:photoId
-router.delete('/:id/photos/:photoId', requireAuth, async (req: AuthRequest, res: Response) => {
+router.delete('/:id/photos/:photoId', requireAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const photoId = String(req.params.photoId);
   const listing = await prisma.listing.findUnique({ where: { id } });
