@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { api } from '../../../lib/api';
+import { colors } from '../../../lib/colors';
 
 interface ThreadUser {
   id: string;
@@ -129,7 +130,7 @@ export default function ThreadListScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : error ? (

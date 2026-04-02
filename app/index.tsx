@@ -8,6 +8,7 @@ import { CitySelector, City } from '../components/common/CitySelector';
 import { CategoryIcon, CategoryType } from '../components/common/CategoryIcon';
 import { ListingCard, Listing } from '../components/listing/ListingCard';
 import { api } from '../lib/api';
+import { colors } from '../lib/colors';
 
 const CATEGORIES: CategoryType[] = [
   'transport',
@@ -106,7 +107,7 @@ export default function HomeScreen() {
         contentContainerClassName="pb-4"
         refreshControl={
           Platform.OS !== 'web' ? (
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brandPrimary} />
           ) : undefined
         }
       >
@@ -116,7 +117,7 @@ export default function HomeScreen() {
             <TextInput
               className="flex-1 px-4 py-3 text-text-primary text-base"
               placeholder={t('searchPlaceholder')}
-              placeholderTextColor="#64748b"
+              placeholderTextColor={colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
@@ -158,7 +159,7 @@ export default function HomeScreen() {
 
           {loading ? (
             <View className="py-12 items-center">
-              <ActivityIndicator size="large" color="#6366f1" />
+              <ActivityIndicator size="large" color={colors.brandPrimary} />
               <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
             </View>
           ) : listings.length === 0 ? (

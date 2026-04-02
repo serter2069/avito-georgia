@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'rea
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 interface ReportItem {
   id: string;
@@ -92,7 +93,7 @@ export default function AdminReports() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       ) : (
         <ScrollView className="flex-1" contentContainerClassName="p-4 gap-3">
@@ -143,7 +144,7 @@ export default function AdminReports() {
                         disabled={actionLoading === r.id}
                       >
                         {actionLoading === r.id ? (
-                          <ActivityIndicator size="small" color="#4CAF50" />
+                          <ActivityIndicator size="small" color={colors.statusSuccess} />
                         ) : (
                           <Text className="text-success text-sm font-medium">{t('resolve')}</Text>
                         )}

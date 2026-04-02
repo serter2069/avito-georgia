@@ -8,6 +8,7 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { api, apiUpload } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 const TOTAL_STEPS = 4;
 
@@ -219,7 +220,7 @@ export default function CreateListingScreen() {
     <View className="px-4 gap-3">
       <Text className="text-text-primary text-base font-semibold">{t('selectCategory')}</Text>
       {loadingCategories ? (
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       ) : (
         <View className="gap-2">
           {categories.map((cat) => (
@@ -253,7 +254,7 @@ export default function CreateListingScreen() {
     <View className="px-4 gap-3">
       <Text className="text-text-primary text-base font-semibold">{t('selectCity')}</Text>
       {loadingCities ? (
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       ) : (
         <View className="gap-2">
           {cities.map((city) => (

@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 interface UserItem {
   id: string;
@@ -81,7 +82,7 @@ export default function AdminUsers() {
           <TextInput
             className="flex-1 px-4 py-2.5 text-text-primary text-sm"
             placeholder={t('searchUsers')}
-            placeholderTextColor="#64748b"
+            placeholderTextColor={colors.textMuted}
             value={search}
             onChangeText={setSearch}
             onSubmitEditing={handleSearch}
@@ -98,7 +99,7 @@ export default function AdminUsers() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       ) : (
         <ScrollView className="flex-1" contentContainerClassName="p-4 gap-3">
@@ -147,7 +148,7 @@ export default function AdminUsers() {
                       disabled={actionLoading === user.id}
                     >
                       {actionLoading === user.id ? (
-                        <ActivityIndicator size="small" color="#6366f1" />
+                        <ActivityIndicator size="small" color={colors.brandPrimary} />
                       ) : (
                         <Text
                           className={`text-sm font-medium ${

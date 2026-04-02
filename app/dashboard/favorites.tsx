@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
 import { Badge } from '../../components/ui/Badge';
 
@@ -96,7 +97,7 @@ export default function FavoritesScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : favorites.length === 0 ? (
@@ -116,7 +117,7 @@ export default function FavoritesScreen() {
           ListFooterComponent={
             loadingMore ? (
               <View className="py-4 items-center">
-                <ActivityIndicator size="small" color="#6366f1" />
+                <ActivityIndicator size="small" color={colors.brandPrimary} />
               </View>
             ) : null
           }

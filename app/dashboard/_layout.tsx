@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { colors } from '../../lib/colors';
 
 export default function DashboardLayout() {
   const { t } = useTranslation();
@@ -10,15 +11,15 @@ export default function DashboardLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#1a1a2e',
-          borderTopColor: '#2d2d4e',
+          backgroundColor: colors.bgSecondary,
+          borderTopColor: colors.borderDefault,
           borderTopWidth: 1,
           height: 60,
           paddingBottom: 8,
           paddingTop: 4,
         },
-        tabBarActiveTintColor: '#6366f1',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarActiveTintColor: colors.brandPrimary,
+        tabBarInactiveTintColor: colors.textMuted,
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',

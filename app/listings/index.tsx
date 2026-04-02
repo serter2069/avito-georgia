@@ -8,6 +8,7 @@ import { ListingCard, Listing } from '../../components/listing/ListingCard';
 import { CategoryType } from '../../components/common/CategoryIcon';
 import { CategoryFilters, CustomField, FilterValues } from '../../components/filters/CategoryFilters';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 const CATEGORIES: CategoryType[] = [
   'transport',
@@ -188,7 +189,7 @@ export default function ListingsScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       </View>
     );
   };
@@ -288,7 +289,7 @@ export default function ListingsScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : (

@@ -1,5 +1,6 @@
 import { View, TextInput, Text } from 'react-native';
 import { useState } from 'react';
+import { colors } from '../../lib/colors';
 
 interface InputProps {
   value: string;
@@ -46,7 +47,7 @@ export function Input({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#64748b"
+        placeholderTextColor={colors.textMuted}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}

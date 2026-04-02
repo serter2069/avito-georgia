@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/Button';
 import { PriceTag } from '../../components/ui/PriceTag';
 import { useAuthStore } from '../../stores/authStore';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 type StatusTab = 'active' | 'sold' | 'removed';
 
@@ -241,7 +242,7 @@ export default function MyListingsScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       </View>
     );
   };
@@ -273,7 +274,7 @@ export default function MyListingsScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : (
@@ -292,7 +293,7 @@ export default function MyListingsScreen() {
       {/* FAB Create button */}
       <TouchableOpacity
         className="absolute bottom-6 right-6 w-14 h-14 bg-primary rounded-full items-center justify-center"
-        style={{ elevation: 5, shadowColor: '#6366f1', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4 }}
+        style={{ elevation: 5, shadowColor: colors.brandPrimary, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4 }}
         onPress={() => router.push('/listings/create')}
       >
         <Text className="text-white text-2xl font-light">+</Text>

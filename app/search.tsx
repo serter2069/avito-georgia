@@ -8,6 +8,7 @@ import { CategoryIcon, CategoryType } from '../components/common/CategoryIcon';
 import { ListingCard, Listing } from '../components/listing/ListingCard';
 import { SearchMap, MapListing } from '../components/map/SearchMap';
 import { api } from '../lib/api';
+import { colors } from '../lib/colors';
 
 const CATEGORIES: CategoryType[] = [
   'transport',
@@ -179,7 +180,7 @@ export default function SearchScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       </View>
     );
   };
@@ -197,7 +198,7 @@ export default function SearchScreen() {
           <TextInput
             className="flex-1 px-4 py-3 text-text-primary text-base"
             placeholder={t('searchPlaceholder')}
-            placeholderTextColor="#64748b"
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
             onSubmitEditing={() => doSearch(true)}
@@ -290,7 +291,7 @@ export default function SearchScreen() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
                 placeholder={t('priceFrom')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.textMuted}
                 value={priceMin}
                 onChangeText={setPriceMin}
                 keyboardType="numeric"
@@ -300,7 +301,7 @@ export default function SearchScreen() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
                 placeholder={t('priceTo')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.textMuted}
                 value={priceMax}
                 onChangeText={setPriceMax}
                 keyboardType="numeric"
@@ -329,7 +330,7 @@ export default function SearchScreen() {
       {/* Results */}
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : viewMode === 'map' && Platform.OS === 'web' ? (
