@@ -53,6 +53,7 @@ export default function RootLayout() {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: colors.bgPrimary },
+          sceneContainerStyle: { backgroundColor: colors.bgPrimary },
         }}
       />
     </View>
