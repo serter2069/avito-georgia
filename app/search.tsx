@@ -156,7 +156,7 @@ export default function SearchScreen() {
   };
 
   const handleListingPress = (id: string) => {
-    // Will navigate to listing detail when route is ready
+    router.push(`/listings/${id}`);
   };
 
   const renderItem = useCallback(({ item }: { item: Listing }) => (
