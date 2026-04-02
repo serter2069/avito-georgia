@@ -146,15 +146,41 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   const listing = await prisma.listing.findUnique({ where: { id } });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
   if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
+  const oldPrice = listing.price;
   const { title, description, price, currency, categoryId, cityId, districtId } = req.body;
+  const newPrice = price !== undefined ? parseFloat(price) : undefined;
   const updated = await prisma.listing.update({
     where: { id },
     data: {
       title, description,
-      price: price !== undefined ? parseFloat(price) : undefined,
+      price: newPrice,
       currency, categoryId, cityId, districtId,
     },
   });
+
+  // Price-drop notification for users who favorited this listing
+  if (newPrice !== undefined && oldPrice !== null && newPrice < oldPrice) {
+    const favorites = await prisma.favorite.findMany({
+      where: { listingId: id },
+      include: { user: { select: { id: true, email: true } } },
+    });
+    if (favorites.length > 0) {
+      await prisma.notification.createMany({
+        data: favorites.map(f => ({
+          userId: f.user.id,
+          listingId: id,
+          type: 'PRICE_DROP',
+          payload: { oldPrice, newPrice, title: updated.title },
+        })),
+      });
+      const { sendPriceDropNotification } = await import('../lib/mail');
+      for (const fav of favorites) {
+        sendPriceDropNotification(fav.user.email, updated.title, oldPrice, newPrice)
+          .catch(err => console.error('Price drop email error:', err));
+      }
+    }
+  }
+
   res.json(updated);
 });
 
@@ -169,6 +195,30 @@ router.patch('/:id/status', requireAuth, async (req: Request, res: Response) => 
     res.status(400).json({ error: 'status must be sold or removed' }); return;
   }
   const updated = await prisma.listing.update({ where: { id }, data: { status } });
+
+  // Notify favoriters when listing is removed
+  if (status === 'removed') {
+    const favorites = await prisma.favorite.findMany({
+      where: { listingId: id },
+      include: { user: { select: { id: true, email: true } } },
+    });
+    if (favorites.length > 0) {
+      await prisma.notification.createMany({
+        data: favorites.map(f => ({
+          userId: f.user.id,
+          listingId: id,
+          type: 'LISTING_REMOVED',
+          payload: { title: listing.title },
+        })),
+      });
+      const { sendListingRemovedNotification } = await import('../lib/mail');
+      for (const fav of favorites) {
+        sendListingRemovedNotification(fav.user.email, listing.title)
+          .catch(err => console.error('Listing removed email error:', err));
+      }
+    }
+  }
+
   res.json(updated);
 });
 
