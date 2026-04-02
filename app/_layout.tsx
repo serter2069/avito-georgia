@@ -16,8 +16,10 @@ function useProtectedRoute() {
     if (!isReady) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    // Allow guests to view listings detail and seller profiles
+    const inPublicRoute = segments[0] === 'listings' || segments[0] === 'users';
 
-    if (!user && !inAuthGroup) {
+    if (!user && !inAuthGroup && !inPublicRoute) {
       router.replace('/(auth)');
     } else if (user && inAuthGroup) {
       router.replace('/');
