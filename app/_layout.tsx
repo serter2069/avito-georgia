@@ -16,8 +16,8 @@ function useProtectedRoute() {
     if (!isReady) return;
 
     const inAuthGroup = segments[0] === '(auth)';
-    // Allow guests to view listings detail and seller profiles
-    const inPublicRoute = segments[0] === 'listings' || segments[0] === 'users';
+    // Allow guests to view listings detail, seller profiles, and Stripe redirect pages
+    const inPublicRoute = segments[0] === 'listings' || segments[0] === 'users' || segments[0] === 'promotions';
 
     if (!user && !inAuthGroup && !inPublicRoute) {
       router.replace('/(auth)');

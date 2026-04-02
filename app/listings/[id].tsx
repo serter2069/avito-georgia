@@ -270,29 +270,44 @@ export default function ListingDetailScreen() {
 
       {/* Bottom action bar */}
       <View className="absolute bottom-0 left-0 right-0 bg-dark-secondary border-t border-border px-4 py-3 flex-row gap-3">
-        <TouchableOpacity
-          className={`px-4 py-3 rounded-lg border items-center justify-center ${
-            isFavorited ? 'bg-secondary/20 border-secondary' : 'border-border'
-          }`}
-          onPress={handleFavorite}
-          disabled={favoriteLoading}
-        >
-          {favoriteLoading ? (
-            <ActivityIndicator size="small" color="#f59e0b" />
-          ) : (
-            <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
-              {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
-            </Text>
-          )}
-        </TouchableOpacity>
+        {user && listing.user.id === user.id ? (
+          // Owner view: promote button
+          <View className="flex-1">
+            <Button
+              title={t('promote')}
+              onPress={() => router.push(`/dashboard/listings/${listing.id}/promote`)}
+              variant="secondary"
+              size="md"
+            />
+          </View>
+        ) : (
+          // Non-owner view: favorite + contact
+          <>
+            <TouchableOpacity
+              className={`px-4 py-3 rounded-lg border items-center justify-center ${
+                isFavorited ? 'bg-secondary/20 border-secondary' : 'border-border'
+              }`}
+              onPress={handleFavorite}
+              disabled={favoriteLoading}
+            >
+              {favoriteLoading ? (
+                <ActivityIndicator size="small" color="#f59e0b" />
+              ) : (
+                <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
+                  {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
+                </Text>
+              )}
+            </TouchableOpacity>
 
-        <View className="flex-1">
-          <Button
-            title={t('contactSeller')}
-            onPress={handleContactSeller}
-            size="md"
-          />
-        </View>
+            <View className="flex-1">
+              <Button
+                title={t('contactSeller')}
+                onPress={handleContactSeller}
+                size="md"
+              />
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
