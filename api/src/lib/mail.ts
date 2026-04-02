@@ -1,14 +1,28 @@
-import nodemailer from 'nodemailer';
+const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
+const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || 'noreply@diagrams.love';
+const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'Avito Georgia';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+async function sendBrevoEmail(to: string, subject: string, htmlContent: string, textContent: string): Promise<void> {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': BREVO_API_KEY,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      sender: { email: BREVO_SENDER_EMAIL, name: BREVO_SENDER_NAME },
+      to: [{ email: to }],
+      subject,
+      htmlContent,
+      textContent,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Brevo API error ${res.status}: ${body}`);
+  }
+}
 
 const templates = {
   ru: (otp: string) => ({
@@ -38,13 +52,12 @@ export async function sendPriceDropNotification(
     console.log(`[DEV] Price drop notification to ${to}: ${title} ${oldPrice} -> ${newPrice}`);
     return;
   }
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
+  await sendBrevoEmail(
     to,
-    subject: `Price drop: ${title} — Avito Georgia`,
-    text: `The listing "${title}" you favorited dropped in price from ${oldPrice} to ${newPrice}.`,
-    html: `<p>The listing <strong>${title}</strong> you favorited dropped in price from <s>${oldPrice}</s> to <strong>${newPrice}</strong>.</p>`,
-  });
+    `Price drop: ${title} — Avito Georgia`,
+    `<p>The listing <strong>${title}</strong> you favorited dropped in price from <s>${oldPrice}</s> to <strong>${newPrice}</strong>.</p>`,
+    `The listing "${title}" you favorited dropped in price from ${oldPrice} to ${newPrice}.`
+  );
 }
 
 export async function sendListingRemovedNotification(
@@ -55,13 +68,12 @@ export async function sendListingRemovedNotification(
     console.log(`[DEV] Listing removed notification to ${to}: ${title}`);
     return;
   }
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
+  await sendBrevoEmail(
     to,
-    subject: `Listing removed: ${title} — Avito Georgia`,
-    text: `The listing "${title}" you favorited has been removed by the seller.`,
-    html: `<p>The listing <strong>${title}</strong> you favorited has been removed by the seller.</p>`,
-  });
+    `Listing removed: ${title} — Avito Georgia`,
+    `<p>The listing <strong>${title}</strong> you favorited has been removed by the seller.</p>`,
+    `The listing "${title}" you favorited has been removed by the seller.`
+  );
 }
 
 export async function sendOtpEmail(
@@ -75,11 +87,5 @@ export async function sendOtpEmail(
   }
   const lang = (['ru', 'en', 'ka'].includes(locale) ? locale : 'ru') as 'ru' | 'en' | 'ka';
   const tpl = templates[lang](otp);
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to: email,
-    subject: tpl.subject,
-    text: tpl.text,
-    html: tpl.html,
-  });
+  await sendBrevoEmail(email, tpl.subject, tpl.html, tpl.text);
 }

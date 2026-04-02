@@ -18,10 +18,20 @@ function useProtectedRoute() {
     if (!isReady) return;
 
     const inAuthGroup = segments[0] === '(auth)';
-    // Allow guests to view listings detail, seller profiles, and Stripe redirect pages
-    const inPublicRoute = segments[0] === 'listings' || segments[0] === 'users' || segments[0] === 'promotions' || segments[0] === 'about' || segments[0] === 'terms' || segments[0] === 'privacy' || segments[0] === 'help';
+    // Public routes accessible without auth
+    const inPublicRoute =
+      segments.length === 0 || // home
+      segments[0] === 'listings' ||
+      segments[0] === 'users' ||
+      segments[0] === 'search' ||
+      segments[0] === 'promotions' ||
+      segments[0] === 'about' ||
+      segments[0] === 'terms' ||
+      segments[0] === 'privacy' ||
+      segments[0] === 'help';
+    const inDashboard = segments[0] === 'dashboard' || segments[0] === 'my';
 
-    if (!user && !inAuthGroup && !inPublicRoute) {
+    if (!user && inDashboard) {
       router.replace('/(auth)');
     } else if (user && inAuthGroup) {
       router.replace('/');
@@ -51,7 +61,7 @@ export default function RootLayout() {
 
   return (
     <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth: 430 }}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <Stack
         screenOptions={{
           headerShown: false,

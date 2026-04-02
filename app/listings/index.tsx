@@ -253,7 +253,7 @@ export default function ListingsScreen() {
       )}
 
       {/* Sort + count */}
-      <View className="px-4 py-2 flex-row items-center justify-between">
+      <View className="px-4 py-2 flex-row items-center justify-between" style={{ zIndex: 100 }}>
         <Text className="text-text-muted text-xs">
           {total} {t('listings').toLowerCase()}
         </Text>
@@ -270,7 +270,7 @@ export default function ListingsScreen() {
           </TouchableOpacity>
 
           {showSort && (
-            <View className="absolute top-9 right-0 bg-surface-card border border-border rounded-lg z-10 min-w-[140px]">
+            <View className="absolute top-9 right-0 bg-surface-card border border-border rounded-lg min-w-[140px]" style={{ zIndex: 999, elevation: 10 }}>
               {SORT_OPTIONS.map((opt) => (
                 <TouchableOpacity
                   key={opt.key}

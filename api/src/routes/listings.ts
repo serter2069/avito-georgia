@@ -1,12 +1,29 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import { Prisma } from '@prisma/client';
+import { z, ZodError } from 'zod';
 import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
 import xss from 'xss';
 
 const router = Router();
+
+function stripHtml(str: string): string {
+  return str.replace(/<[^>]*>/g, '').trim();
+}
+
+const createListingSchema = z.object({
+  title: z.string().min(5).max(100).transform(stripHtml),
+  description: z.string().min(20).max(5000).transform(stripHtml).optional(),
+  price: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(0)).optional().nullable(),
+  currency: z.enum(['GEL', 'USD', 'EUR']).default('GEL'),
+  categoryId: z.string().uuid(),
+  cityId: z.string().uuid(),
+  districtId: z.string().uuid().optional(),
+});
+
+const updateListingSchema = createListingSchema.partial();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 const ACTIVE_LISTING_LIMIT = 10;
@@ -184,18 +201,17 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 // POST /api/listings
 router.post('/', requireAuth, async (req: Request, res: Response) => {
-  const { title, description, price, currency = 'GEL', categoryId, cityId, districtId } = req.body;
-  if (!title || !categoryId || !cityId) {
-    res.status(400).json({ error: 'title, categoryId, cityId required' }); return;
-  }
-  // Reject negative prices; price=0 and omitted price are both valid
-  if (price !== undefined && price !== null) {
-    const parsedPrice = parseFloat(price);
-    if (parsedPrice < 0) {
-      res.status(400).json({ error: 'price must be >= 0' }); return;
+  let data;
+  try {
+    data = createListingSchema.parse(req.body);
+  } catch (err) {
+    if (err instanceof ZodError) {
+      res.status(400).json({ error: err.errors[0]?.message || 'Validation failed' }); return;
     }
+    throw err;
   }
-  // Sanitize text fields to strip HTML tags (XSS prevention)
+  const { title, description, price, currency, categoryId, cityId, districtId } = data;
+  // Sanitize text fields to strip HTML tags (XSS prevention) — defense in depth
   const safeTitle = xss(title);
   const safeDescription = description ? xss(description) : description;
   const userId = req.user!.userId;
@@ -214,7 +230,7 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
   try {
     const listing = await prisma.listing.create({
-      data: { title: safeTitle, description: safeDescription, price: price !== undefined && price !== null ? parseFloat(price) : null, currency, categoryId, cityId, districtId, userId, expiresAt },
+      data: { title: safeTitle, description: safeDescription, price: price ?? null, currency, categoryId, cityId, districtId, userId, expiresAt },
     });
     res.status(201).json(listing);
   } catch (err: any) {
@@ -234,12 +250,17 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
   if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
   const oldPrice = listing.price;
-  const { title, description, price, currency, categoryId, cityId, districtId } = req.body;
-  // Reject negative prices; price=0 is valid, omitted price leaves field unchanged
-  const newPrice = price !== undefined ? parseFloat(price) : undefined;
-  if (newPrice !== undefined && newPrice < 0) {
-    res.status(400).json({ error: 'price must be >= 0' }); return;
+  let updateData;
+  try {
+    updateData = updateListingSchema.parse(req.body);
+  } catch (err) {
+    if (err instanceof ZodError) {
+      res.status(400).json({ error: err.errors[0]?.message || 'Validation failed' }); return;
+    }
+    throw err;
   }
+  const { title, description, price, currency, categoryId, cityId, districtId } = updateData;
+  const newPrice = price;
   // Sanitize only fields present in the request body to strip HTML tags (XSS prevention)
   const safeTitle = title !== undefined ? xss(title) : title;
   const safeDescription = description !== undefined ? xss(description) : description;

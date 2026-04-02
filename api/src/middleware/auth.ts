@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+export interface AuthRequest extends Request {
+  user?: { userId: string; email: string; role: string };
+}
+
 export function requireAuth(req: Request, res: Response, next: NextFunction): void {
   // Accept token from Authorization header (native) or httpOnly cookie (web)
   const header = req.headers.authorization;

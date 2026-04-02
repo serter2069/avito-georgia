@@ -101,7 +101,7 @@ export default function ThreadListScreen() {
       <View className="flex-1 min-w-0">
         <View className="flex-row items-center justify-between mb-1">
           <Text className="text-text-primary font-semibold text-base flex-1 mr-2" numberOfLines={1}>
-            {item.otherUser?.name || item.listing?.title || '—'}
+            {item.otherUser?.name || item.listing?.title || '\u2014'}
           </Text>
           {item.lastMessage && (
             <Text className="text-text-muted text-xs">

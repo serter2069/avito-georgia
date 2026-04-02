@@ -44,3 +44,5 @@ api/node_modules/
 # generated native folders
 /ios
 /android
+worktrees/
+test-results/
