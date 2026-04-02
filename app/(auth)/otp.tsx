@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
@@ -11,7 +11,6 @@ const RESEND_COOLDOWN = 60;
 
 export default function OtpScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
   const { email } = useLocalSearchParams<{ email: string }>();
   const setAuth = useAuthStore((s) => s.setAuth);
 
@@ -92,7 +91,6 @@ export default function OtpScreen() {
         });
         // Persist tokens to storage (fire-and-forget, non-blocking)
         setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
-        router.replace('/');
       } else {
         setError(res.error || t('invalidCode'));
       }
