@@ -41,14 +41,54 @@ jobs:
 
   deploy-api:
     runs-on: self-hosted
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+      JWT_ACCESS_EXPIRES: ${{ secrets.JWT_ACCESS_EXPIRES }}
+      JWT_REFRESH_EXPIRES: ${{ secrets.JWT_REFRESH_EXPIRES }}
+      DEV_AUTH: ${{ secrets.DEV_AUTH }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      SMTP_FROM: ${{ secrets.SMTP_FROM }}
+      MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+      MINIO_BUCKET: ${{ secrets.MINIO_BUCKET }}
+      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+      MINIO_PUBLIC_URL: ${{ secrets.MINIO_PUBLIC_URL }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Write .env file
+        run: |
+          mkdir -p /var/www/avito-georgia/api
+          printf '%s\n' \
+            "DATABASE_URL=${DATABASE_URL}" \
+            "JWT_SECRET=${JWT_SECRET}" \
+            "JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}" \
+            "JWT_ACCESS_EXPIRES=${JWT_ACCESS_EXPIRES:-15m}" \
+            "JWT_REFRESH_EXPIRES=${JWT_REFRESH_EXPIRES:-30d}" \
+            "DEV_AUTH=${DEV_AUTH:-false}" \
+            "SMTP_HOST=${SMTP_HOST}" \
+            "SMTP_PORT=${SMTP_PORT:-587}" \
+            "SMTP_USER=${SMTP_USER}" \
+            "SMTP_PASS=${SMTP_PASS}" \
+            "SMTP_FROM=${SMTP_FROM}" \
+            "MINIO_ENDPOINT=${MINIO_ENDPOINT}" \
+            "MINIO_BUCKET=${MINIO_BUCKET}" \
+            "MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}" \
+            "MINIO_SECRET_KEY=${MINIO_SECRET_KEY}" \
+            "MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL}" \
+            > /var/www/avito-georgia/api/.env
+          chmod 600 /var/www/avito-georgia/api/.env
 
       - name: Deploy API
         run: |
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
           cd /var/www/avito-georgia/api && npm ci && npm run build
-          sudo pm2 restart avito-georgia-api || sudo pm2 start /var/www/avito-georgia/api/dist/index.js --name avito-georgia-api --cwd /var/www/avito-georgia/api
+          pm2 restart avito-georgia-api || pm2 start /var/www/avito-georgia/api/dist/index.js --name avito-georgia-api --cwd /var/www/avito-georgia/api
           sudo chown -R github-runner:www-data /var/www/avito-georgia/api/
           sudo chmod -R g+rw /var/www/avito-georgia/api/
