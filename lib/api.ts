@@ -79,7 +79,7 @@ async function doRefresh(): Promise<boolean> {
   }
 }
 
-async function refreshTokens(): Promise<boolean> {
+export async function refreshTokens(): Promise<boolean> {
   // Deduplicate: if already refreshing, wait for the same in-flight promise
   if (isRefreshing && refreshPromise) return refreshPromise;
 
