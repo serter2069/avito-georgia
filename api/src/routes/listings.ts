@@ -54,12 +54,14 @@ router.get('/', async (req: Request, res: Response) => {
   const page = parseInt(qs(req.query.page) || '1', 10);
   const take = limit;
   const skip = (page - 1) * take;
+  const userId = qs(req.query.userId);
   const where: Prisma.ListingWhereInput = {
     status: 'active',
     OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : {}),
     ...(category ? { categoryId: category } : {}),
     ...(city ? { cityId: city } : {}),
+    ...(userId ? { userId } : {}),
     ...(price_min || price_max
       ? {
           price: {

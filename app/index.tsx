@@ -94,7 +94,7 @@ export default function HomeScreen() {
   };
 
   const handleListingPress = (id: string) => {
-    // Will navigate to listing detail when route is ready
+    router.push(`/listings/${id}`);
   };
 
   return (

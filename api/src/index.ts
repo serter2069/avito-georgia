@@ -13,6 +13,7 @@ import reportsRouter from './routes/reports';
 import promotionsRouter from './routes/promotions';
 import stripeWebhookRouter from './routes/stripe-webhook';
 import adminPaymentsRouter from './routes/admin-payments';
+import usersRouter from './routes/users';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api', chatRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/promotions', promotionsRouter);
 app.use('/api/admin/payments', adminPaymentsRouter);
+app.use('/api/users', usersRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

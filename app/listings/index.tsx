@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Header } from '../../components/layout/Header';
 import { CitySelector, City } from '../../components/common/CitySelector';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
@@ -65,6 +65,7 @@ function mapListing(l: ApiListing): Listing {
 
 export default function ListingsScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
   const { width } = useWindowDimensions();
 
@@ -124,7 +125,7 @@ export default function ListingsScreen() {
   };
 
   const handleListingPress = (id: string) => {
-    // Will navigate to listing detail when route is ready
+    router.push(`/listings/${id}`);
   };
 
   const renderItem = useCallback(({ item }: { item: Listing }) => (
