@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 interface SellerProfile {
   id: string;
@@ -169,7 +170,7 @@ export default function SellerProfileScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       </View>
     );
   };
@@ -184,7 +185,7 @@ export default function SellerProfileScreen() {
           <Text className="text-text-primary text-lg font-bold">{t('sellerProfile')}</Text>
         </View>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </View>
     );

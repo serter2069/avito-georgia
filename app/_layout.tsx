@@ -5,6 +5,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../stores/authStore';
+import { colors } from '../lib/colors';
 
 function useProtectedRoute() {
   const user = useAuthStore((s) => s.user);
@@ -40,7 +41,7 @@ export default function RootLayout() {
   if (!isReady) {
     return (
       <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth: 430 }}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color={colors.brandPrimary} />
       </View>
     );
   }
@@ -51,7 +52,7 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#0f0f1a' },
+          contentStyle: { backgroundColor: colors.bgPrimary },
         }}
       />
     </View>

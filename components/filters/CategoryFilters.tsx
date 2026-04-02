@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { colors } from '../../lib/colors';
 
 export interface CustomField {
   name: string;
@@ -78,7 +79,7 @@ function TextField({
       <TextInput
         className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
         placeholder={t(field.label)}
-        placeholderTextColor="#64748b"
+        placeholderTextColor={colors.textMuted}
         value={value}
         onChangeText={onChange}
         keyboardType={field.type === 'number' ? 'numeric' : 'default'}
@@ -110,7 +111,7 @@ function RangePair({
           <TextInput
             className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
             placeholder={t('from')}
-            placeholderTextColor="#64748b"
+            placeholderTextColor={colors.textMuted}
             value={values[minField.name] || ''}
             onChangeText={(v) => onChange(minField.name, v)}
             keyboardType="numeric"
@@ -120,7 +121,7 @@ function RangePair({
           <TextInput
             className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
             placeholder={t('to')}
-            placeholderTextColor="#64748b"
+            placeholderTextColor={colors.textMuted}
             value={values[maxField.name] || ''}
             onChangeText={(v) => onChange(maxField.name, v)}
             keyboardType="numeric"

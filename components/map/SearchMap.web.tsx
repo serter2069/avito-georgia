@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { colors } from '../../lib/colors';
 
 export interface MapListing {
   id: string;
@@ -94,7 +95,7 @@ export function SearchMap({ listings, onMarkerPress }: SearchMapProps) {
         const popupContent = `
           <div style="min-width:140px;font-family:sans-serif;">
             <div style="font-weight:600;font-size:13px;margin-bottom:4px;line-height:1.3;">${listing.title}</div>
-            <div style="color:#6366f1;font-size:13px;font-weight:700;">${formatPrice(listing.price, listing.currency)}</div>
+            <div style="color:${colors.brandPrimary};font-size:13px;font-weight:700;">${formatPrice(listing.price, listing.currency)}</div>
           </div>
         `;
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Header } from '../../components/layout/Header';
 import { Badge } from '../../components/ui/Badge';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 interface Promotion {
   id: string;
@@ -65,7 +66,7 @@ export default function PaymentsScreen() {
       <View className="flex-1 bg-dark">
         <Header title={t('paymentHistory')} />
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </View>
     );

@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { io, Socket } from 'socket.io-client';
 import { api, getAccessToken } from '../../../lib/api';
 import { useAuthStore } from '../../../stores/authStore';
+import { colors } from '../../../lib/colors';
 
 interface MessageSender {
   id: string;
@@ -189,7 +190,7 @@ export default function ChatScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       ) : (
         <FlatList
@@ -221,7 +222,7 @@ export default function ChatScreen() {
         <TextInput
           className="flex-1 bg-surface border border-border rounded-xl px-4 py-2.5 text-text-primary text-base max-h-24"
           placeholder={t('typeMessage')}
-          placeholderTextColor="#64748b"
+          placeholderTextColor={colors.textMuted}
           value={inputText}
           onChangeText={(text) => {
             setInputText(text);

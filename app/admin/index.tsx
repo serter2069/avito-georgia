@@ -2,6 +2,7 @@ import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 interface Stats {
   totalListings: number;
@@ -64,7 +65,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color={colors.brandPrimary} />
       </View>
     );
   }

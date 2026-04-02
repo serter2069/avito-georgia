@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Header } from '../../components/layout/Header';
 import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 interface ActivePromotion {
   id: string;
@@ -63,7 +64,7 @@ export default function SubscriptionScreen() {
       <View className="flex-1 bg-dark">
         <Header title={t('subscription')} />
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </View>
     );

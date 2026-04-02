@@ -9,6 +9,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../stores/authStore';
+import { colors } from '../../lib/colors';
 
 interface ListingPhoto {
   id: string;
@@ -151,7 +152,7 @@ export default function ListingDetailScreen() {
       <View className="flex-1 bg-dark">
         <Header title={t('loading')} />
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </View>
     );
@@ -291,7 +292,7 @@ export default function ListingDetailScreen() {
               disabled={favoriteLoading}
             >
               {favoriteLoading ? (
-                <ActivityIndicator size="small" color="#f59e0b" />
+                <ActivityIndicator size="small" color={colors.statusWarning} />
               ) : (
                 <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
                   {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}

@@ -1,11 +1,12 @@
 import { Stack } from 'expo-router';
+import { colors } from '../../../../lib/colors';
 
 export default function ListingIdLayout() {
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#0f0f1a' },
+        contentStyle: { backgroundColor: colors.bgPrimary },
       }}
     />
   );

@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput,
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
+import { colors } from '../../lib/colors';
 
 interface ListingItem {
   id: string;
@@ -66,7 +67,7 @@ export default function AdminModeration() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color={colors.brandPrimary} />
       </View>
     );
   }
@@ -147,7 +148,7 @@ export default function AdminModeration() {
                 disabled={actionLoading === listing.id}
               >
                 {actionLoading === listing.id ? (
-                  <ActivityIndicator size="small" color="#4CAF50" />
+                  <ActivityIndicator size="small" color={colors.statusSuccess} />
                 ) : (
                   <Text className="text-success text-sm font-medium">{t('approve')}</Text>
                 )}
@@ -161,7 +162,7 @@ export default function AdminModeration() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-3 py-2 text-text-primary text-sm"
                 placeholder={t('rejectReason')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.textMuted}
                 value={rejectReason}
                 onChangeText={setRejectReason}
               />
@@ -171,7 +172,7 @@ export default function AdminModeration() {
                 disabled={!rejectReason.trim() || actionLoading === listing.id}
               >
                 {actionLoading === listing.id ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={colors.white} />
                 ) : (
                   <Text className="text-white text-sm font-medium">{t('reject')}</Text>
                 )}
