@@ -81,7 +81,17 @@ export default function OtpScreen() {
       }>('/auth/verify-otp', { email, code: otp });
 
       if (res.ok && res.data) {
-        await setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+        // Set Zustand in-memory state synchronously BEFORE navigation.
+        // This ensures useProtectedRoute sees user immediately when
+        // router.replace triggers a layout re-render.
+        // Storage writes (SecureStore) happen async in background — no await.
+        useAuthStore.setState({
+          user: res.data.user,
+          accessToken: res.data.accessToken,
+          isReady: true,
+        });
+        // Persist tokens to storage (fire-and-forget, non-blocking)
+        setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
         router.replace('/');
       } else {
         setError(res.error || t('invalidCode'));
