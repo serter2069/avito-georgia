@@ -5,9 +5,15 @@ import { PromotionType } from '@prisma/client';
 
 const router = Router();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-03-25.dahlia',
-});
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
+    _stripe = new Stripe(key, { apiVersion: '2026-03-25.dahlia' });
+  }
+  return _stripe;
+}
 
 const DAYS_MAP: Record<string, number | null> = {
   top_1d: 1,
@@ -23,7 +29,7 @@ router.post('/', async (req: Request, res: Response) => {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       req.body, // must be raw Buffer
       sig,
       process.env.STRIPE_WEBHOOK_SECRET || ''

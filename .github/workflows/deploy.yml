@@ -58,6 +58,8 @@ jobs:
       MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
       MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
       MINIO_PUBLIC_URL: ${{ secrets.MINIO_PUBLIC_URL }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
     steps:
       - uses: actions/checkout@v4
 
@@ -85,6 +87,8 @@ jobs:
             "MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}" \
             "MINIO_SECRET_KEY=${MINIO_SECRET_KEY}" \
             "MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL}" \
+            "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" \
+            "STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}" \
             > /var/www/avito-georgia/api/.env
           chmod 600 /var/www/avito-georgia/api/.env
           sudo pm2 delete avito-georgia-api 2>/dev/null || true
