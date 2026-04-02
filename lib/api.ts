@@ -46,7 +46,11 @@ export async function clearTokens(): Promise<void> {
   await removeItem(REFRESH_TOKEN_KEY);
 }
 
-async function refreshTokens(): Promise<boolean> {
+// Module-level flag to deduplicate concurrent refresh calls (prevents refresh storms on parallel 401s)
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
+async function doRefresh(): Promise<boolean> {
   const refreshToken = await getItem(REFRESH_TOKEN_KEY);
   if (!refreshToken) return false;
 
@@ -55,16 +59,36 @@ async function refreshTokens(): Promise<boolean> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
+      credentials: 'include', // Web: send httpOnly refreshToken cookie too
     });
 
     if (!res.ok) return false;
 
     const data = await res.json();
-    await setTokens(data.token, data.refreshToken);
+    // accessToken — matches backend response field (was incorrectly data.token before)
+    await setTokens(data.accessToken, data.refreshToken);
+
+    // Maintain isLoggedIn flag for cold-start flash prevention on web
+    if (Platform.OS === 'web') {
+      localStorage.setItem('isLoggedIn', 'true');
+    }
+
     return true;
   } catch {
     return false;
   }
+}
+
+async function refreshTokens(): Promise<boolean> {
+  // Deduplicate: if already refreshing, wait for the same in-flight promise
+  if (isRefreshing && refreshPromise) return refreshPromise;
+
+  isRefreshing = true;
+  refreshPromise = doRefresh().finally(() => {
+    isRefreshing = false;
+    refreshPromise = null;
+  });
+  return refreshPromise;
 }
 
 export interface ApiResponse<T = unknown> {

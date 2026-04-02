@@ -40,6 +40,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   otpCodes     OtpCode[]
+  sessions     Session[]
   listings     Listing[]
   favorites     Favorite[]
   notifications Notification[]
@@ -58,12 +59,25 @@ model OtpCode {
   code      String
   expiresAt DateTime
   used      Boolean  @default(false)
+  attempts  Int      @default(0)
   createdAt DateTime @default(now())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([email])
   @@index([code])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([refreshToken])
 }
 
 model Category {

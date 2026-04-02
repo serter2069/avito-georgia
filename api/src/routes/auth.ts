@@ -6,6 +6,9 @@ import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
+const MAX_OTP_ATTEMPTS = 3;
+const IS_PROD = process.env.NODE_ENV === 'production';
+
 function generateOtp(): string {
   if (process.env.DEV_AUTH === 'true') return '000000';
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -28,6 +31,22 @@ function signTokens(userId: string, email: string, role: string) {
     { expiresIn: (process.env.JWT_REFRESH_EXPIRES || '30d') as string } as jwt.SignOptions
   );
   return { accessToken, refreshToken };
+}
+
+function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: IS_PROD,
+    sameSite: 'lax',
+    maxAge: 15 * 60 * 1000, // 15 minutes
+  });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: IS_PROD,
+    sameSite: 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    path: '/api/auth/refresh', // Only sent to the refresh endpoint — limits XSS exposure
+  });
 }
 
 // POST /api/auth/request-otp
@@ -83,17 +102,35 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     return;
   }
 
+  // Find latest unused, unexpired OTP for this email (do NOT filter by code yet — need to track attempts)
   const otpRecord = await prisma.otpCode.findFirst({
-    where: { email, code, used: false },
+    where: { email, used: false, expiresAt: { gte: new Date() } },
     orderBy: { createdAt: 'desc' },
   });
 
-  if (!otpRecord || otpRecord.expiresAt < new Date()) {
+  if (!otpRecord) {
     res.status(400).json({ error: 'Invalid or expired OTP' });
     return;
   }
 
-  // Mark OTP as used
+  // Brute-force protection: block after MAX_OTP_ATTEMPTS wrong codes
+  if (otpRecord.attempts >= MAX_OTP_ATTEMPTS) {
+    res.status(429).json({ error: 'Too many attempts. Request a new OTP.' });
+    return;
+  }
+
+  // Wrong code: increment attempts counter
+  if (otpRecord.code !== code) {
+    await prisma.otpCode.update({
+      where: { id: otpRecord.id },
+      data: { attempts: { increment: 1 } },
+    });
+    const attemptsLeft = MAX_OTP_ATTEMPTS - (otpRecord.attempts + 1);
+    res.status(400).json({ error: 'Invalid code', attemptsLeft });
+    return;
+  }
+
+  // Correct code: mark as used
   await prisma.otpCode.update({
     where: { id: otpRecord.id },
     data: { used: true },
@@ -106,16 +143,30 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
   }
 
   const tokens = signTokens(user.id, user.email, user.role);
+
+  // Persist session in DB for sliding window refresh and server-side revocation
+  const sessionExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  await prisma.session.create({
+    data: { userId: user.id, refreshToken: tokens.refreshToken, expiresAt: sessionExpiresAt },
+  });
+
+  // Set httpOnly cookies for web clients
+  setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+
+  // Also return tokens in body — native clients (iOS/Android) read from here
   res.json({ ...tokens, user: { id: user.id, email: user.email, role: user.role } });
 });
 
 // POST /api/auth/refresh
 router.post('/refresh', async (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
+  // Accept from httpOnly cookie (web) or request body (native)
+  const refreshToken: string | undefined = req.cookies?.refreshToken || req.body?.refreshToken;
+
   if (!refreshToken) {
     res.status(400).json({ error: 'refreshToken required' });
     return;
   }
+
   try {
     const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as {
       userId: string;
@@ -127,18 +178,56 @@ router.post('/refresh', async (req: Request, res: Response) => {
       res.status(401).json({ error: 'Invalid token type' });
       return;
     }
+
+    // Validate session exists in DB and is not expired (enables server-side revocation)
+    const session = await prisma.session.findUnique({ where: { refreshToken } });
+    if (!session || session.expiresAt < new Date()) {
+      res.status(401).json({ error: 'Session expired or revoked' });
+      return;
+    }
+
     // Verify user still exists
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
     if (!user) {
       res.status(401).json({ error: 'User not found' });
       return;
     }
-    // Return new token pair (access + refresh rotation)
+
+    // Issue new token pair (token rotation)
     const tokens = signTokens(user.id, user.email, user.role);
+
+    // Sliding window: update session with new refreshToken and extended expiresAt
+    const newExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await prisma.session.update({
+      where: { id: session.id },
+      data: { refreshToken: tokens.refreshToken, expiresAt: newExpiresAt },
+    });
+
+    // Refresh httpOnly cookies for web
+    setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+
+    // Return tokens in body for native clients
     res.json(tokens);
   } catch {
     res.status(401).json({ error: 'Invalid or expired refresh token' });
   }
+});
+
+// POST /api/auth/logout
+router.post('/logout', async (req: Request, res: Response) => {
+  // Accept from httpOnly cookie (web) or request body (native)
+  const refreshToken: string | undefined = req.cookies?.refreshToken || req.body?.refreshToken;
+
+  if (refreshToken) {
+    // Delete session — refresh token is now revoked server-side
+    await prisma.session.deleteMany({ where: { refreshToken } });
+  }
+
+  // Clear httpOnly cookies for web clients
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+
+  res.json({ ok: true });
 });
 
 // GET /api/auth/me — return current authenticated user
