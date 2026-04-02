@@ -81,6 +81,7 @@ router.post('/purchase', requireAuth, async (req: Request, res: Response) => {
           quantity: 1,
         }],
         metadata: { userId, type },
+        subscription_data: { metadata: { userId, type } },
         success_url: `${process.env.FRONTEND_URL || 'http://localhost:8081'}/promotions/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:8081'}/promotions/cancel`,
       });
