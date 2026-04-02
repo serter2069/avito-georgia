@@ -5,6 +5,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../stores/authStore';
+import { useAuthRefresh } from '../hooks/useAuthRefresh';
 import { colors } from '../lib/colors';
 
 function useProtectedRoute() {
@@ -36,6 +37,8 @@ export default function RootLayout() {
     hydrate();
   }, []);
 
+  // Proactive token refresh: every 20 min + on tab/app focus (auth.md Level 2)
+  useAuthRefresh();
   useProtectedRoute();
 
   if (!isReady) {
