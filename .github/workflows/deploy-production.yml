@@ -43,55 +43,33 @@ jobs:
   deploy-api:
     runs-on: self-hosted
     environment: production
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-      JWT_ACCESS_EXPIRES: ${{ secrets.JWT_ACCESS_EXPIRES }}
-      JWT_REFRESH_EXPIRES: ${{ secrets.JWT_REFRESH_EXPIRES }}
-      DEV_AUTH: ${{ secrets.DEV_AUTH }}
-      SMTP_HOST: ${{ secrets.SMTP_HOST }}
-      SMTP_PORT: ${{ secrets.SMTP_PORT }}
-      SMTP_USER: ${{ secrets.SMTP_USER }}
-      SMTP_PASS: ${{ secrets.SMTP_PASS }}
-      SMTP_FROM: ${{ secrets.SMTP_FROM }}
-      MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
-      MINIO_BUCKET: ${{ secrets.MINIO_BUCKET }}
-      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-      MINIO_PUBLIC_URL: ${{ secrets.MINIO_PUBLIC_URL }}
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Doppler CLI
+        run: |
+          if ! command -v doppler &> /dev/null; then
+            curl -sLf --retry 3 --tlsv1.2 --proto "=https" \
+              'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | \
+              sudo apt-key add - 2>/dev/null || true
+            echo "deb https://packages.doppler.com/public/cli/deb/debian any-version main" | \
+              sudo tee /etc/apt/sources.list.d/doppler-cli.list
+            sudo apt-get update -qq && sudo apt-get install -y doppler
+          fi
+          doppler --version
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
       - name: Deploy API
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
         run: |
           sudo chown -R github-runner:www-data /var/www/avito-georgia/api/ || true
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
-          cd /var/www/avito-georgia/api && npm ci && DATABASE_URL="${DATABASE_URL}" npm run build
+          cd /var/www/avito-georgia/api && npm ci && doppler run -- npm run build
           sudo chmod -R g+rw /var/www/avito-georgia/api/
-          printf '%s\n' \
-            "DATABASE_URL=${DATABASE_URL}" \
-            "JWT_SECRET=${JWT_SECRET}" \
-            "JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}" \
-            "JWT_ACCESS_EXPIRES=${JWT_ACCESS_EXPIRES:-15m}" \
-            "JWT_REFRESH_EXPIRES=${JWT_REFRESH_EXPIRES:-30d}" \
-            "DEV_AUTH=${DEV_AUTH:-false}" \
-            "SMTP_HOST=${SMTP_HOST}" \
-            "SMTP_PORT=${SMTP_PORT:-587}" \
-            "SMTP_USER=${SMTP_USER}" \
-            "SMTP_PASS=${SMTP_PASS}" \
-            "SMTP_FROM=${SMTP_FROM}" \
-            "MINIO_ENDPOINT=${MINIO_ENDPOINT}" \
-            "MINIO_BUCKET=${MINIO_BUCKET}" \
-            "MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}" \
-            "MINIO_SECRET_KEY=${MINIO_SECRET_KEY}" \
-            "MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL}" \
-            "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" \
-            "STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}" \
-            > /var/www/avito-georgia/api/.env
+          doppler secrets download --no-file --format env > /var/www/avito-georgia/api/.env
           chmod 600 /var/www/avito-georgia/api/.env
           sudo pm2 delete avito-georgia-api 2>/dev/null || true
           sudo pm2 start /var/www/avito-georgia/api/dist/index.js \
