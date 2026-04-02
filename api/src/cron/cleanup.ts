@@ -1,7 +1,5 @@
 import cron from 'node-cron';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 // Run daily at 03:00 UTC — mark expired listings as removed
 // Run hourly — deactivate expired promotions
