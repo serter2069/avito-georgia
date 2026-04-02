@@ -14,9 +14,11 @@ enum ListingStatus {
 }
 
 enum PromotionType {
-  top
+  top_1d
+  top_3d
+  top_7d
   highlight
-  unlimited
+  unlimited_sub
 }
 
 enum PaymentStatus {
@@ -184,12 +186,16 @@ model Favorite {
 model Promotion {
   id            String        @id @default(cuid())
   promotionType PromotionType
+  isActive      Boolean       @default(true)
   expiresAt     DateTime?
   createdAt     DateTime      @default(now())
   listingId     String
   listing       Listing       @relation(fields: [listingId], references: [id])
   userId        String
   user          User          @relation(fields: [userId], references: [id])
+
+  @@index([listingId, isActive])
+  @@index([expiresAt])
 }
 
 model Notification {
@@ -205,15 +211,19 @@ model Notification {
 }
 
 model Payment {
-  id         String        @id @default(cuid())
-  amount     Float
-  currency   String        @default("GEL")
-  status     PaymentStatus @default(pending)
-  provider   String?
-  externalId String?
-  createdAt  DateTime      @default(now())
-  userId     String
-  user       User          @relation(fields: [userId], references: [id])
+  id            String         @id @default(cuid())
+  amount        Float
+  currency      String         @default("GEL")
+  status        PaymentStatus  @default(pending)
+  provider      String?
+  externalId    String?
+  promotionType PromotionType?
+  listingId     String?
+  createdAt     DateTime       @default(now())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id])
+
+  @@index([externalId])
 }
 
 model Report {
