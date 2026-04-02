@@ -1,7 +1,7 @@
 export const colors = {
   bgPrimary: '#F2F8FA',
   bgSecondary: '#E8F4F8',
-  bgSurface: '#E8F4F8',
+  bgSurface: '#FFFFFF',
   bgCard: '#FFFFFF',
   textPrimary: '#0A2840',
   textSecondary: '#1A4A6E',
@@ -11,7 +11,6 @@ export const colors = {
   borderFocus: '#0A7B8A',
   borderError: '#C0392B',
   brandPrimary: '#0A7B8A',
-  brandSecondary: '#1A9BAA',
   statusSuccess: '#2E7D30',
   statusWarning: '#f59e0b',
   statusError: '#C0392B',

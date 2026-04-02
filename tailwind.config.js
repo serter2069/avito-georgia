@@ -13,7 +13,7 @@ module.exports = {
         // Brand: Avito Georgia — Teal Batumi (from brand.html)
         primary: '#0A7B8A',
         'primary-dark': '#0A2840',
-        secondary: '#f59e0b',
+        secondary: '#0A2840',
         accent: '#1A9BAA',
         surface: '#E8F4F8',
         'surface-card': '#FFFFFF',

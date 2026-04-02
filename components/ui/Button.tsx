@@ -24,15 +24,15 @@ const textSizeClasses = {
 
 const variantClasses = {
   primary: 'bg-primary',
-  secondary: 'bg-secondary',
-  ghost: 'border border-primary bg-transparent',
+  secondary: 'border-2 border-secondary bg-transparent',
+  ghost: 'border-2 border-border bg-transparent',
   danger: 'bg-error',
 };
 
 const textVariantClasses = {
   primary: 'text-white font-semibold',
-  secondary: 'text-white font-semibold',
-  ghost: 'text-primary font-semibold',
+  secondary: 'text-secondary font-bold',
+  ghost: 'text-text-muted font-bold',
   danger: 'text-white font-semibold',
 };
 

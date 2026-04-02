@@ -25,7 +25,7 @@ export function PriceTag({
 
   if (price === null || negotiable) {
     return (
-      <Text className={`text-secondary font-bold ${sizeClasses[size]}`}>
+      <Text className={`text-text-muted font-bold ${sizeClasses[size]}`}>
         {t('negotiable')}
       </Text>
     );

@@ -1,4 +1,4 @@
-import { View, TextInput, Text } from 'react-native';
+import { View, TextInput, Text, Platform } from 'react-native';
 import { useState } from 'react';
 import { colors } from '../../lib/colors';
 
@@ -44,6 +44,7 @@ export function Input({
       )}
       <TextInput
         className={`bg-surface border ${borderClass} rounded-lg px-4 py-3 text-text-primary text-base ${!editable ? 'opacity-50' : ''}`}
+        style={focused && Platform.OS === 'web' ? { boxShadow: '0 0 0 3px rgba(10,123,138,0.12)' } : undefined}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}

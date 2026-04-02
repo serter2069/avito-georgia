@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter, useSegments } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
+import { colors } from '../../lib/colors';
 
 export function BottomNav() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export function BottomNav() {
             className="flex-1 items-center py-2"
             onPress={() => router.push(tab.path as any)}
           >
-            <Text style={{ fontSize: tab.size, lineHeight: tab.size + 4, color: active ? '#0A7B8A' : '#6A8898' }}>
+            <Text style={{ fontSize: tab.size, lineHeight: tab.size + 4, color: active ? colors.brandPrimary : colors.textMuted }}>
               {tab.icon}
             </Text>
             <Text

@@ -309,7 +309,7 @@ export default function ListingDetailScreen() {
           <>
             <TouchableOpacity
               className={`px-4 py-3 rounded-lg border items-center justify-center ${
-                isFavorited ? 'bg-secondary/20 border-secondary' : 'border-border'
+                isFavorited ? 'bg-warning/20 border-warning' : 'border-border'
               }`}
               onPress={handleFavorite}
               disabled={favoriteLoading}
@@ -317,7 +317,7 @@ export default function ListingDetailScreen() {
               {favoriteLoading ? (
                 <ActivityIndicator size="small" color={colors.statusWarning} />
               ) : (
-                <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
+                <Text className={`text-sm font-semibold ${isFavorited ? 'text-warning' : 'text-text-secondary'}`}>
                   {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
                 </Text>
               )}

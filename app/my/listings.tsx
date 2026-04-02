@@ -209,7 +209,7 @@ export default function MyListingsScreen() {
             className="flex-1 py-2.5 items-center border-r border-border"
             onPress={() => router.push(`/dashboard/listings/${item.id}/promote`)}
           >
-            <Text className="text-secondary text-xs font-medium">{t('promote')}</Text>
+            <Text className="text-warning text-xs font-medium">{t('promote')}</Text>
           </TouchableOpacity>
         )}
 
