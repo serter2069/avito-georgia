@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -137,7 +138,7 @@ export function CategoryFilters({ customFields, values, onChange }: CategoryFilt
 
   // Find paired range fields (e.g. yearMin + yearMax, areaMin + areaMax)
   const pairedNames = new Set<string>();
-  const renderedFields: JSX.Element[] = [];
+  const renderedFields: React.ReactElement[] = [];
 
   let i = 0;
   while (i < customFields.length) {
