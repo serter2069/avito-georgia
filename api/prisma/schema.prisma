@@ -128,6 +128,7 @@ model Listing {
 model ListingPhoto {
   id        String  @id @default(cuid())
   url       String
+  key       String?
   order     Int     @default(0)
   listingId String
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
