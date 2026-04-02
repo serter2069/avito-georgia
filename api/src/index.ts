@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
 import authRouter from './routes/auth';
 import listingsRouter from './routes/listings';
+import favoritesRouter from './routes/favorites';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);
+app.use('/api/favorites', favoritesRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
