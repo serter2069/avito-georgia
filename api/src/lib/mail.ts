@@ -28,6 +28,42 @@ const templates = {
   }),
 };
 
+export async function sendPriceDropNotification(
+  to: string,
+  title: string,
+  oldPrice: number,
+  newPrice: number
+): Promise<void> {
+  if (process.env.DEV_AUTH === 'true') {
+    console.log(`[DEV] Price drop notification to ${to}: ${title} ${oldPrice} -> ${newPrice}`);
+    return;
+  }
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to,
+    subject: `Price drop: ${title} — Avito Georgia`,
+    text: `The listing "${title}" you favorited dropped in price from ${oldPrice} to ${newPrice}.`,
+    html: `<p>The listing <strong>${title}</strong> you favorited dropped in price from <s>${oldPrice}</s> to <strong>${newPrice}</strong>.</p>`,
+  });
+}
+
+export async function sendListingRemovedNotification(
+  to: string,
+  title: string
+): Promise<void> {
+  if (process.env.DEV_AUTH === 'true') {
+    console.log(`[DEV] Listing removed notification to ${to}: ${title}`);
+    return;
+  }
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to,
+    subject: `Listing removed: ${title} — Avito Georgia`,
+    text: `The listing "${title}" you favorited has been removed by the seller.`,
+    html: `<p>The listing <strong>${title}</strong> you favorited has been removed by the seller.</p>`,
+  });
+}
+
 export async function sendOtpEmail(
   email: string,
   otp: string,
