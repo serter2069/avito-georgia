@@ -212,6 +212,14 @@ const resources = {
       refunded: 'Возврат',
       resolved: 'Решено',
       dismissed: 'Отклонено',
+      paymentSuccess: 'Оплата прошла успешно!',
+      paymentSuccessDesc: 'Ваше продвижение активировано. Объявление начнёт продвигаться в ближайшее время.',
+      paymentCancel: 'Оплата отменена',
+      paymentCancelDesc: 'Вы отменили оплату. Попробуйте снова, если хотите продвинуть объявление.',
+      backToDashboard: 'В панель управления',
+      backToListings: 'К объявлениям',
+      paidAt: 'Оплачено',
+      amountLabel: 'Сумма',
 
       // Category-specific filters
       from: 'От',
@@ -477,6 +485,14 @@ const resources = {
       refunded: 'Refunded',
       resolved: 'Resolved',
       dismissed: 'Dismissed',
+      paymentSuccess: 'Payment successful!',
+      paymentSuccessDesc: 'Your promotion has been activated. Your listing will start being promoted shortly.',
+      paymentCancel: 'Payment cancelled',
+      paymentCancelDesc: 'You cancelled the payment. Try again if you want to promote your listing.',
+      backToDashboard: 'Back to dashboard',
+      backToListings: 'Back to listings',
+      paidAt: 'Paid',
+      amountLabel: 'Amount',
 
       // Category-specific filters
       from: 'From',
@@ -741,6 +757,14 @@ const resources = {
       refunded: 'დაბრუნებული',
       resolved: 'გადაწყვეტილი',
       dismissed: 'უარყოფილი',
+      paymentSuccess: 'გადახდა წარმატებით დასრულდა!',
+      paymentSuccessDesc: 'თქვენი პრომოცია გააქტიურდა. განცხადება მალე დაიწყებს პრომოციას.',
+      paymentCancel: 'გადახდა გაუქმდა',
+      paymentCancelDesc: 'თქვენ გააუქმეთ გადახდა. სცადეთ ხელახლა, თუ გსურთ განცხადების პრომოცია.',
+      backToDashboard: 'მართვის პანელში დაბრუნება',
+      backToListings: 'განცხადებებზე დაბრუნება',
+      paidAt: 'გადახდილია',
+      amountLabel: 'თანხა',
 
       // Category-specific filters
       from: 'დან',
