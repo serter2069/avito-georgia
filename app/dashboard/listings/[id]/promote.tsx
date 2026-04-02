@@ -120,7 +120,7 @@ export default function PromoteListingScreen() {
       <View className="flex-1 bg-dark">
         <Header title={t('promoteListing')} />
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color="#0A7B8A" />
         </View>
       </View>
     );

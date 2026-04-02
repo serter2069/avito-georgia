@@ -219,7 +219,7 @@ export default function CreateListingScreen() {
     <View className="px-4 gap-3">
       <Text className="text-text-primary text-base font-semibold">{t('selectCategory')}</Text>
       {loadingCategories ? (
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color="#0A7B8A" />
       ) : (
         <View className="gap-2">
           {categories.map((cat) => (
@@ -253,7 +253,7 @@ export default function CreateListingScreen() {
     <View className="px-4 gap-3">
       <Text className="text-text-primary text-base font-semibold">{t('selectCity')}</Text>
       {loadingCities ? (
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color="#0A7B8A" />
       ) : (
         <View className="gap-2">
           {cities.map((city) => (

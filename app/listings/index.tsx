@@ -147,7 +147,7 @@ export default function ListingsScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color="#0A7B8A" />
       </View>
     );
   };
@@ -193,7 +193,7 @@ export default function ListingsScreen() {
       </ScrollView>
 
       {/* Sort + count */}
-      <View className="px-4 py-2 flex-row items-center justify-between">
+      <View className="px-4 py-2 flex-row items-center justify-between" style={{ zIndex: 100 }}>
         <Text className="text-text-muted text-xs">
           {total} {t('listings').toLowerCase()}
         </Text>
@@ -210,7 +210,7 @@ export default function ListingsScreen() {
           </TouchableOpacity>
 
           {showSort && (
-            <View className="absolute top-9 right-0 bg-surface-card border border-border rounded-lg z-10 min-w-[140px]">
+            <View className="absolute top-9 right-0 bg-surface-card border border-border rounded-lg min-w-[140px]" style={{ zIndex: 999, elevation: 10 }}>
               {SORT_OPTIONS.map((opt) => (
                 <TouchableOpacity
                   key={opt.key}
@@ -238,7 +238,7 @@ export default function ListingsScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color="#0A7B8A" />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : (

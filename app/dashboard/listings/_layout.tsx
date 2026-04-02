@@ -5,7 +5,7 @@ export default function DashboardListingsLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#0f0f1a' },
+        contentStyle: { backgroundColor: '#F2F8FA' },
       }}
     />
   );

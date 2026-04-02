@@ -10,15 +10,15 @@ export default function DashboardLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#1a1a2e',
-          borderTopColor: '#2d2d4e',
+          backgroundColor: '#E8F4F8',
+          borderTopColor: '#C8E0E8',
           borderTopWidth: 1,
           height: 60,
           paddingBottom: 8,
           paddingTop: 4,
         },
-        tabBarActiveTintColor: '#6366f1',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarActiveTintColor: '#0A7B8A',
+        tabBarInactiveTintColor: '#6A8898',
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',

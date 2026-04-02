@@ -16,10 +16,15 @@ function useProtectedRoute() {
     if (!isReady) return;
 
     const inAuthGroup = segments[0] === '(auth)';
-    // Allow guests to view listings detail and seller profiles
-    const inPublicRoute = segments[0] === 'listings' || segments[0] === 'users';
+    // Public routes accessible without auth
+    const inPublicRoute =
+      segments.length === 0 || // home
+      segments[0] === 'listings' ||
+      segments[0] === 'users' ||
+      segments[0] === 'search';
+    const inDashboard = segments[0] === 'dashboard' || segments[0] === 'my';
 
-    if (!user && !inAuthGroup && !inPublicRoute) {
+    if (!user && inDashboard) {
       router.replace('/(auth)');
     } else if (user && inAuthGroup) {
       router.replace('/');
@@ -40,18 +45,18 @@ export default function RootLayout() {
   if (!isReady) {
     return (
       <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth: 430 }}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#0A7B8A" />
       </View>
     );
   }
 
   return (
     <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth: 430 }}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#0f0f1a' },
+          contentStyle: { backgroundColor: '#F2F8FA' },
         }}
       />
     </View>

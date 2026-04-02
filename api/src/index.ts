@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
 import { setupSocket } from './socket';
@@ -22,7 +23,19 @@ const app = express();
 const httpServer = http.createServer(app);
 const PORT = parseInt(process.env.PORT || '3813', 10);
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://avito-georgia.smartlaunchhub.com',
+    'http://localhost:8081',
+    'http://localhost:19006',
+  ],
+  credentials: true,
+}));
+
+const otpLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: { error: 'Too many requests, try again later' } });
+const verifyLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many attempts' } });
+app.use('/api/auth/request-otp', otpLimiter);
+app.use('/api/auth/verify-otp', verifyLimiter);
 
 // Stripe webhook needs raw body — MUST be before express.json()
 app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhookRouter);

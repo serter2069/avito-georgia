@@ -106,7 +106,7 @@ export default function HomeScreen() {
         contentContainerClassName="pb-4"
         refreshControl={
           Platform.OS !== 'web' ? (
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0A7B8A" />
           ) : undefined
         }
       >
@@ -116,7 +116,7 @@ export default function HomeScreen() {
             <TextInput
               className="flex-1 px-4 py-3 text-text-primary text-base"
               placeholder={t('searchPlaceholder')}
-              placeholderTextColor="#64748b"
+              placeholderTextColor="#6A8898"
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
@@ -158,7 +158,7 @@ export default function HomeScreen() {
 
           {loading ? (
             <View className="py-12 items-center">
-              <ActivityIndicator size="large" color="#6366f1" />
+              <ActivityIndicator size="large" color="#0A7B8A" />
               <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
             </View>
           ) : listings.length === 0 ? (

@@ -96,7 +96,7 @@ export default function FavoritesScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color="#0A7B8A" />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : favorites.length === 0 ? (
@@ -116,7 +116,7 @@ export default function FavoritesScreen() {
           ListFooterComponent={
             loadingMore ? (
               <View className="py-4 items-center">
-                <ActivityIndicator size="small" color="#6366f1" />
+                <ActivityIndicator size="small" color="#0A7B8A" />
               </View>
             ) : null
           }

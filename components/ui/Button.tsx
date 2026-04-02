@@ -51,7 +51,7 @@ export function Button({
       activeOpacity={0.7}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'ghost' ? '#6366f1' : '#fff'} />
+        <ActivityIndicator color={variant === 'ghost' ? '#0A7B8A' : '#fff'} />
       ) : (
         <Text className={`${textVariantClasses[variant]} ${textSizeClasses[size]}`}>
           {title}

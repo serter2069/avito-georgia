@@ -162,7 +162,7 @@ export default function SearchScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color="#0A7B8A" />
       </View>
     );
   };
@@ -177,7 +177,7 @@ export default function SearchScreen() {
           <TextInput
             className="flex-1 px-4 py-3 text-text-primary text-base"
             placeholder={t('searchPlaceholder')}
-            placeholderTextColor="#64748b"
+            placeholderTextColor="#6A8898"
             value={searchQuery}
             onChangeText={setSearchQuery}
             onSubmitEditing={() => doSearch(true)}
@@ -246,7 +246,7 @@ export default function SearchScreen() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
                 placeholder={t('priceFrom')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#6A8898"
                 value={priceMin}
                 onChangeText={setPriceMin}
                 keyboardType="numeric"
@@ -256,7 +256,7 @@ export default function SearchScreen() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
                 placeholder={t('priceTo')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor="#6A8898"
                 value={priceMax}
                 onChangeText={setPriceMax}
                 keyboardType="numeric"
@@ -285,7 +285,7 @@ export default function SearchScreen() {
       {/* Results */}
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color="#0A7B8A" />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : (

@@ -232,7 +232,7 @@ export default function MyListingsScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color="#0A7B8A" />
       </View>
     );
   };
@@ -264,7 +264,7 @@ export default function MyListingsScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color="#0A7B8A" />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : (
@@ -283,7 +283,7 @@ export default function MyListingsScreen() {
       {/* FAB Create button */}
       <TouchableOpacity
         className="absolute bottom-6 right-6 w-14 h-14 bg-primary rounded-full items-center justify-center"
-        style={{ elevation: 5, shadowColor: '#6366f1', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4 }}
+        style={{ elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}
         onPress={() => router.push('/listings/create')}
       >
         <Text className="text-white text-2xl font-light">+</Text>

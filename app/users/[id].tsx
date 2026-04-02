@@ -169,7 +169,7 @@ export default function SellerProfileScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#6366f1" />
+        <ActivityIndicator size="small" color="#0A7B8A" />
       </View>
     );
   };
@@ -184,7 +184,7 @@ export default function SellerProfileScreen() {
           <Text className="text-text-primary text-lg font-bold">{t('sellerProfile')}</Text>
         </View>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color="#0A7B8A" />
         </View>
       </View>
     );

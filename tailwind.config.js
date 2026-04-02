@@ -10,23 +10,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Brand: Avito Georgia (from Trinity brand #38)
-        primary: '#6366f1',       // brandPrimary - Indigo
-        'primary-dark': '#8b5cf6', // brandSecondary - Violet
-        secondary: '#f59e0b',     // statusWarning - Amber (accent)
-        accent: '#a78bfa',        // textAccent - Light violet
-        surface: '#16213e',       // bgSurface
-        'surface-card': '#1e1e35', // bgCard
-        dark: '#0f0f1a',          // bgPrimary
-        'dark-secondary': '#1a1a2e', // bgSecondary
-        'text-primary': '#e2e8f0',
-        'text-secondary': '#94a3b8',
-        'text-muted': '#64748b',
-        border: '#2d2d4e',
-        'border-focus': '#6366f1',
-        success: '#4CAF50',
+        // Brand: Avito Georgia — Teal Batumi (from brand.html)
+        primary: '#0A7B8A',
+        'primary-dark': '#0A2840',
+        secondary: '#f59e0b',
+        accent: '#1A9BAA',
+        surface: '#E8F4F8',
+        'surface-card': '#FFFFFF',
+        dark: '#F2F8FA',
+        'dark-secondary': '#E8F4F8',
+        'text-primary': '#0A2840',
+        'text-secondary': '#1A4A6E',
+        'text-muted': '#6A8898',
+        border: '#C8E0E8',
+        'border-focus': '#0A7B8A',
+        success: '#2E7D30',
         warning: '#f59e0b',
-        error: '#ef4444',
+        error: '#C0392B',
         info: '#3b82f6',
       },
       fontFamily: {
