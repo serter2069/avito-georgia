@@ -141,15 +141,22 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/auth/me — return current user from JWT
+// GET /api/auth/me — return current authenticated user
 router.get('/me', requireAuth, async (req: Request, res: Response) => {
-  const userId = req.user!.userId;
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, email: true, role: true, name: true, createdAt: true },
-  });
-  if (!user) { res.status(404).json({ error: 'User not found' }); return; }
-  res.json({ user });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      select: { id: true, email: true, name: true, phone: true, avatarUrl: true, role: true, locale: true, createdAt: true },
+    });
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    res.json({ user });
+  } catch (err) {
+    console.error('GET /auth/me error:', err);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
 });
 
 export default router;
