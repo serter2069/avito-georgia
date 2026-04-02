@@ -171,7 +171,8 @@ router.get('/:id', async (req: Request, res: Response) => {
     include: {
       photos: { orderBy: { order: 'asc' } },
       city: true, district: true, category: true,
-      user: { select: { id: true, name: true, phone: true, createdAt: true } },
+      // phone intentionally excluded — contact via chat only
+      user: { select: { id: true, name: true, createdAt: true } },
     },
   });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
