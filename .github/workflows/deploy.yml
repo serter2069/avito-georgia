@@ -63,10 +63,10 @@ jobs:
 
       - name: Deploy API
         run: |
+          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/ || true
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
           cd /var/www/avito-georgia/api && npm ci && DATABASE_URL="${DATABASE_URL}" npm run build
-          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/
           sudo chmod -R g+rw /var/www/avito-georgia/api/
           printf '%s\n' \
             "DATABASE_URL=${DATABASE_URL}" \
