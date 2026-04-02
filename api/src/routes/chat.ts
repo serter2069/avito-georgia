@@ -72,6 +72,56 @@ router.get('/threads/:id/messages', requireAuth, async (req: Request, res: Respo
   }
 });
 
+// POST /api/threads — find or create a direct thread between two users (no listing required)
+router.post('/threads', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { otherUserId } = req.body;
+
+    if (!otherUserId || typeof otherUserId !== 'string') {
+      res.status(400).json({ error: 'otherUserId is required' });
+      return;
+    }
+
+    if (otherUserId === userId) {
+      res.status(400).json({ error: 'Cannot start a dialog with yourself' });
+      return;
+    }
+
+    // Verify the other user exists
+    const otherUser = await prisma.user.findUnique({ where: { id: otherUserId }, select: { id: true, name: true } });
+    if (!otherUser) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    // Sort IDs to ensure consistent uniqueness: participant1Id < participant2Id
+    const [p1, p2] = [userId, otherUserId].sort();
+
+    // Upsert direct thread
+    let thread = await prisma.thread.findUnique({
+      where: { participant1Id_participant2Id: { participant1Id: p1, participant2Id: p2 } },
+    });
+
+    if (!thread) {
+      thread = await prisma.thread.create({
+        data: {
+          participant1Id: p1,
+          participant2Id: p2,
+          participants: {
+            create: [{ userId }, { userId: otherUserId }],
+          },
+        },
+      });
+    }
+
+    res.status(201).json({ threadId: thread.id });
+  } catch (err) {
+    console.error('POST /threads error:', err);
+    res.status(500).json({ error: 'Failed to create thread' });
+  }
+});
+
 // POST /api/threads/:listingId/message — send message (creates thread on first message)
 router.post('/threads/:listingId/message', requireAuth, async (req: Request, res: Response) => {
   try {

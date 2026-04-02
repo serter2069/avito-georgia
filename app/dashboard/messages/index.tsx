@@ -28,7 +28,7 @@ interface ThreadMessage {
 
 interface Thread {
   id: string;
-  listing: ThreadListing;
+  listing: ThreadListing | null;
   otherUser: ThreadUser | null;
   lastMessage: ThreadMessage | null;
   updatedAt: string;
@@ -101,7 +101,7 @@ export default function ThreadListScreen() {
       <View className="flex-1 min-w-0">
         <View className="flex-row items-center justify-between mb-1">
           <Text className="text-text-primary font-semibold text-base flex-1 mr-2" numberOfLines={1}>
-            {item.otherUser?.name || item.listing.title}
+            {item.otherUser?.name || item.listing?.title || '—'}
           </Text>
           {item.lastMessage && (
             <Text className="text-text-muted text-xs">
@@ -109,9 +109,11 @@ export default function ThreadListScreen() {
             </Text>
           )}
         </View>
-        <Text className="text-text-secondary text-sm" numberOfLines={1}>
-          {item.listing.title}
-        </Text>
+        {item.listing && (
+          <Text className="text-text-secondary text-sm" numberOfLines={1}>
+            {item.listing.title}
+          </Text>
+        )}
         {item.lastMessage && (
           <Text className="text-text-muted text-xs mt-0.5" numberOfLines={1}>
             {item.lastMessage.text}
