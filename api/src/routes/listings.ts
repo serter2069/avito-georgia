@@ -44,17 +44,20 @@ router.get('/map', async (req: Request, res: Response) => {
 
 // GET /api/listings
 router.get('/', async (req: Request, res: Response) => {
+  const q = qs(req.query.q);
   const category = qs(req.query.category);
   const city = qs(req.query.city);
   const price_min = qs(req.query.price_min);
   const price_max = qs(req.query.price_max);
   const sort = qs(req.query.sort);
+  const limit = Math.min(parseInt(qs(req.query.limit) || '20', 10), 50);
   const page = parseInt(qs(req.query.page) || '1', 10);
-  const take = 20;
+  const take = limit;
   const skip = (page - 1) * take;
   const where: Prisma.ListingWhereInput = {
     status: 'active',
     OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : {}),
     ...(category ? { categoryId: category } : {}),
     ...(city ? { cityId: city } : {}),
     ...(price_min || price_max
