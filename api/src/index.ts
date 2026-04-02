@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
+import authRouter from './auth/auth.router';
 
 dotenv.config();
 
@@ -15,9 +16,14 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Unhandled error:', err.message);
-  res.status(500).json({ error: 'Internal server error' });
+app.use('/api/auth', authRouter);
+
+// Error handler — must be last, after all routes
+app.use((err: Error & { statusCode?: number }, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  const status = err.statusCode || 500;
+  const message = status < 500 ? err.message : 'Internal server error';
+  if (status >= 500) console.error('Unhandled error:', err.message);
+  res.status(status).json({ error: message });
 });
 
 app.listen(PORT, () => {
