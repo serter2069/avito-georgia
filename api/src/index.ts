@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
 import authRouter from './routes/auth';
+import listingsRouter from './routes/listings';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/auth', authRouter);
+app.use('/api/listings', listingsRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
