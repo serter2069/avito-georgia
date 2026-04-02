@@ -125,10 +125,19 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
     }
   }
   const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-  const listing = await prisma.listing.create({
-    data: { title, description, price: price ? parseFloat(price) : null, currency, categoryId, cityId, districtId, userId, expiresAt },
-  });
-  res.status(201).json(listing);
+  try {
+    const listing = await prisma.listing.create({
+      data: { title, description, price: price ? parseFloat(price) : null, currency, categoryId, cityId, districtId, userId, expiresAt },
+    });
+    res.status(201).json(listing);
+  } catch (err: any) {
+    if (err?.code === 'P2003' || err?.code === 'P2025') {
+      res.status(400).json({ error: 'Invalid categoryId or districtId — record not found' });
+      return;
+    }
+    console.error('POST /listings error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // PATCH /api/listings/:id
