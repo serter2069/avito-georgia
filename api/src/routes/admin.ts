@@ -55,7 +55,7 @@ router.get('/users', requireAuth, async (req: Request, res: Response) => {
 router.patch('/users/:id/role', requireAuth, async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
 
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { role } = req.body;
 
   if (!role || !['user', 'admin', 'blocked'].includes(role)) {
@@ -120,7 +120,7 @@ router.get('/stats', requireAuth, async (req: Request, res: Response) => {
 router.patch('/reports/:id/status', requireAuth, async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
 
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { status } = req.body;
 
   if (!status || !['pending', 'resolved', 'dismissed'].includes(status)) {
@@ -146,7 +146,7 @@ router.patch('/reports/:id/status', requireAuth, async (req: Request, res: Respo
 router.patch('/listings/:id/status', requireAuth, async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
 
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { status } = req.body;
 
   if (!status || !['active', 'removed'].includes(status)) {
