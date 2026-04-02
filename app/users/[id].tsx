@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
 import { api } from '../../lib/api';
+import { useAuthStore } from '../../stores/authStore';
+import { colors } from '../../lib/colors';
 
 interface SellerProfile {
   id: string;
@@ -51,6 +53,7 @@ export default function SellerProfileScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { width } = useWindowDimensions();
+  const user = useAuthStore((s) => s.user);
 
   const containerWidth = Math.min(width, 430);
   const itemWidth = (containerWidth - 32 - 12) / 2;
@@ -62,6 +65,7 @@ export default function SellerProfileScreen() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [startingDialog, setStartingDialog] = useState(false);
 
   // Fetch seller profile
   useEffect(() => {
@@ -111,6 +115,22 @@ export default function SellerProfileScreen() {
     router.push(`/listings/${listingId}`);
   }, [router]);
 
+  const handleStartDialog = useCallback(async (specialistId: string) => {
+    if (!user) {
+      router.push('/(auth)');
+      return;
+    }
+    if (startingDialog) return;
+
+    setStartingDialog(true);
+    const res = await api.post<{ threadId: string }>('/threads', { otherUserId: specialistId });
+    setStartingDialog(false);
+
+    if (res.ok && res.data) {
+      router.push(`/dashboard/messages/${res.data.threadId}`);
+    }
+  }, [user, startingDialog, router]);
+
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
@@ -148,6 +168,22 @@ export default function SellerProfileScreen() {
           </View>
         </View>
 
+        {/* Write message button — only shown to other users, not the seller themselves */}
+        {user && user.id !== seller.id && (
+          <TouchableOpacity
+            className="mx-4 mb-4 py-3 bg-primary rounded-lg items-center justify-center"
+            onPress={() => handleStartDialog(seller.id)}
+            disabled={startingDialog}
+            activeOpacity={0.8}
+          >
+            {startingDialog ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text className="text-white font-semibold text-base">{t('writeMessage')}</Text>
+            )}
+          </TouchableOpacity>
+        )}
+
         {/* Active listings header */}
         <View className="px-4 pb-2">
           <Text className="text-text-primary text-lg font-bold">{t('activeListings')}</Text>
@@ -169,7 +205,7 @@ export default function SellerProfileScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#0A7B8A" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       </View>
     );
   };
@@ -184,7 +220,7 @@ export default function SellerProfileScreen() {
           <Text className="text-text-primary text-lg font-bold">{t('sellerProfile')}</Text>
         </View>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </View>
     );

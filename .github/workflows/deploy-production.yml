@@ -1,0 +1,77 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-frontend:
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web
+        run: npx expo export --platform web --output-dir dist
+
+      - name: Generate version.json
+        run: |
+          cat > dist/version.json << EOF
+          {
+            "version": "$(git rev-parse --short HEAD)",
+            "commit": "$(git rev-parse HEAD)",
+            "branch": "${{ github.ref_name }}",
+            "deployed": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "message": "$(git log -1 --pretty=%s | head -c 100)"
+          }
+          EOF
+
+      - name: Deploy frontend
+        run: |
+          rsync -av --delete dist/ /var/www/avito-georgia/web/
+          sudo chown -R github-runner:www-data /var/www/avito-georgia/web/
+          sudo chmod -R g+rw /var/www/avito-georgia/web/
+
+  deploy-api:
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Doppler CLI
+        run: |
+          if ! command -v doppler &> /dev/null; then
+            curl -sLf --retry 3 --tlsv1.2 --proto "=https" \
+              'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | \
+              sudo apt-key add - 2>/dev/null || true
+            echo "deb https://packages.doppler.com/public/cli/deb/debian any-version main" | \
+              sudo tee /etc/apt/sources.list.d/doppler-cli.list
+            sudo apt-get update -qq && sudo apt-get install -y doppler
+          fi
+          doppler --version
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
+      - name: Deploy API
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRD }}
+        run: |
+          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/ || true
+          rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
+            api/ /var/www/avito-georgia/api/
+          cd /var/www/avito-georgia/api && npm ci && doppler run -- npm run build
+          sudo chmod -R g+rw /var/www/avito-georgia/api/
+          doppler secrets download --no-file --format env > /var/www/avito-georgia/api/.env
+          chmod 600 /var/www/avito-georgia/api/.env
+          sudo pm2 delete avito-georgia-api 2>/dev/null || true
+          sudo pm2 start /var/www/avito-georgia/api/dist/index.js \
+            --name avito-georgia-api \
+            --cwd /var/www/avito-georgia/api

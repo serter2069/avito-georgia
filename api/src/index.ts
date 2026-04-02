@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
 import { setupSocket } from './socket';
@@ -16,8 +17,17 @@ import promotionsRouter from './routes/promotions';
 import stripeWebhookRouter from './routes/stripe-webhook';
 import adminPaymentsRouter from './routes/admin-payments';
 import usersRouter from './routes/users';
+import adminRouter from './routes/admin';
 
 dotenv.config();
+
+// Guard against missing or placeholder JWT secrets
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your-jwt-secret') {
+  throw new Error('JWT_SECRET is not configured or is using the placeholder value');
+}
+if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET === 'your-jwt-refresh-secret') {
+  throw new Error('JWT_REFRESH_SECRET is not configured or is using the placeholder value');
+}
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -31,6 +41,7 @@ app.use(cors({
   ],
   credentials: true,
 }));
+app.use(cookieParser());
 
 const otpLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: { error: 'Too many requests, try again later' } });
 const verifyLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many attempts' } });
@@ -52,6 +63,7 @@ app.use('/api/reports', reportsRouter);
 app.use('/api/promotions', promotionsRouter);
 app.use('/api/admin/payments', adminPaymentsRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

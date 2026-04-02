@@ -9,6 +9,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../stores/authStore';
+import { colors } from '../../lib/colors';
 
 interface ListingPhoto {
   id: string;
@@ -56,6 +57,7 @@ export default function ListingDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
 
   // Fetch listing once on mount
   useEffect(() => {
@@ -112,16 +114,38 @@ export default function ListingDetailScreen() {
     setFavoriteLoading(false);
   }, [user, id, isFavorited, favoriteLoading, router]);
 
-  const handleContactSeller = useCallback(() => {
+  const handleContactSeller = useCallback(async () => {
     if (!user) {
       router.push('/(auth)');
       return;
     }
-    // Navigate to chat with seller (chat route to be implemented)
-    if (listing?.user?.id) {
-      router.push(`/listings`);
+    if (!id || !listing?.user?.id || contactLoading) return;
+
+    const listingId = Array.isArray(id) ? id[0] : id;
+
+    setContactLoading(true);
+    try {
+      // Check for an existing thread for this listing before creating a new one
+      const threadsRes = await api.get<Array<{ id: string; listing: { id: string } | null }>>('/threads');
+      if (threadsRes.ok && threadsRes.data) {
+        const existing = threadsRes.data.find((t) => t.listing?.id === listingId);
+        if (existing) {
+          router.push(`/dashboard/messages/${existing.id}`);
+          return;
+        }
+      }
+
+      // No existing thread — send first message to create one
+      const createRes = await api.post<{ threadId: string }>(`/threads/${listingId}/message`, {
+        text: 'Здравствуйте! Интересует ваше объявление.',
+      });
+      if (createRes.ok && createRes.data?.threadId) {
+        router.push(`/dashboard/messages/${createRes.data.threadId}`);
+      }
+    } finally {
+      setContactLoading(false);
     }
-  }, [user, listing, router]);
+  }, [user, id, listing, contactLoading, router]);
 
   const handleShare = useCallback(async () => {
     if (!listing) return;
@@ -151,7 +175,7 @@ export default function ListingDetailScreen() {
       <View className="flex-1 bg-dark">
         <Header title={t('loading')} />
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </View>
     );
@@ -270,29 +294,45 @@ export default function ListingDetailScreen() {
 
       {/* Bottom action bar */}
       <View className="absolute bottom-0 left-0 right-0 bg-dark-secondary border-t border-border px-4 py-3 flex-row gap-3">
-        <TouchableOpacity
-          className={`px-4 py-3 rounded-lg border items-center justify-center ${
-            isFavorited ? 'bg-secondary/20 border-secondary' : 'border-border'
-          }`}
-          onPress={handleFavorite}
-          disabled={favoriteLoading}
-        >
-          {favoriteLoading ? (
-            <ActivityIndicator size="small" color="#f59e0b" />
-          ) : (
-            <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
-              {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
-            </Text>
-          )}
-        </TouchableOpacity>
+        {user && listing.user.id === user.id ? (
+          // Owner view: promote button
+          <View className="flex-1">
+            <Button
+              title={t('promote')}
+              onPress={() => router.push(`/dashboard/listings/${listing.id}/promote`)}
+              variant="secondary"
+              size="md"
+            />
+          </View>
+        ) : (
+          // Non-owner view: favorite + contact
+          <>
+            <TouchableOpacity
+              className={`px-4 py-3 rounded-lg border items-center justify-center ${
+                isFavorited ? 'bg-secondary/20 border-secondary' : 'border-border'
+              }`}
+              onPress={handleFavorite}
+              disabled={favoriteLoading}
+            >
+              {favoriteLoading ? (
+                <ActivityIndicator size="small" color={colors.statusWarning} />
+              ) : (
+                <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
+                  {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
+                </Text>
+              )}
+            </TouchableOpacity>
 
-        <View className="flex-1">
-          <Button
-            title={t('contactSeller')}
-            onPress={handleContactSeller}
-            size="md"
-          />
-        </View>
+            <View className="flex-1">
+              <Button
+                title={contactLoading ? t('loading') : t('contactSeller')}
+                onPress={handleContactSeller}
+                size="md"
+                disabled={contactLoading}
+              />
+            </View>
+          </>
+        )}
       </View>
     </View>
   );

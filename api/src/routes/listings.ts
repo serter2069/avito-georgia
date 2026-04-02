@@ -5,6 +5,7 @@ import { z, ZodError } from 'zod';
 import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
+import xss from 'xss';
 
 const router = Router();
 
@@ -66,12 +67,12 @@ router.get('/my', requireAuth, async (req: Request, res: Response) => {
 });
 
 // GET /api/listings/map?city= — MUST be before /:id
+// city param is optional: omit to get all cities
 router.get('/map', async (req: Request, res: Response) => {
   const city = qs(req.query.city);
-  if (!city) { res.status(400).json({ error: 'city param required' }); return; }
   const listings = await prisma.listing.findMany({
     where: {
-      cityId: city,
+      ...(city ? { cityId: city } : {}),
       status: 'active',
       OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     },
@@ -188,7 +189,8 @@ router.get('/:id', async (req: Request, res: Response) => {
     include: {
       photos: { orderBy: { order: 'asc' } },
       city: true, district: true, category: true,
-      user: { select: { id: true, name: true, phone: true, createdAt: true } },
+      // phone intentionally excluded — contact via chat only
+      user: { select: { id: true, name: true, createdAt: true } },
     },
   });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
@@ -209,6 +211,9 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
     throw err;
   }
   const { title, description, price, currency, categoryId, cityId, districtId } = data;
+  // Sanitize text fields to strip HTML tags (XSS prevention) — defense in depth
+  const safeTitle = xss(title);
+  const safeDescription = description ? xss(description) : description;
   const userId = req.user!.userId;
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (user?.role !== 'admin') {
@@ -225,7 +230,7 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
   try {
     const listing = await prisma.listing.create({
-      data: { title, description, price: price ?? null, currency, categoryId, cityId, districtId, userId, expiresAt },
+      data: { title: safeTitle, description: safeDescription, price: price ?? null, currency, categoryId, cityId, districtId, userId, expiresAt },
     });
     res.status(201).json(listing);
   } catch (err: any) {
@@ -256,10 +261,13 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   }
   const { title, description, price, currency, categoryId, cityId, districtId } = updateData;
   const newPrice = price;
+  // Sanitize only fields present in the request body to strip HTML tags (XSS prevention)
+  const safeTitle = title !== undefined ? xss(title) : title;
+  const safeDescription = description !== undefined ? xss(description) : description;
   const updated = await prisma.listing.update({
     where: { id },
     data: {
-      title, description,
+      title: safeTitle, description: safeDescription,
       price: newPrice,
       currency, categoryId, cityId, districtId,
     },

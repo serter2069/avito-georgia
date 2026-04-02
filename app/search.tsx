@@ -1,4 +1,4 @@
-import { View, ScrollView, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -6,7 +6,9 @@ import { Header } from '../components/layout/Header';
 import { CitySelector, City } from '../components/common/CitySelector';
 import { CategoryIcon, CategoryType } from '../components/common/CategoryIcon';
 import { ListingCard, Listing } from '../components/listing/ListingCard';
+import { SearchMap, MapListing } from '../components/map/SearchMap';
 import { api } from '../lib/api';
+import { colors } from '../lib/colors';
 
 const CATEGORIES: CategoryType[] = [
   'transport',
@@ -16,8 +18,24 @@ const CATEGORIES: CategoryType[] = [
   'furniture',
   'services',
   'jobs',
-  'other',
+  'kids',
+  'pets',
+  'hobbies',
 ];
+
+// Map frontend CategoryType to DB slug
+const CATEGORY_SLUG: Record<CategoryType, string> = {
+  transport: 'transport',
+  realEstate: 'real-estate',
+  electronics: 'electronics',
+  clothing: 'fashion',
+  furniture: 'home-garden',
+  services: 'services',
+  jobs: 'jobs',
+  kids: 'kids',
+  pets: 'pets',
+  hobbies: 'hobbies',
+};
 
 interface ListingsResponse {
   listings: ApiListing[];
@@ -63,8 +81,10 @@ export default function SearchScreen() {
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const [listings, setListings] = useState<Listing[]>([]);
+  const [mapListings, setMapListings] = useState<MapListing[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
@@ -75,13 +95,19 @@ export default function SearchScreen() {
     const parts: string[] = [];
     if (searchQuery.trim()) parts.push(`q=${encodeURIComponent(searchQuery.trim())}`);
     if (selectedCity !== 'all') parts.push(`city=${selectedCity}`);
-    if (selectedCategory) parts.push(`category=${selectedCategory}`);
+    if (selectedCategory) parts.push(`category=${CATEGORY_SLUG[selectedCategory]}`);
     if (priceMin) parts.push(`price_min=${priceMin}`);
     if (priceMax) parts.push(`price_max=${priceMax}`);
     parts.push(`page=${p}`);
     parts.push('sort=createdAt_desc');
     return `/listings?${parts.join('&')}`;
   }, [searchQuery, selectedCity, selectedCategory, priceMin, priceMax]);
+
+  const buildMapQuery = useCallback(() => {
+    const parts: string[] = [];
+    if (selectedCity !== 'all') parts.push(`city=${selectedCity}`);
+    return `/listings/map?${parts.join('&')}`;
+  }, [selectedCity]);
 
   const doSearch = useCallback(async (resetPage = true) => {
     const p = resetPage ? 1 : page;
@@ -102,10 +128,18 @@ export default function SearchScreen() {
       setTotal(res.data.total);
     }
 
+    // Fetch map data in parallel (web-only endpoint, no-op on native)
+    if (Platform.OS === 'web') {
+      const mapRes = await api.get<MapListing[]>(buildMapQuery());
+      if (mapRes.ok && mapRes.data) {
+        setMapListings(mapRes.data);
+      }
+    }
+
     setHasSearched(true);
     setLoading(false);
     setLoadingMore(false);
-  }, [buildQuery, page]);
+  }, [buildQuery, buildMapQuery, page]);
 
   // Auto-search on mount if q param exists
   useEffect(() => {
@@ -138,7 +172,7 @@ export default function SearchScreen() {
   };
 
   const handleListingPress = (id: string) => {
-    // Will navigate to listing detail when route is ready
+    router.push(`/listings/${id}`);
   };
 
   const renderItem = useCallback(({ item }: { item: Listing }) => (
@@ -162,10 +196,13 @@ export default function SearchScreen() {
     if (!loadingMore) return null;
     return (
       <View className="py-4 items-center">
-        <ActivityIndicator size="small" color="#0A7B8A" />
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       </View>
     );
   };
+
+  // Map toggle is only useful on web (Leaflet is web-only)
+  const showMapToggle = Platform.OS === 'web';
 
   return (
     <View className="flex-1 bg-dark">
@@ -177,7 +214,7 @@ export default function SearchScreen() {
           <TextInput
             className="flex-1 px-4 py-3 text-text-primary text-base"
             placeholder={t('searchPlaceholder')}
-            placeholderTextColor="#6A8898"
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
             onSubmitEditing={() => doSearch(true)}
@@ -193,16 +230,40 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      {/* Filters toggle */}
+      {/* Filters toggle + view mode toggle */}
       <View className="px-4 py-2 flex-row items-center justify-between">
-        <TouchableOpacity
-          className={`px-3 py-1.5 rounded-full border ${showFilters ? 'bg-primary border-primary' : 'border-border'}`}
-          onPress={() => setShowFilters(!showFilters)}
-        >
-          <Text className={`text-sm font-medium ${showFilters ? 'text-white' : 'text-text-secondary'}`}>
-            {t('filters')}
-          </Text>
-        </TouchableOpacity>
+        <View className="flex-row items-center gap-2">
+          <TouchableOpacity
+            className={`px-3 py-1.5 rounded-full border ${showFilters ? 'bg-primary border-primary' : 'border-border'}`}
+            onPress={() => setShowFilters(!showFilters)}
+          >
+            <Text className={`text-sm font-medium ${showFilters ? 'text-white' : 'text-text-secondary'}`}>
+              {t('filters')}
+            </Text>
+          </TouchableOpacity>
+
+          {/* List/Map toggle — web only, shown after first search */}
+          {showMapToggle && hasSearched && (
+            <View className="flex-row border border-border rounded-full overflow-hidden">
+              <TouchableOpacity
+                className={`px-3 py-1.5 ${viewMode === 'list' ? 'bg-primary' : 'bg-transparent'}`}
+                onPress={() => setViewMode('list')}
+              >
+                <Text className={`text-sm font-medium ${viewMode === 'list' ? 'text-white' : 'text-text-secondary'}`}>
+                  {t('listView')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`px-3 py-1.5 ${viewMode === 'map' ? 'bg-primary' : 'bg-transparent'}`}
+                onPress={() => setViewMode('map')}
+              >
+                <Text className={`text-sm font-medium ${viewMode === 'map' ? 'text-white' : 'text-text-secondary'}`}>
+                  {t('mapView')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
 
         {hasSearched && (
           <Text className="text-text-muted text-xs">
@@ -246,7 +307,7 @@ export default function SearchScreen() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
                 placeholder={t('priceFrom')}
-                placeholderTextColor="#6A8898"
+                placeholderTextColor={colors.textMuted}
                 value={priceMin}
                 onChangeText={setPriceMin}
                 keyboardType="numeric"
@@ -256,7 +317,7 @@ export default function SearchScreen() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-3 py-2.5 text-text-primary text-sm"
                 placeholder={t('priceTo')}
-                placeholderTextColor="#6A8898"
+                placeholderTextColor={colors.textMuted}
                 value={priceMax}
                 onChangeText={setPriceMax}
                 keyboardType="numeric"
@@ -285,8 +346,12 @@ export default function SearchScreen() {
       {/* Results */}
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
+        </View>
+      ) : viewMode === 'map' && Platform.OS === 'web' ? (
+        <View style={{ flex: 1 }}>
+          <SearchMap listings={mapListings} onMarkerPress={handleListingPress} />
         </View>
       ) : (
         <FlatList

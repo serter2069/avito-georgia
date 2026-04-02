@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../stores/authStore';
+import { colors } from '../../lib/colors';
 
 // AsyncStorage fallback for web
 async function getStoredValue(key: string): Promise<string | null> {
@@ -78,8 +79,8 @@ export default function SettingsScreen() {
             <Switch
               value={notificationsEnabled}
               onValueChange={toggleNotifications}
-              trackColor={{ false: '#C8E0E8', true: '#0A7B8A' }}
-              thumbColor="#fff"
+              trackColor={{ false: colors.borderDefault, true: colors.brandPrimary }}
+              thumbColor={colors.white}
             />
           </View>
         </View>

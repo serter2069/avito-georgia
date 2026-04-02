@@ -1,4 +1,5 @@
 import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { colors } from '../../lib/colors';
 
 interface ButtonProps {
   onPress: () => void;
@@ -51,7 +52,7 @@ export function Button({
       activeOpacity={0.7}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'ghost' ? '#0A7B8A' : '#fff'} />
+        <ActivityIndicator color={variant === 'ghost' ? colors.brandPrimary : colors.white} />
       ) : (
         <Text className={`${textVariantClasses[variant]} ${textSizeClasses[size]}`}>
           {title}

@@ -1,9 +1,7 @@
 import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from './lib/prisma';
 
 export function setupSocket(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {

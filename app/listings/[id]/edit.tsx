@@ -8,6 +8,7 @@ import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { useAuthStore } from '../../../stores/authStore';
 import { api, apiUpload } from '../../../lib/api';
+import { colors } from '../../../lib/colors';
 
 interface ListingDetail {
   id: string;
@@ -212,7 +213,7 @@ export default function EditListingScreen() {
       <View className="flex-1 bg-dark">
         <Header title={t('editListing')} />
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       </View>

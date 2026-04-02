@@ -8,6 +8,7 @@ import { CitySelector, City } from '../components/common/CitySelector';
 import { CategoryIcon, CategoryType } from '../components/common/CategoryIcon';
 import { ListingCard, Listing } from '../components/listing/ListingCard';
 import { api } from '../lib/api';
+import { colors } from '../lib/colors';
 
 const CATEGORIES: CategoryType[] = [
   'transport',
@@ -17,7 +18,9 @@ const CATEGORIES: CategoryType[] = [
   'furniture',
   'services',
   'jobs',
-  'other',
+  'kids',
+  'pets',
+  'hobbies',
 ];
 
 interface ListingsResponse {
@@ -106,7 +109,7 @@ export default function HomeScreen() {
         contentContainerClassName="pb-4"
         refreshControl={
           Platform.OS !== 'web' ? (
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0A7B8A" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brandPrimary} />
           ) : undefined
         }
       >
@@ -116,7 +119,7 @@ export default function HomeScreen() {
             <TextInput
               className="flex-1 px-4 py-3 text-text-primary text-base"
               placeholder={t('searchPlaceholder')}
-              placeholderTextColor="#6A8898"
+              placeholderTextColor={colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
@@ -158,7 +161,7 @@ export default function HomeScreen() {
 
           {loading ? (
             <View className="py-12 items-center">
-              <ActivityIndicator size="large" color="#0A7B8A" />
+              <ActivityIndicator size="large" color={colors.brandPrimary} />
               <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
             </View>
           ) : listings.length === 0 ? (
@@ -179,7 +182,7 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      <Footer />
+      <Footer onNavigate={(path) => router.push(path as any)} />
     </View>
   );
 }

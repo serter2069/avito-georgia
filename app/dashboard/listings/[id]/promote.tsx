@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Header } from '../../../../components/layout/Header';
 import { Button } from '../../../../components/ui/Button';
 import { api } from '../../../../lib/api';
+import { colors } from '../../../../lib/colors';
 
 interface PriceOption {
   type: string;
@@ -120,7 +121,7 @@ export default function PromoteListingScreen() {
       <View className="flex-1 bg-dark">
         <Header title={t('promoteListing')} />
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </View>
     );

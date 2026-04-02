@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { api } from '../../../lib/api';
+import { colors } from '../../../lib/colors';
 
 interface ThreadUser {
   id: string;
@@ -27,7 +28,7 @@ interface ThreadMessage {
 
 interface Thread {
   id: string;
-  listing: ThreadListing;
+  listing: ThreadListing | null;
   otherUser: ThreadUser | null;
   lastMessage: ThreadMessage | null;
   updatedAt: string;
@@ -100,7 +101,7 @@ export default function ThreadListScreen() {
       <View className="flex-1 min-w-0">
         <View className="flex-row items-center justify-between mb-1">
           <Text className="text-text-primary font-semibold text-base flex-1 mr-2" numberOfLines={1}>
-            {item.otherUser?.name || item.listing.title}
+            {item.otherUser?.name || item.listing?.title || '\u2014'}
           </Text>
           {item.lastMessage && (
             <Text className="text-text-muted text-xs">
@@ -108,9 +109,11 @@ export default function ThreadListScreen() {
             </Text>
           )}
         </View>
-        <Text className="text-text-secondary text-sm" numberOfLines={1}>
-          {item.listing.title}
-        </Text>
+        {item.listing && (
+          <Text className="text-text-secondary text-sm" numberOfLines={1}>
+            {item.listing.title}
+          </Text>
+        )}
         {item.lastMessage && (
           <Text className="text-text-muted text-xs mt-0.5" numberOfLines={1}>
             {item.lastMessage.text}
@@ -129,7 +132,7 @@ export default function ThreadListScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : error ? (

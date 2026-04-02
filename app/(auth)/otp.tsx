@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
@@ -11,7 +11,6 @@ const RESEND_COOLDOWN = 60;
 
 export default function OtpScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
   const { email } = useLocalSearchParams<{ email: string }>();
   const setAuth = useAuthStore((s) => s.setAuth);
 
@@ -81,8 +80,17 @@ export default function OtpScreen() {
       }>('/auth/verify-otp', { email, code: otp });
 
       if (res.ok && res.data) {
-        await setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
-        router.replace('/');
+        // Set Zustand in-memory state synchronously BEFORE navigation.
+        // This ensures useProtectedRoute sees user immediately when
+        // router.replace triggers a layout re-render.
+        // Storage writes (SecureStore) happen async in background — no await.
+        useAuthStore.setState({
+          user: res.data.user,
+          accessToken: res.data.accessToken,
+          isReady: true,
+        });
+        // Persist tokens to storage (fire-and-forget, non-blocking)
+        setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
       } else {
         setError(res.error || t('invalidCode'));
       }

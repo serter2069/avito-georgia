@@ -5,6 +5,8 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../stores/authStore';
+import { useAuthRefresh } from '../hooks/useAuthRefresh';
+import { colors } from '../lib/colors';
 
 function useProtectedRoute() {
   const user = useAuthStore((s) => s.user);
@@ -21,7 +23,12 @@ function useProtectedRoute() {
       segments.length === 0 || // home
       segments[0] === 'listings' ||
       segments[0] === 'users' ||
-      segments[0] === 'search';
+      segments[0] === 'search' ||
+      segments[0] === 'promotions' ||
+      segments[0] === 'about' ||
+      segments[0] === 'terms' ||
+      segments[0] === 'privacy' ||
+      segments[0] === 'help';
     const inDashboard = segments[0] === 'dashboard' || segments[0] === 'my';
 
     if (!user && inDashboard) {
@@ -40,12 +47,14 @@ export default function RootLayout() {
     hydrate();
   }, []);
 
+  // Proactive token refresh: every 20 min + on tab/app focus (auth.md Level 2)
+  useAuthRefresh();
   useProtectedRoute();
 
   if (!isReady) {
     return (
       <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth: 430 }}>
-        <ActivityIndicator size="large" color="#0A7B8A" />
+        <ActivityIndicator size="large" color={colors.brandPrimary} />
       </View>
     );
   }
@@ -56,7 +65,8 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#F2F8FA' },
+          contentStyle: { backgroundColor: colors.bgPrimary },
+          sceneContainerStyle: { backgroundColor: colors.bgPrimary },
         }}
       />
     </View>
