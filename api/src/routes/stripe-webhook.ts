@@ -124,12 +124,33 @@ router.post('/', async (req: Request, res: Response) => {
       }
 
       case 'customer.subscription.deleted': {
-        // Subscription canceled — deactivate unlimited_sub
+        // Subscription canceled — deactivate unlimited_sub promotion
         const sub = event.data.object as Stripe.Subscription;
-        const customerId = sub.customer as string;
-        // Find user by Stripe customer — for now, log it
-        console.log(`[stripe-webhook] Subscription deleted for customer ${customerId}`);
-        // TODO: map Stripe customer to userId and deactivate promotion
+
+        // Try metadata on the subscription object first (set via subscription_data.metadata at checkout)
+        let userId: string | undefined = sub.metadata?.userId;
+
+        // Fallback: look up the original checkout session to get userId from its metadata
+        if (!userId) {
+          const sessions = await getStripe().checkout.sessions.list({ subscription: sub.id, limit: 1 });
+          userId = sessions.data[0]?.metadata?.userId ?? undefined;
+        }
+
+        if (!userId) {
+          console.warn(`[stripe-webhook] customer.subscription.deleted: could not resolve userId for subscription ${sub.id}, skipping deactivation`);
+          break;
+        }
+
+        const result = await prisma.promotion.updateMany({
+          where: { userId, promotionType: 'unlimited_sub', isActive: true },
+          data: { isActive: false },
+        });
+
+        if (result.count === 0) {
+          console.warn(`[stripe-webhook] customer.subscription.deleted: no active unlimited_sub found for user ${userId} (sub ${sub.id})`);
+        } else {
+          console.log(`[stripe-webhook] Deactivated ${result.count} unlimited_sub promotion(s) for user ${userId} (sub ${sub.id})`);
+        }
         break;
       }
 
