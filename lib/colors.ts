@@ -1,6 +1,7 @@
 export const colors = {
-  bgPrimary: '#F2F8FA',
-  bgSecondary: '#E8F4F8',
+  bgPrimary: '#FFFFFF',
+  bgSection: '#F2F8FA',
+  bgSecondary: '#F2F8FA',
   bgSurface: '#FFFFFF',
   bgCard: '#FFFFFF',
   textPrimary: '#0A2840',
