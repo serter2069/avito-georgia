@@ -98,6 +98,23 @@ export function setupSocket(httpServer: HttpServer): Server {
       }
     });
 
+    // Typing indicator
+    socket.on('typing', (data: { threadId: string }) => {
+      if (data.threadId) {
+        socket.to(data.threadId).emit('typing', {
+          threadId: data.threadId,
+          userId: socket.data.userId,
+        });
+      }
+    });
+
+    // Leave thread room
+    socket.on('leave_thread', (threadId: string) => {
+      if (threadId) {
+        socket.leave(threadId);
+      }
+    });
+
     socket.on('disconnect', () => {
       console.log(`Socket disconnected: ${socket.data.userId}`);
     });
