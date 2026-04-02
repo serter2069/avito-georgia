@@ -274,7 +274,7 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   });
 
   // Price-drop notification for users who favorited this listing
-  if (newPrice !== undefined && oldPrice !== null && newPrice < oldPrice) {
+  if (newPrice !== undefined && newPrice !== null && oldPrice !== null && newPrice < oldPrice) {
     const favorites = await prisma.favorite.findMany({
       where: { listingId: id },
       include: { user: { select: { id: true, email: true } } },
