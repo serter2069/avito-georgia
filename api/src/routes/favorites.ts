@@ -1,11 +1,11 @@
-import { Router, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth, AuthRequest } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
 // POST /api/favorites/:listingId
-router.post('/:listingId', requireAuth, async (req: AuthRequest, res: Response) => {
+router.post('/:listingId', requireAuth, async (req: Request, res: Response) => {
   const listingId = String(req.params.listingId);
   const userId = req.user!.userId;
   const listing = await prisma.listing.findUnique({ where: { id: listingId } });
@@ -17,7 +17,7 @@ router.post('/:listingId', requireAuth, async (req: AuthRequest, res: Response) 
 });
 
 // DELETE /api/favorites/:listingId
-router.delete('/:listingId', requireAuth, async (req: AuthRequest, res: Response) => {
+router.delete('/:listingId', requireAuth, async (req: Request, res: Response) => {
   const listingId = String(req.params.listingId);
   const userId = req.user!.userId;
   const existing = await prisma.favorite.findUnique({ where: { userId_listingId: { userId, listingId } } });
@@ -27,7 +27,7 @@ router.delete('/:listingId', requireAuth, async (req: AuthRequest, res: Response
 });
 
 // GET /api/favorites
-router.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.userId;
   const page = parseInt(req.query.page as string) || 1;
   const take = 20;

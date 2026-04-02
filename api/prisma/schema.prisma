@@ -14,9 +14,11 @@ enum ListingStatus {
 }
 
 enum PromotionType {
-  top
+  top_1d
+  top_3d
+  top_7d
   highlight
-  unlimited
+  unlimited_sub
 }
 
 enum PaymentStatus {
@@ -40,11 +42,13 @@ model User {
   otpCodes      OtpCode[]
   listings      Listing[]
   favorites     Favorite[]
+  notifications Notification[]
   sentMessages  Message[]           @relation("MessageSender")
   threads       ThreadParticipant[]
   payments      Payment[]
   promotions    Promotion[]
-  notifications Notification[]
+  reports       Report[]             @relation("Reports")
+  reportedBy    Report[]             @relation("ReportedUser")
 }
 
 // Auth: OTP only — no password field on User
@@ -116,9 +120,10 @@ model Listing {
 
   photos        ListingPhoto[]
   favorites     Favorite[]
+  notifications Notification[]
   promotions    Promotion[]
   threads       Thread[]
-  notifications Notification[]
+  reports       Report[]
 
   @@index([status])
   @@index([expiresAt])
@@ -181,12 +186,16 @@ model Favorite {
 model Promotion {
   id            String        @id @default(cuid())
   promotionType PromotionType
+  isActive      Boolean       @default(true)
   expiresAt     DateTime?
   createdAt     DateTime      @default(now())
   listingId     String
   listing       Listing       @relation(fields: [listingId], references: [id])
   userId        String
   user          User          @relation(fields: [userId], references: [id])
+
+  @@index([listingId, isActive])
+  @@index([expiresAt])
 }
 
 model Notification {
@@ -202,13 +211,34 @@ model Notification {
 }
 
 model Payment {
-  id         String        @id @default(cuid())
-  amount     Float
-  currency   String        @default("GEL")
-  status     PaymentStatus @default(pending)
-  provider   String?
-  externalId String?
-  createdAt  DateTime      @default(now())
-  userId     String
-  user       User          @relation(fields: [userId], references: [id])
+  id            String         @id @default(cuid())
+  amount        Float
+  currency      String         @default("GEL")
+  status        PaymentStatus  @default(pending)
+  provider      String?
+  externalId    String?
+  promotionType PromotionType?
+  listingId     String?
+  createdAt     DateTime       @default(now())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id])
+
+  @@index([externalId])
+}
+
+model Report {
+  id           String   @id @default(cuid())
+  reporterId   String
+  reporter     User     @relation("Reports", fields: [reporterId], references: [id])
+  listingId    String?
+  listing      Listing? @relation(fields: [listingId], references: [id])
+  targetUserId String?
+  targetUser   User?    @relation("ReportedUser", fields: [targetUserId], references: [id])
+  reason       String
+  description  String?
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+
+  @@index([reporterId])
+  @@index([status])
 }

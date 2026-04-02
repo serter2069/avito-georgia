@@ -58,6 +58,8 @@ jobs:
       MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
       MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
       MINIO_PUBLIC_URL: ${{ secrets.MINIO_PUBLIC_URL }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
     steps:
       - uses: actions/checkout@v4
 
@@ -86,9 +88,33 @@ jobs:
 
       - name: Deploy API
         run: |
+          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/ || true
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
-          cd /var/www/avito-georgia/api && npm ci && npm run build
-          pm2 restart avito-georgia-api || pm2 start /var/www/avito-georgia/api/dist/index.js --name avito-georgia-api --cwd /var/www/avito-georgia/api
-          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/
+          cd /var/www/avito-georgia/api && npm ci && DATABASE_URL="${DATABASE_URL}" npm run build
           sudo chmod -R g+rw /var/www/avito-georgia/api/
+          printf '%s\n' \
+            "DATABASE_URL=${DATABASE_URL}" \
+            "JWT_SECRET=${JWT_SECRET}" \
+            "JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}" \
+            "JWT_ACCESS_EXPIRES=${JWT_ACCESS_EXPIRES:-15m}" \
+            "JWT_REFRESH_EXPIRES=${JWT_REFRESH_EXPIRES:-30d}" \
+            "DEV_AUTH=${DEV_AUTH:-false}" \
+            "SMTP_HOST=${SMTP_HOST}" \
+            "SMTP_PORT=${SMTP_PORT:-587}" \
+            "SMTP_USER=${SMTP_USER}" \
+            "SMTP_PASS=${SMTP_PASS}" \
+            "SMTP_FROM=${SMTP_FROM}" \
+            "MINIO_ENDPOINT=${MINIO_ENDPOINT}" \
+            "MINIO_BUCKET=${MINIO_BUCKET}" \
+            "MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}" \
+            "MINIO_SECRET_KEY=${MINIO_SECRET_KEY}" \
+            "MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL}" \
+            "STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}" \
+            "STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}" \
+            > /var/www/avito-georgia/api/.env
+          chmod 600 /var/www/avito-georgia/api/.env
+          sudo pm2 delete avito-georgia-api 2>/dev/null || true
+          sudo pm2 start /var/www/avito-georgia/api/dist/index.js \
+            --name avito-georgia-api \
+            --cwd /var/www/avito-georgia/api
