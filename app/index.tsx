@@ -180,7 +180,7 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      <Footer />
+      <Footer onNavigate={(path) => router.push(path as any)} />
     </View>
   );
 }
