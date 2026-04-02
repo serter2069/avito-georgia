@@ -5,9 +5,16 @@ import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-03-25.dahlia',
-});
+// Lazy Stripe initialization — avoids crash on startup if key is missing
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
+    _stripe = new Stripe(key, { apiVersion: '2026-03-25.dahlia' });
+  }
+  return _stripe;
+}
 
 // Price config: amount in tetri (1 GEL = 100 tetri), Stripe uses smallest unit
 const PRICES: Record<string, { amount: number; label: string; days: number | null; recurring: boolean }> = {
@@ -61,7 +68,7 @@ router.post('/purchase', requireAuth, async (req: Request, res: Response) => {
     if (priceConfig.recurring) {
       // Subscription flow: create a Stripe Checkout Session in subscription mode
       // Requires a Stripe Price object — for now, create inline price
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         mode: 'subscription',
         payment_method_types: ['card'],
         line_items: [{
@@ -94,7 +101,7 @@ router.post('/purchase', requireAuth, async (req: Request, res: Response) => {
       res.json({ url: session.url, sessionId: session.id });
     } else {
       // One-time payment: create PaymentIntent
-      const paymentIntent = await stripe.paymentIntents.create({
+      const paymentIntent = await getStripe().paymentIntents.create({
         amount: priceConfig.amount,
         currency: 'gel',
         metadata: { userId, listingId: listingId || '', type },
