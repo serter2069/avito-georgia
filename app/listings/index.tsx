@@ -314,6 +314,7 @@ export default function ListingsScreen() {
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}
           contentContainerClassName="pb-4"
+          style={{ flex: 1 }}
         />
       )}
     </View>

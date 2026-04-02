@@ -2,11 +2,12 @@ import '../global.css';
 import '../lib/i18n';
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../stores/authStore';
 import { useAuthRefresh } from '../hooks/useAuthRefresh';
 import { colors } from '../lib/colors';
+import { BottomNav } from '../components/layout/BottomNav';
 
 function useProtectedRoute() {
   const user = useAuthStore((s) => s.user);
@@ -53,14 +54,14 @@ export default function RootLayout() {
 
   if (!isReady) {
     return (
-      <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth: 430 }}>
+      <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth: 430, ...(Platform.OS === 'web' ? { height: '100vh' } as any : {}) }}>
         <ActivityIndicator size="large" color={colors.brandPrimary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth: 430 }}>
+    <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth: 430, ...(Platform.OS === 'web' ? { height: '100vh' } as any : {}) }}>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -69,6 +70,7 @@ export default function RootLayout() {
           sceneContainerStyle: { backgroundColor: colors.bgPrimary },
         }}
       />
+      <BottomNav />
     </View>
   );
 }
