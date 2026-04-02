@@ -15,6 +15,20 @@ function getLocale(req: Request): string {
   return ['ru', 'en', 'ka'].includes(lang || '') ? lang! : 'ru';
 }
 
+function signTokens(userId: string, email: string, role: string) {
+  const accessToken = jwt.sign(
+    { userId, email, role, type: 'access' },
+    process.env.JWT_SECRET!,
+    { expiresIn: (process.env.JWT_ACCESS_EXPIRES || '15m') as string } as jwt.SignOptions
+  );
+  const refreshToken = jwt.sign(
+    { userId, email, role, type: 'refresh' },
+    process.env.JWT_REFRESH_SECRET!,
+    { expiresIn: (process.env.JWT_REFRESH_EXPIRES || '30d') as string } as jwt.SignOptions
+  );
+  return { accessToken, refreshToken };
+}
+
 // POST /api/auth/request-otp
 router.post('/request-otp', async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -22,17 +36,31 @@ router.post('/request-otp', async (req: Request, res: Response) => {
     res.status(400).json({ error: 'Valid email required' });
     return;
   }
+
+  // Rate limit: block if OTP was requested within the last 60 seconds
+  const recentOtp = await prisma.otpCode.findFirst({
+    where: {
+      email,
+      used: false,
+      createdAt: { gte: new Date(Date.now() - 60_000) },
+    },
+  });
+  if (recentOtp) {
+    res.status(429).json({ error: 'Wait 60 seconds before requesting a new OTP' });
+    return;
+  }
+
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-  // Ensure user record exists
+  // Ensure user record exists (upsert — first login creates user)
   const user = await prisma.user.upsert({
     where: { email },
     update: {},
     create: { email },
   });
 
-  // Create a new OtpCode record (invalidate old ones by marking them used)
+  // Invalidate any previous unused OTPs for this email
   await prisma.otpCode.updateMany({
     where: { email, used: false },
     data: { used: true },
@@ -60,7 +88,7 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
   });
 
   if (!otpRecord || otpRecord.expiresAt < new Date()) {
-    res.status(401).json({ error: 'Invalid or expired code' });
+    res.status(400).json({ error: 'Invalid or expired OTP' });
     return;
   }
 
@@ -76,18 +104,8 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     return;
   }
 
-  const accessToken = jwt.sign(
-    { userId: user.id, email: user.email, type: 'access' },
-    process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m' } as jwt.SignOptions
-  );
-  const refreshToken = jwt.sign(
-    { userId: user.id, email: user.email, type: 'refresh' },
-    process.env.JWT_REFRESH_SECRET!,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRES || '30d' } as jwt.SignOptions
-  );
-
-  res.json({ accessToken, refreshToken, userId: user.id });
+  const tokens = signTokens(user.id, user.email, user.role);
+  res.json({ ...tokens, user: { id: user.id, email: user.email, role: user.role } });
 });
 
 // POST /api/auth/refresh
@@ -101,18 +119,22 @@ router.post('/refresh', async (req: Request, res: Response) => {
     const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as {
       userId: string;
       email: string;
+      role: string;
       type: string;
     };
     if (payload.type !== 'refresh') {
       res.status(401).json({ error: 'Invalid token type' });
       return;
     }
-    const accessToken = jwt.sign(
-      { userId: payload.userId, email: payload.email, type: 'access' },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m' } as jwt.SignOptions
-    );
-    res.json({ accessToken });
+    // Verify user still exists
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) {
+      res.status(401).json({ error: 'User not found' });
+      return;
+    }
+    // Return new token pair (access + refresh rotation)
+    const tokens = signTokens(user.id, user.email, user.role);
+    res.json(tokens);
   } catch {
     res.status(401).json({ error: 'Invalid or expired refresh token' });
   }
