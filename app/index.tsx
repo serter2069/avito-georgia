@@ -18,7 +18,9 @@ const CATEGORIES: CategoryType[] = [
   'furniture',
   'services',
   'jobs',
-  'other',
+  'kids',
+  'pets',
+  'hobbies',
 ];
 
 interface ListingsResponse {

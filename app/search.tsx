@@ -18,8 +18,24 @@ const CATEGORIES: CategoryType[] = [
   'furniture',
   'services',
   'jobs',
-  'other',
+  'kids',
+  'pets',
+  'hobbies',
 ];
+
+// Map frontend CategoryType to DB slug
+const CATEGORY_SLUG: Record<CategoryType, string> = {
+  transport: 'transport',
+  realEstate: 'real-estate',
+  electronics: 'electronics',
+  clothing: 'fashion',
+  furniture: 'home-garden',
+  services: 'services',
+  jobs: 'jobs',
+  kids: 'kids',
+  pets: 'pets',
+  hobbies: 'hobbies',
+};
 
 interface ListingsResponse {
   listings: ApiListing[];
@@ -79,7 +95,7 @@ export default function SearchScreen() {
     const parts: string[] = [];
     if (searchQuery.trim()) parts.push(`q=${encodeURIComponent(searchQuery.trim())}`);
     if (selectedCity !== 'all') parts.push(`city=${selectedCity}`);
-    if (selectedCategory) parts.push(`category=${selectedCategory}`);
+    if (selectedCategory) parts.push(`category=${CATEGORY_SLUG[selectedCategory]}`);
     if (priceMin) parts.push(`price_min=${priceMin}`);
     if (priceMax) parts.push(`price_max=${priceMax}`);
     parts.push(`page=${p}`);

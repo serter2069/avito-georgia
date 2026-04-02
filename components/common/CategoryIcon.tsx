@@ -9,7 +9,9 @@ export type CategoryType =
   | 'furniture'
   | 'services'
   | 'jobs'
-  | 'other';
+  | 'kids'
+  | 'pets'
+  | 'hobbies';
 
 interface CategoryIconProps {
   category: CategoryType;
@@ -26,7 +28,9 @@ const CATEGORY_ICONS: Record<CategoryType, string> = {
   furniture: '\u{1FA91}',    // chair
   services: '\u{1F527}',     // wrench
   jobs: '\u{1F4BC}',         // briefcase
-  other: '\u{1F4E6}',        // package
+  kids: '\u{1F9F8}',         // teddy bear
+  pets: '\u{1F43E}',         // paw prints
+  hobbies: '\u{1F3A8}',      // artist palette
 };
 
 const sizeClasses = {
