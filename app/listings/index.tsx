@@ -18,14 +18,23 @@ const CATEGORIES: CategoryType[] = [
   'furniture',
   'services',
   'jobs',
-  'other',
+  'kids',
+  'pets',
+  'hobbies',
 ];
 
 // Map frontend CategoryType to DB slug
-const CATEGORY_SLUG: Partial<Record<CategoryType, string>> = {
+const CATEGORY_SLUG: Record<CategoryType, string> = {
   transport: 'transport',
   realEstate: 'real-estate',
+  electronics: 'electronics',
+  clothing: 'fashion',
+  furniture: 'home-garden',
+  services: 'services',
   jobs: 'jobs',
+  kids: 'kids',
+  pets: 'pets',
+  hobbies: 'hobbies',
 };
 
 type SortOption = 'createdAt_desc' | 'price_asc' | 'price_desc' | 'views_desc';
@@ -126,7 +135,7 @@ export default function ListingsScreen() {
 
   const fetchListings = useCallback(async (p: number, reset: boolean) => {
     const parts: string[] = [];
-    if (selectedCategory) parts.push(`category=${selectedCategory}`);
+    if (selectedCategory) parts.push(`category=${CATEGORY_SLUG[selectedCategory]}`);
     if (selectedCity !== 'all') parts.push(`city=${selectedCity}`);
     parts.push(`sort=${sortBy}`);
     parts.push(`page=${p}`);
