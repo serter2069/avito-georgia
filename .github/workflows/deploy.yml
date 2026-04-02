@@ -45,11 +45,37 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy API
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          DEV_AUTH: ${{ secrets.DEV_AUTH }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
         run: |
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
           cd /var/www/avito-georgia/api && npm ci
-          cd /var/www/avito-georgia/api && DATABASE_URL="${{ secrets.DATABASE_URL }}" npm run build
-          sudo DATABASE_URL="${{ secrets.DATABASE_URL }}" pm2 restart avito-georgia-api || sudo pm2 start /var/www/avito-georgia/api/dist/index.js --name avito-georgia-api --cwd /var/www/avito-georgia/api --env production
+          cd /var/www/avito-georgia/api && DATABASE_URL="${DATABASE_URL}" npm run build
+          sudo DATABASE_URL="${DATABASE_URL}" \
+            JWT_SECRET="${JWT_SECRET}" \
+            JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}" \
+            DEV_AUTH="${DEV_AUTH}" \
+            SMTP_HOST="${SMTP_HOST}" \
+            SMTP_PORT="${SMTP_PORT}" \
+            SMTP_FROM="${SMTP_FROM}" \
+            pm2 restart avito-georgia-api || \
+          sudo DATABASE_URL="${DATABASE_URL}" \
+            JWT_SECRET="${JWT_SECRET}" \
+            JWT_REFRESH_SECRET="${JWT_REFRESH_SECRET}" \
+            DEV_AUTH="${DEV_AUTH}" \
+            SMTP_HOST="${SMTP_HOST}" \
+            SMTP_PORT="${SMTP_PORT}" \
+            SMTP_FROM="${SMTP_FROM}" \
+            pm2 start /var/www/avito-georgia/api/dist/index.js \
+              --name avito-georgia-api \
+              --cwd /var/www/avito-georgia/api \
+              --env production
           sudo chown -R github-runner:www-data /var/www/avito-georgia/api/
           sudo chmod -R g+rw /var/www/avito-georgia/api/
