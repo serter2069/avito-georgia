@@ -49,12 +49,12 @@ router.get('/my', requireAuth, async (req: Request, res: Response) => {
 });
 
 // GET /api/listings/map?city= — MUST be before /:id
+// city param is optional: omit to get all cities
 router.get('/map', async (req: Request, res: Response) => {
   const city = qs(req.query.city);
-  if (!city) { res.status(400).json({ error: 'city param required' }); return; }
   const listings = await prisma.listing.findMany({
     where: {
-      cityId: city,
+      ...(city ? { cityId: city } : {}),
       status: 'active',
       OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     },

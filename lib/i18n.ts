@@ -169,6 +169,11 @@ const resources = {
       unlimitedListings: 'Безлимитные объявления',
       dashboard: 'Панель управления',
 
+      // Map / View toggle
+      listView: 'Список',
+      mapView: 'Карта',
+      noCoordinates: 'Нет данных для карты',
+
       // Footer
       about: 'О нас',
       terms: 'Условия',
@@ -332,6 +337,11 @@ const resources = {
       unlimitedListings: 'Unlimited listings',
       dashboard: 'Dashboard',
 
+      // Map / View toggle
+      listView: 'List',
+      mapView: 'Map',
+      noCoordinates: 'No map data available',
+
       about: 'About',
       terms: 'Terms',
       privacy: 'Privacy',
@@ -493,6 +503,11 @@ const resources = {
       expiresAt: 'მოქმედებს',
       unlimitedListings: 'შეუზღუდავი განცხადებები',
       dashboard: 'მართვის პანელი',
+
+      // Map / View toggle
+      listView: 'სია',
+      mapView: 'რუკა',
+      noCoordinates: 'რუკის მონაცემები არ არის',
 
       about: 'ჩვენ შესახებ',
       terms: 'პირობები',
