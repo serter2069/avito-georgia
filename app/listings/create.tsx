@@ -1,7 +1,7 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator, Platform, BackHandler } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'expo-router';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Header } from '../../components/layout/Header';
 import { Input } from '../../components/ui/Input';
@@ -65,6 +65,73 @@ export default function CreateListingScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const redirectedRef = useRef(false);
+  const draftSavedRef = useRef(false);
+  const submittedRef = useRef(false);
+
+  // Check if the form has enough data to save as a draft (need at least category + city)
+  const hasFormData = () => {
+    return !!(selectedCategoryId && selectedCityId);
+  };
+
+  // Save current form data as draft (best-effort, silently ignores errors)
+  const saveDraft = useCallback(async () => {
+    if (!user || draftSavedRef.current || !selectedCategoryId || !selectedCityId) return;
+    draftSavedRef.current = true;
+    try {
+      const body: Record<string, any> = {
+        status: 'draft',
+        categoryId: selectedCategoryId,
+        cityId: selectedCityId,
+      };
+      if (title.trim()) body.title = title.trim();
+      if (description.trim()) body.description = description.trim();
+      if (price.trim()) body.price = price.trim();
+      if (selectedDistrictId) body.districtId = selectedDistrictId;
+
+      const createRes = await api.post<{ id: string }>('/listings', body);
+      if (createRes.ok && createRes.data && photos.length > 0) {
+        const formData = new FormData();
+        for (const photo of photos) {
+          const blob: any = { uri: photo.uri, type: photo.mimeType || 'image/jpeg', name: photo.fileName || 'photo.jpg' };
+          formData.append('photos', blob);
+        }
+        await apiUpload(`/listings/${createRes.data.id}/photos`, formData);
+      }
+    } catch (_) {
+      // Draft save is best-effort; ignore errors
+    }
+  }, [user, selectedCategoryId, selectedCityId, title, description, price, selectedDistrictId, photos]);
+
+  // Show draft save prompt when user presses hardware back on Android
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android') return;
+      const onBackPress = () => {
+        if (submittedRef.current || !hasFormData()) return false;
+        Alert.alert(
+          t('saveDraftTitle'),
+          t('saveDraftMessage'),
+          [
+            {
+              text: t('dontSave'),
+              style: 'destructive',
+              onPress: () => router.back(),
+            },
+            {
+              text: t('saveDraft'),
+              onPress: async () => {
+                await saveDraft();
+                router.back();
+              },
+            },
+          ]
+        );
+        return true;
+      };
+      const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => sub.remove();
+    }, [selectedCategoryId, selectedCityId, title, description, price, photos, selectedDistrictId])
+  );
 
   // Redirect if not logged in — show explanation first
   useEffect(() => {
@@ -199,6 +266,7 @@ export default function CreateListingScreen() {
         await apiUpload(`/listings/${listingId}/photos`, formData);
       }
 
+      submittedRef.current = true;
       Alert.alert(t('listingCreated'), '', [
         { text: t('done'), onPress: () => router.replace('/my/listings') },
       ]);
@@ -207,6 +275,32 @@ export default function CreateListingScreen() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Handle header back — show draft save prompt if applicable
+  const handleHeaderBack = () => {
+    if (submittedRef.current || !hasFormData()) {
+      router.back();
+      return;
+    }
+    Alert.alert(
+      t('saveDraftTitle'),
+      t('saveDraftMessage'),
+      [
+        {
+          text: t('dontSave'),
+          style: 'destructive',
+          onPress: () => router.back(),
+        },
+        {
+          text: t('saveDraft'),
+          onPress: async () => {
+            await saveDraft();
+            router.back();
+          },
+        },
+      ]
+    );
   };
 
   const renderStepIndicator = () => (
@@ -391,7 +485,7 @@ export default function CreateListingScreen() {
 
   return (
     <View className="flex-1 bg-dark">
-      <Header title={t('createListing')} />
+      <Header title={t('createListing')} showBack onBack={handleHeaderBack} />
       {renderStepIndicator()}
 
       <ScrollView className="flex-1" contentContainerClassName="pb-6">
