@@ -10,7 +10,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
 
-type StatusTab = 'active' | 'sold' | 'removed';
+type StatusTab = 'active' | 'draft' | 'sold' | 'removed';
 
 interface MyListing {
   id: string;
@@ -35,6 +35,7 @@ interface MyListingsResponse {
 
 const STATUS_BADGE_VARIANT: Record<string, 'success' | 'warning' | 'error' | 'default'> = {
   active: 'success',
+  draft: 'default',
   sold: 'warning',
   removed: 'error',
 };
@@ -137,8 +138,35 @@ export default function MyListingsScreen() {
     ]);
   };
 
+  const handlePublishDraft = async (id: string) => {
+    const res = await api.patch(`/listings/${id}/status`, { status: 'active' });
+    if (res.ok) {
+      fetchListings(1, true);
+    } else {
+      Alert.alert(t('error'), (res as any).error || t('error'));
+    }
+  };
+
+  const handleDeleteDraft = (id: string) => {
+    Alert.alert(t('confirmDelete'), '', [
+      { text: t('cancel'), style: 'cancel' },
+      {
+        text: t('delete'),
+        style: 'destructive',
+        onPress: async () => {
+          const res = await api.patch(`/listings/${id}/status`, { status: 'removed' });
+          if (res.ok) {
+            setListings((prev) => prev.filter((l) => l.id !== id));
+            setTotal((prev) => prev - 1);
+          }
+        },
+      },
+    ]);
+  };
+
   const tabs: { key: StatusTab; label: string }[] = [
     { key: 'active', label: t('active') },
+    { key: 'draft', label: t('drafts') },
     { key: 'sold', label: t('sold') },
     { key: 'removed', label: t('removed') },
   ];
@@ -179,47 +207,72 @@ export default function MyListingsScreen() {
 
       {/* Actions */}
       <View className="flex-row border-t border-border">
-        <TouchableOpacity
-          className="flex-1 py-2.5 items-center border-r border-border"
-          onPress={() => router.push(`/listings/${item.id}/edit`)}
-        >
-          <Text className="text-primary text-xs font-medium">{t('edit')}</Text>
-        </TouchableOpacity>
+        {item.status === 'draft' ? (
+          <>
+            <TouchableOpacity
+              className="flex-1 py-2.5 items-center border-r border-border"
+              onPress={() => router.push(`/listings/${item.id}/edit`)}
+            >
+              <Text className="text-primary text-xs font-medium">{t('continueDraft')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-1 py-2.5 items-center border-r border-border"
+              onPress={() => handlePublishDraft(item.id)}
+            >
+              <Text className="text-success text-xs font-medium">{t('publish')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-1 py-2.5 items-center"
+              onPress={() => handleDeleteDraft(item.id)}
+            >
+              <Text className="text-error text-xs font-medium">{t('delete')}</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              className="flex-1 py-2.5 items-center border-r border-border"
+              onPress={() => router.push(`/listings/${item.id}/edit`)}
+            >
+              <Text className="text-primary text-xs font-medium">{t('edit')}</Text>
+            </TouchableOpacity>
 
-        {item.status === 'active' && (
-          <TouchableOpacity
-            className="flex-1 py-2.5 items-center border-r border-border"
-            onPress={() => handleDeactivate(item.id)}
-          >
-            <Text className="text-warning text-xs font-medium">{t('deactivate')}</Text>
-          </TouchableOpacity>
-        )}
+            {item.status === 'active' && (
+              <TouchableOpacity
+                className="flex-1 py-2.5 items-center border-r border-border"
+                onPress={() => handleDeactivate(item.id)}
+              >
+                <Text className="text-warning text-xs font-medium">{t('deactivate')}</Text>
+              </TouchableOpacity>
+            )}
 
-        {item.status === 'active' && (
-          <TouchableOpacity
-            className="flex-1 py-2.5 items-center border-r border-border"
-            onPress={() => handleRenew(item.id)}
-          >
-            <Text className="text-success text-xs font-medium">{t('renew')}</Text>
-          </TouchableOpacity>
-        )}
+            {item.status === 'active' && (
+              <TouchableOpacity
+                className="flex-1 py-2.5 items-center border-r border-border"
+                onPress={() => handleRenew(item.id)}
+              >
+                <Text className="text-success text-xs font-medium">{t('renew')}</Text>
+              </TouchableOpacity>
+            )}
 
-        {item.status === 'active' && (
-          <TouchableOpacity
-            className="flex-1 py-2.5 items-center border-r border-border"
-            onPress={() => router.push(`/dashboard/listings/${item.id}/promote`)}
-          >
-            <Text className="text-secondary text-xs font-medium">{t('promote')}</Text>
-          </TouchableOpacity>
-        )}
+            {item.status === 'active' && (
+              <TouchableOpacity
+                className="flex-1 py-2.5 items-center border-r border-border"
+                onPress={() => router.push(`/dashboard/listings/${item.id}/promote`)}
+              >
+                <Text className="text-secondary text-xs font-medium">{t('promote')}</Text>
+              </TouchableOpacity>
+            )}
 
-        {item.status !== 'active' && (
-          <TouchableOpacity
-            className="flex-1 py-2.5 items-center"
-            onPress={() => handleDelete(item.id)}
-          >
-            <Text className="text-error text-xs font-medium">{t('delete')}</Text>
-          </TouchableOpacity>
+            {item.status !== 'active' && (
+              <TouchableOpacity
+                className="flex-1 py-2.5 items-center"
+                onPress={() => handleDelete(item.id)}
+              >
+                <Text className="text-error text-xs font-medium">{t('delete')}</Text>
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
     </View>

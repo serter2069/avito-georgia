@@ -23,6 +23,18 @@ const createListingSchema = z.object({
   districtId: z.string().uuid().optional(),
 });
 
+// Draft schema: categoryId + cityId required by DB, all other fields optional
+const createDraftSchema = z.object({
+  title: z.string().min(1).max(100).transform(stripHtml).optional(),
+  description: z.string().max(5000).transform(stripHtml).optional(),
+  price: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(0)).optional().nullable(),
+  currency: z.enum(['GEL', 'USD', 'EUR']).default('GEL'),
+  categoryId: z.string().uuid(),
+  cityId: z.string().uuid(),
+  districtId: z.string().uuid().optional(),
+  status: z.literal('draft'),
+});
+
 const updateListingSchema = createListingSchema.partial();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -226,9 +238,10 @@ router.get('/:id/phone', requireAuth, async (req: Request, res: Response) => {
 
 // POST /api/listings
 router.post('/', requireAuth, async (req: Request, res: Response) => {
-  let data;
+  const isDraft = req.body.status === 'draft';
+  let data: any;
   try {
-    data = createListingSchema.parse(req.body);
+    data = isDraft ? createDraftSchema.parse(req.body) : createListingSchema.parse(req.body);
   } catch (err) {
     if (err instanceof ZodError) {
       res.status(400).json({ error: err.errors[0]?.message || 'Validation failed' }); return;
@@ -237,36 +250,51 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   }
   const { title, description, price, currency, categoryId, cityId, districtId } = data;
   // Sanitize text fields to strip HTML tags (XSS prevention) — defense in depth
-  const safeTitle = xss(title);
+  const safeTitle = title ? xss(title) : 'Draft';
   const safeDescription = description ? xss(description) : description;
   const userId = req.user!.userId;
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (user?.role !== 'admin') {
-    // Check if user has an active unlimited_sub promotion — bypasses the listing limit
-    const hasUnlimited = await prisma.promotion.findFirst({
-      where: {
-        userId,
-        promotionType: 'unlimited_sub',
-        isActive: true,
-        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-      },
-    });
-    if (!hasUnlimited) {
-      const activeCount = await prisma.listing.count({
+
+  // Active listing limit check only applies to non-draft listings
+  if (!isDraft) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user?.role !== 'admin') {
+      // Check if user has an active unlimited_sub promotion — bypasses the listing limit
+      const hasUnlimited = await prisma.promotion.findFirst({
         where: {
-          userId, status: 'active',
+          userId,
+          promotionType: 'unlimited_sub',
+          isActive: true,
           OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
         },
       });
-      if (activeCount >= ACTIVE_LISTING_LIMIT) {
-        res.status(403).json({ error: `Active listing limit reached (${ACTIVE_LISTING_LIMIT})` }); return;
+      if (!hasUnlimited) {
+        const activeCount = await prisma.listing.count({
+          where: {
+            userId, status: 'active',
+            OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+          },
+        });
+        if (activeCount >= ACTIVE_LISTING_LIMIT) {
+          res.status(403).json({ error: `Active listing limit reached (${ACTIVE_LISTING_LIMIT})` }); return;
+        }
       }
     }
   }
-  const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  const expiresAt = isDraft ? null : new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
   try {
     const listing = await prisma.listing.create({
-      data: { title: safeTitle, description: safeDescription, price: price ?? null, currency, categoryId, cityId, districtId, userId, expiresAt },
+      data: {
+        title: safeTitle,
+        description: safeDescription,
+        price: price ?? null,
+        currency: currency || 'GEL',
+        categoryId,
+        cityId,
+        districtId,
+        userId,
+        status: isDraft ? 'draft' : 'active',
+        expiresAt,
+      },
     });
     res.status(201).json(listing);
   } catch (err: any) {
@@ -342,8 +370,18 @@ router.patch('/:id/status', requireAuth, async (req: Request, res: Response) => 
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
   if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
   const { status } = req.body;
-  if (!['sold', 'removed'].includes(status)) {
-    res.status(400).json({ error: 'status must be sold or removed' }); return;
+  if (!['sold', 'removed', 'active'].includes(status)) {
+    res.status(400).json({ error: 'status must be sold, removed, or active' }); return;
+  }
+  // Publishing a draft: validate required fields and set expiresAt
+  if (status === 'active' && listing.status === 'draft') {
+    if (!listing.title || listing.title === 'Draft' || !listing.categoryId || !listing.cityId) {
+      res.status(400).json({ error: 'Draft is missing required fields (title, category, city)' }); return;
+    }
+    const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+    const published = await prisma.listing.update({ where: { id }, data: { status: 'active', expiresAt } });
+    res.json(published);
+    return;
   }
   const updated = await prisma.listing.update({ where: { id }, data: { status } });
 

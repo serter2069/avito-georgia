@@ -36,6 +36,7 @@ interface HeaderProps {
   title?: string;
   showLanguageSwitcher?: boolean;
   showBack?: boolean;
+  onBack?: () => void;
 }
 
 function LanguageDropdown() {
@@ -160,7 +161,7 @@ function LanguageDropdown() {
   );
 }
 
-export function Header({ title, showLanguageSwitcher = true, showBack = false }: HeaderProps) {
+export function Header({ title, showLanguageSwitcher = true, showBack = false, onBack }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const { isDesktop } = useResponsive();
   const router = useRouter();
@@ -214,7 +215,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
       <View className="bg-white border-b border-border px-4 py-3 flex-row items-center justify-between" style={{ paddingTop: Math.max(12, insets.top) }}>
         <View className="flex-row items-center gap-3">
           {showBack && (
-            <TouchableOpacity onPress={() => router.back()} className="mr-1">
+            <TouchableOpacity onPress={onBack ?? (() => router.back())} className="mr-1">
               <Ionicons name="chevron-back" size={24} color="#0A7B8A" />
             </TouchableOpacity>
           )}
