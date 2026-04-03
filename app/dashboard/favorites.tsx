@@ -15,8 +15,8 @@ interface FavoriteListing {
   currency: string;
   status: string;
   photos: { url: string }[];
-  city?: { id: string; nameRu: string };
-  category?: { id: string; name: string };
+  city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
+  category?: { id: string; name: string; slug: string };
 }
 
 interface FavoriteItem {
@@ -33,20 +33,42 @@ interface FavoritesResponse {
   limit: number;
 }
 
-function mapFavToListing(fav: FavoriteItem): Listing {
+// Map DB category slug to i18n translation key
+const SLUG_TO_I18N_KEY: Record<string, string> = {
+  transport: 'transport',
+  'real-estate': 'realEstate',
+  electronics: 'electronics',
+  fashion: 'clothing',
+  'home-garden': 'furniture',
+  services: 'services',
+  jobs: 'jobs',
+  kids: 'kids',
+  pets: 'pets',
+  hobbies: 'hobbies',
+};
+
+function getCityName(city: FavoriteListing['city'], lang: string): string | undefined {
+  if (!city) return undefined;
+  if (lang === 'en') return city.nameEn || city.nameRu;
+  if (lang === 'ka') return city.nameKa || city.nameRu;
+  return city.nameRu;
+}
+
+function mapFavToListing(fav: FavoriteItem, lang: string, t: (key: string) => string): Listing {
+  const i18nKey = fav.listing.category?.slug ? SLUG_TO_I18N_KEY[fav.listing.category.slug] : undefined;
   return {
     id: fav.listing.id,
     title: fav.listing.title,
     price: fav.listing.price,
     currency: fav.listing.currency,
     imageUrl: fav.listing.photos?.[0]?.url,
-    city: fav.listing.city?.nameRu,
-    category: fav.listing.category?.name,
+    city: getCityName(fav.listing.city, lang),
+    category: i18nKey ? t(i18nKey) : (fav.listing.category?.name),
   };
 }
 
 export default function FavoritesScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +107,7 @@ export default function FavoritesScreen() {
 
   const renderItem = ({ item }: { item: FavoriteItem }) => (
     <View className="px-4 mb-3">
-      <ListingCard listing={mapFavToListing(item)} onPress={handleListingPress} />
+      <ListingCard listing={mapFavToListing(item, i18n.language, t)} onPress={handleListingPress} />
     </View>
   );
 

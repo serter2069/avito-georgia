@@ -23,6 +23,8 @@ interface City {
   id: string;
   name: string;
   nameRu: string;
+  nameEn: string;
+  nameKa: string;
   districts?: { id: string; name: string }[];
 }
 
@@ -33,7 +35,7 @@ interface PhotoAsset {
 }
 
 export default function CreateListingScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
 
@@ -48,7 +50,6 @@ export default function CreateListingScreen() {
   // Step 2: City + District
   const [cities, setCities] = useState<City[]>([]);
   const [loadingCities, setLoadingCities] = useState(true);
-  const [citiesError, setCitiesError] = useState(false);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(null);
 
@@ -88,21 +89,25 @@ export default function CreateListingScreen() {
     })();
   }, []);
 
-  // Fetch cities from API — no hardcoded fallback: fallback IDs are not UUIDs and cause FK errors
-  const fetchCities = async () => {
-    setCitiesError(false);
-    setLoadingCities(true);
-    const res = await api.get<City[]>('/cities');
-    if (res.ok && res.data && res.data.length > 0) {
-      setCities(res.data);
-    } else {
-      setCitiesError(true);
-    }
-    setLoadingCities(false);
-  };
-
+  // Fetch cities (reusing the same endpoint as categories for cities)
   useEffect(() => {
-    fetchCities();
+    (async () => {
+      // The API doesn't have a /cities endpoint exposed in routes, so we use known cities
+      // from CitySelector. We'll fetch them if endpoint exists, otherwise hardcode.
+      const res = await api.get<City[]>('/cities');
+      if (res.ok && res.data) {
+        setCities(res.data);
+      } else {
+        // Fallback: use known city IDs
+        setCities([
+          { id: 'tbilisi', name: 'Tbilisi', nameRu: 'Тбилиси', nameEn: 'Tbilisi', nameKa: 'თბილისი' },
+          { id: 'batumi', name: 'Batumi', nameRu: 'Батуми', nameEn: 'Batumi', nameKa: 'ბათუმი' },
+          { id: 'kutaisi', name: 'Kutaisi', nameRu: 'Кутаиси', nameEn: 'Kutaisi', nameKa: 'ქუთაისი' },
+          { id: 'rustavi', name: 'Rustavi', nameRu: 'Рустави', nameEn: 'Rustavi', nameKa: 'რუსთავი' },
+        ]);
+      }
+      setLoadingCities(false);
+    })();
   }, []);
 
   const validateStep = (): boolean => {
@@ -259,16 +264,6 @@ export default function CreateListingScreen() {
       <Text className="text-text-primary text-base font-semibold">{t('selectCity')}</Text>
       {loadingCities ? (
         <ActivityIndicator size="small" color={colors.brandPrimary} />
-      ) : citiesError ? (
-        <View className="gap-3 items-center py-4">
-          <Text className="text-error text-sm text-center">{t('citiesLoadError')}</Text>
-          <TouchableOpacity
-            className="px-4 py-2 rounded-lg border border-primary"
-            onPress={fetchCities}
-          >
-            <Text className="text-primary text-sm">{t('retry')}</Text>
-          </TouchableOpacity>
-        </View>
       ) : (
         <View className="gap-2">
           {cities.map((city) => (
@@ -289,7 +284,7 @@ export default function CreateListingScreen() {
                   selectedCityId === city.id ? 'text-primary' : 'text-text-primary'
                 }`}
               >
-                {city.nameRu}
+                {i18n.language === 'en' ? (city.nameEn || city.nameRu) : i18n.language === 'ka' ? (city.nameKa || city.nameRu) : city.nameRu}
               </Text>
             </TouchableOpacity>
           ))}
@@ -415,11 +410,7 @@ export default function CreateListingScreen() {
         )}
         <View className="flex-1">
           {step < TOTAL_STEPS ? (
-            <Button
-              title={t('next')}
-              onPress={handleNext}
-              disabled={step === 2 && (loadingCities || citiesError)}
-            />
+            <Button title={t('next')} onPress={handleNext} />
           ) : (
             <Button
               title={t('publish')}

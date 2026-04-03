@@ -29,7 +29,7 @@ interface ListingDetail {
   createdAt: string;
   city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
   district?: { id: string; nameRu: string; nameEn: string; nameKa: string } | null;
-  category?: { id: string; name: string };
+  category?: { id: string; name: string; slug: string };
   photos: ListingPhoto[];
   user: { id: string; name: string | null; phone: string | null; createdAt: string };
   isPromoted?: boolean;
@@ -47,8 +47,22 @@ const STATUS_LABELS: Record<string, string> = {
   removed: 'statusRemoved',
 };
 
+// Map DB category slug to i18n translation key
+const SLUG_TO_I18N_KEY: Record<string, string> = {
+  transport: 'transport',
+  'real-estate': 'realEstate',
+  electronics: 'electronics',
+  fashion: 'clothing',
+  'home-garden': 'furniture',
+  services: 'services',
+  jobs: 'jobs',
+  kids: 'kids',
+  pets: 'pets',
+  hobbies: 'hobbies',
+};
+
 export default function ListingDetailScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
@@ -236,8 +250,8 @@ export default function ListingDetailScreen() {
         <View className="px-4 pb-3 flex-row flex-wrap items-center gap-2">
           {listing.city && (
             <Text className="text-text-secondary text-sm">
-              {listing.city.nameRu}
-              {listing.district ? `, ${listing.district.nameRu}` : ''}
+              {i18n.language === 'en' ? (listing.city.nameEn || listing.city.nameRu) : i18n.language === 'ka' ? (listing.city.nameKa || listing.city.nameRu) : listing.city.nameRu}
+              {listing.district ? `, ${i18n.language === 'en' ? (listing.district.nameEn || listing.district.nameRu) : i18n.language === 'ka' ? (listing.district.nameKa || listing.district.nameRu) : listing.district.nameRu}` : ''}
             </Text>
           )}
           <Text className="text-text-muted text-xs">
@@ -251,7 +265,7 @@ export default function ListingDetailScreen() {
         {/* Category */}
         {listing.category && (
           <View className="px-4 pb-3">
-            <Badge label={listing.category.name} />
+            <Badge label={listing.category.slug && SLUG_TO_I18N_KEY[listing.category.slug] ? t(SLUG_TO_I18N_KEY[listing.category.slug]) : listing.category.name} />
           </View>
         )}
 

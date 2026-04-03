@@ -56,8 +56,8 @@ router.get('/my', requireAuth, async (req: Request, res: Response) => {
       skip,
       include: {
         photos: { orderBy: { order: 'asc' }, take: 1 },
-        city: { select: { id: true, nameRu: true } },
-        category: { select: { id: true, name: true } },
+        city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
+        category: { select: { id: true, name: true, slug: true } },
       },
     }),
     prisma.listing.count({ where }),
@@ -151,8 +151,8 @@ router.get('/', async (req: Request, res: Response) => {
       where, orderBy, take, skip,
       include: {
         photos: { orderBy: { order: 'asc' }, take: 3 },
-        city: { select: { id: true, nameRu: true } },
-        category: { select: { id: true, name: true } },
+        city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
+        category: { select: { id: true, name: true, slug: true } },
         promotions: {
           where: { isActive: true },
           select: { promotionType: true, expiresAt: true },

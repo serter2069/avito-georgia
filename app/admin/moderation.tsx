@@ -15,13 +15,13 @@ interface ListingItem {
   createdAt: string;
   views: number;
   photos?: { url: string }[];
-  city?: { nameRu: string };
+  city?: { nameRu: string; nameEn: string; nameKa: string };
   category?: { name: string };
   user?: { id: string; name: string | null; email: string };
 }
 
 export default function AdminModeration() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [listings, setListings] = useState<ListingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -88,7 +88,7 @@ export default function AdminModeration() {
                 {listing.title}
               </Text>
               <Text className="text-text-muted text-xs mt-1">
-                {listing.category?.name} | {listing.city?.nameRu} | {formatDate(listing.createdAt)}
+                {listing.category?.name} | {listing.city ? (i18n.language === 'en' ? (listing.city.nameEn || listing.city.nameRu) : i18n.language === 'ka' ? (listing.city.nameKa || listing.city.nameRu) : listing.city.nameRu) : ''} | {formatDate(listing.createdAt)}
               </Text>
             </View>
             <View className={`px-2 py-1 rounded ${
