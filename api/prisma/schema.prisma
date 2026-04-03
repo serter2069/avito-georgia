@@ -137,6 +137,8 @@ model Listing {
   city       City      @relation(fields: [cityId], references: [id])
   districtId String?
   district   District? @relation(fields: [districtId], references: [id])
+  lat        Float?
+  lng        Float?
 
   photos        ListingPhoto[]
   favorites     Favorite[]
