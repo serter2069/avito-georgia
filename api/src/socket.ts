@@ -1,6 +1,7 @@
 import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import xss from 'xss';
 import { prisma } from './lib/prisma';
 import { sendNewMessageEmail } from './lib/mail';
 
@@ -152,7 +153,7 @@ export function setupSocket(httpServer: HttpServer): Server {
         // Save message
         const message = await prisma.message.create({
           data: {
-            text: text.trim(),
+            text: xss(text.trim()),
             threadId,
             senderId: socket.data.userId,
           },

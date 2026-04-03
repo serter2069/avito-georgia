@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import xss from 'xss';
 import { requireAuth } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 
@@ -248,7 +249,7 @@ router.post('/threads/:listingId/message', requireAuth, async (req: Request, res
     // Create message
     const message = await prisma.message.create({
       data: {
-        text: text.trim(),
+        text: xss(text.trim()),
         threadId: thread.id,
         senderId: userId,
       },
