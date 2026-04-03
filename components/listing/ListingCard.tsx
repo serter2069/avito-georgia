@@ -13,6 +13,8 @@ export interface Listing {
   city?: string;
   category?: string;
   createdAt?: string;
+  isPromoted?: boolean;
+  isHighlighted?: boolean;
 }
 
 interface ListingCardProps {
@@ -21,23 +23,34 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing, onPress }: ListingCardProps) {
+  const borderClass = listing.isHighlighted
+    ? 'bg-surface-card rounded-lg border-2 border-primary overflow-hidden'
+    : 'bg-surface-card rounded-lg border border-border overflow-hidden';
+
   return (
     <TouchableOpacity
-      className="bg-surface-card rounded-lg border border-border overflow-hidden"
+      className={borderClass}
       onPress={() => onPress(listing.id)}
       activeOpacity={0.7}
     >
-      {listing.imageUrl ? (
-        <Image
-          source={{ uri: listing.imageUrl }}
-          className="w-full h-48"
-          resizeMode="cover"
-        />
-      ) : (
-        <View className="w-full h-48 bg-surface items-center justify-center">
-          <Ionicons name="image-outline" size={32} color="#C8E0E8" />
-        </View>
-      )}
+      <View className="relative">
+        {listing.imageUrl ? (
+          <Image
+            source={{ uri: listing.imageUrl }}
+            className="w-full h-48"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="w-full h-48 bg-surface items-center justify-center">
+            <Ionicons name="image-outline" size={32} color="#C8E0E8" />
+          </View>
+        )}
+        {listing.isPromoted && (
+          <View className="absolute top-2 left-2 bg-yellow-400 px-2 py-0.5 rounded">
+            <Text className="text-xs font-bold text-yellow-900">Топ</Text>
+          </View>
+        )}
+      </View>
 
       <View className="p-3 gap-2">
         <Text className="text-text-primary text-base font-semibold" numberOfLines={2}>
