@@ -1,6 +1,33 @@
 import * as Localization from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+
+const LANG_KEY = 'user_language';
+
+async function getStoredLang(): Promise<string | null> {
+  if (Platform.OS === 'web') {
+    return localStorage.getItem(LANG_KEY);
+  }
+  return SecureStore.getItemAsync(LANG_KEY);
+}
+
+export async function setStoredLang(lang: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    localStorage.setItem(LANG_KEY, lang);
+    return;
+  }
+  await SecureStore.setItemAsync(LANG_KEY, lang);
+}
+
+/** Call once on app start (after i18n module loads) to restore saved language. */
+export async function initI18n(): Promise<void> {
+  const savedLang = await getStoredLang();
+  if (savedLang && supportedLangs.includes(savedLang) && savedLang !== i18n.language) {
+    await i18n.changeLanguage(savedLang);
+  }
+}
 
 const resources = {
   ru: {
@@ -902,7 +929,7 @@ const resources = {
 };
 
 const deviceLang = Localization.getLocales()[0]?.languageCode || 'ru';
-const supportedLangs = ['ru', 'en', 'ka'];
+export const supportedLangs = ['ru', 'en', 'ka'];
 const initialLang = supportedLangs.includes(deviceLang) ? deviceLang : 'ru';
 
 i18n.use(initReactI18next).init({
