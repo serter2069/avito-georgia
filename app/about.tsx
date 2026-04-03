@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { colors } from '../lib/colors';
@@ -15,11 +15,15 @@ export default function AboutScreen() {
         </TouchableOpacity>
         <Text style={styles.title}>{t('aboutTitle')}</Text>
       </View>
-      <View style={styles.content}>
-        <Text style={styles.body}>
-          {t('aboutDescription')}
-        </Text>
-      </View>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <Text style={styles.body}>{t('aboutDescription')}</Text>
+        <Text style={styles.sectionTitle}>{t('aboutMissionTitle')}</Text>
+        <Text style={styles.body}>{t('aboutMissionText')}</Text>
+        <Text style={styles.sectionTitle}>{t('aboutCitiesTitle')}</Text>
+        <Text style={styles.body}>{t('aboutCitiesText')}</Text>
+        <Text style={styles.sectionTitle}>{t('aboutContactTitle')}</Text>
+        <Text style={styles.body}>{t('aboutContactText')}</Text>
+      </ScrollView>
     </View>
   );
 }
@@ -50,8 +54,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  scroll: {
+    flex: 1,
+  },
   content: {
     padding: 16,
+    paddingBottom: 40,
+  },
+  sectionTitle: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 20,
+    marginBottom: 8,
   },
   body: {
     color: colors.textSecondary,
