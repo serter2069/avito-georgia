@@ -355,8 +355,13 @@ router.post('/:id/renew', requireAuth, async (req: Request, res: Response) => {
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
   if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
   if (listing.status !== 'active') { res.status(400).json({ error: 'Can only renew active listings' }); return; }
+  // 30-day cooldown: free renewal is allowed once per 30 days
+  const RENEWAL_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+  if (listing.lastRenewedAt && (Date.now() - listing.lastRenewedAt.getTime()) < RENEWAL_COOLDOWN_MS) {
+    res.status(403).json({ error: 'Free renewal available once per 30 days' }); return;
+  }
   const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-  const updated = await prisma.listing.update({ where: { id }, data: { expiresAt } });
+  const updated = await prisma.listing.update({ where: { id }, data: { expiresAt, lastRenewedAt: new Date() } });
   res.json(updated);
 });
 
