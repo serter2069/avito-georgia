@@ -26,6 +26,14 @@ router.delete('/:listingId', requireAuth, async (req: Request, res: Response) =>
   res.json({ ok: true });
 });
 
+// GET /api/favorites/:listingId/check
+router.get('/:listingId/check', requireAuth, async (req: Request, res: Response) => {
+  const listingId = String(req.params.listingId);
+  const userId = req.user!.userId;
+  const result = await prisma.favorite.findUnique({ where: { userId_listingId: { userId, listingId } } });
+  res.json({ isFavorited: !!result });
+});
+
 // GET /api/favorites
 router.get('/', requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.userId;
