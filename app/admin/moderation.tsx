@@ -33,7 +33,7 @@ export default function AdminModeration() {
   const fetchListings = useCallback(async (p: number) => {
     setLoading(true);
     const res = await api.get<{ listings: ListingItem[]; total: number }>(
-      `/listings?sort=createdAt_desc&limit=20&page=${p}`
+      `/admin/listings/pending?limit=20&page=${p}`
     );
     if (res.ok && res.data) {
       setListings(res.data.listings);
@@ -56,8 +56,8 @@ export default function AdminModeration() {
   const handleReject = async (id: string) => {
     if (!rejectReason.trim()) return;
     setActionLoading(id);
-    await api.patch(`/admin/listings/${id}/status`, { status: 'removed' });
-    setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: 'removed' } : l)));
+    await api.patch(`/admin/listings/${id}/status`, { status: 'rejected', rejectReason: rejectReason.trim() });
+    setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: 'rejected' } : l)));
     setRejectId(null);
     setRejectReason('');
     setActionLoading(null);
@@ -122,8 +122,19 @@ export default function AdminModeration() {
           </View>
 
           {/* Actions */}
-          {listing.status === 'active' && (
+          {listing.status === 'pending_moderation' && (
             <View className="flex-row gap-2">
+              <TouchableOpacity
+                className="flex-1 bg-success/20 border border-success/40 py-2 rounded-lg items-center"
+                onPress={() => handleApprove(listing.id)}
+                disabled={actionLoading === listing.id}
+              >
+                {actionLoading === listing.id ? (
+                  <ActivityIndicator size="small" color={colors.statusSuccess} />
+                ) : (
+                  <Text className="text-success text-sm font-medium">{t('approve')}</Text>
+                )}
+              </TouchableOpacity>
               <TouchableOpacity
                 className="flex-1 bg-error/20 border border-error/40 py-2 rounded-lg items-center"
                 onPress={() => {
@@ -137,22 +148,6 @@ export default function AdminModeration() {
                 disabled={actionLoading === listing.id}
               >
                 <Text className="text-error text-sm font-medium">{t('reject')}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {listing.status === 'removed' && (
-            <View className="flex-row gap-2">
-              <TouchableOpacity
-                className="flex-1 bg-success/20 border border-success/40 py-2 rounded-lg items-center"
-                onPress={() => handleApprove(listing.id)}
-                disabled={actionLoading === listing.id}
-              >
-                {actionLoading === listing.id ? (
-                  <ActivityIndicator size="small" color={colors.statusSuccess} />
-                ) : (
-                  <Text className="text-success text-sm font-medium">{t('approve')}</Text>
-                )}
               </TouchableOpacity>
             </View>
           )}
