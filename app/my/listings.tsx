@@ -124,7 +124,7 @@ export default function MyListingsScreen() {
     Alert.alert(t('confirmDelete'), t('confirmDeleteText'), [
       { text: t('cancel'), style: 'cancel' },
       {
-        text: t('delete'),
+        text: t('deactivate'),
         style: 'destructive',
         onPress: async () => {
           const res = await api.patch(`/listings/${id}/status`, { status: 'removed' });
