@@ -11,7 +11,7 @@ export default function DashboardLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.bgSecondary,
+          backgroundColor: '#ffffff',
           borderTopColor: colors.borderDefault,
           borderTopWidth: 1,
           height: 60,
