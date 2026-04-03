@@ -18,6 +18,7 @@ import stripeWebhookRouter from './routes/stripe-webhook';
 import adminPaymentsRouter from './routes/admin-payments';
 import usersRouter from './routes/users';
 import adminRouter from './routes/admin';
+import notificationsRouter from './routes/notifications';
 
 dotenv.config();
 
@@ -67,6 +68,7 @@ app.use('/api/promotions', promotionsRouter);
 app.use('/api/admin/payments', adminPaymentsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/notifications', notificationsRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
