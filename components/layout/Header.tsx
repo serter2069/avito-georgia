@@ -79,7 +79,10 @@ function LanguageDropdown() {
           <Pressable
             onPress={() => setOpen(false)}
             style={{
-              position: 'fixed' as any,
+              ...Platform.select({
+                web: { position: 'fixed' as any },
+                default: { position: 'absolute' as any },
+              }),
               top: 0,
               left: 0,
               right: 0,
