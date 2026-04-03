@@ -1,20 +1,14 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireAdmin } from '../middleware/auth';
 
 const router = Router();
 
-function requireAdmin(req: Request, res: Response): boolean {
-  if (req.user!.role !== 'admin') {
-    res.status(403).json({ error: 'Admin access required' });
-    return false;
-  }
-  return true;
-}
+// All admin routes require authentication and admin role
+router.use(requireAuth, requireAdmin);
 
 // GET /api/admin/users — paginated user list
-router.get('/users', requireAuth, async (req: Request, res: Response) => {
-  if (!requireAdmin(req, res)) return;
+router.get('/users', async (req: Request, res: Response) => {
 
   const page = Math.max(parseInt(req.query.page as string) || 1, 1);
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
@@ -52,8 +46,7 @@ router.get('/users', requireAuth, async (req: Request, res: Response) => {
 });
 
 // PATCH /api/admin/users/:id/role — update user role (block/unblock)
-router.patch('/users/:id/role', requireAuth, async (req: Request, res: Response) => {
-  if (!requireAdmin(req, res)) return;
+router.patch('/users/:id/role', async (req: Request, res: Response) => {
 
   const id = req.params.id as string;
   const { role } = req.body;
@@ -85,8 +78,7 @@ router.patch('/users/:id/role', requireAuth, async (req: Request, res: Response)
 });
 
 // GET /api/admin/stats — dashboard stats
-router.get('/stats', requireAuth, async (req: Request, res: Response) => {
-  if (!requireAdmin(req, res)) return;
+router.get('/stats', async (req: Request, res: Response) => {
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -119,8 +111,7 @@ router.get('/stats', requireAuth, async (req: Request, res: Response) => {
 });
 
 // PATCH /api/admin/reports/:id/status — update report status
-router.patch('/reports/:id/status', requireAuth, async (req: Request, res: Response) => {
-  if (!requireAdmin(req, res)) return;
+router.patch('/reports/:id/status', async (req: Request, res: Response) => {
 
   const id = req.params.id as string;
   const { status } = req.body;
@@ -145,8 +136,7 @@ router.patch('/reports/:id/status', requireAuth, async (req: Request, res: Respo
 });
 
 // GET /api/admin/listings/pending — moderation queue (pending_moderation listings)
-router.get('/listings/pending', requireAuth, async (req: Request, res: Response) => {
-  if (!requireAdmin(req, res)) return;
+router.get('/listings/pending', async (req: Request, res: Response) => {
 
   const page = Math.max(parseInt(req.query.page as string) || 1, 1);
   const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
@@ -174,8 +164,7 @@ router.get('/listings/pending', requireAuth, async (req: Request, res: Response)
 });
 
 // PATCH /api/admin/listings/:id/status — admin can approve/reject listings
-router.patch('/listings/:id/status', requireAuth, async (req: Request, res: Response) => {
-  if (!requireAdmin(req, res)) return;
+router.patch('/listings/:id/status', async (req: Request, res: Response) => {
 
   const id = req.params.id as string;
   const { status } = req.body;
