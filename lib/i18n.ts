@@ -275,11 +275,6 @@ const resources = {
       mapView: 'Карта',
       noCoordinates: 'Нет данных для карты',
 
-      // Map / View toggle
-      listView: 'Список',
-      mapView: 'Карта',
-      noCoordinates: 'Нет данных для карты',
-
       // Footer
       about: 'О нас',
       terms: 'Условия',
@@ -576,11 +571,6 @@ const resources = {
       mapView: 'Map',
       noCoordinates: 'No map data available',
 
-      // Map / View toggle
-      listView: 'List',
-      mapView: 'Map',
-      noCoordinates: 'No map data available',
-
       about: 'About',
       terms: 'Terms',
       privacy: 'Privacy',
@@ -870,11 +860,6 @@ const resources = {
       'cf_experience_1-3': '1-3 წელი',
       'cf_experience_3-5': '3-5 წელი',
       'cf_experience_5+': '5+ წელი',
-
-      // Map / View toggle
-      listView: 'სია',
-      mapView: 'რუკა',
-      noCoordinates: 'რუკის მონაცემები არ არის',
 
       // Map / View toggle
       listView: 'სია',
