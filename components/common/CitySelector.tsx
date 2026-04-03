@@ -30,7 +30,7 @@ export function CitySelector({ selected, onSelect }: CitySelectorProps) {
       {CITIES.map((city) => (
         <TouchableOpacity
           key={city}
-          className={`px-4 py-2 rounded-full border ${
+          className={`px-3 py-1 rounded-full border ${
             selected === city
               ? 'bg-primary border-primary'
               : 'bg-surface border-border'
@@ -38,7 +38,7 @@ export function CitySelector({ selected, onSelect }: CitySelectorProps) {
           onPress={() => onSelect(city)}
         >
           <Text
-            className={`text-sm font-medium ${
+            className={`text-xs font-medium ${
               selected === city ? 'text-white' : 'text-text-secondary'
             }`}
           >
