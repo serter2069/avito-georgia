@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
+import { Header } from '../../components/layout/Header';
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../lib/colors';
@@ -213,12 +214,7 @@ export default function SellerProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 bg-dark">
-        <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text className="text-primary text-base font-semibold">{t('back')}</Text>
-          </TouchableOpacity>
-          <Text className="text-text-primary text-lg font-bold">{t('sellerProfile')}</Text>
-        </View>
+        <Header showBack title={t('sellerProfile')} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
@@ -229,12 +225,7 @@ export default function SellerProfileScreen() {
   if (error || !seller) {
     return (
       <View className="flex-1 bg-dark">
-        <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text className="text-primary text-base font-semibold">{t('back')}</Text>
-          </TouchableOpacity>
-          <Text className="text-text-primary text-lg font-bold">{t('error')}</Text>
-        </View>
+        <Header showBack title={t('error')} />
         <View className="flex-1 items-center justify-center px-4">
           <Text className="text-text-muted text-base">{error || 'User not found'}</Text>
         </View>
@@ -244,15 +235,7 @@ export default function SellerProfileScreen() {
 
   return (
     <View className="flex-1 bg-dark">
-      {/* Header */}
-      <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-primary text-base font-semibold">{t('back')}</Text>
-        </TouchableOpacity>
-        <Text className="text-text-primary text-lg font-bold flex-1" numberOfLines={1}>
-          {seller.name}
-        </Text>
-      </View>
+      <Header showBack title={seller.name} />
 
       <FlatList
         data={listings}
