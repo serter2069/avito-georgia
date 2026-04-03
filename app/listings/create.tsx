@@ -381,7 +381,7 @@ export default function CreateListingScreen() {
   );
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       <Header title={t('createListing')} />
       {renderStepIndicator()}
 

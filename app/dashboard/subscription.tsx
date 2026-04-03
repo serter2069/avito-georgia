@@ -61,7 +61,7 @@ export default function SubscriptionScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-dark">
+      <View className="flex-1 bg-white">
         <Header title={t('subscription')} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.brandPrimary} />
@@ -71,7 +71,7 @@ export default function SubscriptionScreen() {
   }
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       <Header title={t('subscription')} />
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4">
@@ -88,7 +88,7 @@ export default function SubscriptionScreen() {
             </View>
           </View>
 
-          <View className="bg-dark/50 rounded-lg p-4 mb-4 gap-3">
+          <View className="bg-bg-section/50 rounded-lg p-4 mb-4 gap-3">
             <FeatureRow text={t('unlimitedListings')} />
             <FeatureRow text={t('promotionUnlimitedSubDesc')} />
           </View>

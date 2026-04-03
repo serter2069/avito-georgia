@@ -9,7 +9,7 @@ export default function PromotionSuccessScreen() {
   const { session_id } = useLocalSearchParams<{ session_id?: string }>();
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       <ScrollView
         className="flex-1"
         contentContainerClassName="flex-1 items-center justify-center px-6 py-12"

@@ -172,7 +172,7 @@ export default function ListingDetailScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-dark">
+      <View className="flex-1 bg-white">
         <Header title={t('loading')} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.brandPrimary} />
@@ -183,7 +183,7 @@ export default function ListingDetailScreen() {
 
   if (error || !listing) {
     return (
-      <View className="flex-1 bg-dark">
+      <View className="flex-1 bg-white">
         <Header title={t('error')} />
         <View className="flex-1 items-center justify-center px-4">
           <Text className="text-text-muted text-base mb-4">{error || 'Not found'}</Text>
@@ -196,9 +196,9 @@ export default function ListingDetailScreen() {
   const photoUrls = listing.photos.map(p => p.url);
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       {/* Header with back button */}
-      <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
+      <View className="bg-bg-section border-b border-border px-4 py-3 flex-row items-center gap-3">
         <TouchableOpacity onPress={() => router.back()}>
           <Text className="text-primary text-base font-semibold">{t('back')}</Text>
         </TouchableOpacity>
@@ -293,7 +293,7 @@ export default function ListingDetailScreen() {
       </ScrollView>
 
       {/* Bottom action bar */}
-      <View className="absolute bottom-0 left-0 right-0 bg-dark-secondary border-t border-border px-4 py-3 flex-row gap-3">
+      <View className="absolute bottom-0 left-0 right-0 bg-bg-section border-t border-border px-4 py-3 flex-row gap-3">
         {user && listing.user.id === user.id ? (
           // Owner view: promote button
           <View className="flex-1">
