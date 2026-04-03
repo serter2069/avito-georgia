@@ -1,6 +1,6 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Linking } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Linking, Modal, Pressable, TextInput, Animated, Dimensions, KeyboardAvoidingView } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Header } from '../../components/layout/Header';
 import { PhotoGallery } from '../../components/listing/PhotoGallery';
@@ -77,6 +77,11 @@ export default function ListingDetailScreen() {
   const [phoneLoading, setPhoneLoading] = useState(false);
   const [phoneRevealed, setPhoneRevealed] = useState(false);
 
+  // Contact sheet state
+  const [contactSheetVisible, setContactSheetVisible] = useState(false);
+  const [contactMessage, setContactMessage] = useState('');
+  const contactSheetAnim = useRef(new Animated.Value(0)).current;
+
   // Fetch listing once on mount
   useEffect(() => {
     if (!id) return;
@@ -132,7 +137,7 @@ export default function ListingDetailScreen() {
     setFavoriteLoading(false);
   }, [user, id, isFavorited, favoriteLoading, router]);
 
-  const handleContactSeller = useCallback(async () => {
+  const openContactSheet = useCallback(async () => {
     if (!user) {
       router.push('/(auth)');
       return;
@@ -141,9 +146,9 @@ export default function ListingDetailScreen() {
 
     const listingId = Array.isArray(id) ? id[0] : id;
 
+    // Check for an existing thread — navigate directly if one exists
     setContactLoading(true);
     try {
-      // Check for an existing thread for this listing before creating a new one
       const threadsRes = await api.get<Array<{ id: string; listing: { id: string } | null }>>('/threads');
       if (threadsRes.ok && threadsRes.data) {
         const existing = threadsRes.data.find((t) => t.listing?.id === listingId);
@@ -152,18 +157,46 @@ export default function ListingDetailScreen() {
           return;
         }
       }
+    } finally {
+      setContactLoading(false);
+    }
 
-      // No existing thread — send first message to create one
-      const createRes = await api.post<{ threadId: string }>(`/threads/${listingId}/message`, {
-        text: t('defaultContactMessage'),
-      });
+    // No existing thread — show the contact sheet
+    setContactMessage(t('defaultContactMessage'));
+    setContactSheetVisible(true);
+    Animated.timing(contactSheetAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [user, id, listing, contactLoading, router, t, contactSheetAnim]);
+
+  const closeContactSheet = useCallback(() => {
+    Animated.timing(contactSheetAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setContactSheetVisible(false));
+  }, [contactSheetAnim]);
+
+  const handleSendContactMessage = useCallback(async () => {
+    if (!id || !listing?.user?.id || contactLoading) return;
+    const text = contactMessage.trim();
+    if (!text) return;
+
+    const listingId = Array.isArray(id) ? id[0] : id;
+
+    setContactLoading(true);
+    try {
+      const createRes = await api.post<{ threadId: string }>(`/threads/${listingId}/message`, { text });
       if (createRes.ok && createRes.data?.threadId) {
+        closeContactSheet();
         router.push(`/dashboard/messages/${createRes.data.threadId}`);
       }
     } finally {
       setContactLoading(false);
     }
-  }, [user, id, listing, contactLoading, router]);
+  }, [id, listing, contactLoading, contactMessage, router, closeContactSheet]);
 
   const handleRevealPhone = useCallback(async () => {
     if (!user) {
@@ -361,7 +394,7 @@ export default function ListingDetailScreen() {
               <View className="flex-1">
                 <Button
                   title={contactLoading ? t('loading') : t('contactSeller')}
-                  onPress={handleContactSeller}
+                  onPress={openContactSheet}
                   size="md"
                   disabled={contactLoading}
                 />
@@ -386,6 +419,150 @@ export default function ListingDetailScreen() {
           </>
         )}
       </View>
+
+      {/* Contact seller bottom sheet */}
+      {contactSheetVisible && (() => {
+        const screenHeight = Dimensions.get('window').height;
+        const sheetTranslateY = contactSheetAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [screenHeight * 0.5, 0],
+        });
+        const backdropOpacity = contactSheetAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+        });
+        return (
+          <Modal
+            visible={contactSheetVisible}
+            transparent
+            animationType="none"
+            onRequestClose={closeContactSheet}
+          >
+            <KeyboardAvoidingView
+              style={{ flex: 1 }}
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+              <Animated.View
+                style={{
+                  flex: 1,
+                  backgroundColor: 'rgba(0,0,0,0.4)',
+                  opacity: backdropOpacity,
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <Pressable style={{ flex: 1 }} onPress={closeContactSheet} />
+
+                <Animated.View
+                  style={{
+                    transform: [{ translateY: sheetTranslateY }],
+                    backgroundColor: '#FFFFFF',
+                    borderTopLeftRadius: 16,
+                    borderTopRightRadius: 16,
+                    paddingBottom: 32,
+                  }}
+                >
+                  {/* Handle bar */}
+                  <View style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 12 }}>
+                    <View
+                      style={{
+                        width: 36,
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: '#D1D5DB',
+                      }}
+                    />
+                  </View>
+
+                  {/* Title */}
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontWeight: '600',
+                      color: '#0A2840',
+                      textAlign: 'center',
+                      marginBottom: 20,
+                      paddingHorizontal: 24,
+                    }}
+                  >
+                    {t('contactSeller')}
+                  </Text>
+
+                  {/* Message input */}
+                  <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
+                    <TextInput
+                      style={{
+                        borderWidth: 1,
+                        borderColor: '#CBD5E1',
+                        borderRadius: 10,
+                        paddingHorizontal: 14,
+                        paddingVertical: 12,
+                        fontSize: 15,
+                        color: '#0A2840',
+                        backgroundColor: '#F8FAFC',
+                        minHeight: 100,
+                        textAlignVertical: 'top',
+                      }}
+                      value={contactMessage}
+                      onChangeText={setContactMessage}
+                      placeholder={t('typeMessage')}
+                      placeholderTextColor="#94A3B8"
+                      multiline
+                      autoFocus
+                    />
+                  </View>
+
+                  {/* Buttons */}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      paddingHorizontal: 20,
+                      gap: 12,
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                        paddingVertical: 14,
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: '#CBD5E1',
+                        alignItems: 'center',
+                      }}
+                      onPress={closeContactSheet}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#64748B' }}>
+                        {t('cancel')}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                        paddingVertical: 14,
+                        borderRadius: 10,
+                        backgroundColor: contactLoading || !contactMessage.trim() ? '#94A3B8' : '#0A7B8A',
+                        alignItems: 'center',
+                      }}
+                      onPress={handleSendContactMessage}
+                      disabled={contactLoading || !contactMessage.trim()}
+                      activeOpacity={0.7}
+                    >
+                      {contactLoading ? (
+                        <ActivityIndicator color="#FFFFFF" />
+                      ) : (
+                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>
+                          {t('send')}
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </Animated.View>
+              </Animated.View>
+            </KeyboardAvoidingView>
+          </Modal>
+        );
+      })()}
     </View>
   );
 }
