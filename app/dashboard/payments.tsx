@@ -5,6 +5,7 @@ import { Header } from '../../components/layout/Header';
 import { Badge } from '../../components/ui/Badge';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Promotion {
   id: string;
@@ -79,7 +80,7 @@ export default function PaymentsScreen() {
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-3">
         {promotions.length === 0 ? (
           <View className="bg-surface-card border border-border rounded-lg p-8 items-center">
-            <Text className="text-4xl mb-4">{'\uD83D\uDCB3'}</Text>
+            <Ionicons name="card" size={48} color={colors.brandPrimary} style={{ marginBottom: 16 }} />
             <Text className="text-text-primary text-lg font-bold mb-2">
               {t('paymentHistory')}
             </Text>

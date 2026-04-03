@@ -330,7 +330,7 @@ export default function ListingsScreen() {
             <Text className="text-text-secondary text-xs font-medium">
               {t(SORT_OPTIONS.find(s => s.key === sortBy)?.label || 'sortDate')}
             </Text>
-            <Text className="text-text-muted text-xs">{showSort ? '\u25B2' : '\u25BC'}</Text>
+            <Ionicons name={showSort ? 'arrow-up' : 'arrow-down'} size={12} color={colors.textMuted} />
           </TouchableOpacity>
 
           {showSort && (

@@ -2,6 +2,7 @@ import { View, Text, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Button } from '../../components/ui/Button';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function PromotionCancelScreen() {
   const { t } = useTranslation();
@@ -14,7 +15,7 @@ export default function PromotionCancelScreen() {
         contentContainerClassName="flex-1 items-center justify-center px-6 py-12"
       >
         <View className="items-center mb-8">
-          <Text className="text-6xl mb-4">{'\u274C'}</Text>
+          <Ionicons name="close-circle" size={72} color="#ef4444" style={{ marginBottom: 16 }} />
           <Text className="text-text-primary text-2xl font-bold text-center mb-3">
             {t('paymentCancel')}
           </Text>

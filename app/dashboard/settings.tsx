@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 // AsyncStorage fallback for web
 async function getStoredValue(key: string): Promise<string | null> {
@@ -102,7 +103,7 @@ export default function SettingsScreen() {
               >
                 <Text className="text-text-primary text-base">{lang.name}</Text>
                 {i18n.language === lang.code && (
-                  <Text className="text-primary text-base font-bold">{'\u2713'}</Text>
+                  <Ionicons name="checkmark" size={20} color={colors.brandPrimary} />
                 )}
               </TouchableOpacity>
             ))}

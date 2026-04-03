@@ -137,7 +137,7 @@ export default function SubscriptionScreen() {
 function FeatureRow({ text }: { text: string }) {
   return (
     <View className="flex-row items-start gap-2">
-      <Text className="text-success text-sm">{'\u2713'}</Text>
+      <Ionicons name="checkmark" size={16} color="#22c55e" />
       <Text className="text-text-secondary text-sm flex-1">{text}</Text>
     </View>
   );

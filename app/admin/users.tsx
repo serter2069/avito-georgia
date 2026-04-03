@@ -93,7 +93,7 @@ export default function AdminUsers() {
             className="px-4 items-center justify-center bg-primary"
             onPress={handleSearch}
           >
-            <Text className="text-white text-sm">&#x1F50D;</Text>
+            <Ionicons name="search" size={18} color="#ffffff" />
           </TouchableOpacity>
         </View>
       </View>
