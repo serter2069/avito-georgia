@@ -103,7 +103,7 @@ router.post('/', async (req: Request, res: Response) => {
 
         // Create unlimited_sub promotion (idempotency: skip if active sub already exists)
         const existingSub = await prisma.promotion.findFirst({
-          where: { userId, listingId: '', promotionType: 'unlimited_sub', isActive: true },
+          where: { userId, listingId: null, promotionType: 'unlimited_sub', isActive: true },
         });
         if (existingSub) {
           console.log(`[stripe-webhook] Skipped duplicate unlimited_sub for user ${userId}`);
@@ -113,7 +113,7 @@ router.post('/', async (req: Request, res: Response) => {
         await prisma.promotion.create({
           data: {
             userId,
-            listingId: '', // Not listing-specific
+            listingId: null, // Not listing-specific
             promotionType: 'unlimited_sub',
             isActive: true,
             expiresAt: null,

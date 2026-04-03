@@ -212,8 +212,8 @@ model Promotion {
   isActive      Boolean       @default(true)
   expiresAt     DateTime?
   createdAt     DateTime      @default(now())
-  listingId     String
-  listing       Listing       @relation(fields: [listingId], references: [id])
+  listingId     String?
+  listing       Listing?      @relation(fields: [listingId], references: [id])
   userId        String
   user          User          @relation(fields: [userId], references: [id])
 
