@@ -1,8 +1,9 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Image, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from '../../stores/authStore';
-import { api } from '../../lib/api';
+import { api, apiUpload } from '../../lib/api';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 
@@ -12,18 +13,21 @@ export default function ProfileScreen() {
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     // User fields from authStore only have id, email, role
     // Name and phone are on the DB user but not returned by verify-otp
     // Try to load full profile if /auth/me endpoint exists
     const loadProfile = async () => {
-      const res = await api.get<{ user: { id: string; email: string; name: string | null; phone: string | null } }>('/auth/me');
+      const res = await api.get<{ user: { id: string; email: string; name: string | null; phone: string | null; avatarUrl: string | null } }>('/auth/me');
       if (res.ok && res.data) {
         setName(res.data.user.name || '');
         setPhone(res.data.user.phone || '');
+        setAvatarUrl(res.data.user.avatarUrl || null);
       }
     };
     loadProfile();
@@ -38,6 +42,45 @@ export default function ProfileScreen() {
       setTimeout(() => setSaved(false), 2000);
     }
     setSaving(false);
+  };
+
+  const handlePickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsMultipleSelection: false,
+      quality: 0.8,
+    });
+
+    if (result.canceled || !result.assets?.length) return;
+
+    const asset = result.assets[0];
+    // Optimistic update
+    setAvatarUrl(asset.uri);
+    setUploadingAvatar(true);
+
+    try {
+      const formData = new FormData();
+      const blob: any = {
+        uri: asset.uri,
+        type: asset.mimeType || 'image/jpeg',
+        name: asset.fileName || 'avatar.jpg',
+      };
+      formData.append('avatar', blob);
+
+      const res = await apiUpload<{ avatarUrl: string }>('/users/avatar', formData);
+      if (res.ok && res.data?.avatarUrl) {
+        setAvatarUrl(res.data.avatarUrl);
+      } else {
+        Alert.alert(t('error'), res.error || t('error'));
+        // Revert optimistic update on failure
+        setAvatarUrl(null);
+      }
+    } catch {
+      Alert.alert(t('error'), t('error'));
+      setAvatarUrl(null);
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const getInitials = () => {
@@ -63,10 +106,30 @@ export default function ProfileScreen() {
       <ScrollView className="flex-1" contentContainerClassName="p-4 gap-5">
         {/* Avatar */}
         <View className="items-center py-4">
-          <View className="w-20 h-20 rounded-full bg-primary/20 items-center justify-center mb-3">
-            <Text className="text-primary text-2xl font-bold">{getInitials()}</Text>
-          </View>
-          <Text className="text-text-secondary text-sm">{user?.email}</Text>
+          <TouchableOpacity onPress={handlePickAvatar} disabled={uploadingAvatar} className="mb-3">
+            <View className="w-20 h-20 rounded-full overflow-hidden bg-primary/20 items-center justify-center">
+              {avatarUrl ? (
+                <Image
+                  source={{ uri: avatarUrl }}
+                  style={{ width: 80, height: 80 }}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text className="text-primary text-2xl font-bold">{getInitials()}</Text>
+              )}
+              {uploadingAvatar && (
+                <View className="absolute inset-0 bg-black/50 items-center justify-center">
+                  <ActivityIndicator color="#fff" size="small" />
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handlePickAvatar} disabled={uploadingAvatar}>
+            <Text className="text-primary text-sm font-medium">
+              {uploadingAvatar ? t('loading') : t('changePhoto')}
+            </Text>
+          </TouchableOpacity>
+          <Text className="text-text-secondary text-sm mt-1">{user?.email}</Text>
         </View>
 
         {/* Name */}
