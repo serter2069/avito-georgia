@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../../components/layout/Header';
 import { CitySelector, City } from '../../components/common/CitySelector';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
@@ -104,6 +105,7 @@ export default function ListingsScreen() {
   );
   const [sortBy, setSortBy] = useState<SortOption>('createdAt_desc');
   const [showSort, setShowSort] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Category-specific filters from API
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
@@ -243,8 +245,20 @@ export default function ListingsScreen() {
         ))}
       </ScrollView>
 
-      {/* Category-specific filters (shown when category has customFields) */}
+      {/* Category-specific filters — collapsed behind Filters button */}
       {customFields.length > 0 && (
+        <View className="px-4 pb-2">
+          <TouchableOpacity
+            className="flex-row items-center gap-1 px-3 py-1.5 rounded-full border border-border self-start"
+            onPress={() => setShowFilters(!showFilters)}
+          >
+            <Ionicons name="options-outline" size={14} color={colors.textSecondary} />
+            <Text className="text-text-secondary text-xs font-medium">{t('filters')}</Text>
+            <Ionicons name={showFilters ? 'chevron-up' : 'chevron-down'} size={12} color={colors.textMuted} />
+          </TouchableOpacity>
+        </View>
+      )}
+      {showFilters && customFields.length > 0 && (
         <CategoryFilters
           customFields={customFields}
           values={customFilterValues}

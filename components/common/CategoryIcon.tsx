@@ -35,9 +35,9 @@ const CATEGORY_ICONS: Record<CategoryType, keyof typeof Ionicons.glyphMap> = {
 };
 
 const sizeMap = {
-  sm: { container: 40, icon: 18, label: 11 },
-  md: { container: 56, icon: 26, label: 11 },
-  lg: { container: 80, icon: 38, label: 13 },
+  sm: { container: 36, icon: 16, label: 10 },
+  md: { container: 44, icon: 20, label: 10 },
+  lg: { container: 64, icon: 30, label: 12 },
 };
 
 export function CategoryIcon({ category, size = 'md', showLabel = true }: CategoryIconProps) {

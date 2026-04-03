@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import { PriceTag } from '../ui/PriceTag';
 import { Badge } from '../ui/Badge';
 
@@ -21,8 +21,6 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing, onPress }: ListingCardProps) {
-  const { t } = useTranslation();
-
   return (
     <TouchableOpacity
       className="bg-surface-card rounded-lg border border-border overflow-hidden"
@@ -37,7 +35,7 @@ export function ListingCard({ listing, onPress }: ListingCardProps) {
         />
       ) : (
         <View className="w-full h-48 bg-surface items-center justify-center">
-          <Text className="text-text-muted text-sm">{t('photos')}</Text>
+          <Ionicons name="image-outline" size={32} color="#C8E0E8" />
         </View>
       )}
 
