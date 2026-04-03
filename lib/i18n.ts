@@ -335,6 +335,8 @@ const resources = {
       language: 'Язык',
       nickname: 'Имя пользователя',
       phone: 'Телефон',
+      showPhone: 'Показать телефон',
+      phoneNotSpecified: 'Телефон не указан',
     },
   },
   en: {
@@ -631,6 +633,8 @@ const resources = {
       language: 'Language',
       nickname: 'Nickname',
       phone: 'Phone',
+      showPhone: 'Show phone number',
+      phoneNotSpecified: 'Phone not specified',
     },
   },
   ka: {
@@ -927,6 +931,8 @@ const resources = {
       language: 'ენა',
       nickname: 'მომხმარებლის სახელი',
       phone: 'ტელეფონი',
+      showPhone: 'ტელეფონის ნახვა',
+      phoneNotSpecified: 'ტელეფონი მითითებული არ არის',
     },
   },
 };
