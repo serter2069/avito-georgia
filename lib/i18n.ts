@@ -382,6 +382,19 @@ const resources = {
       // Similar listings
       similarListings: 'Похожие объявления',
 
+      // Onboarding
+      onboardingTitle: 'Расскажите о себе',
+      onboardingSubtitle: 'Заполните профиль, чтобы начать',
+      onboardingName: 'Имя',
+      onboardingNamePlaceholder: 'Введите ваше имя',
+      onboardingPhone: 'Телефон (необязательно)',
+      onboardingPhonePlaceholder: '+995...',
+      onboardingCity: 'Город',
+      onboardingCityPlaceholder: 'Выберите город',
+      onboardingSubmit: 'Продолжить',
+      onboardingSkip: 'Пропустить',
+      onboardingNameRequired: 'Введите имя',
+
       // Report listing
       reportListing: 'Пожаловаться',
       reportTitle: 'Причина жалобы',
@@ -735,6 +748,19 @@ const resources = {
       // Similar listings
       similarListings: 'Similar listings',
 
+      // Onboarding
+      onboardingTitle: 'Tell us about yourself',
+      onboardingSubtitle: 'Fill in your profile to get started',
+      onboardingName: 'Name',
+      onboardingNamePlaceholder: 'Enter your name',
+      onboardingPhone: 'Phone (optional)',
+      onboardingPhonePlaceholder: '+995...',
+      onboardingCity: 'City',
+      onboardingCityPlaceholder: 'Select a city',
+      onboardingSubmit: 'Continue',
+      onboardingSkip: 'Skip',
+      onboardingNameRequired: 'Enter your name',
+
       // Report listing
       reportListing: 'Report',
       reportTitle: 'Report reason',
@@ -1087,6 +1113,19 @@ const resources = {
 
       // Similar listings
       similarListings: 'მსგავსი განცხადებები',
+
+      // Onboarding
+      onboardingTitle: 'მოგვიყევი შენს შესახებ',
+      onboardingSubtitle: 'შეავსე პროფილი დასაწყებად',
+      onboardingName: 'სახელი',
+      onboardingNamePlaceholder: 'შეიყვანე შენი სახელი',
+      onboardingPhone: 'ტელეფონი (არასავალდებულო)',
+      onboardingPhonePlaceholder: '+995...',
+      onboardingCity: 'ქალაქი',
+      onboardingCityPlaceholder: 'აირჩიე ქალაქი',
+      onboardingSubmit: 'გაგრძელება',
+      onboardingSkip: 'გამოტოვება',
+      onboardingNameRequired: 'შეიყვანე სახელი',
 
       // Report listing
       reportListing: 'საჩივარი',

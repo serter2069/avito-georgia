@@ -154,7 +154,7 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
   setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
 
   // Also return tokens in body — native clients (iOS/Android) read from here
-  res.json({ ...tokens, user: { id: user.id, email: user.email, role: user.role } });
+  res.json({ ...tokens, user: { id: user.id, email: user.email, role: user.role, isOnboarded: user.isOnboarded } });
 });
 
 // POST /api/auth/refresh
@@ -235,7 +235,7 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.userId },
-      select: { id: true, email: true, name: true, phone: true, avatarUrl: true, role: true, locale: true, createdAt: true },
+      select: { id: true, email: true, name: true, phone: true, avatarUrl: true, role: true, locale: true, isOnboarded: true, createdAt: true },
     });
     if (!user) {
       res.status(404).json({ error: 'User not found' });

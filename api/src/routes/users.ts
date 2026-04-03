@@ -12,16 +12,18 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 router.patch('/me', requireAuth, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { name, phone } = req.body;
+    const { name, phone, city, isOnboarded } = req.body;
 
-    const data: Record<string, string | null> = {};
+    const data: Record<string, string | boolean | null> = {};
     if (name !== undefined) data.name = typeof name === 'string' ? name.trim() || null : null;
     if (phone !== undefined) data.phone = typeof phone === 'string' ? phone.trim() || null : null;
+    if (city !== undefined) data.city = typeof city === 'string' ? city.trim() || null : null;
+    if (isOnboarded === true) data.isOnboarded = true;
 
     const user = await prisma.user.update({
       where: { id: userId },
       data,
-      select: { id: true, email: true, name: true, phone: true, avatarUrl: true, role: true, locale: true },
+      select: { id: true, email: true, name: true, phone: true, avatarUrl: true, role: true, locale: true, city: true, isOnboarded: true },
     });
 
     res.json({ user });
