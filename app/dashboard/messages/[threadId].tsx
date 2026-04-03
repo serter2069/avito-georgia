@@ -181,8 +181,9 @@ export default function ChatScreen() {
     >
       {/* Header */}
       <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3 pr-1">
-          <Text className="text-primary text-base font-semibold">{'\u2190'} {t('back')}</Text>
+        <TouchableOpacity onPress={() => router.back()} className="mr-3 pr-1 flex-row items-center gap-1">
+          <Ionicons name="arrow-back" size={20} color={colors.brandPrimary} />
+          <Text className="text-primary text-base font-semibold">{t('back')}</Text>
         </TouchableOpacity>
         <Text className="text-text-primary text-lg font-bold flex-1" numberOfLines={1}>
           {t('messages')}

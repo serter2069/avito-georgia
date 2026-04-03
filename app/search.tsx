@@ -2,6 +2,7 @@ import { View, ScrollView, Text, TextInput, TouchableOpacity, FlatList, Activity
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/layout/Header';
 import { CitySelector, City } from '../components/common/CitySelector';
 import { CategoryIcon, CategoryType } from '../components/common/CategoryIcon';
@@ -185,7 +186,7 @@ export default function SearchScreen() {
     if (!hasSearched) return null;
     return (
       <View className="py-16 items-center px-4">
-        <Text className="text-text-muted text-4xl mb-4">&#x1F50D;</Text>
+        <Ionicons name="search" size={48} color={colors.textMuted} style={{ marginBottom: 16 }} />
         <Text className="text-text-primary text-base font-semibold mb-1">{t('nothingFound')}</Text>
         <Text className="text-text-muted text-sm text-center">{t('tryDifferentSearch')}</Text>
       </View>
@@ -225,7 +226,7 @@ export default function SearchScreen() {
             className="px-4 items-center justify-center bg-primary"
             onPress={() => doSearch(true)}
           >
-            <Text className="text-white text-base">&#x1F50D;</Text>
+            <Ionicons name="search" size={20} color="#ffffff" />
           </TouchableOpacity>
         </View>
       </View>
