@@ -1,17 +1,35 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, Pressable, Platform } from 'react-native';
+import { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, Modal, Pressable, Platform, Animated, Dimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { useResponsive } from '../../hooks/useResponsive';
 import { useAuthStore } from '../../stores/authStore';
 import { setStoredLang } from '../../lib/i18n';
+import { colors } from '../../lib/colors';
 
 const LANGUAGES = [
   { code: 'ru', label: 'RU', flag: '\u{1F1F7}\u{1F1FA}', name: '\u0420\u0443\u0441\u0441\u043A\u0438\u0439' },
   { code: 'en', label: 'EN', flag: '\u{1F1EC}\u{1F1E7}', name: 'English' },
   { code: 'ka', label: 'KA', flag: '\u{1F1EC}\u{1F1EA}', name: '\u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8' },
 ] as const;
+
+interface MenuItem {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  path: string;
+  authRequired?: boolean;
+  guestOnly?: boolean;
+}
+
+const MENU_ITEMS: MenuItem[] = [
+  { icon: 'home-outline', label: 'home', path: '/' },
+  { icon: 'list-outline', label: 'listings', path: '/listings' },
+  { icon: 'chatbubble-outline', label: 'messages', path: '/dashboard/messages', authRequired: true },
+  { icon: 'heart-outline', label: 'favorites', path: '/dashboard/favorites', authRequired: true },
+  { icon: 'person-outline', label: 'profile', path: '/dashboard/profile', authRequired: true },
+  { icon: 'log-in-outline', label: 'login', path: '/(auth)', guestOnly: true },
+];
 
 interface HeaderProps {
   title?: string;
@@ -142,13 +160,48 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
   const { t, i18n } = useTranslation();
   const { isDesktop } = useResponsive();
   const router = useRouter();
+  const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const [menuOpen, setMenuOpen] = useState(false);
+  const slideAnim = useRef(new Animated.Value(0)).current;
+
+  const openMenu = () => {
+    setMenuOpen(true);
+    Animated.timing(slideAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeMenu = () => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setMenuOpen(false));
+  };
 
   const navigateTo = (path: string) => {
-    setMenuOpen(false);
-    router.push(path as any);
+    closeMenu();
+    setTimeout(() => router.push(path as any), 220);
   };
+
+  const visibleItems = MENU_ITEMS.filter((item) => {
+    if (item.authRequired && !user) return false;
+    if (item.guestOnly && user) return false;
+    return true;
+  });
+
+  const screenHeight = Dimensions.get('window').height;
+  const sheetTranslateY = slideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [screenHeight * 0.6, 0],
+  });
+  const backdropOpacity = slideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
 
   // Desktop: full navigation bar (no hamburger needed)
   if (isDesktop) {
@@ -201,7 +254,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
     );
   }
 
-  // Mobile/Tablet: compact header with hamburger menu
+  // Mobile/Tablet: compact header with hamburger + bottom sheet menu
   return (
     <View className="bg-white border-b border-border px-4 py-3 flex-row items-center justify-between">
       <View className="flex-row items-center gap-2 flex-1">
@@ -218,7 +271,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
       <View className="flex-row items-center gap-2">
         {showLanguageSwitcher && <LanguageDropdown />}
 
-        <TouchableOpacity onPress={() => setMenuOpen(true)} className="ml-1 p-1">
+        <TouchableOpacity onPress={openMenu} className="ml-1 p-1">
           <Ionicons name="menu" size={24} color="#0A2840" />
         </TouchableOpacity>
       </View>
@@ -226,48 +279,98 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
       <Modal
         visible={menuOpen}
         transparent
-        animationType="fade"
-        onRequestClose={() => setMenuOpen(false)}
+        animationType="none"
+        onRequestClose={closeMenu}
       >
-        <Pressable
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' }}
-          onPress={() => setMenuOpen(false)}
+        {/* Backdrop */}
+        <Animated.View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            opacity: backdropOpacity,
+            justifyContent: 'flex-end',
+          }}
         >
-          <View
-            style={{ position: 'absolute', top: 0, right: 0, width: 240, height: '100%', backgroundColor: '#FFFFFF', paddingTop: 56, paddingHorizontal: 16 }}
+          <Pressable style={{ flex: 1 }} onPress={closeMenu} />
+
+          {/* Bottom sheet */}
+          <Animated.View
+            style={{
+              transform: [{ translateY: sheetTranslateY }],
+              backgroundColor: '#FFFFFF',
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+              paddingBottom: 32,
+              maxHeight: '60%',
+            }}
           >
-            <TouchableOpacity onPress={() => setMenuOpen(false)} style={{ position: 'absolute', top: 16, right: 16 }}>
-              <Ionicons name="close" size={24} color="#0A2840" />
-            </TouchableOpacity>
+            {/* Handle bar */}
+            <View style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 12 }}>
+              <View
+                style={{
+                  width: 36,
+                  height: 4,
+                  borderRadius: 2,
+                  backgroundColor: '#D1D5DB',
+                }}
+              />
+            </View>
 
-            <TouchableOpacity className="py-3 flex-row items-center gap-3" onPress={() => navigateTo('/listings')}>
-              <Ionicons name="list-outline" size={20} color="#0A7B8A" />
-              <Text className="text-text-primary text-base">{t('listings')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="py-3 flex-row items-center gap-3" onPress={() => navigateTo('/my/listings')}>
-              <Ionicons name="albums-outline" size={20} color="#0A7B8A" />
-              <Text className="text-text-primary text-base">{t('myListings')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="py-3 flex-row items-center gap-3" onPress={() => navigateTo('/dashboard/favorites')}>
-              <Ionicons name="heart-outline" size={20} color="#0A7B8A" />
-              <Text className="text-text-primary text-base">{t('favorites')}</Text>
-            </TouchableOpacity>
-
-            {user ? (
-              <TouchableOpacity className="py-3 flex-row items-center gap-3" onPress={() => navigateTo('/dashboard/profile')}>
-                <Ionicons name="person-outline" size={20} color="#0A7B8A" />
-                <Text className="text-text-primary text-base">{t('profile')}</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity className="py-3 flex-row items-center gap-3" onPress={() => navigateTo('/(auth)')}>
-                <Ionicons name="log-in-outline" size={20} color="#0A7B8A" />
-                <Text className="text-text-primary text-base">{t('login')}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </Pressable>
+            {/* Grid of items - 2 columns */}
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                paddingHorizontal: 24,
+                paddingBottom: 8,
+              }}
+            >
+              {visibleItems.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <TouchableOpacity
+                    key={item.path}
+                    style={{
+                      width: '50%',
+                      alignItems: 'center',
+                      paddingVertical: 16,
+                    }}
+                    onPress={() => navigateTo(item.path)}
+                    activeOpacity={0.6}
+                  >
+                    <View
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 12,
+                        backgroundColor: isActive ? colors.brandPrimary + '15' : '#F3F4F6',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 6,
+                      }}
+                    >
+                      <Ionicons
+                        name={item.icon}
+                        size={22}
+                        color={isActive ? colors.brandPrimary : colors.textSecondary}
+                      />
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontWeight: '500',
+                        color: isActive ? colors.brandPrimary : colors.textSecondary,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {t(item.label)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </Animated.View>
+        </Animated.View>
       </Modal>
     </View>
   );
