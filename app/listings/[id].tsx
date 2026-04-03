@@ -198,22 +198,19 @@ export default function ListingDetailScreen() {
 
   return (
     <View className="flex-1 bg-dark">
-      {/* Header with back button */}
-      <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-primary text-base font-semibold">{t('back')}</Text>
-        </TouchableOpacity>
-        <Text className="text-text-primary text-lg font-bold flex-1" numberOfLines={1}>
-          {listing.title}
-        </Text>
-        <TouchableOpacity onPress={handleShare}>
-          <Text className="text-text-secondary text-sm">{t('share')}</Text>
-        </TouchableOpacity>
-      </View>
+      <Header showBack title={listing.title} />
 
       <ScrollView className="flex-1" contentContainerClassName="pb-24">
         {/* Photo gallery */}
         <PhotoGallery photos={photoUrls} height={300} />
+
+        {/* Share button */}
+        <View className="px-4 pt-3 flex-row justify-end">
+          <TouchableOpacity onPress={handleShare} className="flex-row items-center gap-1">
+            <Ionicons name="share-outline" size={18} color="#64748B" />
+            <Text className="text-text-secondary text-sm">{t('share')}</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Status badge */}
         {listing.status !== 'active' && (
