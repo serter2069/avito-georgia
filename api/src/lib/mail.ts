@@ -133,6 +133,30 @@ export async function sendNewMessageEmail(
   );
 }
 
+export async function sendExpiryReminderEmail(
+  to: string,
+  title: string,
+  listingId: string,
+  expiresAt: Date
+): Promise<void> {
+  if (process.env.DEV_AUTH === 'true') {
+    console.log(`[DEV] Expiry reminder email to ${to}: "${title}" expires ${expiresAt.toISOString()}`);
+    return;
+  }
+  if (!BREVO_API_KEY) {
+    console.log(`[MAIL] BREVO_API_KEY not set — skipping expiry reminder email to ${to}`);
+    return;
+  }
+  const expiryDateStr = expiresAt.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const renewUrl = `https://avito-georgia.smartlaunchhub.com/listings/${listingId}`;
+  await sendBrevoEmail(
+    to,
+    `Ваше объявление истекает через 3 дня — Avito Georgia`,
+    `<p>Ваше объявление <strong>${title}</strong> истекает <strong>${expiryDateStr}</strong>.</p><p><a href="${renewUrl}">Продлить объявление</a></p>`,
+    `Ваше объявление "${title}" истекает ${expiryDateStr}.\nПродлить: ${renewUrl}`
+  );
+}
+
 export async function sendListingRejectedEmail(
   to: string,
   title: string,
