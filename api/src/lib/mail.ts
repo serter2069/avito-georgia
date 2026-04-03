@@ -110,6 +110,29 @@ export async function sendListingApprovedEmail(
   );
 }
 
+export async function sendNewMessageEmail(
+  to: string,
+  senderName: string,
+  messagePreview: string,
+  threadId: string
+): Promise<void> {
+  if (process.env.DEV_AUTH === 'true') {
+    console.log(`[DEV] New message email to ${to} from ${senderName}, thread ${threadId}`);
+    return;
+  }
+  if (!BREVO_API_KEY) {
+    console.log(`[MAIL] BREVO_API_KEY not set — skipping new message email to ${to}`);
+    return;
+  }
+  const preview = messagePreview.length > 100 ? messagePreview.slice(0, 100) + '…' : messagePreview;
+  await sendBrevoEmail(
+    to,
+    `Новое сообщение от ${senderName} — Avito Georgia`,
+    `<p>У вас новое сообщение от <strong>${senderName}</strong>:</p><blockquote>${preview}</blockquote><p>Войдите в приложение, чтобы ответить.</p>`,
+    `Новое сообщение от ${senderName}:\n${preview}\n\nВойдите в приложение, чтобы ответить.`
+  );
+}
+
 export async function sendListingRejectedEmail(
   to: string,
   title: string,

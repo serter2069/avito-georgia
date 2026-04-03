@@ -228,8 +228,8 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   type      String
-  listingId String
-  listing   Listing  @relation(fields: [listingId], references: [id])
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id])
   payload   Json
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
