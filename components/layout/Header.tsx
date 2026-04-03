@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Modal, Pressable, Platform, Animated, Dim
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useResponsive } from '../../hooks/useResponsive';
 import { useAuthStore } from '../../stores/authStore';
 import { setStoredLang } from '../../lib/i18n';
@@ -165,6 +166,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
   const router = useRouter();
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
+  const insets = useSafeAreaInsets();
   const [menuOpen, setMenuOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -209,7 +211,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
   // Desktop: full navigation bar (no hamburger needed)
   if (isDesktop) {
     return (
-      <View className="bg-white border-b border-border px-4 py-3 flex-row items-center justify-between">
+      <View className="bg-white border-b border-border px-4 py-3 flex-row items-center justify-between" style={{ paddingTop: Math.max(12, insets.top) }}>
         <View className="flex-row items-center gap-3">
           {showBack && (
             <TouchableOpacity onPress={() => router.back()} className="mr-1">
@@ -259,7 +261,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false }:
 
   // Mobile/Tablet: compact header with hamburger + bottom sheet menu
   return (
-    <View className="bg-white border-b border-border px-4 py-3 flex-row items-center justify-between">
+    <View className="bg-white border-b border-border px-4 py-3 flex-row items-center justify-between" style={{ paddingTop: Math.max(12, insets.top) }}>
       <View className="flex-row items-center gap-2 flex-1">
         {showBack && (
           <TouchableOpacity onPress={() => router.back()} className="mr-1">

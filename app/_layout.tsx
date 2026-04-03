@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAuthStore } from '../stores/authStore';
 import { useAuthRefresh } from '../hooks/useAuthRefresh';
 import { colors } from '../lib/colors';
@@ -65,22 +66,26 @@ export default function RootLayout() {
 
   if (!isReady) {
     return (
-      <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth }}>
-        <ActivityIndicator size="large" color={colors.brandPrimary} />
-      </View>
+      <SafeAreaProvider>
+        <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth }}>
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
+        </View>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth }}>
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.bgPrimary },
-          sceneContainerStyle: { backgroundColor: colors.bgPrimary },
-        }}
-      />
-    </View>
+    <SafeAreaProvider>
+      <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth }}>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.bgPrimary },
+            sceneContainerStyle: { backgroundColor: colors.bgPrimary },
+          }}
+        />
+      </View>
+    </SafeAreaProvider>
   );
 }
