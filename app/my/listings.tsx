@@ -139,8 +139,8 @@ export default function MyListingsScreen() {
 
   const tabs: { key: StatusTab; label: string }[] = [
     { key: 'active', label: t('active') },
-    { key: 'sold', label: t('archived') },
-    { key: 'removed', label: t('draft') },
+    { key: 'sold', label: t('sold') },
+    { key: 'removed', label: t('removed') },
   ];
 
   const renderItem = ({ item }: { item: MyListing }) => (
