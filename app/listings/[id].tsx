@@ -77,6 +77,11 @@ export default function ListingDetailScreen() {
   const [phoneLoading, setPhoneLoading] = useState(false);
   const [phoneRevealed, setPhoneRevealed] = useState(false);
 
+  // Report state
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportDone, setReportDone] = useState(false);
+
   // Contact sheet state
   const [contactSheetVisible, setContactSheetVisible] = useState(false);
   const [contactMessage, setContactMessage] = useState('');
@@ -235,6 +240,23 @@ export default function ListingDetailScreen() {
     }
   }, [listing, router]);
 
+  const handleReport = useCallback(async (reason: string) => {
+    if (!user || !id || reportLoading) return;
+    setReportLoading(true);
+    const listingId = Array.isArray(id) ? id[0] : id;
+    const res = await api.post('/reports', { listingId, reason });
+    setReportLoading(false);
+    if (res.ok) {
+      setReportDone(true);
+      setTimeout(() => {
+        setReportModalVisible(false);
+        setReportDone(false);
+      }, 1500);
+    } else {
+      setReportModalVisible(false);
+    }
+  }, [user, id, reportLoading]);
+
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -273,8 +295,14 @@ export default function ListingDetailScreen() {
         {/* Photo gallery */}
         <PhotoGallery photos={photoUrls} height={300} />
 
-        {/* Share button */}
-        <View className="px-4 pt-3 flex-row justify-end">
+        {/* Share + Report buttons */}
+        <View className="px-4 pt-3 flex-row justify-end items-center gap-4">
+          {user && listing.user.id !== user.id && !reportDone && (
+            <TouchableOpacity onPress={() => setReportModalVisible(true)} className="flex-row items-center gap-1">
+              <Ionicons name="flag-outline" size={18} color="#64748B" />
+              <Text className="text-text-secondary text-sm">{t('reportListing')}</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity onPress={handleShare} className="flex-row items-center gap-1">
             <Ionicons name="share-outline" size={18} color="#64748B" />
             <Text className="text-text-secondary text-sm">{t('share')}</Text>
@@ -419,6 +447,72 @@ export default function ListingDetailScreen() {
           </>
         )}
       </View>
+
+      {/* Report listing modal */}
+      <Modal
+        visible={reportModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setReportModalVisible(false)}
+      >
+        <Pressable
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}
+          onPress={() => setReportModalVisible(false)}
+        >
+          <Pressable
+            style={{ backgroundColor: '#FFFFFF', borderRadius: 16, width: '100%', maxWidth: 380, paddingVertical: 24, paddingHorizontal: 20 }}
+            onPress={() => {}}
+          >
+            {reportDone ? (
+              <View style={{ alignItems: 'center', paddingVertical: 12 }}>
+                <Ionicons name="checkmark-circle" size={48} color="#0A7B8A" />
+                <Text style={{ fontSize: 16, fontWeight: '600', color: '#0A2840', marginTop: 12, textAlign: 'center' }}>
+                  {t('reportSuccess')}
+                </Text>
+              </View>
+            ) : (
+              <>
+                <Text style={{ fontSize: 17, fontWeight: '700', color: '#0A2840', marginBottom: 16, textAlign: 'center' }}>
+                  {t('reportTitle')}
+                </Text>
+                {reportLoading ? (
+                  <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+                    <ActivityIndicator size="large" color="#0A7B8A" />
+                  </View>
+                ) : (
+                  [
+                    { key: 'fraud', label: t('reportReasonFraud') },
+                    { key: 'spam', label: t('reportReasonSpam') },
+                    { key: 'wrong_category', label: t('reportReasonWrongCategory') },
+                    { key: 'prohibited', label: t('reportReasonProhibited') },
+                    { key: 'other', label: t('reportReasonOther') },
+                  ].map((item, idx, arr) => (
+                    <TouchableOpacity
+                      key={item.key}
+                      onPress={() => handleReport(item.key)}
+                      activeOpacity={0.7}
+                      style={{
+                        paddingVertical: 14,
+                        borderBottomWidth: idx < arr.length - 1 ? 1 : 0,
+                        borderBottomColor: '#F1F5F9',
+                      }}
+                    >
+                      <Text style={{ fontSize: 15, color: '#0A2840' }}>{item.label}</Text>
+                    </TouchableOpacity>
+                  ))
+                )}
+                <TouchableOpacity
+                  onPress={() => setReportModalVisible(false)}
+                  style={{ marginTop: 8, paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9' }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={{ fontSize: 15, color: '#94A3B8' }}>{t('cancel')}</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* Contact seller bottom sheet */}
       {contactSheetVisible && (() => {

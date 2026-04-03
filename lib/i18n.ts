@@ -338,6 +338,17 @@ const resources = {
       showPhone: 'Показать телефон',
       phoneNotSpecified: 'Телефон не указан',
       changePhoto: 'Изменить фото',
+
+      // Report listing
+      reportListing: 'Пожаловаться',
+      reportTitle: 'Причина жалобы',
+      reportReasonFraud: 'Мошенничество',
+      reportReasonSpam: 'Спам',
+      reportReasonWrongCategory: 'Неверная категория',
+      reportReasonProhibited: 'Запрещённый товар',
+      reportReasonOther: 'Другое',
+      reportSuccess: 'Жалоба отправлена',
+      reportError: 'Не удалось отправить жалобу',
     },
   },
   en: {
@@ -637,6 +648,17 @@ const resources = {
       showPhone: 'Show phone number',
       phoneNotSpecified: 'Phone not specified',
       changePhoto: 'Change photo',
+
+      // Report listing
+      reportListing: 'Report',
+      reportTitle: 'Report reason',
+      reportReasonFraud: 'Fraud',
+      reportReasonSpam: 'Spam',
+      reportReasonWrongCategory: 'Wrong category',
+      reportReasonProhibited: 'Prohibited item',
+      reportReasonOther: 'Other',
+      reportSuccess: 'Report submitted',
+      reportError: 'Failed to submit report',
     },
   },
   ka: {
@@ -936,6 +958,17 @@ const resources = {
       showPhone: 'ტელეფონის ნახვა',
       phoneNotSpecified: 'ტელეფონი მითითებული არ არის',
       changePhoto: 'ფოტოს შეცვლა',
+
+      // Report listing
+      reportListing: 'საჩივარი',
+      reportTitle: 'საჩივრის მიზეზი',
+      reportReasonFraud: 'თაღლითობა',
+      reportReasonSpam: 'სპამი',
+      reportReasonWrongCategory: 'არასწორი კატეგორია',
+      reportReasonProhibited: 'აკრძალული საქონელი',
+      reportReasonOther: 'სხვა',
+      reportSuccess: 'საჩივარი გაგზავნილია',
+      reportError: 'საჩივრის გაგზავნა ვერ მოხერხდა',
     },
   },
 };
