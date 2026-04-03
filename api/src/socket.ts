@@ -103,12 +103,20 @@ export function setupSocket(httpServer: HttpServer): Server {
     });
 
     // Typing indicator
-    socket.on('typing', (data: { threadId: string }) => {
-      if (data.threadId) {
+    socket.on('typing', async (data: { threadId: string }) => {
+      if (!data.threadId) return;
+      try {
+        // Verify user is participant before broadcasting typing indicator (prevents IDOR)
+        const participant = await prisma.threadParticipant.findUnique({
+          where: { threadId_userId: { threadId: data.threadId, userId: socket.data.userId } },
+        });
+        if (!participant) return; // silently ignore — do not reveal thread existence
         socket.to(data.threadId).emit('typing', {
           threadId: data.threadId,
           userId: socket.data.userId,
         });
+      } catch (err) {
+        console.error('typing error:', err);
       }
     });
 
