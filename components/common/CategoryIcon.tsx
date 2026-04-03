@@ -1,5 +1,7 @@
 import { View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { colors } from '../../lib/colors';
 
 export type CategoryType =
   | 'transport'
@@ -19,37 +21,49 @@ interface CategoryIconProps {
   showLabel?: boolean;
 }
 
-// Unicode icons for categories (no external icon library needed)
-const CATEGORY_ICONS: Record<CategoryType, string> = {
-  transport: '\u{1F697}',    // car
-  realEstate: '\u{1F3E0}',   // house
-  electronics: '\u{1F4F1}',  // phone
-  clothing: '\u{1F455}',     // shirt
-  furniture: '\u{1FA91}',    // chair
-  services: '\u{1F527}',     // wrench
-  jobs: '\u{1F4BC}',         // briefcase
-  kids: '\u{1F9F8}',         // teddy bear
-  pets: '\u{1F43E}',         // paw prints
-  hobbies: '\u{1F3A8}',      // artist palette
+const CATEGORY_ICONS: Record<CategoryType, keyof typeof Ionicons.glyphMap> = {
+  transport: 'car-outline',
+  realEstate: 'home-outline',
+  electronics: 'phone-portrait-outline',
+  clothing: 'shirt-outline',
+  furniture: 'bed-outline',
+  services: 'construct-outline',
+  jobs: 'briefcase-outline',
+  kids: 'happy-outline',
+  pets: 'paw-outline',
+  hobbies: 'color-palette-outline',
 };
 
-const sizeClasses = {
-  sm: { container: 'w-10 h-10', icon: 'text-lg', label: 'text-xs' },
-  md: { container: 'w-14 h-14', icon: 'text-2xl', label: 'text-xs' },
-  lg: { container: 'w-20 h-20', icon: 'text-4xl', label: 'text-sm' },
+const sizeMap = {
+  sm: { container: 40, icon: 18, label: 11 },
+  md: { container: 56, icon: 26, label: 11 },
+  lg: { container: 80, icon: 38, label: 13 },
 };
 
 export function CategoryIcon({ category, size = 'md', showLabel = true }: CategoryIconProps) {
   const { t } = useTranslation();
-  const s = sizeClasses[size];
+  const s = sizeMap[size];
 
   return (
-    <View className="items-center gap-1">
-      <View className={`${s.container} bg-surface rounded-xl items-center justify-center`}>
-        <Text className={s.icon}>{CATEGORY_ICONS[category]}</Text>
+    <View style={{ alignItems: 'center', gap: 4 }}>
+      <View style={{
+        width: s.container,
+        height: s.container,
+        backgroundColor: colors.bgSurface,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.borderDefault,
+      }}>
+        <Ionicons
+          name={CATEGORY_ICONS[category]}
+          size={s.icon}
+          color={colors.brandPrimary}
+        />
       </View>
       {showLabel && (
-        <Text className={`text-text-secondary ${s.label}`} numberOfLines={1}>
+        <Text style={{ color: colors.textSecondary, fontSize: s.label }} numberOfLines={1}>
           {t(category)}
         </Text>
       )}

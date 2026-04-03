@@ -5,6 +5,7 @@ import { Header } from '../../components/layout/Header';
 import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ActivePromotion {
   id: string;
@@ -78,7 +79,7 @@ export default function SubscriptionScreen() {
         {/* Subscription card */}
         <View className="bg-surface-card border border-primary rounded-xl p-5">
           <View className="items-center mb-4">
-            <Text className="text-3xl mb-2">{'\u221E'}</Text>
+            <Ionicons name="infinite" size={36} color={colors.brandPrimary} style={{ marginBottom: 8 }} />
             <Text className="text-text-primary text-xl font-bold">
               {t('promotionUnlimitedSub')}
             </Text>

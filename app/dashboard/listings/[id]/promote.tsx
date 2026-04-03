@@ -6,6 +6,7 @@ import { Header } from '../../../../components/layout/Header';
 import { Button } from '../../../../components/ui/Button';
 import { api } from '../../../../lib/api';
 import { colors } from '../../../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 interface PriceOption {
   type: string;
@@ -46,12 +47,12 @@ const TYPE_DESC_I18N: Record<string, string> = {
   unlimited_sub: 'promotionUnlimitedSubDesc',
 };
 
-const TYPE_ICONS: Record<string, string> = {
-  top_1d: '\u2B06',
-  top_3d: '\u2B06\u2B06',
-  top_7d: '\u2B06\u2B06\u2B06',
-  highlight: '\u2728',
-  unlimited_sub: '\u221E',
+const TYPE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  top_1d: 'trending-up-outline',
+  top_3d: 'trending-up',
+  top_7d: 'rocket-outline',
+  highlight: 'star-outline',
+  unlimited_sub: 'infinite',
 };
 
 export default function PromoteListingScreen() {
@@ -182,9 +183,11 @@ export default function PromoteListingScreen() {
 
               <View className="flex-row items-center justify-between mb-2">
                 <View className="flex-row items-center gap-2">
-                  <Text className="text-xl">
-                    {TYPE_ICONS[option.type] || '\u26A1'}
-                  </Text>
+                  <Ionicons
+                    name={TYPE_ICONS[option.type] || 'flash-outline'}
+                    size={20}
+                    color={colors.brandPrimary}
+                  />
                   <Text className="text-text-primary text-base font-bold">
                     {t(TYPE_I18N[option.type] || option.type)}
                   </Text>

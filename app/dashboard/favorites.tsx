@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { ListingCard, Listing } from '../../components/listing/ListingCard';
 import { Badge } from '../../components/ui/Badge';
 
@@ -102,7 +103,7 @@ export default function FavoritesScreen() {
         </View>
       ) : favorites.length === 0 ? (
         <View className="flex-1 items-center justify-center px-4">
-          <Text className="text-text-muted text-4xl mb-3">{'\u2661'}</Text>
+          <Ionicons name="heart-outline" size={48} color={colors.textMuted} style={{ marginBottom: 12 }} />
           <Text className="text-text-primary text-base font-semibold">{t('noFavorites')}</Text>
           <Text className="text-text-muted text-sm mt-1">{t('noFavoritesHint')}</Text>
         </View>

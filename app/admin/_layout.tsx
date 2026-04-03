@@ -3,6 +3,8 @@ import { Slot, useRouter, usePathname } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
 import { useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../lib/colors';
 
 const TABS = [
   { key: 'adminDashboard', path: '/admin' },
@@ -44,7 +46,10 @@ export default function AdminLayout() {
       {/* Admin header */}
       <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center justify-between">
         <TouchableOpacity onPress={() => router.push('/')}>
-          <Text className="text-text-muted text-sm">&larr; {t('home')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Ionicons name="chevron-back" size={16} color={colors.textMuted} />
+              <Text className="text-text-muted text-sm">{t('home')}</Text>
+            </View>
         </TouchableOpacity>
         <Text className="text-primary text-lg font-bold">{t('adminPanel')}</Text>
         <Text className="text-text-muted text-xs">{user.email}</Text>

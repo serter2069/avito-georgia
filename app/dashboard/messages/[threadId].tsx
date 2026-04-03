@@ -6,6 +6,7 @@ import { io, Socket } from 'socket.io-client';
 import { api, getAccessToken } from '../../../lib/api';
 import { useAuthStore } from '../../../stores/authStore';
 import { colors } from '../../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 interface MessageSender {
   id: string;
@@ -238,9 +239,7 @@ export default function ChatScreen() {
           onPress={handleSend}
           disabled={!inputText.trim() || sending}
         >
-          <Text className={`text-lg ${inputText.trim() ? 'text-white' : 'text-text-muted'}`}>
-            {'\u2191'}
-          </Text>
+          <Ionicons name="arrow-up" size={20} color={inputText.trim() ? '#ffffff' : colors.textMuted} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

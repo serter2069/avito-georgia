@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 interface PaymentItem {
   id: string;
@@ -103,7 +104,7 @@ export default function AdminPayments() {
             onPress={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
           >
-            <Text className={page > 1 ? 'text-white' : 'text-text-muted'}>&larr;</Text>
+            <Ionicons name="chevron-back" size={18} color={page > 1 ? '#ffffff' : colors.textMuted} />
           </TouchableOpacity>
           <Text className="text-text-secondary self-center text-sm">
             {page} / {Math.ceil(total / 50)}
@@ -113,7 +114,7 @@ export default function AdminPayments() {
             onPress={() => setPage((p) => p + 1)}
             disabled={page >= Math.ceil(total / 50)}
           >
-            <Text className={page < Math.ceil(total / 50) ? 'text-white' : 'text-text-muted'}>&rarr;</Text>
+            <Ionicons name="chevron-forward" size={18} color={page < Math.ceil(total / 50) ? '#ffffff' : colors.textMuted} />
           </TouchableOpacity>
         </View>
       )}
