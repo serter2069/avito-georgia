@@ -71,7 +71,6 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <StatusBar style="dark" />
-        <Header />
         {isDesktop(breakpoint) ? (
           <View style={{ flex: 1, flexDirection: 'row' }}>
             <DesktopSidebar />
@@ -86,6 +85,7 @@ export default function RootLayout() {
           </View>
         ) : (
           <>
+            <Header />
             <Stack
               screenOptions={{
                 headerShown: false,
