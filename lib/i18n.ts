@@ -281,6 +281,16 @@ const resources = {
       privacy: 'Конфиденциальность',
       help: 'Помощь',
 
+      // Static pages
+      aboutTitle: 'О сервисе',
+      aboutDescription: 'Avito Georgia — доска объявлений для Грузии. Покупайте и продавайте товары, недвижимость, транспорт и услуги.',
+      termsTitle: 'Условия использования',
+      privacyTitle: 'Политика конфиденциальности',
+      comingSoon: 'Раздел находится в разработке',
+
+      // Chat
+      defaultContactMessage: 'Здравствуйте! Интересует ваше объявление.',
+
       // Dashboard
       messages: 'Сообщения',
       noMessages: 'Нет сообщений',
@@ -566,6 +576,16 @@ const resources = {
       privacy: 'Privacy',
       help: 'Help',
 
+      // Static pages
+      aboutTitle: 'About Service',
+      aboutDescription: 'Avito Georgia — classifieds board for Georgia. Buy and sell goods, real estate, transport and services.',
+      termsTitle: 'Terms of Use',
+      privacyTitle: 'Privacy Policy',
+      comingSoon: 'Section is under development',
+
+      // Chat
+      defaultContactMessage: 'Hello! I am interested in your listing.',
+
       // Dashboard
       messages: 'Messages',
       noMessages: 'No messages',
@@ -850,6 +870,16 @@ const resources = {
       terms: 'პირობები',
       privacy: 'კონფიდენციალურობა',
       help: 'დახმარება',
+
+      // Static pages
+      aboutTitle: 'სერვისის შესახებ',
+      aboutDescription: 'Avito Georgia — განცხადებების დაფა საქართველოსთვის. ყიდეთ და გაყიდეთ საქონელი, უძრავი ქონება, ტრანსპორტი და სერვისები.',
+      termsTitle: 'გამოყენების პირობები',
+      privacyTitle: 'კონფიდენციალურობის პოლიტიკა',
+      comingSoon: 'განყოფილება მუშავდება',
+
+      // Chat
+      defaultContactMessage: 'გამარჯობა! დაინტერესებული ვარ თქვენი განცხადებით.',
 
       // Dashboard
       messages: 'შეტყობინებები',

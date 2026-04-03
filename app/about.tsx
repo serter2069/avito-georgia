@@ -1,21 +1,23 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../lib/colors';
 
 export default function AboutScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>← Назад</Text>
+          <Text style={styles.backText}>← {t('back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>О сервисе</Text>
+        <Text style={styles.title}>{t('aboutTitle')}</Text>
       </View>
       <View style={styles.content}>
         <Text style={styles.body}>
-          Avito Georgia — доска объявлений для Грузии. Покупайте и продавайте товары, недвижимость, транспорт и услуги.
+          {t('aboutDescription')}
         </Text>
       </View>
     </View>

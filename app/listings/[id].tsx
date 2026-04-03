@@ -137,7 +137,7 @@ export default function ListingDetailScreen() {
 
       // No existing thread — send first message to create one
       const createRes = await api.post<{ threadId: string }>(`/threads/${listingId}/message`, {
-        text: 'Здравствуйте! Интересует ваше объявление.',
+        text: t('defaultContactMessage'),
       });
       if (createRes.ok && createRes.data?.threadId) {
         router.push(`/dashboard/messages/${createRes.data.threadId}`);
