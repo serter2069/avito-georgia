@@ -56,6 +56,8 @@ interface ApiListing {
   city?: { id: string; nameRu: string };
   category?: { id: string; name: string };
   photos?: { id: string; url: string; order: number }[];
+  isPromoted?: boolean;
+  isHighlighted?: boolean;
 }
 
 function mapListing(l: ApiListing): Listing {
@@ -68,6 +70,8 @@ function mapListing(l: ApiListing): Listing {
     city: l.city?.nameRu,
     category: l.category?.name,
     createdAt: l.createdAt,
+    isPromoted: l.isPromoted ?? false,
+    isHighlighted: l.isHighlighted ?? false,
   };
 }
 
