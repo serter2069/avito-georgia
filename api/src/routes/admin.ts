@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireAdmin } from '../middleware/auth';
+import { sendListingApprovedEmail, sendListingRejectedEmail } from '../lib/mail';
 
 const router = Router();
 
@@ -167,7 +168,7 @@ router.get('/listings/pending', async (req: Request, res: Response) => {
 router.patch('/listings/:id/status', async (req: Request, res: Response) => {
 
   const id = req.params.id as string;
-  const { status } = req.body;
+  const { status, rejectReason } = req.body;
 
   const allowedStatuses = ['active', 'removed', 'rejected', 'pending_moderation'];
   if (!status || !allowedStatuses.includes(status)) {
@@ -175,16 +176,36 @@ router.patch('/listings/:id/status', async (req: Request, res: Response) => {
     return;
   }
 
-  const listing = await prisma.listing.findUnique({ where: { id } });
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    include: { user: { select: { email: true } } },
+  });
   if (!listing) {
     res.status(404).json({ error: 'Listing not found' });
     return;
   }
 
+  const updateData: Record<string, any> = { status };
+  if (status === 'rejected') {
+    updateData.rejectionReason = rejectReason || null;
+  } else if (status === 'active') {
+    updateData.rejectionReason = null;
+  }
+
   const updated = await prisma.listing.update({
     where: { id },
-    data: { status: status as any },
+    data: updateData,
   });
+
+  // Send email notification to the listing owner
+  const userEmail = listing.user.email;
+  if (status === 'active') {
+    sendListingApprovedEmail(userEmail, listing.title)
+      .catch(err => console.error('Approval email error:', err));
+  } else if (status === 'rejected') {
+    sendListingRejectedEmail(userEmail, listing.title, rejectReason || null)
+      .catch(err => console.error('Rejection email error:', err));
+  }
 
   res.json(updated);
 });

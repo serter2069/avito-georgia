@@ -89,3 +89,48 @@ export async function sendOtpEmail(
   const tpl = templates[lang](otp);
   await sendBrevoEmail(email, tpl.subject, tpl.html, tpl.text);
 }
+
+export async function sendListingApprovedEmail(
+  to: string,
+  title: string
+): Promise<void> {
+  if (process.env.DEV_AUTH === 'true') {
+    console.log(`[DEV] Listing approved email to ${to}: "${title}"`);
+    return;
+  }
+  if (!BREVO_API_KEY) {
+    console.log(`[MAIL] BREVO_API_KEY not set — skipping approval email to ${to}`);
+    return;
+  }
+  await sendBrevoEmail(
+    to,
+    `Ваше объявление опубликовано — Avito Georgia`,
+    `<p>Ваше объявление <strong>${title}</strong> прошло модерацию и теперь опубликовано.</p>`,
+    `Ваше объявление "${title}" прошло модерацию и теперь опубликовано.`
+  );
+}
+
+export async function sendListingRejectedEmail(
+  to: string,
+  title: string,
+  reason?: string | null
+): Promise<void> {
+  if (process.env.DEV_AUTH === 'true') {
+    console.log(`[DEV] Listing rejected email to ${to}: "${title}", reason: ${reason}`);
+    return;
+  }
+  if (!BREVO_API_KEY) {
+    console.log(`[MAIL] BREVO_API_KEY not set — skipping rejection email to ${to}`);
+    return;
+  }
+  const reasonBlock = reason
+    ? `<p>Причина: ${reason}</p>`
+    : '';
+  const reasonText = reason ? `\nПричина: ${reason}` : '';
+  await sendBrevoEmail(
+    to,
+    `Ваше объявление отклонено — Avito Georgia`,
+    `<p>Ваше объявление <strong>${title}</strong> было отклонено модератором.</p>${reasonBlock}`,
+    `Ваше объявление "${title}" было отклонено модератором.${reasonText}`
+  );
+}
