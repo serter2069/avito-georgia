@@ -124,8 +124,19 @@ router.get('/', async (req: Request, res: Response) => {
 
   const where: Prisma.ListingWhereInput = {
     status: 'active',
-    OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-    ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : {}),
+    AND: [
+      { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+      ...(q
+        ? [
+            {
+              OR: [
+                { title: { contains: q, mode: 'insensitive' as const } },
+                { description: { contains: q, mode: 'insensitive' as const } },
+              ],
+            },
+          ]
+        : []),
+    ],
     ...(categoryId ? { categoryId } : {}),
     ...(city ? { cityId: city } : {}),
     ...(userId ? { userId } : {}),
