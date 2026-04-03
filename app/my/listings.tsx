@@ -248,7 +248,7 @@ export default function MyListingsScreen() {
   };
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       <Header title={t('myListings')} />
 
       {/* Tabs */}

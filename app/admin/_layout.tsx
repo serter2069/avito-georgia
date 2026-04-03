@@ -26,7 +26,7 @@ export default function AdminLayout() {
 
   if (!user || user.role !== 'admin') {
     return (
-      <View className="flex-1 bg-dark items-center justify-center px-6">
+      <View className="flex-1 bg-white items-center justify-center px-6">
         <Text className="text-error text-xl font-bold mb-2">{t('accessDenied')}</Text>
         <Text className="text-text-secondary text-sm text-center mb-6">{t('accessDeniedMessage')}</Text>
         <TouchableOpacity
@@ -40,9 +40,9 @@ export default function AdminLayout() {
   }
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       {/* Admin header */}
-      <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center justify-between">
+      <View className="bg-bg-section border-b border-border px-4 py-3 flex-row items-center justify-between">
         <TouchableOpacity onPress={() => router.push('/')}>
           <Text className="text-text-muted text-sm">&larr; {t('home')}</Text>
         </TouchableOpacity>
@@ -54,7 +54,7 @@ export default function AdminLayout() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        className="bg-dark-secondary border-b border-border"
+        className="bg-bg-section border-b border-border"
         contentContainerClassName="px-2"
       >
         {TABS.map((tab) => {

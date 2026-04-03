@@ -54,9 +54,9 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       {/* Header */}
-      <View className="bg-dark-secondary border-b border-border px-4 py-3">
+      <View className="bg-bg-section border-b border-border px-4 py-3">
         <Text className="text-text-primary text-lg font-bold">{t('profile')}</Text>
       </View>
 

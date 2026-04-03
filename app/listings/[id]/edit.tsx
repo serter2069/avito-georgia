@@ -210,7 +210,7 @@ export default function EditListingScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-dark">
+      <View className="flex-1 bg-white">
         <Header title={t('editListing')} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.brandPrimary} />
@@ -221,7 +221,7 @@ export default function EditListingScreen() {
   }
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       <Header title={t('editListing')} />
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">

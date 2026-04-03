@@ -174,12 +174,12 @@ export default function ChatScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-dark"
+      className="flex-1 bg-white"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
       {/* Header */}
-      <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center">
+      <View className="bg-bg-section border-b border-border px-4 py-3 flex-row items-center">
         <TouchableOpacity onPress={() => router.back()} className="mr-3 pr-1">
           <Text className="text-primary text-base font-semibold">{'\u2190'} {t('back')}</Text>
         </TouchableOpacity>
@@ -218,7 +218,7 @@ export default function ChatScreen() {
       )}
 
       {/* Input bar */}
-      <View className="border-t border-border bg-dark-secondary px-3 py-2 flex-row items-end gap-2">
+      <View className="border-t border-border bg-bg-section px-3 py-2 flex-row items-end gap-2">
         <TextInput
           className="flex-1 bg-surface border border-border rounded-xl px-4 py-2.5 text-text-primary text-base max-h-24"
           placeholder={t('typeMessage')}

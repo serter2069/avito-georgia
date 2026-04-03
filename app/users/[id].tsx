@@ -212,8 +212,8 @@ export default function SellerProfileScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-dark">
-        <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
+      <View className="flex-1 bg-white">
+        <View className="bg-bg-section border-b border-border px-4 py-3 flex-row items-center gap-3">
           <TouchableOpacity onPress={() => router.back()}>
             <Text className="text-primary text-base font-semibold">{t('back')}</Text>
           </TouchableOpacity>
@@ -228,8 +228,8 @@ export default function SellerProfileScreen() {
 
   if (error || !seller) {
     return (
-      <View className="flex-1 bg-dark">
-        <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
+      <View className="flex-1 bg-white">
+        <View className="bg-bg-section border-b border-border px-4 py-3 flex-row items-center gap-3">
           <TouchableOpacity onPress={() => router.back()}>
             <Text className="text-primary text-base font-semibold">{t('back')}</Text>
           </TouchableOpacity>
@@ -243,9 +243,9 @@ export default function SellerProfileScreen() {
   }
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       {/* Header */}
-      <View className="bg-dark-secondary border-b border-border px-4 py-3 flex-row items-center gap-3">
+      <View className="bg-bg-section border-b border-border px-4 py-3 flex-row items-center gap-3">
         <TouchableOpacity onPress={() => router.back()}>
           <Text className="text-primary text-base font-semibold">{t('back')}</Text>
         </TouchableOpacity>

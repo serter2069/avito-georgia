@@ -17,8 +17,8 @@ module.exports = {
         accent: '#1A9BAA',
         surface: '#E8F4F8',
         'surface-card': '#FFFFFF',
-        dark: '#F2F8FA',
-        'dark-secondary': '#E8F4F8',
+        'bg-page': '#FFFFFF',
+        'bg-section': '#F2F8FA',
         'text-primary': '#0A2840',
         'text-secondary': '#1A4A6E',
         'text-muted': '#6A8898',
@@ -31,6 +31,11 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+      },
+      screens: {
+        sm: '430px',
+        md: '768px',
+        lg: '1280px',
       },
       borderRadius: {
         sm: '4px',

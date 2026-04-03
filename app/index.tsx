@@ -101,7 +101,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       <Header />
 
       <ScrollView

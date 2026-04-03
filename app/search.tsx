@@ -205,7 +205,7 @@ export default function SearchScreen() {
   const showMapToggle = Platform.OS === 'web';
 
   return (
-    <View className="flex-1 bg-dark">
+    <View className="flex-1 bg-white">
       <Header title={t('search')} />
 
       {/* Search input */}
