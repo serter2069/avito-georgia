@@ -340,6 +340,9 @@ const resources = {
       phoneNotSpecified: 'Телефон не указан',
       changePhoto: 'Изменить фото',
 
+      // Similar listings
+      similarListings: 'Похожие объявления',
+
       // Report listing
       reportListing: 'Пожаловаться',
       reportTitle: 'Причина жалобы',
@@ -651,6 +654,9 @@ const resources = {
       phoneNotSpecified: 'Phone not specified',
       changePhoto: 'Change photo',
 
+      // Similar listings
+      similarListings: 'Similar listings',
+
       // Report listing
       reportListing: 'Report',
       reportTitle: 'Report reason',
@@ -961,6 +967,9 @@ const resources = {
       showPhone: 'ტელეფონის ნახვა',
       phoneNotSpecified: 'ტელეფონი მითითებული არ არის',
       changePhoto: 'ფოტოს შეცვლა',
+
+      // Similar listings
+      similarListings: 'მსგავსი განცხადებები',
 
       // Report listing
       reportListing: 'საჩივარი',
