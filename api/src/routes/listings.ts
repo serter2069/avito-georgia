@@ -217,14 +217,25 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.userId;
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (user?.role !== 'admin') {
-    const activeCount = await prisma.listing.count({
+    // Check if user has an active unlimited_sub promotion — bypasses the listing limit
+    const hasUnlimited = await prisma.promotion.findFirst({
       where: {
-        userId, status: 'active',
+        userId,
+        promotionType: 'unlimited_sub',
+        isActive: true,
         OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
     });
-    if (activeCount >= ACTIVE_LISTING_LIMIT) {
-      res.status(403).json({ error: `Active listing limit reached (${ACTIVE_LISTING_LIMIT})` }); return;
+    if (!hasUnlimited) {
+      const activeCount = await prisma.listing.count({
+        where: {
+          userId, status: 'active',
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+      });
+      if (activeCount >= ACTIVE_LISTING_LIMIT) {
+        res.status(403).json({ error: `Active listing limit reached (${ACTIVE_LISTING_LIMIT})` }); return;
+      }
     }
   }
   const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
