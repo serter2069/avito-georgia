@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Header } from '../../components/layout/Header';
@@ -62,10 +62,17 @@ export default function CreateListingScreen() {
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Redirect if not logged in
+  const redirectedRef = useRef(false);
+
+  // Redirect if not logged in — show explanation first
   useEffect(() => {
-    if (!user) {
-      router.replace('/(auth)');
+    if (!user && !redirectedRef.current) {
+      redirectedRef.current = true;
+      Alert.alert(
+        t('authRequired'),
+        t('authRequiredToCreate'),
+        [{ text: t('ok'), onPress: () => router.replace('/(auth)') }]
+      );
     }
   }, [user]);
 

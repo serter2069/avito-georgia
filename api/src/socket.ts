@@ -3,9 +3,15 @@ import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { prisma } from './lib/prisma';
 
+const ALLOWED_ORIGINS = [
+  'https://avito-georgia.smartlaunchhub.com',
+  'http://localhost:8081',
+  'http://localhost:19006',
+];
+
 export function setupSocket(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
-    cors: { origin: '*' },
+    cors: { origin: ALLOWED_ORIGINS, credentials: true },
     path: '/socket.io',
   });
 

@@ -69,6 +69,9 @@ const resources = {
       statusRemoved: 'Снято',
       loginToFavorite: 'Войдите, чтобы добавить в избранное',
       loginToContact: 'Войдите, чтобы написать продавцу',
+      authRequired: 'Требуется авторизация',
+      authRequiredToCreate: 'Войдите, чтобы разместить объявление.',
+      ok: 'Понятно',
 
       // Cities
       tbilisi: 'Тбилиси',
@@ -371,6 +374,9 @@ const resources = {
       statusRemoved: 'Removed',
       loginToFavorite: 'Log in to add to favorites',
       loginToContact: 'Log in to contact seller',
+      authRequired: 'Login Required',
+      authRequiredToCreate: 'Please log in to post a listing.',
+      ok: 'OK',
 
       tbilisi: 'Tbilisi',
       batumi: 'Batumi',
@@ -666,6 +672,9 @@ const resources = {
       statusRemoved: 'წაშლილი',
       loginToFavorite: 'შედით ფავორიტებში დასამატებლად',
       loginToContact: 'შედით გამყიდველთან დასაკავშირებლად',
+      authRequired: 'საჭიროა ავტორიზაცია',
+      authRequiredToCreate: 'განცხადების გამოსაქვეყნებლად გაიარეთ ავტორიზაცია.',
+      ok: 'კარგი',
 
       tbilisi: 'თბილისი',
       batumi: 'ბათუმი',

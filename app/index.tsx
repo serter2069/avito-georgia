@@ -2,6 +2,7 @@ import { View, ScrollView, Text, TextInput, TouchableOpacity, ActivityIndicator,
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { CitySelector, City } from '../components/common/CitySelector';
@@ -129,7 +130,7 @@ export default function HomeScreen() {
               className="px-4 items-center justify-center bg-primary"
               onPress={handleSearch}
             >
-              <Text className="text-white text-base">&#x1F50D;</Text>
+              <Ionicons name="search" size={20} color="#ffffff" />
             </TouchableOpacity>
           </View>
         </View>
