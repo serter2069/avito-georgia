@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Head from 'expo-router/head';
 import { Header } from '../components/layout/Header';
 import { CitySelector, City } from '../components/common/CitySelector';
 import { CategoryIcon, CategoryType } from '../components/common/CategoryIcon';
@@ -232,8 +233,20 @@ export default function SearchScreen() {
   // Map toggle is only useful on web (Leaflet is web-only)
   const showMapToggle = Platform.OS === 'web';
 
+  const searchTitle = searchQuery.trim()
+    ? `Поиск: ${searchQuery.trim()} | Авито Грузия`
+    : 'Поиск | Авито Грузия';
+
   return (
     <View className="flex-1 bg-dark">
+      {Platform.OS === 'web' && (
+        <Head>
+          <title>{searchTitle}</title>
+          <meta name="description" content={`Поиск объявлений в Грузии${searchQuery.trim() ? `: ${searchQuery.trim()}` : ''}. Найдите что ищете на Авито Грузия.`} />
+          <meta property="og:title" content={searchTitle} />
+          <meta property="og:type" content="website" />
+        </Head>
+      )}
       <Header title={t('search')} />
 
       {/* Search input */}

@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Pla
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import Head from 'expo-router/head';
 import { Header } from '../../components/layout/Header';
 import { PhotoGallery } from '../../components/listing/PhotoGallery';
 import { PriceTag } from '../../components/ui/PriceTag';
@@ -265,8 +266,27 @@ export default function ListingDetailScreen() {
 
   const photoUrls = listing.photos.map(p => p.url);
 
+  const seoTitle = listing.city
+    ? `${listing.title} — ${i18n.language === 'en' ? (listing.city.nameEn || listing.city.nameRu) : i18n.language === 'ka' ? (listing.city.nameKa || listing.city.nameRu) : listing.city.nameRu} | Авито Грузия`
+    : `${listing.title} | Авито Грузия`;
+  const seoDescription = listing.description
+    ? listing.description.slice(0, 160)
+    : `${listing.title} — объявление на Авито Грузия`;
+  const seoImage = listing.photos[0]?.url;
+
   return (
     <View className="flex-1 bg-dark">
+      {Platform.OS === 'web' && (
+        <Head>
+          <title>{seoTitle}</title>
+          <meta name="description" content={seoDescription} />
+          <meta property="og:title" content={seoTitle} />
+          <meta property="og:description" content={seoDescription} />
+          <meta property="og:type" content="article" />
+          <meta property="og:url" content={`https://avito-georgia.smartlaunchhub.com/listings/${listing.id}`} />
+          {seoImage ? <meta property="og:image" content={seoImage} /> : null}
+        </Head>
+      )}
       <Header showBack title={listing.title} />
 
       <ScrollView className="flex-1" contentContainerClassName="pb-24">

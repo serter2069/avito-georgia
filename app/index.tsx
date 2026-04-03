@@ -7,6 +7,7 @@ import { Header } from '../components/layout/Header';
 import { CitySelector, City } from '../components/common/CitySelector';
 import { ListingFeed } from '../components/listing/ListingFeed';
 import { colors } from '../lib/colors';
+import Head from 'expo-router/head';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -21,6 +22,16 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 bg-dark">
+      {Platform.OS === 'web' && (
+        <Head>
+          <title>Авито Грузия — объявления в Грузии</title>
+          <meta name="description" content="Купить и продать в Грузии. Недвижимость, авто, электроника, работа и многое другое. Бесплатные объявления." />
+          <meta property="og:title" content="Авито Грузия — объявления в Грузии" />
+          <meta property="og:description" content="Купить и продать в Грузии. Недвижимость, авто, электроника, работа и многое другое. Бесплатные объявления." />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://avito-georgia.smartlaunchhub.com/" />
+        </Head>
+      )}
       <Header />
 
       <ScrollView
