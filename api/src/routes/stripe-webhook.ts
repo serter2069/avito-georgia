@@ -32,7 +32,7 @@ router.post('/', async (req: Request, res: Response) => {
     event = getStripe().webhooks.constructEvent(
       req.body, // must be raw Buffer
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET || ''
+      process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err: any) {
     console.error('[stripe-webhook] Signature verification failed:', err.message);

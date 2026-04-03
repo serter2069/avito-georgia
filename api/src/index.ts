@@ -28,6 +28,9 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your-jwt-secret') {
 if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET === 'your-jwt-refresh-secret') {
   throw new Error('JWT_REFRESH_SECRET is not configured or is using the placeholder value');
 }
+if (!process.env.STRIPE_WEBHOOK_SECRET) {
+  throw new Error('STRIPE_WEBHOOK_SECRET is not configured');
+}
 
 const app = express();
 const httpServer = http.createServer(app);
