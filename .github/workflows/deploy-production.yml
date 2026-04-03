@@ -67,7 +67,7 @@ jobs:
           sudo chown -R github-runner:www-data /var/www/avito-georgia/api/ || true
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
-          cd /var/www/avito-georgia/api && npm ci && doppler run -- npm run build
+          cd /var/www/avito-georgia/api && npm ci && npx prisma generate && doppler run -- npm run build
           sudo chmod -R g+rw /var/www/avito-georgia/api/
           doppler secrets download --no-file --format env > /var/www/avito-georgia/api/.env
           chmod 600 /var/www/avito-georgia/api/.env
