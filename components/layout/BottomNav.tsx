@@ -15,10 +15,10 @@ interface Tab {
 
 const TABS: Tab[] = [
   { label: 'Home', iconDefault: 'home-outline', iconActive: 'home', path: '/' },
-  { label: 'Search', iconDefault: 'search-outline', iconActive: 'search', path: '/listings' },
+  { label: 'Listings', iconDefault: 'grid-outline', iconActive: 'grid', path: '/listings' },
   { label: 'Create', iconDefault: 'add-circle-outline', iconActive: 'add-circle', path: '/listings/create' },
   { label: 'Favorites', iconDefault: 'heart-outline', iconActive: 'heart', path: '/dashboard/favorites' },
-  { label: 'Profile', iconDefault: 'person-outline', iconActive: 'person', path: '/dashboard/profile' },
+  { label: 'Profile', iconDefault: 'person-circle-outline', iconActive: 'person-circle', path: '/dashboard/profile' },
 ];
 
 export function BottomNav() {

@@ -1,21 +1,25 @@
 import { View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+type IoniconsName = keyof typeof Ionicons.glyphMap;
+
 interface NavItem {
   labelKey: string;
-  icon: string;
+  iconDefault: IoniconsName;
+  iconActive: IoniconsName;
   path: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { labelKey: 'home', icon: '\u2302', path: '/' },
-  { labelKey: 'listings', icon: '\u2630', path: '/listings' },
-  { labelKey: 'createListing', icon: '\u2795', path: '/listings/create' },
-  { labelKey: 'messages', icon: '\u2709', path: '/dashboard/messages' },
-  { labelKey: 'favorites', icon: '\u2661', path: '/dashboard/favorites' },
-  { labelKey: 'profile', icon: '\u263A', path: '/dashboard/profile' },
-  { labelKey: 'settings', icon: '\u2699', path: '/dashboard/settings' },
+  { labelKey: 'home', iconDefault: 'home-outline', iconActive: 'home', path: '/' },
+  { labelKey: 'listings', iconDefault: 'grid-outline', iconActive: 'grid', path: '/listings' },
+  { labelKey: 'createListing', iconDefault: 'add-circle-outline', iconActive: 'add-circle', path: '/listings/create' },
+  { labelKey: 'messages', iconDefault: 'chatbubble-outline', iconActive: 'chatbubble', path: '/dashboard/messages' },
+  { labelKey: 'favorites', iconDefault: 'heart-outline', iconActive: 'heart', path: '/dashboard/favorites' },
+  { labelKey: 'profile', iconDefault: 'person-circle-outline', iconActive: 'person-circle', path: '/dashboard/profile' },
+  { labelKey: 'settings', iconDefault: 'settings-outline', iconActive: 'settings', path: '/dashboard/settings' },
 ];
 
 export function DesktopSidebar() {
@@ -44,12 +48,12 @@ export function DesktopSidebar() {
             onPress={() => router.push(item.path as any)}
             activeOpacity={0.7}
           >
-            <Text
-              className={`text-lg ${active ? 'text-primary' : 'text-text-muted'}`}
+            <Ionicons
+              name={active ? item.iconActive : item.iconDefault}
+              size={22}
+              color={active ? '#0A7B8A' : '#6A8898'}
               style={{ width: 28 }}
-            >
-              {item.icon}
-            </Text>
+            />
             <Text
               className={`text-base font-medium ${
                 active ? 'text-primary' : 'text-text-muted'
