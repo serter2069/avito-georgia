@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Linking, Modal, Pressable, TextInput, Animated, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Linking, Modal, Pressable, TextInput, Animated, Dimensions, KeyboardAvoidingView, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -227,13 +227,20 @@ export default function ListingDetailScreen() {
     if (!listing) return;
     const url = `https://avito-georgia.smartlaunchhub.com/listings/${listing.id}`;
     if (Platform.OS === 'web') {
-      if (navigator.clipboard) {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({ title: listing.title, url });
+        } catch {
+          // user cancelled or API unavailable — fall through to clipboard
+        }
+      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(url);
+        Alert.alert(t('linkCopied'));
       }
     } else {
       await Share.share({ message: `${listing.title} - ${url}`, url });
     }
-  }, [listing]);
+  }, [listing, t]);
 
   const handleSellerPress = useCallback(() => {
     if (listing?.user?.id) {
