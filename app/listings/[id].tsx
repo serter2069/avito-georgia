@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ListingPhoto {
   id: string;
@@ -287,7 +288,7 @@ export default function ListingDetailScreen() {
                 {t('memberSince')} {formatDate(listing.user.createdAt)}
               </Text>
             </View>
-            <Text className="text-text-muted text-lg">&rsaquo;</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
           </View>
         </TouchableOpacity>
       </ScrollView>

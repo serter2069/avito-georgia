@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { api } from '../../../lib/api';
 import { colors } from '../../../lib/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ThreadUser {
   id: string;
@@ -150,7 +151,7 @@ export default function ThreadListScreen() {
         </View>
       ) : threads.length === 0 ? (
         <View className="flex-1 items-center justify-center px-4">
-          <Text className="text-text-muted text-4xl mb-3">{'\u2709'}</Text>
+          <Ionicons name="mail-outline" size={48} color={colors.textMuted} style={{ marginBottom: 12 }} />
           <Text className="text-text-primary text-base font-semibold">{t('noMessages')}</Text>
           <Text className="text-text-muted text-sm mt-1">{t('noMessagesHint')}</Text>
         </View>
