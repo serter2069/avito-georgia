@@ -21,18 +21,96 @@ router.get('/threads', requireAuth, async (req: Request, res: Response) => {
       orderBy: { updatedAt: 'desc' },
     });
 
-    const result = threads.map((t) => ({
-      id: t.id,
-      listing: t.listing,
-      otherUser: t.participants.find((p) => p.userId !== userId)?.user || null,
-      lastMessage: t.messages[0] || null,
-      updatedAt: t.updatedAt,
+    // Compute unread count per thread: messages from others sent after our lastSeenAt
+    type ThreadWithIncludes = (typeof threads)[number];
+    const result = await Promise.all(threads.map(async (t: ThreadWithIncludes) => {
+      const myParticipant = t.participants.find((p: { userId: string }) => p.userId === userId);
+      const lastSeenAt = myParticipant?.lastSeenAt;
+
+      const unreadCount = await prisma.message.count({
+        where: {
+          threadId: t.id,
+          senderId: { not: userId },
+          ...(lastSeenAt ? { createdAt: { gt: lastSeenAt } } : {}),
+        },
+      });
+
+      return {
+        id: t.id,
+        listing: t.listing,
+        otherUser: t.participants.find((p: { userId: string }) => p.userId !== userId)?.user || null,
+        lastMessage: t.messages[0] || null,
+        updatedAt: t.updatedAt,
+        unreadCount,
+      };
     }));
 
     res.json(result);
   } catch (err) {
     console.error('GET /threads error:', err);
     res.status(500).json({ error: 'Failed to fetch threads' });
+  }
+});
+
+// GET /api/threads/unread-count — total unread messages across all threads
+router.get('/threads/unread-count', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+
+    // Get all thread participations for this user
+    const participations = await prisma.threadParticipant.findMany({
+      where: { userId },
+      select: { threadId: true, lastSeenAt: true },
+    });
+
+    if (participations.length === 0) {
+      res.json({ count: 0 });
+      return;
+    }
+
+    // Count unread per participation and sum
+    let total = 0;
+    await Promise.all(participations.map(async (p: { threadId: string; lastSeenAt: Date | null }) => {
+      const count = await prisma.message.count({
+        where: {
+          threadId: p.threadId,
+          senderId: { not: userId },
+          ...(p.lastSeenAt ? { createdAt: { gt: p.lastSeenAt } } : {}),
+        },
+      });
+      total += count;
+    }));
+
+    res.json({ count: total });
+  } catch (err) {
+    console.error('GET /threads/unread-count error:', err);
+    res.status(500).json({ error: 'Failed to fetch unread count' });
+  }
+});
+
+// POST /api/threads/:threadId/seen — mark thread as seen (update lastSeenAt)
+router.post('/threads/:threadId/seen', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const threadId = req.params.threadId as string;
+
+    const participant = await prisma.threadParticipant.findUnique({
+      where: { threadId_userId: { threadId, userId } },
+    });
+    if (!participant) {
+      res.status(403).json({ error: 'Not a participant of this thread' });
+      return;
+    }
+
+    await prisma.threadParticipant.update({
+      where: { threadId_userId: { threadId, userId } },
+      data: { lastSeenAt: new Date() },
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('POST /threads/:threadId/seen error:', err);
+    res.status(500).json({ error: 'Failed to mark thread as seen' });
   }
 });
 

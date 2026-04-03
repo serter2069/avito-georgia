@@ -178,11 +178,12 @@ model Thread {
 }
 
 model ThreadParticipant {
-  id       String @id @default(cuid())
-  threadId String
-  thread   Thread @relation(fields: [threadId], references: [id])
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  id         String    @id @default(cuid())
+  threadId   String
+  thread     Thread    @relation(fields: [threadId], references: [id])
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  lastSeenAt DateTime?
 
   @@unique([threadId, userId])
 }

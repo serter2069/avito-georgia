@@ -1,7 +1,7 @@
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, AppState } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'expo-router';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { api } from '../../../lib/api';
 import { colors } from '../../../lib/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,6 +33,7 @@ interface Thread {
   otherUser: ThreadUser | null;
   lastMessage: ThreadMessage | null;
   updatedAt: string;
+  unreadCount: number;
 }
 
 function getInitials(name: string | null | undefined): string {
@@ -65,6 +66,7 @@ export default function ThreadListScreen() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const appStateRef = useRef(AppState.currentState);
 
   const fetchThreads = useCallback(async () => {
     setError(null);
@@ -81,48 +83,84 @@ export default function ThreadListScreen() {
     fetchThreads().finally(() => setLoading(false));
   }, [fetchThreads]);
 
+  // Re-fetch when screen is focused (coming back from a thread)
+  useFocusEffect(
+    useCallback(() => {
+      fetchThreads();
+    }, [fetchThreads])
+  );
+
+  // Re-fetch when app comes to foreground
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (appStateRef.current.match(/inactive|background/) && nextState === 'active') {
+        fetchThreads();
+      }
+      appStateRef.current = nextState;
+    });
+    return () => subscription.remove();
+  }, [fetchThreads]);
+
   const handleThreadPress = (threadId: string) => {
     router.push(`/dashboard/messages/${threadId}`);
   };
 
-  const renderThread = ({ item }: { item: Thread }) => (
-    <TouchableOpacity
-      className="flex-row items-center px-4 py-3 border-b border-border"
-      onPress={() => handleThreadPress(item.id)}
-      activeOpacity={0.7}
-    >
-      {/* Avatar */}
-      <View className="w-12 h-12 rounded-full bg-primary/20 items-center justify-center mr-3">
-        <Text className="text-primary font-bold text-base">
-          {getInitials(item.otherUser?.name)}
-        </Text>
-      </View>
-
-      {/* Content */}
-      <View className="flex-1 min-w-0">
-        <View className="flex-row items-center justify-between mb-1">
-          <Text className="text-text-primary font-semibold text-base flex-1 mr-2" numberOfLines={1}>
-            {item.otherUser?.name || item.listing?.title || '\u2014'}
+  const renderThread = ({ item }: { item: Thread }) => {
+    const hasUnread = item.unreadCount > 0;
+    return (
+      <TouchableOpacity
+        className="flex-row items-center px-4 py-3 border-b border-border"
+        onPress={() => handleThreadPress(item.id)}
+        activeOpacity={0.7}
+      >
+        {/* Avatar */}
+        <View className="w-12 h-12 rounded-full bg-primary/20 items-center justify-center mr-3">
+          <Text className="text-primary font-bold text-base">
+            {getInitials(item.otherUser?.name)}
           </Text>
+        </View>
+
+        {/* Content */}
+        <View className="flex-1 min-w-0">
+          <View className="flex-row items-center justify-between mb-1">
+            <Text
+              className={`text-base flex-1 mr-2 ${hasUnread ? 'text-text-primary font-bold' : 'text-text-primary font-semibold'}`}
+              numberOfLines={1}
+            >
+              {item.otherUser?.name || item.listing?.title || '\u2014'}
+            </Text>
+            <View className="flex-row items-center gap-2">
+              {item.lastMessage && (
+                <Text className="text-text-muted text-xs">
+                  {formatTime(item.lastMessage.createdAt)}
+                </Text>
+              )}
+              {hasUnread && (
+                <View className="bg-red-500 rounded-full min-w-[20px] h-5 items-center justify-center px-1.5">
+                  <Text className="text-white text-xs font-bold leading-none">
+                    {item.unreadCount > 99 ? '99+' : item.unreadCount}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+          {item.listing && (
+            <Text className="text-text-secondary text-sm" numberOfLines={1}>
+              {item.listing.title}
+            </Text>
+          )}
           {item.lastMessage && (
-            <Text className="text-text-muted text-xs">
-              {formatTime(item.lastMessage.createdAt)}
+            <Text
+              className={`text-xs mt-0.5 ${hasUnread ? 'text-text-primary font-medium' : 'text-text-muted'}`}
+              numberOfLines={1}
+            >
+              {item.lastMessage.text}
             </Text>
           )}
         </View>
-        {item.listing && (
-          <Text className="text-text-secondary text-sm" numberOfLines={1}>
-            {item.listing.title}
-          </Text>
-        )}
-        {item.lastMessage && (
-          <Text className="text-text-muted text-xs mt-0.5" numberOfLines={1}>
-            {item.lastMessage.text}
-          </Text>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View className="flex-1 bg-dark">
