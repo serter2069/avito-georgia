@@ -116,11 +116,15 @@ export default function ChatScreen() {
     };
   }, [threadId, currentUser?.id]);
 
-  // Initial message load
+  // Initial message load + mark thread as seen
   useEffect(() => {
     setLoading(true);
     loadMessages().finally(() => setLoading(false));
-  }, [loadMessages]);
+    // Mark thread as seen on open
+    if (threadId) {
+      api.post(`/threads/${threadId}/seen`, {});
+    }
+  }, [loadMessages, threadId]);
 
   const handleSend = async () => {
     const text = inputText.trim();
