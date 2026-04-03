@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Linking } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -73,6 +73,9 @@ export default function ListingDetailScreen() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
+  const [phone, setPhone] = useState<string | null>(null);
+  const [phoneLoading, setPhoneLoading] = useState(false);
+  const [phoneRevealed, setPhoneRevealed] = useState(false);
 
   // Fetch listing once on mount
   useEffect(() => {
@@ -161,6 +164,25 @@ export default function ListingDetailScreen() {
       setContactLoading(false);
     }
   }, [user, id, listing, contactLoading, router]);
+
+  const handleRevealPhone = useCallback(async () => {
+    if (!user) {
+      router.push('/(auth)');
+      return;
+    }
+    if (phoneRevealed && phone) {
+      Linking.openURL(`tel:${phone}`);
+      return;
+    }
+    if (!id || phoneLoading) return;
+    setPhoneLoading(true);
+    const res = await api.get<{ phone: string | null }>(`/listings/${id}/phone`);
+    setPhoneLoading(false);
+    if (res.ok && res.data) {
+      setPhone(res.data.phone);
+      setPhoneRevealed(true);
+    }
+  }, [user, id, phone, phoneRevealed, phoneLoading, router]);
 
   const handleShare = useCallback(async () => {
     if (!listing) return;
@@ -305,10 +327,10 @@ export default function ListingDetailScreen() {
       </ScrollView>
 
       {/* Bottom action bar */}
-      <View className="absolute bottom-0 left-0 right-0 bg-dark-secondary border-t border-border px-4 py-3 flex-row gap-3">
+      <View className="absolute bottom-0 left-0 right-0 bg-dark-secondary border-t border-border px-4 py-3 gap-2">
         {user && listing.user.id === user.id ? (
           // Owner view: promote button
-          <View className="flex-1">
+          <View>
             <Button
               title={t('promote')}
               onPress={() => router.push(`/dashboard/listings/${listing.id}/promote`)}
@@ -317,32 +339,50 @@ export default function ListingDetailScreen() {
             />
           </View>
         ) : (
-          // Non-owner view: favorite + contact
+          // Non-owner view: favorite + contact + phone reveal
           <>
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                className={`px-4 py-3 rounded-lg border items-center justify-center ${
+                  isFavorited ? 'bg-secondary/20 border-secondary' : 'border-border'
+                }`}
+                onPress={handleFavorite}
+                disabled={favoriteLoading}
+              >
+                {favoriteLoading ? (
+                  <ActivityIndicator size="small" color={colors.statusWarning} />
+                ) : (
+                  <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
+                    {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
+                  </Text>
+                )}
+              </TouchableOpacity>
+
+              <View className="flex-1">
+                <Button
+                  title={contactLoading ? t('loading') : t('contactSeller')}
+                  onPress={handleContactSeller}
+                  size="md"
+                  disabled={contactLoading}
+                />
+              </View>
+            </View>
+
             <TouchableOpacity
-              className={`px-4 py-3 rounded-lg border items-center justify-center ${
-                isFavorited ? 'bg-secondary/20 border-secondary' : 'border-border'
-              }`}
-              onPress={handleFavorite}
-              disabled={favoriteLoading}
+              className="py-3 rounded-lg border border-primary items-center justify-center"
+              onPress={handleRevealPhone}
+              disabled={phoneLoading}
             >
-              {favoriteLoading ? (
-                <ActivityIndicator size="small" color={colors.statusWarning} />
+              {phoneLoading ? (
+                <ActivityIndicator size="small" color={colors.brandPrimary} />
+              ) : phoneRevealed && phone ? (
+                <Text className="text-primary text-sm font-semibold">{phone}</Text>
+              ) : phoneRevealed && !phone ? (
+                <Text className="text-text-muted text-sm">{t('phoneNotSpecified')}</Text>
               ) : (
-                <Text className={`text-sm font-semibold ${isFavorited ? 'text-secondary' : 'text-text-secondary'}`}>
-                  {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
-                </Text>
+                <Text className="text-primary text-sm font-semibold">{t('showPhone')}</Text>
               )}
             </TouchableOpacity>
-
-            <View className="flex-1">
-              <Button
-                title={contactLoading ? t('loading') : t('contactSeller')}
-                onPress={handleContactSeller}
-                size="md"
-                disabled={contactLoading}
-              />
-            </View>
           </>
         )}
       </View>

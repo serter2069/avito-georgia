@@ -199,6 +199,18 @@ router.get('/:id', async (req: Request, res: Response) => {
   res.json({ ...listing, views: listing.views + 1 });
 });
 
+// GET /api/listings/:id/phone — reveal seller phone (auth required)
+router.get('/:id/phone', requireAuth, async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    select: { id: true, status: true, user: { select: { phone: true } } },
+  });
+  if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
+  if (listing.status !== 'active') { res.status(410).json({ error: 'Listing is not active' }); return; }
+  res.json({ phone: listing.user.phone || null });
+});
+
 // POST /api/listings
 router.post('/', requireAuth, async (req: Request, res: Response) => {
   let data;
