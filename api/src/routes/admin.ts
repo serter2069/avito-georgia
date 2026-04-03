@@ -91,10 +91,11 @@ router.get('/stats', requireAuth, async (req: Request, res: Response) => {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [totalListings, totalUsers, pendingReports, paymentsThisMonth] = await Promise.all([
+  const [totalListings, totalUsers, pendingReports, pendingModeration, paymentsThisMonth] = await Promise.all([
     prisma.listing.count(),
     prisma.user.count(),
     prisma.report.count({ where: { status: 'pending' } }),
+    prisma.listing.count({ where: { status: 'pending_moderation' } }),
     prisma.payment.aggregate({
       where: {
         createdAt: { gte: monthStart },
@@ -109,6 +110,7 @@ router.get('/stats', requireAuth, async (req: Request, res: Response) => {
     totalListings,
     totalUsers,
     pendingReports,
+    pendingModeration,
     paymentsThisMonth: {
       count: paymentsThisMonth._count,
       sum: paymentsThisMonth._sum.amount || 0,
@@ -142,6 +144,35 @@ router.patch('/reports/:id/status', requireAuth, async (req: Request, res: Respo
   res.json(updated);
 });
 
+// GET /api/admin/listings/pending — moderation queue (pending_moderation listings)
+router.get('/listings/pending', requireAuth, async (req: Request, res: Response) => {
+  if (!requireAdmin(req, res)) return;
+
+  const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+  const skip = (page - 1) * limit;
+
+  const where = { status: 'pending_moderation' as const };
+
+  const [listings, total] = await Promise.all([
+    prisma.listing.findMany({
+      where,
+      orderBy: { createdAt: 'asc' },
+      skip,
+      take: limit,
+      include: {
+        photos: { orderBy: { order: 'asc' }, take: 1 },
+        city: { select: { id: true, nameRu: true } },
+        category: { select: { id: true, name: true } },
+        user: { select: { id: true, name: true, email: true } },
+      },
+    }),
+    prisma.listing.count({ where }),
+  ]);
+
+  res.json({ listings, total, page, totalPages: Math.ceil(total / limit) });
+});
+
 // PATCH /api/admin/listings/:id/status — admin can approve/reject listings
 router.patch('/listings/:id/status', requireAuth, async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
@@ -149,8 +180,9 @@ router.patch('/listings/:id/status', requireAuth, async (req: Request, res: Resp
   const id = req.params.id as string;
   const { status } = req.body;
 
-  if (!status || !['active', 'removed'].includes(status)) {
-    res.status(400).json({ error: 'status must be active or removed' });
+  const allowedStatuses = ['active', 'removed', 'rejected', 'pending_moderation'];
+  if (!status || !allowedStatuses.includes(status)) {
+    res.status(400).json({ error: `status must be one of: ${allowedStatuses.join(', ')}` });
     return;
   }
 
