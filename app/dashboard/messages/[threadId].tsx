@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -126,18 +126,18 @@ export default function ChatScreen() {
     const text = inputText.trim();
     if (!text || sending) return;
 
-    setSending(true);
-    setInputText('');
-
-    if (socketRef.current?.connected) {
-      socketRef.current.emit('send_message', { threadId, text });
-    } else {
-      // Fallback to REST — this shouldn't normally happen
-      // The REST endpoint creates messages via POST /threads/:listingId/message,
-      // but we don't have listingId here, so just log warning
-      console.warn('Socket not connected, message may not be sent');
+    if (!socketRef.current?.connected) {
+      // Keep input text so user can retry — never silently lose the message
+      Alert.alert(
+        t('chat.errorTitle', 'No connection'),
+        t('chat.errorSocketDisconnected', 'Message not sent: no connection to server. Please try again.'),
+      );
+      return;
     }
 
+    setSending(true);
+    setInputText('');
+    socketRef.current.emit('send_message', { threadId, text });
     setSending(false);
   };
 
