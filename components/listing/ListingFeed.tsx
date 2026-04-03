@@ -63,8 +63,8 @@ interface ApiListing {
   status: string;
   views: number;
   createdAt: string;
-  city?: { id: string; nameRu: string };
-  category?: { id: string; name: string };
+  city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
+  category?: { id: string; name: string; slug: string };
   photos?: { id: string; url: string; order: number }[];
   isPromoted?: boolean;
   isHighlighted?: boolean;
@@ -77,15 +77,37 @@ interface ApiCategory {
   customFields: CustomField[] | null;
 }
 
-function mapListing(l: ApiListing): Listing {
+function getCityName(city: ApiListing['city'], lang: string): string | undefined {
+  if (!city) return undefined;
+  if (lang === 'en') return city.nameEn || city.nameRu;
+  if (lang === 'ka') return city.nameKa || city.nameRu;
+  return city.nameRu;
+}
+
+// Map DB category slug to i18n translation key
+const SLUG_TO_I18N_KEY: Record<string, string> = {
+  transport: 'transport',
+  'real-estate': 'realEstate',
+  electronics: 'electronics',
+  fashion: 'clothing',
+  'home-garden': 'furniture',
+  services: 'services',
+  jobs: 'jobs',
+  kids: 'kids',
+  pets: 'pets',
+  hobbies: 'hobbies',
+};
+
+function mapListing(l: ApiListing, lang: string, t: (key: string) => string): Listing {
+  const i18nKey = l.category?.slug ? SLUG_TO_I18N_KEY[l.category.slug] : undefined;
   return {
     id: l.id,
     title: l.title,
     price: l.price,
     currency: l.currency,
     imageUrl: l.photos?.[0]?.url,
-    city: l.city?.nameRu,
-    category: l.category?.name,
+    city: getCityName(l.city, lang),
+    category: i18nKey ? t(i18nKey) : (l.category?.name),
     createdAt: l.createdAt,
     isPromoted: l.isPromoted ?? false,
     isHighlighted: l.isHighlighted ?? false,
@@ -103,7 +125,7 @@ export function ListingFeed({
   showFilters: showFiltersProp = true,
   compact = false,
 }: ListingFeedProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { isMobile, isTablet, isDesktop, sidebarWidth, maxWidth } = useResponsive();
@@ -176,17 +198,18 @@ export function ListingFeed({
 
     const res = await api.get<ListingsResponse>(query);
     if (res.ok && res.data) {
+      const lang = i18n.language;
       if (reset) {
-        setListings(res.data.listings.map(mapListing));
+        setListings(res.data.listings.map((l) => mapListing(l, lang, t)));
       } else {
-        setListings(prev => [...prev, ...res.data!.listings.map(mapListing)]);
+        setListings(prev => [...prev, ...res.data!.listings.map((l) => mapListing(l, lang, t))]);
       }
       setTotal(res.data.total);
     }
 
     setLoading(false);
     setLoadingMore(false);
-  }, [selectedCategory, selectedCity, sortBy, customFilterValues, compact]);
+  }, [selectedCategory, selectedCity, sortBy, customFilterValues, compact, i18n.language]);
 
   // Reset and fetch when filters change
   useEffect(() => {

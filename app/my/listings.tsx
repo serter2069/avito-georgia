@@ -21,7 +21,7 @@ interface MyListing {
   views: number;
   createdAt: string;
   expiresAt: string | null;
-  city?: { id: string; nameRu: string };
+  city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
   category?: { id: string; name: string };
   photos?: { id: string; url: string; order: number }[];
 }

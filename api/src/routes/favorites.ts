@@ -50,8 +50,8 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
         listing: {
           include: {
             photos: { orderBy: { order: 'asc' }, take: 1 },
-            city: { select: { id: true, nameRu: true } },
-            category: { select: { id: true, name: true } },
+            city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
+            category: { select: { id: true, name: true, slug: true } },
           },
         },
       },

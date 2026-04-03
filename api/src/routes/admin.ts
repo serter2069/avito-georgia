@@ -162,7 +162,7 @@ router.get('/listings/pending', requireAuth, async (req: Request, res: Response)
       take: limit,
       include: {
         photos: { orderBy: { order: 'asc' }, take: 1 },
-        city: { select: { id: true, nameRu: true } },
+        city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
         category: { select: { id: true, name: true } },
         user: { select: { id: true, name: true, email: true } },
       },
