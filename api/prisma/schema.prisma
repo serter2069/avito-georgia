@@ -124,6 +124,7 @@ model Listing {
   status      ListingStatus @default(active)
   views       Int           @default(0)
   expiresAt   DateTime?
+  lastRenewedAt DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
