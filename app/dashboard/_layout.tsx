@@ -1,75 +1,52 @@
-import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { colors } from '../../lib/colors';
+import { Stack, usePathname, useRouter } from 'expo-router';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 
-export default function DashboardLayout() {
-  const { t } = useTranslation();
+const NAV_ITEMS = [
+  { label: 'Сообщения', path: '/dashboard/messages' },
+  { label: 'Избранное', path: '/dashboard/favorites' },
+  { label: 'Мои объявления', path: '/dashboard/listings' },
+  { label: 'Настройки', path: '/dashboard/settings' },
+];
+
+function DashboardNav() {
+  const pathname = usePathname();
+  const router = useRouter();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.bgSecondary,
-          borderTopColor: colors.borderDefault,
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 4,
-        },
-        tabBarActiveTintColor: colors.brandPrimary,
-        tabBarInactiveTintColor: colors.textMuted,
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-        },
-      }}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ flexDirection: 'row', gap: 8, padding: 16 }}
+      style={{ backgroundColor: '#FFFFFF' }}
     >
-      <Tabs.Screen
-        name="messages/index"
-        options={{
-          title: t('messages'),
-          tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>{focused ? '\u2709\uFE0F' : '\u2709'}</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="messages/[threadId]"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="favorites"
-        options={{
-          title: t('favorites'),
-          tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>{focused ? '\u2764\uFE0F' : '\u2661'}</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: t('profile'),
-          tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>{focused ? '\uD83D\uDC64' : '\uD83D\uDC64'}</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: t('settings'),
-          tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>{focused ? '\u2699\uFE0F' : '\u2699'}</Text>
-          ),
-        }}
-      />
-      {/* Existing dashboard screens — hidden from tab bar */}
-      <Tabs.Screen name="listings" options={{ href: null }} />
-      <Tabs.Screen name="payments" options={{ href: null }} />
-      <Tabs.Screen name="subscription" options={{ href: null }} />
-    </Tabs>
+      {NAV_ITEMS.map((item) => {
+        const isActive = pathname.startsWith(item.path);
+        return (
+          <TouchableOpacity
+            key={item.path}
+            onPress={() => router.push(item.path as any)}
+            style={{
+              backgroundColor: isActive ? '#0A7B8A' : '#F2F8FA',
+              borderRadius: 20,
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ color: isActive ? '#FFFFFF' : '#0A2840', fontSize: 14, fontWeight: '500' }}>
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+export default function DashboardLayout() {
+  return (
+    <View style={{ flex: 1 }}>
+      <DashboardNav />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }} />
+    </View>
   );
 }

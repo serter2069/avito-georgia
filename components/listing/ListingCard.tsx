@@ -1,4 +1,5 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { PriceTag } from '../ui/PriceTag';
 import { Badge } from '../ui/Badge';
@@ -13,6 +14,7 @@ export interface Listing {
   city?: string;
   category?: string;
   createdAt?: string;
+  isPromoted?: boolean;
 }
 
 interface ListingCardProps {
@@ -20,26 +22,56 @@ interface ListingCardProps {
   onPress: (id: string) => void;
 }
 
+const webShadow = Platform.OS === 'web' ? {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.08,
+  shadowRadius: 3,
+} : {};
+
 export function ListingCard({ listing, onPress }: ListingCardProps) {
   const { t } = useTranslation();
 
   return (
     <TouchableOpacity
-      className="bg-surface-card rounded-lg border border-border overflow-hidden"
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderWidth: 1,
+        borderColor: '#C8E0E8',
+        borderRadius: 12,
+        overflow: 'hidden',
+        ...webShadow,
+      }}
       onPress={() => onPress(listing.id)}
       activeOpacity={0.7}
     >
-      {listing.imageUrl ? (
-        <Image
-          source={{ uri: listing.imageUrl }}
-          className="w-full h-48"
-          resizeMode="cover"
-        />
-      ) : (
-        <View className="w-full h-48 bg-surface items-center justify-center">
-          <Text className="text-text-muted text-sm">{t('photos')}</Text>
-        </View>
-      )}
+      <View>
+        {listing.imageUrl ? (
+          <Image
+            source={{ uri: listing.imageUrl }}
+            className="w-full h-48"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="w-full h-48 items-center justify-center" style={{ backgroundColor: '#F2F8FA' }}>
+            <Ionicons name="camera-outline" size={32} color="#6A8898" />
+          </View>
+        )}
+
+        {listing.isPromoted && (
+          <View style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: '#f59e0b',
+            borderRadius: 6,
+            paddingHorizontal: 6,
+            paddingVertical: 2,
+          }}>
+            <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '700' }}>TOP</Text>
+          </View>
+        )}
+      </View>
 
       <View className="p-3 gap-2">
         <Text className="text-text-primary text-base font-semibold" numberOfLines={2}>

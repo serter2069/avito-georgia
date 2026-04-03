@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -9,6 +9,7 @@ import { CategoryType } from '../../components/common/CategoryIcon';
 import { CategoryFilters, CustomField, FilterValues } from '../../components/filters/CategoryFilters';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
+import { useBreakpoint, getColumns } from '../../lib/responsive';
 
 const CATEGORIES: CategoryType[] = [
   'transport',
@@ -85,6 +86,7 @@ function mapListing(l: ApiListing): Listing {
     city: l.city?.nameRu,
     category: l.category?.name,
     createdAt: l.createdAt,
+    isPromoted: l.isPromoted,
   };
 }
 
@@ -92,11 +94,12 @@ export default function ListingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
-  const { width } = useWindowDimensions();
-
-  // Max 430px as per root layout, minus padding (16*2) minus gap (12)
-  const containerWidth = Math.min(width, 430);
-  const itemWidth = (containerWidth - 32 - 12) / 2;
+  const { width: screenWidth } = useWindowDimensions();
+  const breakpoint = useBreakpoint();
+  const columns = getColumns(breakpoint);
+  const padding = 16; // 8px each side
+  const gap = 8;
+  const cardWidth = (screenWidth - padding - gap * (columns - 1)) / columns;
 
   const [selectedCity, setSelectedCity] = useState<City>('all');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
@@ -178,12 +181,6 @@ export default function ListingsScreen() {
   const handleListingPress = (id: string) => {
     router.push(`/listings/${id}`);
   };
-
-  const renderItem = useCallback(({ item }: { item: Listing }) => (
-    <View style={{ width: itemWidth, marginBottom: 12 }}>
-      <ListingCard listing={item} onPress={handleListingPress} />
-    </View>
-  ), [itemWidth]);
 
   const renderEmpty = () => {
     if (loading) return null;
@@ -302,20 +299,33 @@ export default function ListingsScreen() {
           <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
         </View>
       ) : (
-        <FlatList
-          data={listings}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          numColumns={2}
-          columnWrapperClassName="px-4 justify-between"
-          ListHeaderComponent={renderHeader}
-          ListEmptyComponent={renderEmpty}
-          ListFooterComponent={renderFooter}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3}
-          contentContainerClassName="pb-4"
+        <ScrollView
           style={{ flex: 1 }}
-        />
+          contentContainerStyle={{ paddingBottom: 16 }}
+          onScroll={({ nativeEvent }) => {
+            const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+            if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 200) {
+              handleLoadMore();
+            }
+          }}
+          scrollEventThrottle={400}
+        >
+          {renderHeader()}
+
+          {listings.length === 0 ? (
+            renderEmpty()
+          ) : (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 8, gap: 8 }}>
+              {listings.map((listing) => (
+                <View key={listing.id} style={{ width: cardWidth, marginBottom: 4 }}>
+                  <ListingCard listing={listing} onPress={handleListingPress} />
+                </View>
+              ))}
+            </View>
+          )}
+
+          {renderFooter()}
+        </ScrollView>
       )}
     </View>
   );
