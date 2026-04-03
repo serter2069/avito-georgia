@@ -96,6 +96,7 @@ router.get('/', async (req: Request, res: Response) => {
   const q = qs(req.query.q);
   const category = qs(req.query.category);
   const city = qs(req.query.city);
+  const exclude = qs(req.query.exclude);
   const price_min = qs(req.query.price_min);
   const price_max = qs(req.query.price_max);
   const sort = qs(req.query.sort);
@@ -140,6 +141,7 @@ router.get('/', async (req: Request, res: Response) => {
     ...(categoryId ? { categoryId } : {}),
     ...(city ? { cityId: city } : {}),
     ...(userId ? { userId } : {}),
+    ...(exclude ? { id: { not: exclude } } : {}),
     ...(price_min || price_max
       ? {
           price: {

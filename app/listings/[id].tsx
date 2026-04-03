@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Linking, Modal, Pressable, TextInput, Animated, Dimensions, KeyboardAvoidingView, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Linking, Modal, Pressable, TextInput, Animated, Dimensions, KeyboardAvoidingView, Alert, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -17,6 +17,15 @@ interface ListingPhoto {
   id: string;
   url: string;
   order: number;
+}
+
+interface SimilarListing {
+  id: string;
+  title: string;
+  price: number | null;
+  currency: string;
+  photos: { url: string }[];
+  city?: { nameRu: string; nameEn: string; nameKa: string };
 }
 
 interface ListingDetail {
@@ -71,6 +80,8 @@ export default function ListingDetailScreen() {
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [similarListings, setSimilarListings] = useState<SimilarListing[]>([]);
+  const [similarLoading, setSimilarLoading] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
@@ -108,6 +119,33 @@ export default function ListingDetailScreen() {
 
     return () => { cancelled = true; };
   }, [id]);
+
+  // Fetch similar listings when main listing is loaded
+  useEffect(() => {
+    if (!listing) return;
+    const categoryId = listing.category?.id;
+    const cityId = listing.city?.id;
+    if (!categoryId || !cityId) return;
+
+    let cancelled = false;
+    setSimilarLoading(true);
+    (async () => {
+      const params = new URLSearchParams({
+        category: categoryId,
+        city: cityId,
+        limit: '4',
+        exclude: listing.id,
+      });
+      const res = await api.get<{ listings: SimilarListing[] }>(`/listings?${params.toString()}`);
+      if (cancelled) return;
+      if (res.ok && res.data) {
+        setSimilarListings(res.data.listings);
+      }
+      setSimilarLoading(false);
+    })();
+
+    return () => { cancelled = true; };
+  }, [listing]);
 
   // Check if favorited (only for logged-in users)
   useEffect(() => {
@@ -412,6 +450,60 @@ export default function ListingDetailScreen() {
             <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
           </View>
         </TouchableOpacity>
+
+        {/* Similar listings */}
+        {(similarLoading || similarListings.length > 0) && (
+          <View className="px-4 mb-6">
+            <Text className="text-text-primary text-base font-semibold mb-3">{t('similarListings')}</Text>
+            {similarLoading ? (
+              <ActivityIndicator size="small" color={colors.brandPrimary} />
+            ) : (
+              <View className="flex-row flex-wrap gap-3">
+                {similarListings.map((item) => {
+                  const cityName = i18n.language === 'en'
+                    ? (item.city?.nameEn || item.city?.nameRu || '')
+                    : i18n.language === 'ka'
+                    ? (item.city?.nameKa || item.city?.nameRu || '')
+                    : (item.city?.nameRu || '');
+                  const imageUrl = item.photos[0]?.url;
+                  const priceText = item.price != null
+                    ? `${item.price.toLocaleString()} ${item.currency}`
+                    : t('negotiable');
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      className="bg-surface-card rounded-lg border border-border overflow-hidden"
+                      style={{ width: '47%' }}
+                      onPress={() => router.push(`/listings/${item.id}`)}
+                      activeOpacity={0.7}
+                    >
+                      {imageUrl ? (
+                        <Image
+                          source={{ uri: imageUrl }}
+                          style={{ width: '100%', height: 110 }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={{ width: '100%', height: 110 }} className="bg-surface items-center justify-center">
+                          <Ionicons name="image-outline" size={24} color="#C8E0E8" />
+                        </View>
+                      )}
+                      <View className="p-2 gap-1">
+                        <Text className="text-text-primary text-sm font-semibold" numberOfLines={2}>
+                          {item.title}
+                        </Text>
+                        <Text className="text-primary text-sm font-bold">{priceText}</Text>
+                        {cityName ? (
+                          <Text className="text-text-muted text-xs" numberOfLines={1}>{cityName}</Text>
+                        ) : null}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
 
       {/* Bottom action bar */}
