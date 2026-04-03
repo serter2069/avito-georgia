@@ -8,11 +8,11 @@ interface BurgerMenuProps {
 
 const NAV_ITEMS: { icon: keyof typeof Ionicons.glyphMap; label: string; path: string }[] = [
   { icon: 'home-outline', label: 'Главная', path: '/' },
-  { icon: 'list-outline', label: 'Объявления', path: '/listings' },
+  { icon: 'grid-outline', label: 'Объявления', path: '/listings' },
   { icon: 'add-circle-outline', label: 'Создать', path: '/listings/create' },
   { icon: 'chatbubble-outline', label: 'Сообщения', path: '/dashboard/messages' },
   { icon: 'heart-outline', label: 'Избранное', path: '/dashboard/favorites' },
-  { icon: 'person-outline', label: 'Профиль', path: '/dashboard/profile' },
+  { icon: 'person-circle-outline', label: 'Профиль', path: '/dashboard/profile' },
   { icon: 'settings-outline', label: 'Настройки', path: '/dashboard/settings' },
 ];
 
