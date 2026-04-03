@@ -87,10 +87,10 @@ export default function ListingDetailScreen() {
     let cancelled = false;
 
     (async () => {
-      const res = await api.get<{ favorites: Array<{ listing: { id: string } }> }>('/favorites?page=1');
+      const res = await api.get<{ isFavorited: boolean }>(`/favorites/${id}/check`);
       if (cancelled) return;
       if (res.ok && res.data) {
-        setIsFavorited(res.data.favorites.some(f => f.listing.id === id));
+        setIsFavorited(res.data.isFavorited);
       }
     })();
 
