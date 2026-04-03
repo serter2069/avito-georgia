@@ -2,12 +2,16 @@ import '../global.css';
 import '../lib/i18n';
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { View, ActivityIndicator, Platform } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAuthStore } from '../stores/authStore';
 import { useAuthRefresh } from '../hooks/useAuthRefresh';
 import { colors } from '../lib/colors';
+import { useBreakpoint, isDesktop } from '../lib/responsive';
+import { Header } from '../components/layout/Header';
 import { BottomNav } from '../components/layout/BottomNav';
+import { DesktopSidebar } from '../components/layout/DesktopSidebar';
 
 function useProtectedRoute() {
   const user = useAuthStore((s) => s.user);
@@ -43,6 +47,7 @@ function useProtectedRoute() {
 export default function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate);
   const isReady = useAuthStore((s) => s.isReady);
+  const breakpoint = useBreakpoint();
 
   useEffect(() => {
     hydrate();
@@ -54,23 +59,43 @@ export default function RootLayout() {
 
   if (!isReady) {
     return (
-      <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth: 430, ...(Platform.OS === 'web' ? { height: '100vh' } as any : {}) }}>
-        <ActivityIndicator size="large" color={colors.brandPrimary} />
-      </View>
+      <SafeAreaProvider>
+        <View style={{ flex: 1, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color={colors.brandPrimary} />
+        </View>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth: 430, ...(Platform.OS === 'web' ? { height: '100vh' } as any : {}) }}>
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.bgPrimary },
-          sceneContainerStyle: { backgroundColor: colors.bgPrimary },
-        }}
-      />
-      <BottomNav />
-    </View>
+    <SafeAreaProvider>
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+        <StatusBar style="dark" />
+        <Header />
+        {isDesktop(breakpoint) ? (
+          <View style={{ flex: 1, flexDirection: 'row' }}>
+            <DesktopSidebar />
+            <View style={{ flex: 1, maxWidth: 1280 }}>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: '#FFFFFF' },
+                }}
+              />
+            </View>
+          </View>
+        ) : (
+          <>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: '#FFFFFF' },
+              }}
+            />
+            <BottomNav />
+          </>
+        )}
+      </View>
+    </SafeAreaProvider>
   );
 }
