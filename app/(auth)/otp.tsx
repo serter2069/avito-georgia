@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { api } from '../../lib/api';
@@ -13,6 +13,7 @@ export default function OtpScreen() {
   const { t } = useTranslation();
   const { email } = useLocalSearchParams<{ email: string }>();
   const setAuth = useAuthStore((s) => s.setAuth);
+  const router = useRouter();
 
   const [code, setCode] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [error, setError] = useState('');
@@ -76,7 +77,7 @@ export default function OtpScreen() {
       const res = await api.post<{
         accessToken: string;
         refreshToken: string;
-        user: { id: string; email: string; role: string };
+        user: { id: string; email: string; role: string; isOnboarded: boolean };
       }>('/auth/verify-otp', { email, code: otp });
 
       if (res.ok && res.data) {
@@ -91,6 +92,12 @@ export default function OtpScreen() {
         });
         // Persist tokens to storage (fire-and-forget, non-blocking)
         setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+        // Route based on onboarding status
+        if (!res.data.user.isOnboarded) {
+          router.replace('/onboarding');
+        } else {
+          router.replace('/');
+        }
       } else {
         setError(res.error || t('invalidCode'));
       }

@@ -20,6 +20,7 @@ function useProtectedRoute() {
     if (!isReady) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    const inOnboarding = segments[0] === 'onboarding';
     // Public routes accessible without auth
     const inPublicRoute =
       segments.length === 0 || // home
@@ -35,7 +36,13 @@ function useProtectedRoute() {
 
     if (!user && inDashboard) {
       router.replace('/(auth)');
+    } else if (!user && inOnboarding) {
+      // Unauthenticated users cannot access onboarding
+      router.replace('/(auth)');
     } else if (user && inAuthGroup) {
+      router.replace('/');
+    } else if (user && inOnboarding && user.isOnboarded === true) {
+      // Already onboarded users skip the onboarding screen
       router.replace('/');
     }
   }, [user, isReady, segments]);

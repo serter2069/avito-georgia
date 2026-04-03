@@ -38,10 +38,12 @@ model User {
   name      String?
   phone     String?
   avatarUrl String?
-  role      String   @default("user")
-  locale    String   @default("ru")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role        String   @default("user")
+  locale      String   @default("ru")
+  city        String?
+  isOnboarded Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   otpCodes      OtpCode[]
   sessions      Session[]
