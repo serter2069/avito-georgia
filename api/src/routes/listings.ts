@@ -5,6 +5,7 @@ import { z, ZodError } from 'zod';
 import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
+import { geocodeCity } from '../lib/geocoder';
 import xss from 'xss';
 
 const router = Router();
@@ -281,6 +282,16 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
     }
   }
   const expiresAt = isDraft ? null : new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  // Geocode city coordinates — best-effort, never blocks listing creation
+  let lat: number | null = null;
+  let lng: number | null = null;
+  if (cityId) {
+    const cityRecord = await prisma.city.findUnique({ where: { id: cityId }, select: { nameEn: true } });
+    if (cityRecord?.nameEn) {
+      const coords = await geocodeCity(cityRecord.nameEn);
+      if (coords) { lat = coords.lat; lng = coords.lng; }
+    }
+  }
   try {
     const listing = await prisma.listing.create({
       data: {
@@ -294,6 +305,8 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
         userId,
         status: isDraft ? 'draft' : 'active',
         expiresAt,
+        lat,
+        lng,
       },
     });
     res.status(201).json(listing);
@@ -328,12 +341,24 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   // Sanitize only fields present in the request body to strip HTML tags (XSS prevention)
   const safeTitle = title !== undefined ? xss(title) : title;
   const safeDescription = description !== undefined ? xss(description) : description;
+  // Re-geocode if cityId is being changed
+  let coordsUpdate: { lat?: number | null; lng?: number | null } = {};
+  if (cityId !== undefined) {
+    const city = await prisma.city.findUnique({ where: { id: cityId }, select: { nameEn: true } });
+    if (city?.nameEn) {
+      const coords = await geocodeCity(city.nameEn);
+      coordsUpdate = { lat: coords?.lat ?? null, lng: coords?.lng ?? null };
+    } else {
+      coordsUpdate = { lat: null, lng: null };
+    }
+  }
   const updated = await prisma.listing.update({
     where: { id },
     data: {
       title: safeTitle, description: safeDescription,
       price: newPrice,
       currency, categoryId, cityId, districtId,
+      ...coordsUpdate,
     },
   });
 
