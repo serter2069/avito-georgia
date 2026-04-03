@@ -28,6 +28,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
       res.status(401).json({ error: 'Invalid token type' });
       return;
     }
+    if (payload.role === 'blocked') {
+      res.status(403).json({ error: 'Account suspended' });
+      return;
+    }
     req.user = { userId: payload.userId, email: payload.email, role: payload.role };
     next();
   } catch {
