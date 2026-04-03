@@ -1,8 +1,8 @@
 export const colors = {
-  bgPrimary: '#F2F8FA',
-  bgSecondary: '#E8F4F8',
-  bgSurface: '#E8F4F8',
-  bgCard: '#FFFFFF',
+  bgPrimary: '#ffffff',
+  bgSecondary: '#ffffff',
+  bgSurface: '#f5f5f5',
+  bgCard: '#ffffff',
   textPrimary: '#0A2840',
   textSecondary: '#1A4A6E',
   textMuted: '#6A8898',

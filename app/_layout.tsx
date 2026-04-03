@@ -2,7 +2,7 @@ import '../global.css';
 import '../lib/i18n';
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../stores/authStore';
 import { useAuthRefresh } from '../hooks/useAuthRefresh';
@@ -39,9 +39,19 @@ function useProtectedRoute() {
   }, [user, isReady, segments]);
 }
 
+/** Returns responsive maxWidth based on screen width */
+function useResponsiveMaxWidth() {
+  const { width } = useWindowDimensions();
+  if (Platform.OS !== 'web') return 430;
+  if (width < 768) return 430;
+  if (width < 1024) return 700;
+  return 1200;
+}
+
 export default function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate);
   const isReady = useAuthStore((s) => s.isReady);
+  const maxWidth = useResponsiveMaxWidth();
 
   useEffect(() => {
     hydrate();
@@ -53,14 +63,14 @@ export default function RootLayout() {
 
   if (!isReady) {
     return (
-      <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth: 430 }}>
+      <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth }}>
         <ActivityIndicator size="large" color={colors.brandPrimary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth: 430 }}>
+    <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth }}>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{

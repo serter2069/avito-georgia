@@ -16,7 +16,7 @@ export function Footer({ onNavigate }: FooterProps) {
   ] as const;
 
   return (
-    <View className="bg-dark-secondary border-t border-border px-4 py-4">
+    <View className="bg-white border-t border-border px-4 py-4">
       <View className="flex-row justify-center gap-4 mb-2">
         {links.map((link) => (
           <TouchableOpacity

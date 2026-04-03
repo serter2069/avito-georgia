@@ -10,6 +10,7 @@ import { CategoryType } from '../../components/common/CategoryIcon';
 import { CategoryFilters, CustomField, FilterValues } from '../../components/filters/CategoryFilters';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
+import { useResponsive } from '../../hooks/useResponsive';
 
 const CATEGORIES: CategoryType[] = [
   'transport',
@@ -94,10 +95,14 @@ export default function ListingsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
   const { width } = useWindowDimensions();
+  const { isMobile, isTablet, isDesktop, listingColumns, sidebarWidth, maxWidth } = useResponsive();
 
-  // Max 430px as per root layout, minus padding (16*2) minus gap (12)
-  const containerWidth = Math.min(width, 430);
-  const itemWidth = (containerWidth - 32 - 12) / 2;
+  // Responsive item width calculation
+  const padding = 32; // px-4 * 2
+  const gap = 12;
+  const availableWidth = Math.min(width, maxWidth) - padding - (isDesktop ? sidebarWidth + 16 : 0);
+  const cols = isDesktop ? 3 : 2;
+  const itemWidth = (availableWidth - gap * (cols - 1)) / cols;
 
   const [selectedCity, setSelectedCity] = useState<City>('all');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
@@ -125,7 +130,6 @@ export default function ListingsScreen() {
       setCustomFilterValues({});
       return;
     }
-    // Find category in /api/categories list (already loaded or fetch fresh)
     api.get<ApiCategory[]>('/categories').then((res) => {
       if (res.ok && res.data) {
         const cat = res.data.find((c) => c.slug === slug);
@@ -141,7 +145,6 @@ export default function ListingsScreen() {
     if (selectedCity !== 'all') parts.push(`city=${selectedCity}`);
     parts.push(`sort=${sortBy}`);
     parts.push(`page=${p}`);
-    // Append custom filter values as query params
     Object.entries(customFilterValues).forEach(([key, val]) => {
       if (val) parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(val)}`);
     });
@@ -205,65 +208,112 @@ export default function ListingsScreen() {
     );
   };
 
-  const renderHeader = () => (
-    <View>
-      {/* City filter */}
-      <CitySelector selected={selectedCity} onSelect={setSelectedCity} />
-
-      {/* Category tabs */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-2 px-4 py-2"
-      >
+  // Desktop sidebar filters
+  const renderDesktopSidebar = () => (
+    <View style={{ width: sidebarWidth, paddingRight: 16 }}>
+      <Text className="text-text-primary text-base font-bold mb-3">{t('category')}</Text>
+      <View className="gap-1 mb-4">
         <TouchableOpacity
-          className={`px-3 py-1.5 rounded-full border ${
-            !selectedCategory ? 'bg-primary border-primary' : 'border-border'
-          }`}
+          className={`px-3 py-2 rounded-lg ${!selectedCategory ? 'bg-primary' : ''}`}
           onPress={() => setSelectedCategory(null)}
         >
-          <Text className={`text-xs font-medium ${
-            !selectedCategory ? 'text-white' : 'text-text-secondary'
-          }`}>
+          <Text className={`text-sm font-medium ${!selectedCategory ? 'text-white' : 'text-text-secondary'}`}>
             {t('all')}
           </Text>
         </TouchableOpacity>
         {CATEGORIES.map((cat) => (
           <TouchableOpacity
             key={cat}
-            className={`px-3 py-1.5 rounded-full border ${
-              selectedCategory === cat ? 'bg-primary border-primary' : 'border-border'
-            }`}
+            className={`px-3 py-2 rounded-lg ${selectedCategory === cat ? 'bg-primary' : ''}`}
             onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
           >
-            <Text className={`text-xs font-medium ${
-              selectedCategory === cat ? 'text-white' : 'text-text-secondary'
-            }`}>
+            <Text className={`text-sm font-medium ${selectedCategory === cat ? 'text-white' : 'text-text-secondary'}`}>
               {t(cat)}
             </Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
 
-      {/* Category-specific filters — collapsed behind Filters button */}
+      {/* City filter */}
+      <Text className="text-text-primary text-base font-bold mb-2">{t('allCities')}</Text>
+      <CitySelector selected={selectedCity} onSelect={setSelectedCity} />
+
+      {/* Category-specific filters */}
       {customFields.length > 0 && (
-        <View className="px-4 pb-2">
-          <TouchableOpacity
-            className="flex-row items-center gap-1 px-3 py-1.5 rounded-full border border-border self-start"
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <Ionicons name="options-outline" size={14} color={colors.textSecondary} />
-            <Text className="text-text-secondary text-xs font-medium">{t('filters')}</Text>
-            <Ionicons name={showFilters ? 'chevron-up' : 'chevron-down'} size={12} color={colors.textMuted} />
-          </TouchableOpacity>
+        <View className="mt-4">
+          <CategoryFilters
+            customFields={customFields}
+            values={customFilterValues}
+            onChange={setCustomFilterValues}
+          />
         </View>
       )}
-      {showFilters && customFields.length > 0 && (
-        <CategoryFilters
-          customFields={customFields}
-          values={customFilterValues}
-          onChange={setCustomFilterValues}
-        />
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View>
+      {/* Mobile/Tablet: inline filters */}
+      {!isDesktop && (
+        <>
+          <CitySelector selected={selectedCity} onSelect={setSelectedCity} />
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="gap-2 px-4 py-2"
+          >
+            <TouchableOpacity
+              className={`px-3 py-1.5 rounded-full border ${
+                !selectedCategory ? 'bg-primary border-primary' : 'border-border'
+              }`}
+              onPress={() => setSelectedCategory(null)}
+            >
+              <Text className={`text-xs font-medium ${
+                !selectedCategory ? 'text-white' : 'text-text-secondary'
+              }`}>
+                {t('all')}
+              </Text>
+            </TouchableOpacity>
+            {CATEGORIES.map((cat) => (
+              <TouchableOpacity
+                key={cat}
+                className={`px-3 py-1.5 rounded-full border ${
+                  selectedCategory === cat ? 'bg-primary border-primary' : 'border-border'
+                }`}
+                onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+              >
+                <Text className={`text-xs font-medium ${
+                  selectedCategory === cat ? 'text-white' : 'text-text-secondary'
+                }`}>
+                  {t(cat)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Category-specific filters — collapsed behind Filters button */}
+          {customFields.length > 0 && (
+            <View className="px-4 pb-2">
+              <TouchableOpacity
+                className="flex-row items-center gap-1 px-3 py-1.5 rounded-full border border-border self-start"
+                onPress={() => setShowFilters(!showFilters)}
+              >
+                <Ionicons name="options-outline" size={14} color={colors.textSecondary} />
+                <Text className="text-text-secondary text-xs font-medium">{t('filters')}</Text>
+                <Ionicons name={showFilters ? 'chevron-up' : 'chevron-down'} size={12} color={colors.textMuted} />
+              </TouchableOpacity>
+            </View>
+          )}
+          {showFilters && customFields.length > 0 && (
+            <CategoryFilters
+              customFields={customFields}
+              values={customFilterValues}
+              onChange={setCustomFilterValues}
+            />
+          )}
+        </>
+
       )}
 
       {/* Sort + count */}
@@ -306,10 +356,8 @@ export default function ListingsScreen() {
     </View>
   );
 
-  return (
-    <View className="flex-1 bg-dark">
-      <Header title={t('listings')} />
-
+  const listContent = (
+    <>
       {loading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.brandPrimary} />
@@ -320,7 +368,8 @@ export default function ListingsScreen() {
           data={listings}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          numColumns={2}
+          numColumns={cols}
+          key={`cols-${cols}`}
           columnWrapperClassName="px-4 justify-between"
           ListHeaderComponent={renderHeader}
           ListEmptyComponent={renderEmpty}
@@ -329,6 +378,23 @@ export default function ListingsScreen() {
           onEndReachedThreshold={0.3}
           contentContainerClassName="pb-4"
         />
+      )}
+    </>
+  );
+
+  return (
+    <View className="flex-1 bg-dark">
+      <Header title={t('listings')} />
+
+      {isDesktop ? (
+        <View style={{ flexDirection: 'row', flex: 1, paddingLeft: 16, paddingTop: 12 }}>
+          {renderDesktopSidebar()}
+          <View style={{ flex: 1 }}>
+            {listContent}
+          </View>
+        </View>
+      ) : (
+        listContent
       )}
     </View>
   );
