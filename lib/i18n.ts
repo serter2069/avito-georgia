@@ -337,6 +337,7 @@ const resources = {
       phone: 'Телефон',
       showPhone: 'Показать телефон',
       phoneNotSpecified: 'Телефон не указан',
+      changePhoto: 'Изменить фото',
     },
   },
   en: {
@@ -635,6 +636,7 @@ const resources = {
       phone: 'Phone',
       showPhone: 'Show phone number',
       phoneNotSpecified: 'Phone not specified',
+      changePhoto: 'Change photo',
     },
   },
   ka: {
@@ -933,6 +935,7 @@ const resources = {
       phone: 'ტელეფონი',
       showPhone: 'ტელეფონის ნახვა',
       phoneNotSpecified: 'ტელეფონი მითითებული არ არის',
+      changePhoto: 'ფოტოს შეცვლა',
     },
   },
 };
