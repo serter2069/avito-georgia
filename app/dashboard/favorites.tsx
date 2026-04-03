@@ -79,7 +79,7 @@ export default function FavoritesScreen() {
   };
 
   const handleListingPress = (id: string) => {
-    // Navigate to listing detail when route is ready
+    router.push(`/listings/${id}`);
   };
 
   const renderItem = ({ item }: { item: FavoriteItem }) => (
