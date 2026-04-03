@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useBreakpoint } from '../../lib/responsive';
+import { useBreakpoint, isDesktop } from '../../lib/responsive';
 import { useAuthStore } from '../../stores/authStore';
 import { BurgerMenu } from './BurgerMenu';
 
@@ -59,6 +59,7 @@ export function Header() {
   const [burgerOpen, setBurgerOpen] = useState(false);
 
   const isMobileView = breakpoint === 'mobile';
+  const isDesktopView = isDesktop(breakpoint);
 
   return (
     <>
@@ -110,29 +111,32 @@ export function Header() {
           </>
         ) : (
           <>
-            {/* Desktop/Tablet: logo + nav links + lang switcher + avatar/login */}
+            {/* Tablet/Desktop: logo + (nav links on tablet only) + lang switcher + avatar/login */}
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#0A2840' }}>
               Avito Georgia
             </Text>
 
-            <View style={{ flexDirection: 'row', gap: 24, alignItems: 'center' }}>
-              {NAV_LINKS.map((link) => {
-                const active = pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path));
-                return (
-                  <TouchableOpacity key={link.path} onPress={() => router.push(link.path as any)}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: active ? '600' : '400',
-                        color: active ? '#0A7B8A' : '#0A2840',
-                      }}
-                    >
-                      {link.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            {/* Nav links only on tablet — desktop uses DesktopSidebar for navigation */}
+            {!isDesktopView && (
+              <View style={{ flexDirection: 'row', gap: 24, alignItems: 'center' }}>
+                {NAV_LINKS.map((link) => {
+                  const active = pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path));
+                  return (
+                    <TouchableOpacity key={link.path} onPress={() => router.push(link.path as any)}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: active ? '600' : '400',
+                          color: active ? '#0A7B8A' : '#0A2840',
+                        }}
+                      >
+                        {link.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
 
             <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
               <LanguageSwitcher />
