@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useResponsive } from '../../hooks/useResponsive';
 import { useAuthStore } from '../../stores/authStore';
+import { setStoredLang } from '../../lib/i18n';
 
 const LANGUAGES = [
   { code: 'ru', label: 'RU' },
@@ -24,8 +25,9 @@ export function Header({ title, showLanguageSwitcher = true }: HeaderProps) {
   const user = useAuthStore((s) => s.user);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const switchLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
+  const switchLanguage = async (lang: string) => {
+    await i18n.changeLanguage(lang);
+    await setStoredLang(lang);
   };
 
   const navigateTo = (path: string) => {

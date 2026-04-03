@@ -1,5 +1,6 @@
 import '../global.css';
 import '../lib/i18n';
+import { initI18n } from '../lib/i18n';
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
@@ -55,6 +56,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     hydrate();
+    initI18n();
   }, []);
 
   // Proactive token refresh: every 20 min + on tab/app focus (auth.md Level 2)
