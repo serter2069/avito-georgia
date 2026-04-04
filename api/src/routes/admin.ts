@@ -1,7 +1,11 @@
 import { Router, Request, Response } from 'express';
+import { ListingStatus } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireAdmin } from '../middleware/auth';
 import { sendListingApprovedEmail, sendListingRejectedEmail } from '../lib/mail';
+import { isValidAdminTransition, getAdminAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
+
+const LISTING_EXPIRY_DAYS = 30;
 
 const router = Router();
 
@@ -164,15 +168,14 @@ router.get('/listings/pending', async (req: Request, res: Response) => {
   res.json({ listings, total, page, totalPages: Math.ceil(total / limit) });
 });
 
-// PATCH /api/admin/listings/:id/status — admin can approve/reject listings
+// PATCH /api/admin/listings/:id/status — admin status transitions (state machine)
 router.patch('/listings/:id/status', async (req: Request, res: Response) => {
 
   const id = req.params.id as string;
   const { status, rejectReason } = req.body;
 
-  const allowedStatuses = ['active', 'removed', 'rejected', 'pending_moderation'];
-  if (!status || !allowedStatuses.includes(status)) {
-    res.status(400).json({ error: `status must be one of: ${allowedStatuses.join(', ')}` });
+  if (!status || !ALL_LISTING_STATUSES.includes(status)) {
+    res.status(400).json({ error: `Invalid status. Must be one of: ${ALL_LISTING_STATUSES.join(', ')}` });
     return;
   }
 
@@ -185,11 +188,28 @@ router.patch('/listings/:id/status', async (req: Request, res: Response) => {
     return;
   }
 
-  const updateData: Record<string, any> = { status };
-  if (status === 'rejected') {
+  const currentStatus = listing.status as ListingStatus;
+  const targetStatus = status as ListingStatus;
+
+  // Validate transition using state machine
+  if (!isValidAdminTransition(currentStatus, targetStatus)) {
+    const allowed = getAdminAllowedTransitions(currentStatus);
+    res.status(400).json({
+      error: `Invalid status transition from '${currentStatus}' to '${targetStatus}'`,
+      allowedTransitions: allowed,
+    });
+    return;
+  }
+
+  const updateData: Record<string, any> = { status: targetStatus };
+  if (targetStatus === 'rejected') {
     updateData.rejectionReason = rejectReason || null;
-  } else if (status === 'active') {
+  } else if (targetStatus === 'active') {
     updateData.rejectionReason = null;
+    // Set activation timestamp and expiry when admin approves
+    const now = new Date();
+    updateData.activatedAt = now;
+    updateData.expiresAt = new Date(now.getTime() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
   }
 
   const updated = await prisma.listing.update({
@@ -199,10 +219,10 @@ router.patch('/listings/:id/status', async (req: Request, res: Response) => {
 
   // Send email notification to the listing owner
   const userEmail = listing.user.email;
-  if (status === 'active') {
+  if (targetStatus === 'active') {
     sendListingApprovedEmail(userEmail, listing.title)
       .catch(err => console.error('Approval email error:', err));
-  } else if (status === 'rejected') {
+  } else if (targetStatus === 'rejected') {
     sendListingRejectedEmail(userEmail, listing.title, rejectReason || null)
       .catch(err => console.error('Rejection email error:', err));
   }

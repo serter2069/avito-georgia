@@ -2,11 +2,11 @@ import cron from 'node-cron';
 import { prisma } from '../lib/prisma';
 import { sendExpiryReminderEmail } from '../lib/mail';
 
-// Run daily at 03:00 UTC — mark expired listings as removed
+// Run daily at 03:00 UTC — mark expired listings with 'expired' status
 // Run daily at 09:00 UTC — send expiry reminder emails (3 days before expiry)
 // Run hourly — deactivate expired promotions
 export function startCleanupCron(): void {
-  // Listings cleanup: daily at 03:00 UTC
+  // Listings expiry: daily at 03:00 UTC — active listings past expiresAt → expired
   cron.schedule('0 3 * * *', async () => {
     try {
       const result = await prisma.listing.updateMany({
@@ -14,9 +14,9 @@ export function startCleanupCron(): void {
           status: 'active',
           expiresAt: { lt: new Date() },
         },
-        data: { status: 'removed' },
+        data: { status: 'expired' },
       });
-      console.log(`[cron] cleanup: marked ${result.count} expired listings as removed`);
+      console.log(`[cron] cleanup: marked ${result.count} expired listings as expired`);
     } catch (err) {
       console.error('[cron] cleanup error:', err);
     }
@@ -100,7 +100,7 @@ export function startCleanupCron(): void {
     }
   });
 
-  console.log('[cron] Listing cleanup scheduled (daily 03:00 UTC)');
+  console.log('[cron] Listing expiry scheduled (daily 03:00 UTC)');
   console.log('[cron] Expiry reminder scheduled (daily 09:00 UTC)');
   console.log('[cron] Promotion cleanup scheduled (hourly)');
 }

@@ -2,10 +2,12 @@ import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import { Prisma } from '@prisma/client';
 import { z, ZodError } from 'zod';
+import { ListingStatus } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
 import { geocodeCity } from '../lib/geocoder';
+import { isValidOwnerTransition, getOwnerAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
 import xss from 'xss';
 
 const router = Router();
@@ -281,7 +283,8 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
       }
     }
   }
-  const expiresAt = isDraft ? null : new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  // Non-draft listings go to pending_moderation for admin review
+  const initialStatus: ListingStatus = isDraft ? 'draft' : 'pending_moderation';
   // Geocode city coordinates — best-effort, never blocks listing creation
   let lat: number | null = null;
   let lng: number | null = null;
@@ -303,8 +306,7 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
         cityId,
         districtId,
         userId,
-        status: isDraft ? 'draft' : 'active',
-        expiresAt,
+        status: initialStatus,
         lat,
         lng,
       },
@@ -388,30 +390,41 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   res.json(updated);
 });
 
-// PATCH /api/listings/:id/status
+// PATCH /api/listings/:id/status — owner status transitions (state machine)
 router.patch('/:id/status', requireAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const listing = await prisma.listing.findUnique({ where: { id } });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
   if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
+
   const { status } = req.body;
-  if (!['sold', 'removed', 'active'].includes(status)) {
-    res.status(400).json({ error: 'status must be sold, removed, or active' }); return;
+  if (!status || !ALL_LISTING_STATUSES.includes(status)) {
+    res.status(400).json({ error: `Invalid status. Must be one of: ${ALL_LISTING_STATUSES.join(', ')}` }); return;
   }
-  // Publishing a draft: validate required fields and set expiresAt
-  if (status === 'active' && listing.status === 'draft') {
+
+  const currentStatus = listing.status as ListingStatus;
+  const targetStatus = status as ListingStatus;
+
+  // Validate transition using state machine
+  if (!isValidOwnerTransition(currentStatus, targetStatus)) {
+    const allowed = getOwnerAllowedTransitions(currentStatus);
+    res.status(400).json({
+      error: `Invalid status transition from '${currentStatus}' to '${targetStatus}'`,
+      allowedTransitions: allowed,
+    }); return;
+  }
+
+  // Submitting for moderation: validate required fields
+  if (targetStatus === 'pending_moderation' && (currentStatus === 'draft' || currentStatus === 'rejected' || currentStatus === 'expired')) {
     if (!listing.title || listing.title === 'Draft' || !listing.categoryId || !listing.cityId) {
-      res.status(400).json({ error: 'Draft is missing required fields (title, category, city)' }); return;
+      res.status(400).json({ error: 'Listing is missing required fields (title, category, city)' }); return;
     }
-    const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-    const published = await prisma.listing.update({ where: { id }, data: { status: 'active', expiresAt } });
-    res.json(published);
-    return;
   }
-  const updated = await prisma.listing.update({ where: { id }, data: { status } });
+
+  const updated = await prisma.listing.update({ where: { id }, data: { status: targetStatus } });
 
   // Notify favoriters when listing is removed
-  if (status === 'removed') {
+  if (targetStatus === 'removed') {
     const favorites = await prisma.favorite.findMany({
       where: { listingId: id },
       include: { user: { select: { id: true, email: true } } },
