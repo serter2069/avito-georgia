@@ -10,6 +10,7 @@ const TABS = [
   { key: 'adminDashboard', path: '/admin' },
   { key: 'adminModeration', path: '/admin/moderation' },
   { key: 'adminUsers', path: '/admin/users' },
+  { key: 'adminCategories', path: '/admin/categories' },
   { key: 'adminPayments', path: '/admin/payments' },
   { key: 'adminReports', path: '/admin/reports' },
 ] as const;

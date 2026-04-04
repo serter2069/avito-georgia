@@ -61,6 +61,10 @@ export default function CreateListingScreen() {
   // Step 4: Photos
   const [photos, setPhotos] = useState<PhotoAsset[]>([]);
 
+  // Quota info for selected category
+  const [quotaInfo, setQuotaInfo] = useState<{ used: number; freeQuota: number; remaining: number; paidPrice: number } | null>(null);
+  const [loadingQuota, setLoadingQuota] = useState(false);
+
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -144,6 +148,22 @@ export default function CreateListingScreen() {
       );
     }
   }, [user]);
+
+  // Fetch quota when category changes
+  useEffect(() => {
+    if (!selectedCategoryId || !user) {
+      setQuotaInfo(null);
+      return;
+    }
+    setLoadingQuota(true);
+    (async () => {
+      const res = await api.get<{ used: number; freeQuota: number; remaining: number; paidPrice: number }>(`/categories/${selectedCategoryId}/quota`);
+      if (res.ok && res.data) {
+        setQuotaInfo(res.data);
+      }
+      setLoadingQuota(false);
+    })();
+  }, [selectedCategoryId, user]);
 
   // Fetch categories
   useEffect(() => {
@@ -349,6 +369,26 @@ export default function CreateListingScreen() {
       )}
       {errors.category && (
         <Text className="text-error text-xs">{errors.category}</Text>
+      )}
+
+      {/* Quota status for selected category */}
+      {selectedCategoryId && quotaInfo && !loadingQuota && (
+        <View className={`p-3 rounded-lg border ${quotaInfo.remaining > 0 ? 'border-border bg-surface-card' : 'border-error/50 bg-error/10'}`}>
+          <Text className="text-text-secondary text-xs">
+            {t('remainingFree')}: <Text className={`font-semibold ${quotaInfo.remaining > 0 ? 'text-primary' : 'text-error'}`}>{quotaInfo.remaining}/{quotaInfo.freeQuota}</Text>
+          </Text>
+          {quotaInfo.remaining === 0 && quotaInfo.paidPrice > 0 && (
+            <Text className="text-text-muted text-xs mt-1">
+              {t('paidListing')}: {quotaInfo.paidPrice} GEL
+            </Text>
+          )}
+          {quotaInfo.remaining === 0 && quotaInfo.paidPrice === 0 && (
+            <Text className="text-error text-xs mt-1">{t('quotaExceeded')}</Text>
+          )}
+        </View>
+      )}
+      {selectedCategoryId && loadingQuota && (
+        <ActivityIndicator size="small" color={colors.brandPrimary} />
       )}
     </View>
   );
