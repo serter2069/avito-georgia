@@ -87,14 +87,16 @@ model Session {
 }
 
 model Category {
-  id           String     @id @default(cuid())
-  name         String
-  slug         String     @unique
-  customFields Json?
-  parentId     String?
-  parent       Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
-  children     Category[] @relation("CategoryChildren")
-  listings     Listing[]
+  id               String     @id @default(cuid())
+  name             String
+  slug             String     @unique
+  customFields     Json?
+  freeListingQuota Int        @default(5)
+  paidListingPrice Float      @default(0.0)
+  parentId         String?
+  parent           Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children         Category[] @relation("CategoryChildren")
+  listings         Listing[]
 }
 
 model City {

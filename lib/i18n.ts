@@ -412,6 +412,14 @@ const resources = {
       reportReasonOther: 'Другое',
       reportSuccess: 'Жалоба отправлена',
       reportError: 'Не удалось отправить жалобу',
+
+      // Category monetization
+      freeQuota: 'Бесплатная квота',
+      quotaExceeded: 'Лимит бесплатных объявлений в этой категории исчерпан',
+      paidListing: 'Платное размещение',
+      pricePerListing: 'Цена за объявление',
+      remainingFree: 'Осталось бесплатных',
+      adminCategories: 'Категории',
     },
   },
   en: {
@@ -785,6 +793,14 @@ const resources = {
       reportReasonOther: 'Other',
       reportSuccess: 'Report submitted',
       reportError: 'Failed to submit report',
+
+      // Category monetization
+      freeQuota: 'Free quota',
+      quotaExceeded: 'Free listing limit for this category has been reached',
+      paidListing: 'Paid listing',
+      pricePerListing: 'Price per listing',
+      remainingFree: 'Free remaining',
+      adminCategories: 'Categories',
     },
   },
   ka: {
@@ -1158,6 +1174,14 @@ const resources = {
       reportReasonOther: 'სხვა',
       reportSuccess: 'საჩივარი გაგზავნილია',
       reportError: 'საჩივრის გაგზავნა ვერ მოხერხდა',
+
+      // Category monetization
+      freeQuota: 'უფასო კვოტა',
+      quotaExceeded: 'ამ კატეგორიაში უფასო განცხადებების ლიმიტი ამოწურულია',
+      paidListing: 'ფასიანი განცხადება',
+      pricePerListing: 'ფასი განცხადებაზე',
+      remainingFree: 'დარჩენილი უფასო',
+      adminCategories: 'კატეგორიები',
     },
   },
 };

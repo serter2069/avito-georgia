@@ -230,4 +230,53 @@ router.patch('/listings/:id/status', async (req: Request, res: Response) => {
   res.json(updated);
 });
 
+// GET /api/admin/categories — list categories with monetization fields
+router.get('/categories', async (req: Request, res: Response) => {
+  const categories = await prisma.category.findMany({
+    orderBy: { name: 'asc' },
+    include: {
+      children: { select: { id: true, name: true, slug: true, freeListingQuota: true, paidListingPrice: true } },
+    },
+  });
+  res.json(categories);
+});
+
+// PATCH /api/admin/categories/:id — update category monetization settings
+router.patch('/categories/:id', async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { freeListingQuota, paidListingPrice } = req.body;
+
+  const category = await prisma.category.findUnique({ where: { id } });
+  if (!category) {
+    res.status(404).json({ error: 'Category not found' });
+    return;
+  }
+
+  const updateData: Record<string, any> = {};
+  if (freeListingQuota !== undefined) {
+    const quota = parseInt(freeListingQuota, 10);
+    if (isNaN(quota) || quota < 0) {
+      res.status(400).json({ error: 'freeListingQuota must be a non-negative integer' });
+      return;
+    }
+    updateData.freeListingQuota = quota;
+  }
+  if (paidListingPrice !== undefined) {
+    const price = parseFloat(paidListingPrice);
+    if (isNaN(price) || price < 0) {
+      res.status(400).json({ error: 'paidListingPrice must be a non-negative number' });
+      return;
+    }
+    updateData.paidListingPrice = price;
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    res.status(400).json({ error: 'No valid fields to update' });
+    return;
+  }
+
+  const updated = await prisma.category.update({ where: { id }, data: updateData });
+  res.json(updated);
+});
+
 export default router;

@@ -42,7 +42,6 @@ const createDraftSchema = z.object({
 const updateListingSchema = createListingSchema.partial();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
-const ACTIVE_LISTING_LIMIT = 10;
 const LISTING_EXPIRY_DAYS = 30;
 
 function qs(val: unknown): string | undefined {
@@ -258,11 +257,11 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
   const safeDescription = description ? xss(description) : description;
   const userId = req.user!.userId;
 
-  // Active listing limit check only applies to non-draft listings
+  // Per-category free listing quota check (only for non-draft listings)
   if (!isDraft) {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (user?.role !== 'admin') {
-      // Check if user has an active unlimited_sub promotion — bypasses the listing limit
+    const userRecord = await prisma.user.findUnique({ where: { id: userId } });
+    if (userRecord?.role !== 'admin') {
+      // Check if user has an active unlimited_sub promotion — bypasses quota
       const hasUnlimited = await prisma.promotion.findFirst({
         where: {
           userId,
@@ -272,14 +271,60 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
         },
       });
       if (!hasUnlimited) {
-        const activeCount = await prisma.listing.count({
+        // Load category with parent for inheritance
+        const cat = await prisma.category.findUnique({
+          where: { id: categoryId },
+          include: { parent: { select: { freeListingQuota: true, paidListingPrice: true } } },
+        });
+        // Subcategory inherits from parent if own freeListingQuota is 0
+        const freeQuota = (cat && cat.freeListingQuota === 0 && cat.parent)
+          ? cat.parent.freeListingQuota
+          : (cat?.freeListingQuota ?? 5);
+        const paidPrice = (cat && cat.freeListingQuota === 0 && cat.parent)
+          ? cat.parent.paidListingPrice
+          : (cat?.paidListingPrice ?? 0);
+
+        // Count active + pending_moderation listings in THIS category
+        const usedCount = await prisma.listing.count({
           where: {
-            userId, status: 'active',
-            OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+            userId,
+            categoryId,
+            status: { in: ['active', 'pending_moderation'] },
           },
         });
-        if (activeCount >= ACTIVE_LISTING_LIMIT) {
-          res.status(403).json({ error: `Active listing limit reached (${ACTIVE_LISTING_LIMIT})` }); return;
+
+        if (usedCount >= freeQuota) {
+          if (paidPrice === 0) {
+            // Extra listings are blocked (not purchasable)
+            res.status(402).json({
+              error: 'quota_exceeded',
+              allowPaid: false,
+              freeQuota,
+              used: usedCount,
+            });
+            return;
+          }
+          // Paid listing flow: require paymentId
+          const paymentId = req.body.paymentId as string | undefined;
+          if (!paymentId) {
+            res.status(402).json({
+              error: 'quota_exceeded',
+              allowPaid: true,
+              price: paidPrice,
+              freeQuota,
+              used: usedCount,
+            });
+            return;
+          }
+          // Verify payment: must be completed, belong to user, not yet consumed
+          const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
+          if (!payment || payment.status !== 'completed' || payment.userId !== userId || payment.listingId !== null) {
+            res.status(400).json({ error: 'Invalid or already used payment' });
+            return;
+          }
+          // Atomically mark payment as consumed (set listingId after listing creation below)
+          // We store paymentId to link after creation
+          (req as any)._quotaPaymentId = paymentId;
         }
       }
     }
@@ -312,6 +357,16 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
         lng,
       },
     });
+
+    // Atomically link payment to listing if quota was exceeded and payment was provided
+    const quotaPaymentId = (req as any)._quotaPaymentId as string | undefined;
+    if (quotaPaymentId) {
+      await prisma.payment.update({
+        where: { id: quotaPaymentId },
+        data: { listingId: listing.id },
+      });
+    }
+
     res.status(201).json(listing);
   } catch (err: any) {
     if (err?.code === 'P2003' || err?.code === 'P2025') {
