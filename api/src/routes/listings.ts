@@ -6,6 +6,7 @@ import { ListingStatus } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
+import { listingCreateRateLimit, searchRateLimit, phoneRevealRateLimit } from '../middleware/rateLimiter';
 import { geocodeCity } from '../lib/geocoder';
 import { isValidOwnerTransition, getOwnerAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
 import xss from 'xss';
@@ -107,7 +108,7 @@ router.get('/map', async (req: Request, res: Response) => {
 });
 
 // GET /api/listings
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', searchRateLimit, async (req: Request, res: Response) => {
   const q = qs(req.query.q);
   const category = qs(req.query.category);
   const city = qs(req.query.city);
@@ -227,8 +228,8 @@ router.get('/:id', async (req: Request, res: Response) => {
   res.json({ ...listing, views: listing.views + 1 });
 });
 
-// GET /api/listings/:id/phone — reveal seller phone (auth required)
-router.get('/:id/phone', requireAuth, async (req: Request, res: Response) => {
+// GET /api/listings/:id/phone — reveal seller phone (auth required, rate limited)
+router.get('/:id/phone', requireAuth, phoneRevealRateLimit, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const listing = await prisma.listing.findUnique({
     where: { id },
@@ -240,7 +241,7 @@ router.get('/:id/phone', requireAuth, async (req: Request, res: Response) => {
 });
 
 // POST /api/listings
-router.post('/', requireAuth, async (req: Request, res: Response) => {
+router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: Response) => {
   const isDraft = req.body.status === 'draft';
   let data: any;
   try {

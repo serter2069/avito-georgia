@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import xss from 'xss';
 import { requireAuth } from '../middleware/auth';
+import { chatMessageRateLimit } from '../middleware/rateLimiter';
 import { prisma } from '../lib/prisma';
 
 const router = Router();
@@ -201,7 +202,7 @@ router.post('/threads', requireAuth, async (req: Request, res: Response) => {
 });
 
 // POST /api/threads/:listingId/message — send message (creates thread on first message)
-router.post('/threads/:listingId/message', requireAuth, async (req: Request, res: Response) => {
+router.post('/threads/:listingId/message', requireAuth, chatMessageRateLimit, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
     const listingId = req.params.listingId as string;
