@@ -1,8 +1,8 @@
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
-import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
+import { otpRateLimit, otpVerifyRateLimit } from './middleware/rateLimiter';
 import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
 import { setupSocket } from './socket';
@@ -47,10 +47,12 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
-const otpLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: { error: 'Too many requests, try again later' } });
-const verifyLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many attempts' } });
-app.use('/api/auth/request-otp', otpLimiter);
-app.use('/api/auth/verify-otp', verifyLimiter);
+// Trust proxy headers when behind nginx/reverse proxy (required for correct IP-based rate limiting)
+app.set('trust proxy', 1);
+
+// Rate limiting — OTP endpoints (applied before body parser to protect against abuse)
+app.use('/api/auth/request-otp', otpRateLimit);
+app.use('/api/auth/verify-otp', otpVerifyRateLimit);
 
 // Stripe webhook needs raw body — MUST be before express.json()
 app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhookRouter);
