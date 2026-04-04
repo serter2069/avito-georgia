@@ -125,6 +125,7 @@ model Listing {
   currency    String        @default("GEL")
   status      ListingStatus @default(active)
   views       Int           @default(0)
+  activatedAt     DateTime?
   expiresAt       DateTime?
   lastRenewedAt   DateTime?
   rejectionReason String?
