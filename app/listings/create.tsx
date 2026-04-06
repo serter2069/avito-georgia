@@ -15,8 +15,11 @@ const TOTAL_STEPS = 4;
 interface Category {
   id: string;
   name: string;
+  nameKa: string;
+  nameRu: string;
+  nameEn: string;
   slug: string;
-  children?: { id: string; name: string; slug: string }[];
+  children?: { id: string; name: string; nameKa: string; nameRu: string; nameEn: string; slug: string }[];
 }
 
 interface City {
@@ -361,7 +364,7 @@ export default function CreateListingScreen() {
                   selectedCategoryId === cat.id ? 'text-primary' : 'text-text-primary'
                 }`}
               >
-                {cat.name}
+                {i18n.language === 'en' ? (cat.nameEn || cat.name) : i18n.language === 'ka' ? (cat.nameKa || cat.nameEn || cat.name) : (cat.nameRu || cat.name)}
               </Text>
             </TouchableOpacity>
           ))}

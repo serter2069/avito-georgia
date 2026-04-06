@@ -89,6 +89,9 @@ model Session {
 model Category {
   id               String     @id @default(cuid())
   name             String
+  nameKa           String     @default("")
+  nameRu           String     @default("")
+  nameEn           String     @default("")
   slug             String     @unique
   customFields     Json?
   freeListingQuota Int        @default(5)

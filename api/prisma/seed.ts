@@ -27,16 +27,16 @@ const batumiDistricts = [
 ];
 
 const categories = [
-  { slug: 'real-estate', name: 'Недвижимость' },
-  { slug: 'transport', name: 'Транспорт' },
-  { slug: 'jobs', name: 'Работа' },
-  { slug: 'electronics', name: 'Электроника' },
-  { slug: 'fashion', name: 'Одежда и мода' },
-  { slug: 'home-garden', name: 'Для дома и сада' },
-  { slug: 'pets', name: 'Животные' },
-  { slug: 'services', name: 'Услуги' },
-  { slug: 'hobbies', name: 'Хобби и отдых' },
-  { slug: 'kids', name: 'Детские товары' },
+  { slug: 'real-estate', name: 'Real Estate',       nameEn: 'Real Estate',       nameRu: 'Недвижимость',    nameKa: 'უძრავი ქონება' },
+  { slug: 'transport',   name: 'Transport',          nameEn: 'Transport',          nameRu: 'Транспорт',       nameKa: 'ტრანსპორტი' },
+  { slug: 'jobs',        name: 'Jobs',               nameEn: 'Jobs',               nameRu: 'Работа',          nameKa: 'სამუშაო' },
+  { slug: 'electronics', name: 'Electronics',        nameEn: 'Electronics',        nameRu: 'Электроника',     nameKa: 'ელექტრონიკა' },
+  { slug: 'fashion',     name: 'Fashion & Clothing', nameEn: 'Fashion & Clothing', nameRu: 'Одежда и мода',   nameKa: 'ტანსაცმელი და მოდა' },
+  { slug: 'home-garden', name: 'Home & Garden',      nameEn: 'Home & Garden',      nameRu: 'Для дома и сада', nameKa: 'სახლი და ბაღი' },
+  { slug: 'pets',        name: 'Pets',               nameEn: 'Pets',               nameRu: 'Животные',        nameKa: 'შინაური ცხოველები' },
+  { slug: 'services',    name: 'Services',           nameEn: 'Services',           nameRu: 'Услуги',          nameKa: 'მომსახურება' },
+  { slug: 'hobbies',     name: 'Hobbies & Leisure',  nameEn: 'Hobbies & Leisure',  nameRu: 'Хобби и отдых',   nameKa: 'ჰობი და დასვენება' },
+  { slug: 'kids',        name: 'Kids & Baby',        nameEn: 'Kids & Baby',        nameRu: 'Детские товары',  nameKa: 'საბავშვო საქონელი' },
 ];
 
 async function main() {
@@ -73,7 +73,7 @@ async function main() {
   for (const cat of categories) {
     await prisma.category.upsert({
       where: { slug: cat.slug },
-      update: {},
+      update: { name: cat.name, nameEn: cat.nameEn, nameRu: cat.nameRu, nameKa: cat.nameKa },
       create: cat,
     });
   }

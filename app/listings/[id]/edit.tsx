@@ -20,7 +20,7 @@ interface ListingDetail {
   categoryId: string;
   cityId: string;
   districtId: string | null;
-  category?: { id: string; name: string };
+  category?: { id: string; name: string; nameKa: string; nameRu: string; nameEn: string };
   city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
   district?: { id: string; name: string } | null;
   photos?: { id: string; url: string; order: number }[];
@@ -29,6 +29,9 @@ interface ListingDetail {
 interface Category {
   id: string;
   name: string;
+  nameKa: string;
+  nameRu: string;
+  nameEn: string;
   slug: string;
 }
 
@@ -274,7 +277,7 @@ export default function EditListingScreen() {
                     selectedCategoryId === cat.id ? 'text-white' : 'text-text-primary'
                   }`}
                 >
-                  {cat.name}
+                  {i18n.language === 'en' ? (cat.nameEn || cat.name) : i18n.language === 'ka' ? (cat.nameKa || cat.nameEn || cat.name) : (cat.nameRu || cat.name)}
                 </Text>
               </TouchableOpacity>
             ))}

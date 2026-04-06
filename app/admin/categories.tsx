@@ -7,6 +7,9 @@ import { colors } from '../../lib/colors';
 interface CategoryItem {
   id: string;
   name: string;
+  nameKa: string;
+  nameRu: string;
+  nameEn: string;
   slug: string;
   freeListingQuota: number;
   paidListingPrice: number;
@@ -70,7 +73,8 @@ export default function AdminCategories() {
       >
         <View className="flex-row items-center justify-between mb-2">
           <View className="flex-1">
-            <Text className="text-text-primary text-sm font-semibold">{cat.name}</Text>
+            <Text className="text-text-primary text-sm font-semibold">{cat.nameEn || cat.name}</Text>
+            <Text className="text-text-muted text-xs">{cat.nameRu || ''}{cat.nameKa ? ` / ${cat.nameKa}` : ''}</Text>
             <Text className="text-text-muted text-xs">{cat.slug}</Text>
           </View>
           {!isEditing && (

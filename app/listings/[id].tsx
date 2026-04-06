@@ -39,7 +39,7 @@ interface ListingDetail {
   createdAt: string;
   city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
   district?: { id: string; nameRu: string; nameEn: string; nameKa: string } | null;
-  category?: { id: string; name: string; slug: string };
+  category?: { id: string; name: string; nameKa: string; nameRu: string; nameEn: string; slug: string };
   photos: ListingPhoto[];
   user: { id: string; name: string | null; phone: string | null; createdAt: string };
   isPromoted?: boolean;
