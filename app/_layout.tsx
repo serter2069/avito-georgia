@@ -9,6 +9,17 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAuthStore } from '../stores/authStore';
 import { useAuthRefresh } from '../hooks/useAuthRefresh';
 import { colors } from '../lib/colors';
+import { useFonts } from 'expo-font';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
+
+// Prevent splash screen from auto-hiding before fonts are loaded
+SplashScreen.preventAutoHideAsync();
 
 function useProtectedRoute() {
   const user = useAuthStore((s) => s.user);
@@ -62,16 +73,31 @@ export default function RootLayout() {
   const isReady = useAuthStore((s) => s.isReady);
   const maxWidth = useResponsiveMaxWidth();
 
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
   useEffect(() => {
     hydrate();
     initI18n();
   }, []);
 
+  // Hide splash screen once fonts are loaded
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
   // Proactive token refresh: every 20 min + on tab/app focus (auth.md Level 2)
   useAuthRefresh();
   useProtectedRoute();
 
-  if (!isReady) {
+  // Wait for both fonts and auth store hydration before rendering
+  if (!fontsLoaded || !isReady) {
     return (
       <SafeAreaProvider>
         <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth }}>
