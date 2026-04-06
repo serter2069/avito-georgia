@@ -10,7 +10,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
 
-type StatusTab = 'active' | 'draft' | 'sold' | 'removed';
+type StatusTab = 'active' | 'pending_moderation' | 'draft' | 'sold' | 'removed';
 
 interface MyListing {
   id: string;
@@ -35,9 +35,11 @@ interface MyListingsResponse {
 
 const STATUS_BADGE_VARIANT: Record<string, 'success' | 'warning' | 'error' | 'default'> = {
   active: 'success',
+  pending_moderation: 'warning',
   draft: 'default',
   sold: 'warning',
   removed: 'error',
+  rejected: 'error',
 };
 
 export default function MyListingsScreen() {
@@ -139,8 +141,19 @@ export default function MyListingsScreen() {
   };
 
   const handlePublishDraft = async (id: string) => {
-    const res = await api.patch(`/listings/${id}/status`, { status: 'active' });
+    const res = await api.patch(`/listings/${id}/status`, { status: 'pending_moderation' });
     if (res.ok) {
+      setTab('pending_moderation');
+      fetchListings(1, true);
+    } else {
+      Alert.alert(t('error'), (res as any).error || t('error'));
+    }
+  };
+
+  const handleWithdrawFromModeration = async (id: string) => {
+    const res = await api.patch(`/listings/${id}/status`, { status: 'draft' });
+    if (res.ok) {
+      setTab('draft');
       fetchListings(1, true);
     } else {
       Alert.alert(t('error'), (res as any).error || t('error'));
@@ -166,6 +179,7 @@ export default function MyListingsScreen() {
 
   const tabs: { key: StatusTab; label: string }[] = [
     { key: 'active', label: t('active') },
+    { key: 'pending_moderation', label: t('pendingModeration') },
     { key: 'draft', label: t('drafts') },
     { key: 'sold', label: t('sold') },
     { key: 'removed', label: t('removed') },
@@ -195,7 +209,7 @@ export default function MyListingsScreen() {
           <PriceTag price={item.price} currency={item.currency} size="sm" />
           <View className="flex-row items-center gap-2 mt-1">
             <Badge
-              label={item.status}
+              label={item.status === 'pending_moderation' ? t('statusPendingModeration') : item.status}
               variant={STATUS_BADGE_VARIANT[item.status] || 'default'}
             />
             <Text className="text-text-muted text-xs">
@@ -261,6 +275,15 @@ export default function MyListingsScreen() {
                 onPress={() => router.push(`/dashboard/listings/${item.id}/promote`)}
               >
                 <Text className="text-secondary text-xs font-medium">{t('promote')}</Text>
+              </TouchableOpacity>
+            )}
+
+            {item.status === 'pending_moderation' && (
+              <TouchableOpacity
+                className="flex-1 py-2.5 items-center border-r border-border"
+                onPress={() => handleWithdrawFromModeration(item.id)}
+              >
+                <Text className="text-warning text-xs font-medium">{t('draft')}</Text>
               </TouchableOpacity>
             )}
 

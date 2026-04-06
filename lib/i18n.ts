@@ -420,6 +420,12 @@ const resources = {
       pricePerListing: 'Цена за объявление',
       remainingFree: 'Осталось бесплатных',
       adminCategories: 'Категории',
+
+      // Moderation flow
+      pendingModeration: 'На модерации',
+      statusPendingModeration: 'На модерации',
+      listingSubmittedForReview: 'Объявление отправлено на проверку',
+      listingSubmittedForReviewDesc: 'Оно появится в разделе «На модерации» и будет опубликовано после проверки.',
     },
   },
   en: {
@@ -801,6 +807,12 @@ const resources = {
       pricePerListing: 'Price per listing',
       remainingFree: 'Free remaining',
       adminCategories: 'Categories',
+
+      // Moderation flow
+      pendingModeration: 'Pending review',
+      statusPendingModeration: 'Pending review',
+      listingSubmittedForReview: 'Listing submitted for review',
+      listingSubmittedForReviewDesc: 'It will appear in the "Pending review" tab and go live after admin approval.',
     },
   },
   ka: {
@@ -1182,6 +1194,12 @@ const resources = {
       pricePerListing: 'ფასი განცხადებაზე',
       remainingFree: 'დარჩენილი უფასო',
       adminCategories: 'კატეგორიები',
+
+      // Moderation flow
+      pendingModeration: 'მოდერაციაზე',
+      statusPendingModeration: 'მოდერაციაზე',
+      listingSubmittedForReview: 'განცხადება გაგზავნილია შესამოწმებლად',
+      listingSubmittedForReviewDesc: 'ის გამოჩნდება "მოდერაციაზე" ჩანართში და გამოქვეყნდება ადმინის დამტკიცების შემდეგ.',
     },
   },
 };
