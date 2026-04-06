@@ -37,6 +37,7 @@ const TYPE_I18N: Record<string, string> = {
   top_7d: 'promotionTop7d',
   highlight: 'promotionHighlight',
   unlimited_sub: 'promotionUnlimitedSub',
+  bundle: 'promotionBundle',
 };
 
 const TYPE_DESC_I18N: Record<string, string> = {
@@ -45,6 +46,7 @@ const TYPE_DESC_I18N: Record<string, string> = {
   top_7d: 'promotionTop7dDesc',
   highlight: 'promotionHighlightDesc',
   unlimited_sub: 'promotionUnlimitedSubDesc',
+  bundle: 'promotionBundleDesc',
 };
 
 const TYPE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
@@ -53,6 +55,7 @@ const TYPE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   top_7d: 'rocket-outline',
   highlight: 'star-outline',
   unlimited_sub: 'infinite',
+  bundle: 'flash',
 };
 
 export default function PromoteListingScreen() {
@@ -114,6 +117,13 @@ export default function PromoteListingScreen() {
   };
 
   const isTypeActive = (type: string) => {
+    // Bundle is active only when BOTH its sub-types (top_7d + highlight) are active
+    if (type === 'bundle') {
+      return (
+        activePromotions.some((p) => p.promotionType === 'top_7d' && p.isActive) &&
+        activePromotions.some((p) => p.promotionType === 'highlight' && p.isActive)
+      );
+    }
     return activePromotions.some((p) => p.promotionType === type && p.isActive);
   };
 
@@ -163,18 +173,26 @@ export default function PromoteListingScreen() {
           const active = isTypeActive(option.type);
           const isHighlight = option.type === 'highlight';
           const isBestValue = option.type === 'top_7d';
+          const isBundle = option.type === 'bundle';
 
           return (
             <View
               key={option.type}
               className={`bg-surface-card border rounded-lg p-4 ${
-                isHighlight
+                isBundle
+                  ? 'border-yellow-500'
+                  : isHighlight
                   ? 'border-secondary'
                   : isBestValue
                   ? 'border-primary'
                   : 'border-border'
               }`}
             >
+              {isBundle && (
+                <View className="bg-yellow-500 rounded-full px-2 py-0.5 self-start mb-2">
+                  <Text className="text-white text-xs font-bold">{t('promotionBundleBadge')}</Text>
+                </View>
+              )}
               {isBestValue && (
                 <View className="bg-primary rounded-full px-2 py-0.5 self-start mb-2">
                   <Text className="text-white text-xs font-bold">Best value</Text>
@@ -186,15 +204,20 @@ export default function PromoteListingScreen() {
                   <Ionicons
                     name={TYPE_ICONS[option.type] || 'flash-outline'}
                     size={20}
-                    color={colors.brandPrimary}
+                    color={isBundle ? '#EAB308' : colors.brandPrimary}
                   />
                   <Text className="text-text-primary text-base font-bold">
                     {t(TYPE_I18N[option.type] || option.type)}
                   </Text>
                 </View>
-                <Text className="text-primary text-lg font-bold">
-                  {option.amountGEL} GEL
-                </Text>
+                <View className="items-end">
+                  <Text className={`text-lg font-bold ${isBundle ? 'text-yellow-500' : 'text-primary'}`}>
+                    {option.amountGEL} GEL
+                  </Text>
+                  {isBundle && (
+                    <Text className="text-text-muted text-xs line-through">30 GEL</Text>
+                  )}
+                </View>
               </View>
 
               <Text className="text-text-muted text-sm mb-3">
@@ -212,7 +235,7 @@ export default function PromoteListingScreen() {
                   title={`${t('buyNow')} — ${option.amountGEL} GEL`}
                   onPress={() => handlePurchase(option.type)}
                   loading={purchasing === option.type}
-                  variant={isHighlight ? 'secondary' : 'primary'}
+                  variant={isBundle ? 'primary' : isHighlight ? 'secondary' : 'primary'}
                 />
               )}
             </View>
