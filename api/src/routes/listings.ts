@@ -198,24 +198,42 @@ router.get('/', searchRateLimit, async (req: Request, res: Response) => {
           where: { isActive: true },
           select: { promotionType: true, expiresAt: true },
         },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            promotions: {
+              where: {
+                promotionType: 'unlimited_sub',
+                isActive: true,
+                OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+              },
+              select: { id: true },
+            },
+          },
+        },
       },
     }),
     prisma.listing.count({ where }),
   ]);
 
-  // Sort: promoted (top_*) listings first, then by original sort order
+  // Sort: promoted (top_*) listings first, then premium (unlimited_sub), then original order
   const TOP_TYPES = new Set(['top_1d', 'top_3d', 'top_7d']);
   const enriched = listings.map((l) => {
     const activePromos = l.promotions || [];
     const isTop = activePromos.some((p) => TOP_TYPES.has(p.promotionType));
     const isHighlighted = activePromos.some((p) => p.promotionType === 'highlight');
-    return { ...l, isPromoted: isTop, isHighlighted };
+    const isPremium = (l.user?.promotions?.length ?? 0) > 0;
+    const { promotions: _userPromos, ...userWithoutPromos } = l.user ?? { id: '', name: null };
+    return { ...l, user: userWithoutPromos, isPromoted: isTop, isHighlighted, isPremium };
   });
 
-  // Stable sort: promoted first, then original order preserved
+  // Stable sort: top_* first, then premium, then original order preserved
   enriched.sort((a, b) => {
     if (a.isPromoted && !b.isPromoted) return -1;
     if (!a.isPromoted && b.isPromoted) return 1;
+    if (a.isPremium && !b.isPremium) return -1;
+    if (!a.isPremium && b.isPremium) return 1;
     return 0;
   });
 
@@ -231,7 +249,21 @@ router.get('/:id', async (req: Request, res: Response) => {
       photos: { orderBy: { order: 'asc' } },
       city: true, district: true, category: true,
       // phone intentionally excluded — contact via chat only
-      user: { select: { id: true, name: true, createdAt: true } },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+          promotions: {
+            where: {
+              promotionType: 'unlimited_sub',
+              isActive: true,
+              OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+            },
+            select: { id: true },
+          },
+        },
+      },
     },
   });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
@@ -247,7 +279,11 @@ router.get('/:id', async (req: Request, res: Response) => {
     await prisma.listing.update({ where: { id }, data: { views: { increment: 1 } } });
     updatedViews = listing.views + 1;
   }
-  res.json({ ...listing, views: updatedViews });
+
+  // UC-16: compute isPremium — seller has active unlimited_sub promotion
+  const { promotions: _sellerPromos, ...sellerInfo } = listing.user ?? { id: '', name: null, createdAt: new Date() };
+  const isPremium = (_sellerPromos?.length ?? 0) > 0;
+  res.json({ ...listing, user: sellerInfo, isPremium, views: updatedViews });
 });
 
 // GET /api/listings/:id/phone — reveal seller phone (auth required, rate limited)
