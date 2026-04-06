@@ -20,6 +20,7 @@ interface ListingDetail {
   categoryId: string;
   cityId: string;
   districtId: string | null;
+  address?: string | null;
   category?: { id: string; name: string; nameKa: string; nameRu: string; nameEn: string };
   city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
   district?: { id: string; name: string } | null;
@@ -62,6 +63,7 @@ export default function EditListingScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [address, setAddress] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(null);
@@ -98,6 +100,7 @@ export default function EditListingScreen() {
         setTitle(l.title);
         setDescription(l.description || '');
         setPrice(l.price !== null ? String(l.price) : '');
+        setAddress(l.address || '');
         setSelectedCategoryId(l.categoryId);
         setSelectedCityId(l.cityId);
         setSelectedDistrictId(l.districtId);
@@ -146,6 +149,7 @@ export default function EditListingScreen() {
         categoryId: selectedCategoryId,
         cityId: selectedCityId,
         districtId: selectedDistrictId || undefined,
+        address: address.trim() || undefined,
       });
 
       if (!res.ok) {
@@ -315,6 +319,14 @@ export default function EditListingScreen() {
             <Text className="text-error text-xs mt-1">{errors.city}</Text>
           )}
         </View>
+
+        {/* Optional street address for precise map pin */}
+        <Input
+          label={t('addressOptional')}
+          value={address}
+          onChangeText={setAddress}
+          placeholder={t('addressOptional')}
+        />
 
         {/* Photos section */}
         <View>

@@ -41,9 +41,25 @@ function fixLeafletIcons(L: typeof import('leaflet')) {
   L.Marker.prototype.options.icon = icon;
 }
 
-// Add small random offset so same-city markers don't stack
+// Add small random offset to separate markers sharing identical coordinates
+// Only applied when two or more listings have the exact same lat/lng (city-level fallback)
 function jitter(val: number): number {
   return val + (Math.random() - 0.5) * 0.004;
+}
+
+// Build a set of coordinate keys that appear more than once (city-level duplicates)
+function findDuplicateCoordKeys(listings: { lat: number | null; lng: number | null }[]): Set<string> {
+  const counts = new Map<string, number>();
+  for (const l of listings) {
+    if (l.lat === null || l.lng === null) continue;
+    const key = `${l.lat}:${l.lng}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  const duplicates = new Set<string>();
+  for (const [key, count] of counts) {
+    if (count > 1) duplicates.add(key);
+  }
+  return duplicates;
 }
 
 function formatPrice(price: number | null, currency: string): string {
@@ -85,10 +101,13 @@ export function SearchMap({ listings, onMarkerPress }: SearchMapProps) {
         maxZoom: 19,
       }).addTo(map);
 
-      // Add markers
+      // Add markers — jitter only when multiple listings share identical coords
+      const duplicateKeys = findDuplicateCoordKeys(validListings);
       validListings.forEach((listing) => {
-        const lat = jitter(listing.lat as number);
-        const lng = jitter(listing.lng as number);
+        const coordKey = `${listing.lat}:${listing.lng}`;
+        const needsJitter = duplicateKeys.has(coordKey);
+        const lat = needsJitter ? jitter(listing.lat as number) : listing.lat as number;
+        const lng = needsJitter ? jitter(listing.lng as number) : listing.lng as number;
 
         const marker = L.marker([lat, lng]).addTo(map);
 

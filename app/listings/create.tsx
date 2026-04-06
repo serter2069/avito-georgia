@@ -56,10 +56,11 @@ export default function CreateListingScreen() {
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(null);
 
-  // Step 3: Title, Description, Price
+  // Step 3: Title, Description, Price, Address
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [address, setAddress] = useState('');
 
   // Step 4: Photos
   const [photos, setPhotos] = useState<PhotoAsset[]>([]);
@@ -94,6 +95,7 @@ export default function CreateListingScreen() {
       if (description.trim()) body.description = description.trim();
       if (price.trim()) body.price = price.trim();
       if (selectedDistrictId) body.districtId = selectedDistrictId;
+      if (address.trim()) body.address = address.trim();
 
       const createRes = await api.post<{ id: string }>('/listings', body);
       if (createRes.ok && createRes.data && photos.length > 0) {
@@ -107,7 +109,7 @@ export default function CreateListingScreen() {
     } catch (_) {
       // Draft save is best-effort; ignore errors
     }
-  }, [user, selectedCategoryId, selectedCityId, title, description, price, selectedDistrictId, photos]);
+  }, [user, selectedCategoryId, selectedCityId, title, description, price, selectedDistrictId, address, photos]);
 
   // Show draft save prompt when user presses hardware back on Android
   useFocusEffect(
@@ -264,6 +266,7 @@ export default function CreateListingScreen() {
         categoryId: selectedCategoryId,
         cityId: selectedCityId,
         districtId: selectedDistrictId || undefined,
+        address: address.trim() || undefined,
       });
 
       if (!createRes.ok || !createRes.data) {
@@ -457,6 +460,16 @@ export default function CreateListingScreen() {
               </TouchableOpacity>
             ))}
         </View>
+      )}
+
+      {/* Optional street address for precise map pin */}
+      {selectedCityId && (
+        <Input
+          label={t('addressOptional')}
+          value={address}
+          onChangeText={setAddress}
+          placeholder={t('addressOptional')}
+        />
       )}
     </View>
   );

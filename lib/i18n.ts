@@ -430,6 +430,9 @@ const resources = {
       statusPendingModeration: 'На модерации',
       listingSubmittedForReview: 'Объявление отправлено на проверку',
       listingSubmittedForReviewDesc: 'Оно появится в разделе «На модерации» и будет опубликовано после проверки.',
+
+      // Address geocoding
+      addressOptional: 'Улица, дом (необязательно)',
     },
   },
   en: {
@@ -821,6 +824,9 @@ const resources = {
       statusPendingModeration: 'Pending review',
       listingSubmittedForReview: 'Listing submitted for review',
       listingSubmittedForReviewDesc: 'It will appear in the "Pending review" tab and go live after admin approval.',
+
+      // Address geocoding
+      addressOptional: 'Street, building (optional)',
     },
   },
   ka: {
@@ -1212,6 +1218,9 @@ const resources = {
       statusPendingModeration: 'მოდერაციაზე',
       listingSubmittedForReview: 'განცხადება გაგზავნილია შესამოწმებლად',
       listingSubmittedForReviewDesc: 'ის გამოჩნდება "მოდერაციაზე" ჩანართში და გამოქვეყნდება ადმინის დამტკიცების შემდეგ.',
+
+      // Address geocoding
+      addressOptional: 'ქუჩა, სახლი (არასავალდებულო)',
     },
   },
 };
