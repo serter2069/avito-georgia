@@ -93,7 +93,7 @@ export default function AdminUsers() {
             className="px-4 items-center justify-center bg-primary"
             onPress={handleSearch}
           >
-            <Ionicons name="search" size={18} color="#ffffff" />
+            <Ionicons name="search" size={18} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>
@@ -174,7 +174,7 @@ export default function AdminUsers() {
                 onPress={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
               >
-                <Ionicons name="chevron-back" size={18} color={page > 1 ? '#ffffff' : colors.textMuted} />
+                <Ionicons name="chevron-back" size={18} color={page > 1 ? colors.white : colors.textMuted} />
               </TouchableOpacity>
               <Text className="text-text-secondary self-center text-sm">
                 {page} / {Math.ceil(total / 20)}
@@ -184,7 +184,7 @@ export default function AdminUsers() {
                 onPress={() => setPage((p) => p + 1)}
                 disabled={page >= Math.ceil(total / 20)}
               >
-                <Ionicons name="chevron-forward" size={18} color={page < Math.ceil(total / 20) ? '#ffffff' : colors.textMuted} />
+                <Ionicons name="chevron-forward" size={18} color={page < Math.ceil(total / 20) ? colors.white : colors.textMuted} />
               </TouchableOpacity>
             </View>
           )}

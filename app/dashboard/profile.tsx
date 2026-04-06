@@ -6,6 +6,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { api, apiUpload } from '../../lib/api';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { colors } from '../../lib/colors';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -119,7 +120,7 @@ export default function ProfileScreen() {
               )}
               {uploadingAvatar && (
                 <View className="absolute inset-0 bg-black/50 items-center justify-center">
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={colors.white} size="small" />
                 </View>
               )}
             </View>

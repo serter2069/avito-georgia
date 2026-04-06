@@ -49,7 +49,7 @@ export default function DashboardLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: colors.bgCard,
           borderTopColor: colors.borderDefault,
           borderTopWidth: 1,
           height: 60,
@@ -77,7 +77,7 @@ export default function DashboardLayout() {
                     position: 'absolute',
                     top: -4,
                     right: -6,
-                    backgroundColor: '#ef4444',
+                    backgroundColor: colors.statusErrorAlt,
                     borderRadius: 9,
                     minWidth: 18,
                     height: 18,
@@ -86,7 +86,7 @@ export default function DashboardLayout() {
                     paddingHorizontal: 3,
                   }}
                 >
-                  <Text style={{ color: '#ffffff', fontSize: 10, fontWeight: '700', lineHeight: 12 }}>
+                  <Text style={{ color: colors.white, fontSize: 10, fontWeight: '700', lineHeight: 12 }}>
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </Text>
                 </View>

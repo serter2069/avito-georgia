@@ -266,7 +266,7 @@ export default function SearchScreen() {
             className="px-4 items-center justify-center bg-primary"
             onPress={() => doSearch(true)}
           >
-            <Ionicons name="search" size={20} color="#ffffff" />
+            <Ionicons name="search" size={20} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>

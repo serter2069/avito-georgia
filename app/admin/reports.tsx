@@ -172,7 +172,7 @@ export default function AdminReports() {
                 onPress={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
               >
-                <Ionicons name="chevron-back" size={18} color={page > 1 ? '#ffffff' : colors.textMuted} />
+                <Ionicons name="chevron-back" size={18} color={page > 1 ? colors.white : colors.textMuted} />
               </TouchableOpacity>
               <Text className="text-text-secondary self-center text-sm">
                 {page} / {Math.ceil(total / 20)}
@@ -182,7 +182,7 @@ export default function AdminReports() {
                 onPress={() => setPage((p) => p + 1)}
                 disabled={page >= Math.ceil(total / 20)}
               >
-                <Ionicons name="chevron-forward" size={18} color={page < Math.ceil(total / 20) ? '#ffffff' : colors.textMuted} />
+                <Ionicons name="chevron-forward" size={18} color={page < Math.ceil(total / 20) ? colors.white : colors.textMuted} />
               </TouchableOpacity>
             </View>
           )}

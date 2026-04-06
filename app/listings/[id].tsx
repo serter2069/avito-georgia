@@ -364,12 +364,12 @@ export default function ListingDetailScreen() {
         <View className="px-4 pt-3 flex-row justify-end items-center gap-4">
           {user && listing.user.id !== user.id && !reportDone && (
             <TouchableOpacity onPress={() => setReportModalVisible(true)} className="flex-row items-center gap-1">
-              <Ionicons name="flag-outline" size={18} color="#64748B" />
+              <Ionicons name="flag-outline" size={18} color={colors.textSubtle} />
               <Text className="text-text-secondary text-sm">{t('reportListing')}</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity onPress={handleShare} className="flex-row items-center gap-1">
-            <Ionicons name="share-outline" size={18} color="#64748B" />
+            <Ionicons name="share-outline" size={18} color={colors.textSubtle} />
             <Text className="text-text-secondary text-sm">{t('share')}</Text>
           </TouchableOpacity>
         </View>
@@ -485,7 +485,7 @@ export default function ListingDetailScreen() {
                         />
                       ) : (
                         <View style={{ width: '100%', height: 110 }} className="bg-surface items-center justify-center">
-                          <Ionicons name="image-outline" size={24} color="#C8E0E8" />
+                          <Ionicons name="image-outline" size={24} color={colors.borderDefault} />
                         </View>
                       )}
                       <View className="p-2 gap-1">
@@ -579,24 +579,24 @@ export default function ListingDetailScreen() {
           onPress={() => setReportModalVisible(false)}
         >
           <Pressable
-            style={{ backgroundColor: '#FFFFFF', borderRadius: 16, width: '100%', maxWidth: 380, paddingVertical: 24, paddingHorizontal: 20 }}
+            style={{ backgroundColor: colors.bgCard, borderRadius: 16, width: '100%', maxWidth: 380, paddingVertical: 24, paddingHorizontal: 20 }}
             onPress={() => {}}
           >
             {reportDone ? (
               <View style={{ alignItems: 'center', paddingVertical: 12 }}>
-                <Ionicons name="checkmark-circle" size={48} color="#0A7B8A" />
-                <Text style={{ fontSize: 16, fontWeight: '600', color: '#0A2840', marginTop: 12, textAlign: 'center' }}>
+                <Ionicons name="checkmark-circle" size={48} color={colors.brandPrimary} />
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textPrimary, marginTop: 12, textAlign: 'center' }}>
                   {t('reportSuccess')}
                 </Text>
               </View>
             ) : (
               <>
-                <Text style={{ fontSize: 17, fontWeight: '700', color: '#0A2840', marginBottom: 16, textAlign: 'center' }}>
+                <Text style={{ fontSize: 17, fontWeight: '700', color: colors.textPrimary, marginBottom: 16, textAlign: 'center' }}>
                   {t('reportTitle')}
                 </Text>
                 {reportLoading ? (
                   <View style={{ alignItems: 'center', paddingVertical: 16 }}>
-                    <ActivityIndicator size="large" color="#0A7B8A" />
+                    <ActivityIndicator size="large" color={colors.brandPrimary} />
                   </View>
                 ) : (
                   [
@@ -613,19 +613,19 @@ export default function ListingDetailScreen() {
                       style={{
                         paddingVertical: 14,
                         borderBottomWidth: idx < arr.length - 1 ? 1 : 0,
-                        borderBottomColor: '#F1F5F9',
+                        borderBottomColor: colors.borderDivider,
                       }}
                     >
-                      <Text style={{ fontSize: 15, color: '#0A2840' }}>{item.label}</Text>
+                      <Text style={{ fontSize: 15, color: colors.textPrimary }}>{item.label}</Text>
                     </TouchableOpacity>
                   ))
                 )}
                 <TouchableOpacity
                   onPress={() => setReportModalVisible(false)}
-                  style={{ marginTop: 8, paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9' }}
+                  style={{ marginTop: 8, paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.borderDivider }}
                   activeOpacity={0.7}
                 >
-                  <Text style={{ fontSize: 15, color: '#94A3B8' }}>{t('cancel')}</Text>
+                  <Text style={{ fontSize: 15, color: colors.textDisabled }}>{t('cancel')}</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -668,7 +668,7 @@ export default function ListingDetailScreen() {
                 <Animated.View
                   style={{
                     transform: [{ translateY: sheetTranslateY }],
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: colors.bgCard,
                     borderTopLeftRadius: 16,
                     borderTopRightRadius: 16,
                     paddingBottom: 32,
@@ -681,7 +681,7 @@ export default function ListingDetailScreen() {
                         width: 36,
                         height: 4,
                         borderRadius: 2,
-                        backgroundColor: '#D1D5DB',
+                        backgroundColor: colors.overlayHandle,
                       }}
                     />
                   </View>
@@ -691,7 +691,7 @@ export default function ListingDetailScreen() {
                     style={{
                       fontSize: 17,
                       fontWeight: '600',
-                      color: '#0A2840',
+                      color: colors.textPrimary,
                       textAlign: 'center',
                       marginBottom: 20,
                       paddingHorizontal: 24,
@@ -705,20 +705,20 @@ export default function ListingDetailScreen() {
                     <TextInput
                       style={{
                         borderWidth: 1,
-                        borderColor: '#CBD5E1',
+                        borderColor: colors.borderSoft,
                         borderRadius: 10,
                         paddingHorizontal: 14,
                         paddingVertical: 12,
                         fontSize: 15,
-                        color: '#0A2840',
-                        backgroundColor: '#F8FAFC',
+                        color: colors.textPrimary,
+                        backgroundColor: colors.bgSubtle,
                         minHeight: 100,
                         textAlignVertical: 'top',
                       }}
                       value={contactMessage}
                       onChangeText={setContactMessage}
                       placeholder={t('typeMessage')}
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor={colors.textDisabled}
                       multiline
                       autoFocus
                     />
@@ -738,13 +738,13 @@ export default function ListingDetailScreen() {
                         paddingVertical: 14,
                         borderRadius: 10,
                         borderWidth: 1,
-                        borderColor: '#CBD5E1',
+                        borderColor: colors.borderSoft,
                         alignItems: 'center',
                       }}
                       onPress={closeContactSheet}
                       activeOpacity={0.7}
                     >
-                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#64748B' }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: colors.textSubtle }}>
                         {t('cancel')}
                       </Text>
                     </TouchableOpacity>
@@ -754,7 +754,7 @@ export default function ListingDetailScreen() {
                         flex: 1,
                         paddingVertical: 14,
                         borderRadius: 10,
-                        backgroundColor: contactLoading || !contactMessage.trim() ? '#94A3B8' : '#0A7B8A',
+                        backgroundColor: contactLoading || !contactMessage.trim() ? colors.textDisabled : colors.brandPrimary,
                         alignItems: 'center',
                       }}
                       onPress={handleSendContactMessage}
@@ -762,9 +762,9 @@ export default function ListingDetailScreen() {
                       activeOpacity={0.7}
                     >
                       {contactLoading ? (
-                        <ActivityIndicator color="#FFFFFF" />
+                        <ActivityIndicator color={colors.white} />
                       ) : (
-                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>
+                        <Text style={{ fontSize: 15, fontWeight: '600', color: colors.white }}>
                           {t('send')}
                         </Text>
                       )}

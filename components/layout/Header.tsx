@@ -63,15 +63,15 @@ function LanguageDropdown() {
           paddingHorizontal: 8,
           borderRadius: 16,
           borderWidth: 1,
-          borderColor: '#E2E8F0',
-          backgroundColor: '#F8FAFC',
+          borderColor: colors.borderLight,
+          backgroundColor: colors.bgSubtle,
           gap: 4,
         }}
         activeOpacity={0.7}
       >
         <Text style={{ fontSize: 14 }}>{currentLang.flag}</Text>
-        <Text style={{ fontSize: 12, fontWeight: '600', color: '#0A2840' }}>{currentLang.label}</Text>
-        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={12} color="#64748B" />
+        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textPrimary }}>{currentLang.label}</Text>
+        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={12} color={colors.textSubtle} />
       </TouchableOpacity>
 
       {/* Dropdown overlay + menu */}
@@ -100,17 +100,17 @@ function LanguageDropdown() {
               top: 36,
               right: 0,
               minWidth: 160,
-              backgroundColor: '#FFFFFF',
+              backgroundColor: colors.bgCard,
               borderRadius: 8,
               borderWidth: 1,
-              borderColor: '#E2E8F0',
+              borderColor: colors.borderLight,
               zIndex: 51,
               ...Platform.select({
                 web: {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
                 },
                 default: {
-                  shadowColor: '#000',
+                  shadowColor: '#000000',
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.12,
                   shadowRadius: 12,
@@ -129,7 +129,7 @@ function LanguageDropdown() {
                   paddingHorizontal: 12,
                   paddingVertical: 10,
                   gap: 8,
-                  backgroundColor: i18n.language === lang.code ? '#F0FDFA' : 'transparent',
+                  backgroundColor: i18n.language === lang.code ? colors.bgBrandSubtle : 'transparent',
                   borderTopLeftRadius: idx === 0 ? 8 : 0,
                   borderTopRightRadius: idx === 0 ? 8 : 0,
                   borderBottomLeftRadius: idx === LANGUAGES.length - 1 ? 8 : 0,
@@ -142,14 +142,14 @@ function LanguageDropdown() {
                   style={{
                     fontSize: 14,
                     fontWeight: i18n.language === lang.code ? '600' : '400',
-                    color: i18n.language === lang.code ? '#0A7B8A' : '#0A2840',
+                    color: i18n.language === lang.code ? colors.brandPrimary : colors.textPrimary,
                   }}
                 >
                   {lang.name}
                 </Text>
                 {i18n.language === lang.code && (
                   <View style={{ marginLeft: 'auto' }}>
-                    <Ionicons name="checkmark" size={16} color="#0A7B8A" />
+                    <Ionicons name="checkmark" size={16} color={colors.brandPrimary} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -216,7 +216,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false, o
         <View className="flex-row items-center gap-3">
           {showBack && (
             <TouchableOpacity onPress={onBack ?? (() => router.back())} className="mr-1">
-              <Ionicons name="chevron-back" size={24} color="#0A7B8A" />
+              <Ionicons name="chevron-back" size={24} color={colors.brandPrimary} />
             </TouchableOpacity>
           )}
           <TouchableOpacity onPress={() => router.push('/')}>
@@ -242,7 +242,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false, o
                 <Text className="text-text-secondary text-sm font-medium">{t('favorites')}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => router.push('/dashboard/profile')}>
-                <Ionicons name="person-circle-outline" size={24} color="#0A7B8A" />
+                <Ionicons name="person-circle-outline" size={24} color={colors.brandPrimary} />
               </TouchableOpacity>
             </>
           ) : (
@@ -266,7 +266,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false, o
       <View className="flex-row items-center gap-2 flex-1">
         {showBack && (
           <TouchableOpacity onPress={() => router.back()} className="mr-1">
-            <Ionicons name="chevron-back" size={24} color="#0A7B8A" />
+            <Ionicons name="chevron-back" size={24} color={colors.brandPrimary} />
           </TouchableOpacity>
         )}
         <Text className="text-text-primary text-lg font-bold flex-1" numberOfLines={1}>
@@ -278,7 +278,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false, o
         {showLanguageSwitcher && <LanguageDropdown />}
 
         <TouchableOpacity onPress={openMenu} className="ml-1 p-1">
-          <Ionicons name="menu" size={24} color="#0A2840" />
+          <Ionicons name="menu" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -303,7 +303,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false, o
           <Animated.View
             style={{
               transform: [{ translateY: sheetTranslateY }],
-              backgroundColor: '#FFFFFF',
+              backgroundColor: colors.bgCard,
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
               paddingBottom: 32,
@@ -317,7 +317,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false, o
                   width: 36,
                   height: 4,
                   borderRadius: 2,
-                  backgroundColor: '#D1D5DB',
+                  backgroundColor: colors.overlayHandle,
                 }}
               />
             </View>
@@ -349,7 +349,7 @@ export function Header({ title, showLanguageSwitcher = true, showBack = false, o
                         width: 48,
                         height: 48,
                         borderRadius: 12,
-                        backgroundColor: isActive ? colors.brandPrimary + '15' : '#F3F4F6',
+                        backgroundColor: isActive ? colors.brandPrimary + '15' : colors.bgMuted,
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginBottom: 6,

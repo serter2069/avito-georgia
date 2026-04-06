@@ -244,7 +244,7 @@ export default function ChatScreen() {
           onPress={handleSend}
           disabled={!inputText.trim() || sending}
         >
-          <Ionicons name="arrow-up" size={20} color={inputText.trim() ? '#ffffff' : colors.textMuted} />
+          <Ionicons name="arrow-up" size={20} color={inputText.trim() ? colors.white : colors.textMuted} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
