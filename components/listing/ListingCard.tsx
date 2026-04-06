@@ -2,6 +2,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PriceTag } from '../ui/PriceTag';
 import { Badge } from '../ui/Badge';
+import { colors } from '../../lib/colors';
 
 export interface Listing {
   id: string;
@@ -42,7 +43,7 @@ export function ListingCard({ listing, onPress }: ListingCardProps) {
           />
         ) : (
           <View className="w-full h-48 bg-surface items-center justify-center">
-            <Ionicons name="image-outline" size={32} color="#C8E0E8" />
+            <Ionicons name="image-outline" size={32} color={colors.borderDefault} />
           </View>
         )}
         {listing.isPromoted && (

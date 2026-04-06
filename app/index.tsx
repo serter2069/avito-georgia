@@ -54,7 +54,7 @@ export default function HomeScreen() {
               className="px-4 items-center justify-center bg-primary"
               onPress={handleSearch}
             >
-              <Ionicons name="search" size={20} color="#ffffff" />
+              <Ionicons name="search" size={20} color={colors.white} />
             </TouchableOpacity>
           </View>
         </View>

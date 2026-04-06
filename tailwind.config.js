@@ -11,12 +11,15 @@ module.exports = {
     extend: {
       colors: {
         // Brand: Avito Georgia — Teal Batumi (from brand.html)
+        // Token values must stay in sync with lib/colors.ts
         primary: '#0A7B8A',
         'primary-dark': '#0A2840',
         secondary: '#f59e0b',
         accent: '#1A9BAA',
-        surface: '#F5F5F5',
+        // surface = light teal wash (bgSurface in lib/colors.ts)
+        surface: '#E8F4F8',
         'surface-card': '#FFFFFF',
+        // dark/dark-secondary = white card backgrounds (intentional naming for dark-on-light pattern)
         dark: '#FFFFFF',
         'dark-secondary': '#FFFFFF',
         'text-primary': '#0A2840',
