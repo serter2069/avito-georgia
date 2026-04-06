@@ -13,6 +13,19 @@ import xss from 'xss';
 
 const router = Router();
 
+// View deduplication: track {ip}:{listingId}:{date} to count only 1 view per IP per listing per day.
+// In-memory only — does not survive restarts, single-process assumption.
+// Future: replace with Redis when cluster mode is introduced.
+const viewedToday = new Map<string, Set<string>>();
+
+// Purge stale date keys every hour to prevent unbounded memory growth.
+setInterval(() => {
+  const today = new Date().toISOString().slice(0, 10);
+  for (const date of viewedToday.keys()) {
+    if (date !== today) viewedToday.delete(date);
+  }
+}, 60 * 60 * 1000).unref();
+
 function stripHtml(str: string): string {
   return str.replace(/<[^>]*>/g, '').trim();
 }
@@ -222,9 +235,19 @@ router.get('/:id', async (req: Request, res: Response) => {
     },
   });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
-  // Atomic view increment
-  await prisma.listing.update({ where: { id }, data: { views: { increment: 1 } } });
-  res.json({ ...listing, views: listing.views + 1 });
+
+  // UC-05: increment views only once per IP per listing per day.
+  const today = new Date().toISOString().slice(0, 10);
+  const viewKey = `${req.ip || 'unknown'}:${id}:${today}`;
+  if (!viewedToday.has(today)) viewedToday.set(today, new Set());
+  const todaySet = viewedToday.get(today)!;
+  let updatedViews = listing.views;
+  if (!todaySet.has(viewKey)) {
+    todaySet.add(viewKey);
+    await prisma.listing.update({ where: { id }, data: { views: { increment: 1 } } });
+    updatedViews = listing.views + 1;
+  }
+  res.json({ ...listing, views: updatedViews });
 });
 
 // GET /api/listings/:id/phone — reveal seller phone (auth required, rate limited)
