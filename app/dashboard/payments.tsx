@@ -7,29 +7,30 @@ import { api } from '../../lib/api';
 import { colors } from '../../lib/colors';
 import { Ionicons } from '@expo/vector-icons';
 
-interface Promotion {
+interface Payment {
   id: string;
-  promotionType: string;
-  isActive: boolean;
-  expiresAt: string | null;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  promotionType: string | null;
+  listingId: string | null;
   createdAt: string;
-  listing: { id: string; title: string } | null;
 }
 
-interface PriceOption {
-  type: string;
-  label: string;
-  amountGEL: number;
-  days: number | null;
-  recurring: boolean;
-}
+const PROMOTION_LABELS: Record<string, string> = {
+  top_1d:        'Top 1 day',
+  top_3d:        'Top 3 days',
+  top_7d:        'Top 7 days',
+  highlight:     'Highlight',
+  unlimited_sub: 'Subscription',
+  bundle:        'Bundle',
+};
 
-const TYPE_LABELS: Record<string, string> = {
-  top_1d: 'promotionTop1d',
-  top_3d: 'promotionTop3d',
-  top_7d: 'promotionTop7d',
-  highlight: 'promotionHighlight',
-  unlimited_sub: 'promotionUnlimitedSub',
+const STATUS_VARIANTS: Record<Payment['status'], 'success' | 'warning' | 'error' | 'default'> = {
+  completed: 'success',
+  pending:   'warning',
+  failed:    'error',
+  refunded:  'default',
 };
 
 function formatGEL(amount: number): string {
@@ -38,29 +39,14 @@ function formatGEL(amount: number): string {
 
 export default function PaymentsScreen() {
   const { t } = useTranslation();
-  const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [pricesMap, setPricesMap] = useState<Record<string, string>>({});
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
-    const [myRes, pricesRes] = await Promise.all([
-      api.get<{ promotions: Promotion[] }>('/promotions/my'),
-      api.get<{ prices: PriceOption[] }>('/promotions/prices'),
-    ]);
-    if (myRes.ok && myRes.data) {
-      // Sort by createdAt descending — newest first
-      const sorted = [...myRes.data.promotions].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      setPromotions(sorted);
-    }
-    if (pricesRes.ok && pricesRes.data) {
-      const map: Record<string, string> = {};
-      for (const p of pricesRes.data.prices) {
-        map[p.type] = formatGEL(p.amountGEL);
-      }
-      setPricesMap(map);
+    const res = await api.get<{ payments: Payment[] }>('/payments/my');
+    if (res.ok && res.data) {
+      setPayments(res.data.payments);
     }
     setLoading(false);
   }, []);
@@ -93,7 +79,7 @@ export default function PaymentsScreen() {
       <Header title={t('paymentHistory')} />
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-3">
-        {promotions.length === 0 ? (
+        {payments.length === 0 ? (
           <View className="bg-surface-card border border-border rounded-lg p-8 items-center">
             <Ionicons name="card" size={48} color={colors.brandPrimary} style={{ marginBottom: 16 }} />
             <Text className="text-text-primary text-lg font-bold mb-2">
@@ -104,43 +90,29 @@ export default function PaymentsScreen() {
             </Text>
           </View>
         ) : (
-          promotions.map((promo) => (
+          payments.map((payment) => (
             <View
-              key={promo.id}
+              key={payment.id}
               className="bg-surface-card border border-border rounded-lg p-4"
             >
-              {/* Header row: type label + status badge */}
+              {/* Header row: promotion type label + status badge */}
               <View className="flex-row items-center justify-between mb-2">
                 <Text className="text-text-primary text-sm font-bold flex-1 mr-2" numberOfLines={1}>
-                  {t(TYPE_LABELS[promo.promotionType] || promo.promotionType)}
+                  {PROMOTION_LABELS[payment.promotionType ?? ''] ?? (payment.promotionType || '—')}
                 </Text>
                 <Badge
-                  label={promo.isActive ? t('alreadyActive') : t('statusRemoved')}
-                  variant={promo.isActive ? 'success' : 'default'}
+                  label={t(`paymentStatus_${payment.status}`, payment.status)}
+                  variant={STATUS_VARIANTS[payment.status]}
                 />
               </View>
 
-              {/* Listing title if present */}
-              {promo.listing && (
-                <Text className="text-text-secondary text-xs mb-2" numberOfLines={1}>
-                  {promo.listing.title}
-                </Text>
-              )}
-
-              {/* Dates + amount */}
+              {/* Date + amount row */}
               <View className="flex-row items-center justify-between mt-1">
-                <View className="gap-0.5">
-                  <Text className="text-text-muted text-xs">
-                    {t('paidAt')}: {formatDate(promo.createdAt)}
-                  </Text>
-                  {promo.expiresAt && (
-                    <Text className="text-text-muted text-xs">
-                      {t('expiresAt')}: {formatDate(promo.expiresAt)}
-                    </Text>
-                  )}
-                </View>
+                <Text className="text-text-muted text-xs">
+                  {formatDate(payment.createdAt)}
+                </Text>
                 <Text className="text-primary text-sm font-bold">
-                  {pricesMap[promo.promotionType] || '—'}
+                  {formatGEL(payment.amount)}
                 </Text>
               </View>
             </View>
