@@ -388,6 +388,26 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
       }
     }
   }
+
+  // Duplicate listing protection: block same user + category + title within 24h (skip for drafts and admins)
+  if (!isDraft && req.user!.role !== 'admin') {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const dupe = await prisma.listing.findFirst({
+      where: {
+        userId,
+        categoryId,
+        status: { in: ['active', 'pending_moderation'] },
+        createdAt: { gte: since },
+        title: { equals: safeTitle, mode: 'insensitive' },
+      },
+      select: { id: true },
+    });
+    if (dupe) {
+      res.status(409).json({ error: 'duplicate_listing', existingId: dupe.id });
+      return;
+    }
+  }
+
   // Non-draft listings go to pending_moderation for admin review
   const initialStatus: ListingStatus = isDraft ? 'draft' : 'pending_moderation';
   // Geocode city coordinates — best-effort, never blocks listing creation
