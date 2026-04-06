@@ -47,19 +47,20 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  otpCodes        OtpCode[]
-  sessions        Session[]
-  listings        Listing[]
-  favorites       Favorite[]
-  notifications   Notification[]
-  sentMessages    Message[]           @relation("MessageSender")
-  threads         ThreadParticipant[]
-  payments        Payment[]
-  promotions      Promotion[]
-  reports         Report[]             @relation("Reports")
-  reportedBy      Report[]             @relation("ReportedUser")
-  reviewsWritten  Review[]             @relation("ReviewAuthor")
-  reviewsReceived Review[]             @relation("ReviewSeller")
+  otpCodes             OtpCode[]
+  sessions             Session[]
+  listings             Listing[]
+  favorites            Favorite[]
+  notifications        Notification[]
+  sentMessages         Message[]           @relation("MessageSender")
+  threads              ThreadParticipant[]
+  payments             Payment[]
+  promotions           Promotion[]
+  reports              Report[]             @relation("Reports")
+  reportedBy           Report[]             @relation("ReportedUser")
+  reviewsWritten       Review[]             @relation("ReviewAuthor")
+  reviewsReceived      Review[]             @relation("ReviewSeller")
+  notificationPrefs    NotificationPref[]
 }
 
 // Auth: OTP only — no password field on User
@@ -318,4 +319,23 @@ model Review {
   @@unique([authorId, listingId])
   @@index([sellerId])
   @@index([listingId])
+}
+
+enum NotificationPrefType {
+  new_message
+  price_drop
+  moderation_update
+}
+
+// UC-30: per-user notification opt-in/opt-out preferences
+model NotificationPref {
+  id        String               @id @default(cuid())
+  userId    String
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationPrefType
+  enabled   Boolean              @default(true)
+  createdAt DateTime             @default(now())
+
+  @@unique([userId, type])
+  @@index([userId])
 }

@@ -7,6 +7,7 @@ interface User {
   email: string;
   role: string;
   isOnboarded?: boolean;
+  locale?: string;
 }
 
 interface AuthState {
@@ -21,6 +22,7 @@ interface AuthActions {
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   hydrate: () => Promise<void>;
+  updateLocale: (locale: string) => Promise<void>;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -52,6 +54,18 @@ export const useAuthStore = create<AuthStore>((set) => ({
       localStorage.removeItem('isLoggedIn');
     }
     set({ user: null, accessToken: null });
+  },
+
+  updateLocale: async (locale: string) => {
+    // Optimistically update local state, then persist to backend
+    set((state) => ({
+      user: state.user ? { ...state.user, locale } : state.user,
+    }));
+    try {
+      await api.patch('/users/me', { locale });
+    } catch {
+      // Non-critical — local language change already applied, backend will sync on next login
+    }
   },
 
   deleteAccount: async () => {
