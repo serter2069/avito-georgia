@@ -278,3 +278,20 @@ model Report {
   @@index([reporterId])
   @@index([status])
 }
+
+// Audit log — append-only record of moderator/admin actions.
+// adminId/adminEmail stored as plain strings (no FK) so records survive user deletion.
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  adminEmail String
+  action     String   // e.g. "listing.status_change", "user.role_change", "report.status_change", "category.update"
+  targetType String   // "listing" | "user" | "report" | "category"
+  targetId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}

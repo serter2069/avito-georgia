@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { ListingStatus } from '@prisma/client';
+import { ListingStatus, Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { requireAuth, requireAdmin } from '../middleware/auth';
 import { sendListingApprovedEmail, sendListingRejectedEmail } from '../lib/mail';
@@ -11,6 +11,27 @@ const router = Router();
 
 // All admin routes require authentication and admin role
 router.use(requireAuth, requireAdmin);
+
+// Helper: write an audit log entry fire-and-forget (never throws, never blocks response)
+function logAudit(
+  adminId: string,
+  adminEmail: string,
+  action: string,
+  targetType: string,
+  targetId: string,
+  details?: Record<string, unknown>,
+): void {
+  prisma.auditLog.create({
+    data: {
+      adminId,
+      adminEmail,
+      action,
+      targetType,
+      targetId,
+      details: details ? (details as Prisma.InputJsonValue) : Prisma.DbNull,
+    },
+  }).catch(err => console.error('audit log error:', err));
+}
 
 // GET /api/admin/users — paginated user list
 router.get('/users', async (req: Request, res: Response) => {
@@ -79,6 +100,12 @@ router.patch('/users/:id/role', async (req: Request, res: Response) => {
     select: { id: true, email: true, name: true, role: true },
   });
 
+  logAudit(req.user!.userId, req.user!.email, 'user.role_change', 'user', id, {
+    previousRole: user.role,
+    newRole: role,
+    targetEmail: user.email,
+  });
+
   res.json(updated);
 });
 
@@ -135,6 +162,11 @@ router.patch('/reports/:id/status', async (req: Request, res: Response) => {
   const updated = await prisma.report.update({
     where: { id },
     data: { status },
+  });
+
+  logAudit(req.user!.userId, req.user!.email, 'report.status_change', 'report', id, {
+    previousStatus: report.status,
+    newStatus: status,
   });
 
   res.json(updated);
@@ -217,6 +249,12 @@ router.patch('/listings/:id/status', async (req: Request, res: Response) => {
     data: updateData,
   });
 
+  logAudit(req.user!.userId, req.user!.email, 'listing.status_change', 'listing', id, {
+    previousStatus: currentStatus,
+    newStatus: targetStatus,
+    ...(rejectReason ? { rejectReason } : {}),
+  });
+
   // Send email notification to the listing owner
   const userEmail = listing.user.email;
   if (targetStatus === 'active') {
@@ -276,7 +314,34 @@ router.patch('/categories/:id', async (req: Request, res: Response) => {
   }
 
   const updated = await prisma.category.update({ where: { id }, data: updateData });
+
+  logAudit(req.user!.userId, req.user!.email, 'category.update', 'category', id, {
+    changes: updateData,
+    categoryName: category.name,
+  });
+
   res.json(updated);
+});
+
+// GET /api/admin/audit-log — paginated audit log (UC-25)
+router.get('/audit-log', async (req: Request, res: Response) => {
+  const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+  const targetType = req.query.targetType as string | undefined;
+
+  const where = targetType ? { targetType } : {};
+
+  const [logs, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.auditLog.count({ where }),
+  ]);
+
+  res.json({ logs, total, page, totalPages: Math.ceil(total / limit) });
 });
 
 export default router;
