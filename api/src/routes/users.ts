@@ -60,6 +60,33 @@ router.post('/avatar', requireAuth, upload.single('avatar'), async (req: Request
   }
 });
 
+// DELETE /api/users/me — soft-delete account (GDPR right to erasure)
+// Sets deletedAt = now(), revokes all sessions immediately.
+// A cron job will hard-delete the account and all its data 30 days later.
+router.delete('/me', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+
+    // Soft-delete: set deletedAt timestamp
+    await prisma.user.update({
+      where: { id: userId },
+      data: { deletedAt: new Date() },
+    });
+
+    // Revoke ALL sessions immediately so existing tokens stop working
+    await prisma.session.deleteMany({ where: { userId } });
+
+    // Clear httpOnly cookies for web clients
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('DELETE /users/me error:', err);
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
+});
+
 // GET /api/users/:id — public seller profile
 router.get('/:id', async (req: Request, res: Response) => {
   const id = String(req.params.id);

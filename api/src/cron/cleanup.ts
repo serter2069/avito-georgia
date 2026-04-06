@@ -100,7 +100,97 @@ export function startCleanupCron(): void {
     }
   });
 
+  // GDPR hard-delete: daily at 04:00 UTC — permanently delete users soft-deleted 30+ days ago
+  // Cascade order (FK-safe): Message → ThreadParticipant → Thread (orphaned) →
+  //   Notification → Favorite → Promotion → Payment → Report → OtpCode → Session →
+  //   ListingPhoto → Listing → User
+  cron.schedule('0 4 * * *', async () => {
+    try {
+      const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+      const users = await prisma.user.findMany({
+        where: { deletedAt: { not: null, lt: cutoff } },
+        select: { id: true },
+      });
+
+      if (users.length === 0) return;
+
+      const userIds = users.map((u) => u.id);
+      console.log(`[cron] gdpr-purge: hard-deleting ${userIds.length} user(s)`);
+
+      for (const userId of userIds) {
+        try {
+          // 1. Messages sent by this user
+          await prisma.message.deleteMany({ where: { senderId: userId } });
+
+          // 2. Thread participations — also removes any orphaned threads below
+          await prisma.threadParticipant.deleteMany({ where: { userId } });
+
+          // 3. Orphaned threads: threads with no remaining participants
+          await prisma.thread.deleteMany({
+            where: { participants: { none: {} } },
+          });
+
+          // 4. Notifications
+          await prisma.notification.deleteMany({ where: { userId } });
+
+          // 5. Favorites
+          await prisma.favorite.deleteMany({ where: { userId } });
+
+          // 6. Promotions
+          await prisma.promotion.deleteMany({ where: { userId } });
+
+          // 7. Payments
+          await prisma.payment.deleteMany({ where: { userId } });
+
+          // 8. Reports (both as reporter and as reported target)
+          await prisma.report.deleteMany({
+            where: { OR: [{ reporterId: userId }, { targetUserId: userId }] },
+          });
+
+          // 9. OTP codes
+          await prisma.otpCode.deleteMany({ where: { userId } });
+
+          // 10. Sessions
+          await prisma.session.deleteMany({ where: { userId } });
+
+          // 11. Listing photos (child of Listing)
+          const listingIds = await prisma.listing.findMany({
+            where: { userId },
+            select: { id: true },
+          });
+          if (listingIds.length > 0) {
+            const ids = listingIds.map((l) => l.id);
+            await prisma.listingPhoto.deleteMany({ where: { listingId: { in: ids } } });
+            // Also clean up listing-related data referencing these listings
+            await prisma.favorite.deleteMany({ where: { listingId: { in: ids } } });
+            await prisma.notification.deleteMany({ where: { listingId: { in: ids } } });
+            await prisma.promotion.deleteMany({ where: { listingId: { in: ids } } });
+            await prisma.report.deleteMany({ where: { listingId: { in: ids } } });
+            // Threads referencing deleted listings
+            await prisma.message.deleteMany({ where: { thread: { listingId: { in: ids } } } });
+            await prisma.threadParticipant.deleteMany({ where: { thread: { listingId: { in: ids } } } });
+            await prisma.thread.deleteMany({ where: { listingId: { in: ids } } });
+          }
+
+          // 12. Listings
+          await prisma.listing.deleteMany({ where: { userId } });
+
+          // 13. User record
+          await prisma.user.delete({ where: { id: userId } });
+
+          console.log(`[cron] gdpr-purge: deleted user ${userId}`);
+        } catch (err) {
+          console.error(`[cron] gdpr-purge: failed to delete user ${userId}:`, err);
+        }
+      }
+    } catch (err) {
+      console.error('[cron] gdpr-purge error:', err);
+    }
+  });
+
   console.log('[cron] Listing expiry scheduled (daily 03:00 UTC)');
   console.log('[cron] Expiry reminder scheduled (daily 09:00 UTC)');
   console.log('[cron] Promotion cleanup scheduled (hourly)');
+  console.log('[cron] GDPR hard-delete scheduled (daily 04:00 UTC)');
 }
