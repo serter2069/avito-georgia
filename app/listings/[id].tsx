@@ -8,6 +8,7 @@ import { PhotoGallery } from '../../components/listing/PhotoGallery';
 import { PriceTag } from '../../components/ui/PriceTag';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { ReviewCard, ReviewData } from '../../components/listing/ReviewCard';
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../lib/colors';
@@ -89,6 +90,18 @@ export default function ListingDetailScreen() {
   const [phoneLoading, setPhoneLoading] = useState(false);
   const [phoneRevealed, setPhoneRevealed] = useState(false);
 
+  // Reviews state
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+
+  // Write-review modal state
+  const [writeReviewVisible, setWriteReviewVisible] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewDone, setReviewDone] = useState(false);
+
   // Report state
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
@@ -144,6 +157,23 @@ export default function ListingDetailScreen() {
       setSimilarLoading(false);
     })();
 
+    return () => { cancelled = true; };
+  }, [listing]);
+
+  // Fetch reviews for this listing's seller (visible when listing is sold)
+  useEffect(() => {
+    if (!listing || listing.status !== 'sold') return;
+    let cancelled = false;
+    setReviewsLoading(true);
+    (async () => {
+      const res = await api.get<{ reviews: ReviewData[] }>(`/reviews?sellerId=${listing.user.id}`);
+      if (cancelled) return;
+      if (res.ok && res.data) {
+        // Only show reviews for this listing
+        setReviews(res.data.reviews.filter((r) => r.listing?.id === listing.id));
+      }
+      setReviewsLoading(false);
+    })();
     return () => { cancelled = true; };
   }, [listing]);
 
@@ -303,6 +333,31 @@ export default function ListingDetailScreen() {
     }
   }, [user, id, reportLoading]);
 
+  const handleSubmitReview = useCallback(async () => {
+    if (!id || reviewSubmitting) return;
+    const listingId = Array.isArray(id) ? id[0] : id;
+    setReviewSubmitting(true);
+    setReviewError(null);
+    const res = await api.post<ReviewData>('/reviews', {
+      listingId,
+      rating: reviewRating,
+      text: reviewText.trim() || undefined,
+    });
+    setReviewSubmitting(false);
+    if (res.ok && res.data) {
+      setReviews((prev) => [res.data!, ...prev]);
+      setReviewDone(true);
+      setTimeout(() => {
+        setWriteReviewVisible(false);
+        setReviewDone(false);
+        setReviewText('');
+        setReviewRating(5);
+      }, 1400);
+    } else {
+      setReviewError(res.error || t('errorOccurred') || 'Error');
+    }
+  }, [id, reviewRating, reviewText, reviewSubmitting, t]);
+
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -450,6 +505,31 @@ export default function ListingDetailScreen() {
             <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
           </View>
         </TouchableOpacity>
+
+        {/* Reviews section — shown for sold listings */}
+        {listing.status === 'sold' && (
+          <View className="px-4 mb-6">
+            <View className="flex-row items-center justify-between mb-3">
+              <Text className="text-text-primary text-base font-semibold">{t('reviews')}</Text>
+              {/* Show "Write review" only to non-owner authenticated users */}
+              {user && listing.user.id !== user.id && (
+                <TouchableOpacity
+                  onPress={() => setWriteReviewVisible(true)}
+                  className="flex-row items-center gap-1"
+                >
+                  <Text className="text-primary text-sm font-semibold">{t('writeReview')}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            {reviewsLoading ? (
+              <ActivityIndicator size="small" color={colors.brandPrimary} />
+            ) : reviews.length === 0 ? (
+              <Text className="text-text-muted text-sm">{t('noReviews')}</Text>
+            ) : (
+              reviews.map((r) => <ReviewCard key={r.id} review={r} />)
+            )}
+          </View>
+        )}
 
         {/* Similar listings */}
         {(similarLoading || similarListings.length > 0) && (
@@ -627,6 +707,85 @@ export default function ListingDetailScreen() {
                 >
                   <Text style={{ fontSize: 15, color: colors.textDisabled }}>{t('cancel')}</Text>
                 </TouchableOpacity>
+              </>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Write review modal */}
+      <Modal
+        visible={writeReviewVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setWriteReviewVisible(false)}
+      >
+        <Pressable
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}
+          onPress={() => setWriteReviewVisible(false)}
+        >
+          <Pressable
+            style={{ backgroundColor: '#FFFFFF', borderRadius: 16, width: '100%', maxWidth: 400, paddingVertical: 24, paddingHorizontal: 20 }}
+            onPress={() => {}}
+          >
+            {reviewDone ? (
+              <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+                <Text style={{ fontSize: 32 }}>★</Text>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: '#0A2840', marginTop: 8, textAlign: 'center' }}>
+                  {t('reviewSubmitted')}
+                </Text>
+              </View>
+            ) : (
+              <>
+                <Text style={{ fontSize: 17, fontWeight: '700', color: '#0A2840', marginBottom: 20, textAlign: 'center' }}>
+                  {t('writeReview')}
+                </Text>
+                {/* Star picker */}
+                <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <TouchableOpacity key={star} onPress={() => setReviewRating(star)} activeOpacity={0.7}>
+                      <Text style={{ fontSize: 32, color: star <= reviewRating ? '#F59E0B' : '#D1D5DB' }}>★</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                {/* Text input */}
+                <TextInput
+                  style={{
+                    borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 10,
+                    paddingHorizontal: 14, paddingVertical: 12, fontSize: 15,
+                    color: '#0A2840', backgroundColor: '#F8FAFC',
+                    minHeight: 90, textAlignVertical: 'top', marginBottom: 16,
+                  }}
+                  value={reviewText}
+                  onChangeText={setReviewText}
+                  placeholder={t('reviewPlaceholder') || 'Tell about your experience...'}
+                  placeholderTextColor="#94A3B8"
+                  multiline
+                />
+                {reviewError ? (
+                  <Text style={{ color: '#EF4444', fontSize: 13, marginBottom: 12, textAlign: 'center' }}>{reviewError}</Text>
+                ) : null}
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, paddingVertical: 13, borderRadius: 10, borderWidth: 1, borderColor: '#CBD5E1', alignItems: 'center' }}
+                    onPress={() => setWriteReviewVisible(false)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#64748B' }}>{t('cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flex: 1, paddingVertical: 13, borderRadius: 10, backgroundColor: reviewSubmitting ? '#94A3B8' : '#0A7B8A', alignItems: 'center' }}
+                    onPress={handleSubmitReview}
+                    disabled={reviewSubmitting}
+                    activeOpacity={0.7}
+                  >
+                    {reviewSubmitting ? (
+                      <ActivityIndicator color="#FFFFFF" />
+                    ) : (
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>{t('submit')}</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
               </>
             )}
           </Pressable>
