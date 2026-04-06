@@ -100,6 +100,13 @@ router.patch('/users/:id/role', async (req: Request, res: Response) => {
     select: { id: true, email: true, name: true, role: true },
   });
 
+  if (role === 'blocked') {
+    await prisma.listing.updateMany({
+      where: { userId: id, status: 'active' },
+      data: { status: 'removed' },
+    });
+  }
+
   logAudit(req.user!.userId, req.user!.email, 'user.role_change', 'user', id, {
     previousRole: user.role,
     newRole: role,
