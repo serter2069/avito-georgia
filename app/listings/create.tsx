@@ -290,7 +290,7 @@ export default function CreateListingScreen() {
       }
 
       submittedRef.current = true;
-      Alert.alert(t('listingCreated'), '', [
+      Alert.alert(t('listingSubmittedForReview'), t('listingSubmittedForReviewDesc'), [
         { text: t('done'), onPress: () => router.replace('/my/listings') },
       ]);
     } catch (err) {
