@@ -25,7 +25,7 @@ interface ApiListing {
   views: number;
   createdAt: string;
   city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
-  category?: { id: string; name: string; slug: string };
+  category?: { id: string; name: string; nameKa: string; nameRu: string; nameEn: string; slug: string };
   photos?: { id: string; url: string; order: number }[];
   isPromoted?: boolean;
   isHighlighted?: boolean;

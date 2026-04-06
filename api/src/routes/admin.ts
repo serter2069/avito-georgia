@@ -235,7 +235,7 @@ router.get('/categories', async (req: Request, res: Response) => {
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' },
     include: {
-      children: { select: { id: true, name: true, slug: true, freeListingQuota: true, paidListingPrice: true } },
+      children: { select: { id: true, name: true, nameKa: true, nameRu: true, nameEn: true, slug: true, freeListingQuota: true, paidListingPrice: true } },
     },
   });
   res.json(categories);

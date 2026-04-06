@@ -72,7 +72,7 @@ router.get('/my', requireAuth, async (req: Request, res: Response) => {
       include: {
         photos: { orderBy: { order: 'asc' }, take: 1 },
         city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
-        category: { select: { id: true, name: true, slug: true } },
+        category: { select: { id: true, name: true, nameKa: true, nameRu: true, nameEn: true, slug: true } },
       },
     }),
     prisma.listing.count({ where }),
@@ -180,7 +180,7 @@ router.get('/', searchRateLimit, async (req: Request, res: Response) => {
       include: {
         photos: { orderBy: { order: 'asc' }, take: 3 },
         city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
-        category: { select: { id: true, name: true, slug: true } },
+        category: { select: { id: true, name: true, nameKa: true, nameRu: true, nameEn: true, slug: true } },
         promotions: {
           where: { isActive: true },
           select: { promotionType: true, expiresAt: true },

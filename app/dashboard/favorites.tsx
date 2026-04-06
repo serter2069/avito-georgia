@@ -16,7 +16,7 @@ interface FavoriteListing {
   status: string;
   photos: { url: string }[];
   city?: { id: string; nameRu: string; nameEn: string; nameKa: string };
-  category?: { id: string; name: string; slug: string };
+  category?: { id: string; name: string; nameKa: string; nameRu: string; nameEn: string; slug: string };
 }
 
 interface FavoriteItem {
