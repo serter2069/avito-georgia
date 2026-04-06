@@ -16,6 +16,14 @@ interface Promotion {
   listing: { id: string; title: string } | null;
 }
 
+interface PriceOption {
+  type: string;
+  label: string;
+  amountGEL: number;
+  days: number | null;
+  recurring: boolean;
+}
+
 const TYPE_LABELS: Record<string, string> = {
   top_1d: 'promotionTop1d',
   top_3d: 'promotionTop3d',
@@ -24,28 +32,35 @@ const TYPE_LABELS: Record<string, string> = {
   unlimited_sub: 'promotionUnlimitedSub',
 };
 
-const TYPE_PRICES: Record<string, string> = {
-  top_1d: '5 GEL',
-  top_3d: '12 GEL',
-  top_7d: '25 GEL',
-  highlight: '3 GEL',
-  unlimited_sub: '9.99 GEL',
-};
+function formatGEL(amount: number): string {
+  return Number.isInteger(amount) ? `${amount} GEL` : `${amount.toFixed(2)} GEL`;
+}
 
 export default function PaymentsScreen() {
   const { t } = useTranslation();
   const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [pricesMap, setPricesMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
-    const res = await api.get<{ promotions: Promotion[] }>('/promotions/my');
-    if (res.ok && res.data) {
+    const [myRes, pricesRes] = await Promise.all([
+      api.get<{ promotions: Promotion[] }>('/promotions/my'),
+      api.get<{ prices: PriceOption[] }>('/promotions/prices'),
+    ]);
+    if (myRes.ok && myRes.data) {
       // Sort by createdAt descending — newest first
-      const sorted = [...res.data.promotions].sort(
+      const sorted = [...myRes.data.promotions].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setPromotions(sorted);
+    }
+    if (pricesRes.ok && pricesRes.data) {
+      const map: Record<string, string> = {};
+      for (const p of pricesRes.data.prices) {
+        map[p.type] = formatGEL(p.amountGEL);
+      }
+      setPricesMap(map);
     }
     setLoading(false);
   }, []);
@@ -125,7 +140,7 @@ export default function PaymentsScreen() {
                   )}
                 </View>
                 <Text className="text-primary text-sm font-bold">
-                  {TYPE_PRICES[promo.promotionType] || '—'}
+                  {pricesMap[promo.promotionType] || '—'}
                 </Text>
               </View>
             </View>
