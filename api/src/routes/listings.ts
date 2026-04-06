@@ -7,7 +7,7 @@ import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
 import { listingCreateRateLimit, searchRateLimit, phoneRevealRateLimit } from '../middleware/rateLimiter';
-import { geocodeCity } from '../lib/geocoder';
+import { geocodeCity, geocodeAddress } from '../lib/geocoder';
 import { isValidOwnerTransition, getOwnerAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
 import xss from 'xss';
 
@@ -38,6 +38,7 @@ const createListingSchema = z.object({
   categoryId: z.string().uuid(),
   cityId: z.string().uuid(),
   districtId: z.string().uuid().optional(),
+  address: z.string().max(200).optional(),
 });
 
 // Draft schema: categoryId + cityId required by DB, all other fields optional
@@ -49,6 +50,7 @@ const createDraftSchema = z.object({
   categoryId: z.string().uuid(),
   cityId: z.string().uuid(),
   districtId: z.string().uuid().optional(),
+  address: z.string().max(200).optional(),
   status: z.literal('draft'),
 });
 
@@ -106,6 +108,7 @@ router.get('/map', async (req: Request, res: Response) => {
     },
     select: {
       id: true, title: true, price: true, currency: true,
+      lat: true, lng: true,
       city: { select: { lat: true, lng: true } },
       photos: { orderBy: { order: 'asc' }, take: 1, select: { url: true } },
     },
@@ -113,7 +116,8 @@ router.get('/map', async (req: Request, res: Response) => {
   res.json(
     listings.map((l) => ({
       id: l.id, title: l.title, price: l.price, currency: l.currency,
-      lat: l.city.lat, lng: l.city.lng,
+      lat: l.lat ?? l.city.lat,
+      lng: l.lng ?? l.city.lng,
       photo: l.photos[0]?.url || null,
     }))
   );
@@ -310,7 +314,7 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
     }
     throw err;
   }
-  const { title, description, price, currency, categoryId, cityId, districtId } = data;
+  const { title, description, price, currency, categoryId, cityId, districtId, address } = data;
   // Sanitize text fields to strip HTML tags (XSS prevention) — defense in depth
   const safeTitle = title ? xss(title) : 'Draft';
   const safeDescription = description ? xss(description) : description;
@@ -410,14 +414,24 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
 
   // Non-draft listings go to pending_moderation for admin review
   const initialStatus: ListingStatus = isDraft ? 'draft' : 'pending_moderation';
-  // Geocode city coordinates — best-effort, never blocks listing creation
+  // Geocode coordinates — best-effort, never blocks listing creation
+  // If address is provided: try address-level first, fall back to city-level
   let lat: number | null = null;
   let lng: number | null = null;
   if (cityId) {
     const cityRecord = await prisma.city.findUnique({ where: { id: cityId }, select: { nameEn: true } });
     if (cityRecord?.nameEn) {
-      const coords = await geocodeCity(cityRecord.nameEn);
-      if (coords) { lat = coords.lat; lng = coords.lng; }
+      if (address) {
+        const addrCoords = await geocodeAddress(address, cityRecord.nameEn);
+        if (addrCoords) {
+          lat = addrCoords.lat;
+          lng = addrCoords.lng;
+        }
+      }
+      if (lat === null) {
+        const cityCoords = await geocodeCity(cityRecord.nameEn);
+        if (cityCoords) { lat = cityCoords.lat; lng = cityCoords.lng; }
+      }
     }
   }
   try {
@@ -430,6 +444,7 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
         categoryId,
         cityId,
         districtId,
+        address: address ?? null,
         userId,
         status: initialStatus,
         lat,
@@ -473,18 +488,29 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
     }
     throw err;
   }
-  const { title, description, price, currency, categoryId, cityId, districtId } = updateData;
+  const { title, description, price, currency, categoryId, cityId, districtId, address } = updateData;
   const newPrice = price;
   // Sanitize only fields present in the request body to strip HTML tags (XSS prevention)
   const safeTitle = title !== undefined ? xss(title) : title;
   const safeDescription = description !== undefined ? xss(description) : description;
-  // Re-geocode if cityId is being changed
+  // Re-geocode when address or cityId changes
   let coordsUpdate: { lat?: number | null; lng?: number | null } = {};
-  if (cityId !== undefined) {
-    const city = await prisma.city.findUnique({ where: { id: cityId }, select: { nameEn: true } });
+  const newAddress = address !== undefined ? address : undefined;
+  const effectiveCityId = cityId ?? listing.cityId;
+  if (address !== undefined || cityId !== undefined) {
+    const city = await prisma.city.findUnique({ where: { id: effectiveCityId }, select: { nameEn: true } });
     if (city?.nameEn) {
-      const coords = await geocodeCity(city.nameEn);
-      coordsUpdate = { lat: coords?.lat ?? null, lng: coords?.lng ?? null };
+      const addrToGeocode = address !== undefined ? address : listing.address;
+      if (addrToGeocode) {
+        const addrCoords = await geocodeAddress(addrToGeocode, city.nameEn);
+        if (addrCoords) {
+          coordsUpdate = { lat: addrCoords.lat, lng: addrCoords.lng };
+        }
+      }
+      if (coordsUpdate.lat === undefined) {
+        const cityCoords = await geocodeCity(city.nameEn);
+        coordsUpdate = { lat: cityCoords?.lat ?? null, lng: cityCoords?.lng ?? null };
+      }
     } else {
       coordsUpdate = { lat: null, lng: null };
     }
@@ -495,6 +521,7 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
       title: safeTitle, description: safeDescription,
       price: newPrice,
       currency, categoryId, cityId, districtId,
+      ...(newAddress !== undefined ? { address: newAddress || null } : {}),
       ...coordsUpdate,
     },
   });
