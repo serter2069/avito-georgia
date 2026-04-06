@@ -3,22 +3,39 @@ import multer from 'multer';
 import { prisma } from '../lib/prisma';
 import { uploadFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
+import { NotificationPrefType } from '@prisma/client';
 
 const router = Router();
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
+const VALID_LOCALES = ['ka', 'ru', 'en'] as const;
+type ValidLocale = typeof VALID_LOCALES[number];
+
+const NOTIFICATION_PREF_TYPES: NotificationPrefType[] = [
+  NotificationPrefType.new_message,
+  NotificationPrefType.price_drop,
+  NotificationPrefType.moderation_update,
+];
+
 // PATCH /api/users/me — update current user profile (must be before /:id)
 router.patch('/me', requireAuth, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { name, phone, city, isOnboarded } = req.body;
+    const { name, phone, city, isOnboarded, locale } = req.body;
 
     const data: Record<string, string | boolean | null> = {};
     if (name !== undefined) data.name = typeof name === 'string' ? name.trim() || null : null;
     if (phone !== undefined) data.phone = typeof phone === 'string' ? phone.trim() || null : null;
     if (city !== undefined) data.city = typeof city === 'string' ? city.trim() || null : null;
     if (isOnboarded === true) data.isOnboarded = true;
+    if (locale !== undefined) {
+      if (!VALID_LOCALES.includes(locale as ValidLocale)) {
+        res.status(400).json({ error: 'Invalid locale. Must be one of: ka, ru, en' });
+        return;
+      }
+      data.locale = locale;
+    }
 
     const user = await prisma.user.update({
       where: { id: userId },
@@ -30,6 +47,68 @@ router.patch('/me', requireAuth, async (req: Request, res: Response) => {
   } catch (err) {
     console.error('PATCH /users/me error:', err);
     res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// GET /api/users/me/notification-prefs — get all notification preferences for current user
+// Returns defaults (all enabled) for types that have no DB row yet (upserts on first call).
+router.get('/me/notification-prefs', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+
+    // Fetch existing prefs
+    const existing = await prisma.notificationPref.findMany({ where: { userId } });
+    const existingTypes = new Set(existing.map((p) => p.type));
+
+    // Create default rows for any missing types
+    const missing = NOTIFICATION_PREF_TYPES.filter((t) => !existingTypes.has(t));
+    if (missing.length > 0) {
+      await prisma.notificationPref.createMany({
+        data: missing.map((type) => ({ userId, type, enabled: true })),
+        skipDuplicates: true,
+      });
+    }
+
+    // Return all prefs (re-fetch to include newly created)
+    const prefs = await prisma.notificationPref.findMany({
+      where: { userId },
+      select: { type: true, enabled: true },
+      orderBy: { type: 'asc' },
+    });
+
+    res.json({ prefs });
+  } catch (err) {
+    console.error('GET /users/me/notification-prefs error:', err);
+    res.status(500).json({ error: 'Failed to fetch notification preferences' });
+  }
+});
+
+// PUT /api/users/me/notification-prefs — update a single notification preference
+router.put('/me/notification-prefs', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { type, enabled } = req.body;
+
+    if (!NOTIFICATION_PREF_TYPES.includes(type as NotificationPrefType)) {
+      res.status(400).json({ error: `Invalid type. Must be one of: ${NOTIFICATION_PREF_TYPES.join(', ')}` });
+      return;
+    }
+    if (typeof enabled !== 'boolean') {
+      res.status(400).json({ error: 'enabled must be a boolean' });
+      return;
+    }
+
+    const pref = await prisma.notificationPref.upsert({
+      where: { userId_type: { userId, type: type as NotificationPrefType } },
+      create: { userId, type: type as NotificationPrefType, enabled },
+      update: { enabled },
+      select: { type: true, enabled: true },
+    });
+
+    res.json({ pref });
+  } catch (err) {
+    console.error('PUT /users/me/notification-prefs error:', err);
+    res.status(500).json({ error: 'Failed to update notification preference' });
   }
 });
 

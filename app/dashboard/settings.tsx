@@ -1,28 +1,12 @@
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../stores/authStore';
+import { api } from '../../lib/api';
+import { setStoredLang } from '../../lib/i18n';
 import { colors } from '../../lib/colors';
 import { Ionicons } from '@expo/vector-icons';
-
-// AsyncStorage fallback for web
-async function getStoredValue(key: string): Promise<string | null> {
-  if (Platform.OS === 'web') {
-    return localStorage.getItem(key);
-  }
-  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-  return AsyncStorage.getItem(key);
-}
-
-async function setStoredValue(key: string, value: string): Promise<void> {
-  if (Platform.OS === 'web') {
-    localStorage.setItem(key, value);
-    return;
-  }
-  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-  await AsyncStorage.setItem(key, value);
-}
 
 const LANGUAGES = [
   { code: 'ru', label: 'RU', name: 'Русский' },
@@ -30,28 +14,69 @@ const LANGUAGES = [
   { code: 'ka', label: 'KA', name: 'ქართული' },
 ] as const;
 
+type NotifPrefType = 'new_message' | 'price_drop' | 'moderation_update';
+
+interface NotifPref {
+  type: NotifPrefType;
+  enabled: boolean;
+}
+
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
   const deleteAccount = useAuthStore((s) => s.deleteAccount);
+  const updateLocale = useAuthStore((s) => s.updateLocale);
 
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notifPrefs, setNotifPrefs] = useState<NotifPref[]>([]);
+  const [notifLoading, setNotifLoading] = useState(true);
+  const [togglingPref, setTogglingPref] = useState<NotifPrefType | null>(null);
   const [deletingAccount, setDeletingAccount] = useState(false);
 
-  useEffect(() => {
-    getStoredValue('notifications_enabled').then((val) => {
-      if (val !== null) setNotificationsEnabled(val === 'true');
-    });
+  // Fetch notification preferences from API on mount
+  const fetchNotifPrefs = useCallback(async () => {
+    setNotifLoading(true);
+    try {
+      const res = await api.get<{ prefs: NotifPref[] }>('/users/me/notification-prefs');
+      if (res.ok && res.data) {
+        setNotifPrefs(res.data.prefs);
+      }
+    } catch {
+      // Non-critical — silent failure, prefs will show as loading
+    } finally {
+      setNotifLoading(false);
+    }
   }, []);
 
-  const toggleNotifications = (value: boolean) => {
-    setNotificationsEnabled(value);
-    setStoredValue('notifications_enabled', String(value));
+  useEffect(() => {
+    fetchNotifPrefs();
+  }, [fetchNotifPrefs]);
+
+  const toggleNotifPref = async (type: NotifPrefType, value: boolean) => {
+    if (togglingPref === type) return;
+    // Optimistic update
+    setNotifPrefs((prev) =>
+      prev.map((p) => (p.type === type ? { ...p, enabled: value } : p))
+    );
+    setTogglingPref(type);
+    try {
+      await api.put('/users/me/notification-prefs', { type, enabled: value });
+    } catch {
+      // Revert on failure
+      setNotifPrefs((prev) =>
+        prev.map((p) => (p.type === type ? { ...p, enabled: !value } : p))
+      );
+    } finally {
+      setTogglingPref(null);
+    }
   };
 
-  const switchLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
+  const switchLanguage = async (lang: string) => {
+    // Apply locally first (instant feedback)
+    await i18n.changeLanguage(lang);
+    await setStoredLang(lang);
+    // Persist to backend — optimistic, non-blocking
+    updateLocale(lang);
   };
 
   const handleLogout = async () => {
@@ -64,7 +89,6 @@ export default function SettingsScreen() {
     const message = t('deleteAccountConfirmMessage');
 
     if (Platform.OS === 'web') {
-      // Alert.alert is not available on web — use window.confirm
       if (window.confirm(`${title}\n\n${message}`)) {
         handleDeleteAccount();
       }
@@ -100,6 +124,14 @@ export default function SettingsScreen() {
     }
   };
 
+  const notifPrefLabel = (type: NotifPrefType): string => {
+    switch (type) {
+      case 'new_message': return t('notifNewMessage');
+      case 'price_drop': return t('notifPriceDrop');
+      case 'moderation_update': return t('notifModerationUpdate');
+    }
+  };
+
   return (
     <View className="flex-1 bg-dark">
       {/* Header */}
@@ -113,20 +145,33 @@ export default function SettingsScreen() {
           <Text className="text-text-secondary text-xs font-semibold uppercase tracking-wider mb-3">
             {t('notifications')}
           </Text>
-          <View className="bg-surface-card rounded-lg border border-border px-4 py-3 flex-row items-center justify-between">
-            <View className="flex-1 mr-3">
-              <Text className="text-text-primary text-base">{t('notifications')}</Text>
-              <Text className="text-text-muted text-xs mt-0.5">
-                {notificationsEnabled ? t('notificationsEnabled') : t('notificationsDisabled')}
-              </Text>
+          {notifLoading ? (
+            <View className="bg-surface-card rounded-lg border border-border px-4 py-4 items-center">
+              <ActivityIndicator size="small" color={colors.brandPrimary} />
             </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={toggleNotifications}
-              trackColor={{ false: colors.borderDefault, true: colors.brandPrimary }}
-              thumbColor={colors.white}
-            />
-          </View>
+          ) : (
+            <View className="bg-surface-card rounded-lg border border-border overflow-hidden">
+              {notifPrefs.map((pref, idx) => (
+                <View
+                  key={pref.type}
+                  className={`px-4 py-3 flex-row items-center justify-between ${
+                    idx < notifPrefs.length - 1 ? 'border-b border-border' : ''
+                  }`}
+                >
+                  <Text className="text-text-primary text-base flex-1 mr-3">
+                    {notifPrefLabel(pref.type)}
+                  </Text>
+                  <Switch
+                    value={pref.enabled}
+                    onValueChange={(val) => toggleNotifPref(pref.type, val)}
+                    trackColor={{ false: colors.borderDefault, true: colors.brandPrimary }}
+                    thumbColor={colors.white}
+                    disabled={togglingPref === pref.type}
+                  />
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Language */}
