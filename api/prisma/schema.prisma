@@ -23,6 +23,7 @@ enum PromotionType {
   top_7d
   highlight
   unlimited_sub
+  bundle
 }
 
 enum PaymentStatus {

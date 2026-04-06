@@ -21,7 +21,11 @@ const DAYS_MAP: Record<string, number | null> = {
   top_7d: 7,
   highlight: 7,
   unlimited_sub: null,
+  bundle: 7,
 };
+
+// Bundle expands to two individual promotion types on fulfillment
+const BUNDLE_SUB_TYPES: PromotionType[] = ['top_7d', 'highlight'];
 
 // POST /api/stripe-webhook — receives raw body (express.raw applied in index.ts)
 router.post('/', async (req: Request, res: Response) => {
@@ -54,27 +58,51 @@ router.post('/', async (req: Request, res: Response) => {
           data: { status: 'completed' },
         });
 
-        // Create promotion (idempotency: skip if active promotion already exists)
+        // Create promotion(s) — idempotency: skip if already active
         const days = DAYS_MAP[type];
         if (listingId && days != null) {
-          const existingPromo = await prisma.promotion.findFirst({
-            where: { userId, listingId, promotionType: type as PromotionType, isActive: true },
-          });
-          if (existingPromo) {
-            console.log(`[stripe-webhook] Skipped duplicate promotion ${type} for listing ${listingId}`);
-            break;
+          if (type === 'bundle') {
+            // Bundle: create top_7d + highlight as separate Promotion records
+            const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+            for (const subType of BUNDLE_SUB_TYPES) {
+              const existingSubPromo = await prisma.promotion.findFirst({
+                where: { userId, listingId, promotionType: subType, isActive: true },
+              });
+              if (existingSubPromo) {
+                console.log(`[stripe-webhook] Skipped duplicate bundle sub-promotion ${subType} for listing ${listingId}`);
+                continue;
+              }
+              await prisma.promotion.create({
+                data: {
+                  userId,
+                  listingId,
+                  promotionType: subType,
+                  isActive: true,
+                  expiresAt,
+                },
+              });
+              console.log(`[stripe-webhook] Created bundle sub-promotion ${subType} for listing ${listingId}, expires ${expiresAt.toISOString()}`);
+            }
+          } else {
+            const existingPromo = await prisma.promotion.findFirst({
+              where: { userId, listingId, promotionType: type as PromotionType, isActive: true },
+            });
+            if (existingPromo) {
+              console.log(`[stripe-webhook] Skipped duplicate promotion ${type} for listing ${listingId}`);
+              break;
+            }
+            const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+            await prisma.promotion.create({
+              data: {
+                userId,
+                listingId,
+                promotionType: type as PromotionType,
+                isActive: true,
+                expiresAt,
+              },
+            });
+            console.log(`[stripe-webhook] Created promotion ${type} for listing ${listingId}, expires ${expiresAt.toISOString()}`);
           }
-          const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
-          await prisma.promotion.create({
-            data: {
-              userId,
-              listingId,
-              promotionType: type as PromotionType,
-              isActive: true,
-              expiresAt,
-            },
-          });
-          console.log(`[stripe-webhook] Created promotion ${type} for listing ${listingId}, expires ${expiresAt.toISOString()}`);
         }
         break;
       }
