@@ -93,6 +93,7 @@ export default function SellerProfileScreen() {
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [startingDialog, setStartingDialog] = useState(false);
+  const [reviewStats, setReviewStats] = useState<{ averageRating: number | null; totalReviews: number } | null>(null);
 
   // Fetch seller profile
   useEffect(() => {
@@ -102,9 +103,10 @@ export default function SellerProfileScreen() {
     (async () => {
       setLoading(true);
       setError(null);
-      const [profileRes, listingsRes] = await Promise.all([
+      const [profileRes, listingsRes, statsRes] = await Promise.all([
         api.get<SellerProfile>(`/users/${id}`),
         api.get<ListingsResponse>(`/listings?userId=${id}&sort=createdAt_desc&page=1`),
+        api.get<{ averageRating: number | null; totalReviews: number }>(`/reviews/stats/${id}`),
       ]);
 
       if (cancelled) return;
@@ -118,6 +120,10 @@ export default function SellerProfileScreen() {
       if (listingsRes.ok && listingsRes.data) {
         setListings(listingsRes.data.listings.map((l) => mapListing(l, i18n.language, t)));
         setTotal(listingsRes.data.total);
+      }
+
+      if (statsRes.ok && statsRes.data) {
+        setReviewStats(statsRes.data);
       }
 
       setLoading(false);
@@ -193,6 +199,19 @@ export default function SellerProfileScreen() {
             <Text className="text-text-primary text-2xl font-bold">{seller.activeListings}</Text>
             <Text className="text-text-muted text-xs">{t('activeListings')}</Text>
           </View>
+          {reviewStats && reviewStats.totalReviews > 0 && (
+            <View className="items-center">
+              <View className="flex-row items-center gap-1">
+                <Text style={{ color: '#F59E0B', fontSize: 18 }}>★</Text>
+                <Text className="text-text-primary text-2xl font-bold">
+                  {reviewStats.averageRating?.toFixed(1)}
+                </Text>
+              </View>
+              <Text className="text-text-muted text-xs">
+                {reviewStats.totalReviews} {t('reviews')}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Write message button — only shown to other users, not the seller themselves */}

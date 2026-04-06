@@ -47,17 +47,19 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  otpCodes      OtpCode[]
-  sessions      Session[]
-  listings      Listing[]
-  favorites     Favorite[]
-  notifications Notification[]
-  sentMessages  Message[]           @relation("MessageSender")
-  threads       ThreadParticipant[]
-  payments      Payment[]
-  promotions    Promotion[]
-  reports       Report[]             @relation("Reports")
-  reportedBy    Report[]             @relation("ReportedUser")
+  otpCodes        OtpCode[]
+  sessions        Session[]
+  listings        Listing[]
+  favorites       Favorite[]
+  notifications   Notification[]
+  sentMessages    Message[]           @relation("MessageSender")
+  threads         ThreadParticipant[]
+  payments        Payment[]
+  promotions      Promotion[]
+  reports         Report[]             @relation("Reports")
+  reportedBy      Report[]             @relation("ReportedUser")
+  reviewsWritten  Review[]             @relation("ReviewAuthor")
+  reviewsReceived Review[]             @relation("ReviewSeller")
 }
 
 // Auth: OTP only — no password field on User
@@ -157,6 +159,7 @@ model Listing {
   promotions    Promotion[]
   threads       Thread[]
   reports       Report[]
+  reviews       Review[]
 
   @@index([status])
   @@index([expiresAt])
@@ -297,4 +300,22 @@ model AuditLog {
   @@index([adminId])
   @@index([targetType, targetId])
   @@index([createdAt])
+}
+
+// Review — left by a buyer (thread participant) after listing is sold
+model Review {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  sellerId  String
+  seller    User     @relation("ReviewSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  rating    Int      // 1–5, enforced at application level
+  text      String?
+  createdAt DateTime @default(now())
+
+  @@unique([authorId, listingId])
+  @@index([sellerId])
+  @@index([listingId])
 }
