@@ -167,10 +167,15 @@ router.post('/threads', requireAuth, async (req: Request, res: Response) => {
       return;
     }
 
-    // Verify the other user exists
-    const otherUser = await prisma.user.findUnique({ where: { id: otherUserId }, select: { id: true, name: true } });
+    // Verify the other user exists and is not blocked
+    const otherUser = await prisma.user.findUnique({ where: { id: otherUserId }, select: { id: true, name: true, role: true } });
     if (!otherUser) {
       res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    if (otherUser.role === 'blocked') {
+      res.status(403).json({ error: 'Cannot message this user' });
       return;
     }
 
