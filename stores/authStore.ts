@@ -19,6 +19,7 @@ interface AuthState {
 interface AuthActions {
   setAuth: (user: User, accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   hydrate: () => Promise<void>;
 }
 
@@ -47,6 +48,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
     await clearTokens();
     // Clear isLoggedIn flag on web
+    if (Platform.OS === 'web') {
+      localStorage.removeItem('isLoggedIn');
+    }
+    set({ user: null, accessToken: null });
+  },
+
+  deleteAccount: async () => {
+    // Call DELETE /api/users/me — backend soft-deletes and revokes all sessions
+    await api.delete('/users/me');
+    // Clear local tokens and state, same as logout
+    await clearTokens();
     if (Platform.OS === 'web') {
       localStorage.removeItem('isLoggedIn');
     }

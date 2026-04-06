@@ -41,9 +41,10 @@ model User {
   role        String   @default("user")
   locale      String   @default("ru")
   city        String?
-  isOnboarded Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isOnboarded Boolean   @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   otpCodes      OtpCode[]
   sessions      Session[]

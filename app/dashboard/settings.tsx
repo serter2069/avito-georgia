@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
@@ -34,8 +34,10 @@ export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
+  const deleteAccount = useAuthStore((s) => s.deleteAccount);
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   useEffect(() => {
     getStoredValue('notifications_enabled').then((val) => {
@@ -55,6 +57,47 @@ export default function SettingsScreen() {
   const handleLogout = async () => {
     await logout();
     router.replace('/(auth)');
+  };
+
+  const confirmDeleteAccount = () => {
+    const title = t('deleteAccount');
+    const message = t('deleteAccountConfirmMessage');
+
+    if (Platform.OS === 'web') {
+      // Alert.alert is not available on web — use window.confirm
+      if (window.confirm(`${title}\n\n${message}`)) {
+        handleDeleteAccount();
+      }
+    } else {
+      Alert.alert(
+        title,
+        message,
+        [
+          { text: t('cancel'), style: 'cancel' },
+          {
+            text: t('deleteAccount'),
+            style: 'destructive',
+            onPress: handleDeleteAccount,
+          },
+        ]
+      );
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deletingAccount) return;
+    setDeletingAccount(true);
+    try {
+      await deleteAccount();
+      router.replace('/(auth)');
+    } catch {
+      setDeletingAccount(false);
+      if (Platform.OS === 'web') {
+        window.alert(t('deleteAccountError'));
+      } else {
+        Alert.alert(t('error'), t('deleteAccountError'));
+      }
+    }
   };
 
   return (
@@ -118,6 +161,20 @@ export default function SettingsScreen() {
             activeOpacity={0.7}
           >
             <Text className="text-error text-base font-semibold">{t('logout')}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Delete account (GDPR) */}
+        <View className="px-4 mt-3 mb-8">
+          <TouchableOpacity
+            className="rounded-lg px-4 py-3 items-center"
+            onPress={confirmDeleteAccount}
+            activeOpacity={0.7}
+            disabled={deletingAccount}
+          >
+            <Text className="text-text-muted text-sm">
+              {deletingAccount ? t('deleting') : t('deleteAccount')}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

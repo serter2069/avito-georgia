@@ -70,6 +70,16 @@ router.post('/request-otp', async (req: Request, res: Response) => {
     return;
   }
 
+  // GDPR: block OTP for soft-deleted accounts (check before upsert to avoid re-creating user)
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, deletedAt: true },
+  });
+  if (existingUser?.deletedAt !== null && existingUser !== null) {
+    res.status(401).json({ error: 'Account deleted' });
+    return;
+  }
+
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -142,6 +152,12 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     return;
   }
 
+  // GDPR: soft-deleted accounts cannot obtain new tokens
+  if (user.deletedAt !== null) {
+    res.status(401).json({ error: 'Account deleted' });
+    return;
+  }
+
   const tokens = signTokens(user.id, user.email, user.role);
 
   // Persist session in DB for sliding window refresh and server-side revocation
@@ -186,10 +202,14 @@ router.post('/refresh', async (req: Request, res: Response) => {
       return;
     }
 
-    // Verify user still exists
+    // Verify user still exists and hasn't been soft-deleted
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
     if (!user) {
       res.status(401).json({ error: 'User not found' });
+      return;
+    }
+    if (user.deletedAt !== null) {
+      res.status(401).json({ error: 'Account deleted' });
       return;
     }
 
