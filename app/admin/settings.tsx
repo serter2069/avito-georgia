@@ -68,7 +68,7 @@ export default function AdminSettings() {
           <Switch
             value={settings.autoModerationEnabled}
             onValueChange={(val) => setSettings((prev) => ({ ...prev, autoModerationEnabled: val }))}
-            trackColor={{ false: colors.border, true: colors.brandPrimary }}
+            trackColor={{ false: colors.borderDefault, true: colors.brandPrimary }}
             thumbColor={colors.textPrimary}
           />
         </View>

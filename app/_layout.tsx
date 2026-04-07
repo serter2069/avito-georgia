@@ -34,7 +34,7 @@ function useProtectedRoute() {
     const inOnboarding = segments[0] === 'onboarding';
     // Public routes accessible without auth
     const inPublicRoute =
-      segments.length === 0 || // home
+      segments[0] === undefined || // home (root index)
       segments[0] === 'listings' ||
       segments[0] === 'users' ||
       segments[0] === 'search' ||
@@ -115,7 +115,6 @@ export default function RootLayout() {
           screenOptions={{
             headerShown: false,
             contentStyle: { backgroundColor: colors.bgPrimary },
-            sceneContainerStyle: { backgroundColor: colors.bgPrimary },
           }}
         />
       </View>
