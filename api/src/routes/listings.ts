@@ -43,7 +43,11 @@ const createListingSchema = z.object({
   cityId: cuid,
   districtId: cuid.optional(),
   address: z.string().max(200).optional(),
-});
+  isNegotiable: z.boolean().optional(),
+}).refine(
+  (data) => data.isNegotiable || (data.price !== undefined && data.price !== null && data.price > 0),
+  { message: 'Price must be greater than 0 or mark as negotiable', path: ['price'] }
+);
 
 // Draft schema: categoryId + cityId required by DB, all other fields optional
 const createDraftSchema = z.object({
@@ -135,9 +139,10 @@ router.get('/', searchRateLimit, async (req: Request, res: Response) => {
   const price_max = qs(req.query.price_max);
   const sort = qs(req.query.sort);
   const limit = Math.min(parseInt(qs(req.query.limit) || '20', 10), 50);
-  const page = parseInt(qs(req.query.page) || '1', 10);
+  const page = parseInt(req.query.page as string || '1', 10);
+  const offsetParam = req.query.offset !== undefined ? parseInt(req.query.offset as string, 10) : null;
   const take = limit;
-  const skip = (page - 1) * take;
+  const skip = offsetParam !== null && !isNaN(offsetParam) ? offsetParam : (page - 1) * take;
   const userId = qs(req.query.userId);
 
   // Resolve category: accept either a cuid (starts with 'c', 25+ chars) or a slug
@@ -597,6 +602,28 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   }
 
   res.json(updated);
+});
+
+// DELETE /api/listings/:id
+router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    include: { photos: { select: { key: true } } },
+  });
+  if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
+  if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
+  if (listing.status === 'removed') { res.status(400).json({ error: 'Listing is already removed' }); return; }
+
+  // Delete photos from MinIO — best-effort, never blocks DB deletion
+  if (listing.photos.length > 0) {
+    await Promise.allSettled(
+      listing.photos.map((p) => (p.key ? deleteFile(p.key) : Promise.resolve()))
+    );
+  }
+
+  await prisma.listing.delete({ where: { id } });
+  res.json({ ok: true });
 });
 
 // PATCH /api/listings/:id/status — owner status transitions (state machine)
