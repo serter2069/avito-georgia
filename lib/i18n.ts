@@ -444,6 +444,20 @@ const resources = {
       pricePerListing: 'Цена за объявление',
       remainingFree: 'Осталось бесплатных',
       adminCategories: 'Категории',
+      adminSettings: 'Настройки',
+
+      // Admin settings — auto-moderation
+      autoModerationTitle: 'Авто-публикация объявлений',
+      autoModerationDesc: 'Когда включено: новые объявления автоматически публикуются без ручной модерации. Когда выключено: объявления уходят на проверку.',
+      autoModerationOn: 'Включено (авто-публикация)',
+      autoModerationOff: 'Выключено (ручная модерация)',
+      bannedWordsTitle: 'Запрещённые слова',
+      bannedWordsDesc: 'Объявления, содержащие эти слова, будут автоматически отклонены.',
+      bannedWordsPlaceholder: 'казино\nспам\nXXX',
+      bannedWordsHint: 'По одному слову или фразе на строку. Регистр не важен.',
+      settingsSaved: 'Настройки сохранены',
+      settingsSaveError: 'Не удалось сохранить настройки',
+      success: 'Успешно',
 
       // Moderation flow
       pendingModeration: 'На модерации',
@@ -867,6 +881,20 @@ const resources = {
       pricePerListing: 'Price per listing',
       remainingFree: 'Free remaining',
       adminCategories: 'Categories',
+      adminSettings: 'Settings',
+
+      // Admin settings — auto-moderation
+      autoModerationTitle: 'Auto-publish listings',
+      autoModerationDesc: 'When ON: new listings are published immediately without manual review. When OFF: listings go to the moderation queue.',
+      autoModerationOn: 'ON (auto-publish)',
+      autoModerationOff: 'OFF (manual moderation)',
+      bannedWordsTitle: 'Banned words',
+      bannedWordsDesc: 'Listings containing these words will be auto-rejected.',
+      bannedWordsPlaceholder: 'casino\nspam\nXXX',
+      bannedWordsHint: 'One word or phrase per line. Case-insensitive.',
+      settingsSaved: 'Settings saved',
+      settingsSaveError: 'Failed to save settings',
+      success: 'Success',
 
       // Moderation flow
       pendingModeration: 'Pending review',
@@ -1290,6 +1318,20 @@ const resources = {
       pricePerListing: 'ფასი განცხადებაზე',
       remainingFree: 'დარჩენილი უფასო',
       adminCategories: 'კატეგორიები',
+      adminSettings: 'პარამეტრები',
+
+      // Admin settings — auto-moderation
+      autoModerationTitle: 'განცხადებების ავტო-გამოქვეყნება',
+      autoModerationDesc: 'ჩართვისას: ახალი განცხადებები ავტომატურად ქვეყნდება მოდერაციის გარეშე. გამორთვისას: განცხადებები იგზავნება შემოწმებაზე.',
+      autoModerationOn: 'ჩართულია (ავტო-გამოქვეყნება)',
+      autoModerationOff: 'გამორთულია (ხელით მოდერაცია)',
+      bannedWordsTitle: 'აკრძალული სიტყვები',
+      bannedWordsDesc: 'განცხადებები, რომლებიც შეიცავს ამ სიტყვებს, ავტომატურად უარყოფილი იქნება.',
+      bannedWordsPlaceholder: 'კაზინო\nსპამი\nXXX',
+      bannedWordsHint: 'თითო სიტყვა ან ფრაზა ხაზზე. რეგისტრი არ აქვს მნიშვნელობა.',
+      settingsSaved: 'პარამეტრები შენახულია',
+      settingsSaveError: 'პარამეტრების შენახვა ვერ მოხერხდა',
+      success: 'წარმატება',
 
       // Moderation flow
       pendingModeration: 'მოდერაციაზე',

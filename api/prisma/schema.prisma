@@ -342,3 +342,11 @@ model NotificationPref {
   @@unique([userId, type])
   @@index([userId])
 }
+
+// Global admin-configurable settings stored as key-value pairs
+model AppSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
