@@ -34,7 +34,7 @@ function stripHtml(str: string): string {
 // Prisma uses cuid() for IDs — validate as non-empty string with min length
 const cuid = z.string().min(1);
 
-const createListingSchema = z.object({
+const listingBaseSchema = z.object({
   title: z.string().min(5).max(100).transform(stripHtml),
   description: z.string().min(20).max(5000).transform(stripHtml).optional(),
   price: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(0)).optional().nullable(),
@@ -44,7 +44,9 @@ const createListingSchema = z.object({
   districtId: cuid.optional(),
   address: z.string().max(200).optional(),
   isNegotiable: z.boolean().optional(),
-}).refine(
+});
+
+const createListingSchema = listingBaseSchema.refine(
   (data) => data.isNegotiable || (data.price !== undefined && data.price !== null && data.price > 0),
   { message: 'Price must be greater than 0 or mark as negotiable', path: ['price'] }
 );
@@ -62,7 +64,7 @@ const createDraftSchema = z.object({
   status: z.literal('draft'),
 });
 
-const updateListingSchema = createListingSchema.partial();
+const updateListingSchema = listingBaseSchema.partial();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 function qs(val: unknown): string | undefined {
