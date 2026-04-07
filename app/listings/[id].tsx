@@ -725,64 +725,64 @@ export default function ListingDetailScreen() {
           onPress={() => setWriteReviewVisible(false)}
         >
           <Pressable
-            style={{ backgroundColor: '#FFFFFF', borderRadius: 16, width: '100%', maxWidth: 400, paddingVertical: 24, paddingHorizontal: 20 }}
+            style={{ backgroundColor: colors.bgCard, borderRadius: 16, width: '100%', maxWidth: 400, paddingVertical: 24, paddingHorizontal: 20 }}
             onPress={() => {}}
           >
             {reviewDone ? (
               <View style={{ alignItems: 'center', paddingVertical: 16 }}>
                 <Text style={{ fontSize: 32 }}>★</Text>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: '#0A2840', marginTop: 8, textAlign: 'center' }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textPrimary, marginTop: 8, textAlign: 'center' }}>
                   {t('reviewSubmitted')}
                 </Text>
               </View>
             ) : (
               <>
-                <Text style={{ fontSize: 17, fontWeight: '700', color: '#0A2840', marginBottom: 20, textAlign: 'center' }}>
+                <Text style={{ fontSize: 17, fontWeight: '700', color: colors.textPrimary, marginBottom: 20, textAlign: 'center' }}>
                   {t('writeReview')}
                 </Text>
                 {/* Star picker */}
                 <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <TouchableOpacity key={star} onPress={() => setReviewRating(star)} activeOpacity={0.7}>
-                      <Text style={{ fontSize: 32, color: star <= reviewRating ? '#F59E0B' : '#D1D5DB' }}>★</Text>
+                      <Text style={{ fontSize: 32, color: star <= reviewRating ? colors.statusWarning : colors.overlayHandle }}>★</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
                 {/* Text input */}
                 <TextInput
                   style={{
-                    borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 10,
+                    borderWidth: 1, borderColor: colors.borderSoft, borderRadius: 10,
                     paddingHorizontal: 14, paddingVertical: 12, fontSize: 15,
-                    color: '#0A2840', backgroundColor: '#F8FAFC',
+                    color: colors.textPrimary, backgroundColor: colors.bgSubtle,
                     minHeight: 90, textAlignVertical: 'top', marginBottom: 16,
                   }}
                   value={reviewText}
                   onChangeText={setReviewText}
                   placeholder={t('reviewPlaceholder') || 'Tell about your experience...'}
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={colors.textDisabled}
                   multiline
                 />
                 {reviewError ? (
-                  <Text style={{ color: '#EF4444', fontSize: 13, marginBottom: 12, textAlign: 'center' }}>{reviewError}</Text>
+                  <Text style={{ color: colors.statusErrorAlt, fontSize: 13, marginBottom: 12, textAlign: 'center' }}>{reviewError}</Text>
                 ) : null}
                 <View style={{ flexDirection: 'row', gap: 12 }}>
                   <TouchableOpacity
-                    style={{ flex: 1, paddingVertical: 13, borderRadius: 10, borderWidth: 1, borderColor: '#CBD5E1', alignItems: 'center' }}
+                    style={{ flex: 1, paddingVertical: 13, borderRadius: 10, borderWidth: 1, borderColor: colors.borderSoft, alignItems: 'center' }}
                     onPress={() => setWriteReviewVisible(false)}
                     activeOpacity={0.7}
                   >
-                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#64748B' }}>{t('cancel')}</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: colors.textSubtle }}>{t('cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={{ flex: 1, paddingVertical: 13, borderRadius: 10, backgroundColor: reviewSubmitting ? '#94A3B8' : '#0A7B8A', alignItems: 'center' }}
+                    style={{ flex: 1, paddingVertical: 13, borderRadius: 10, backgroundColor: reviewSubmitting ? colors.textDisabled : colors.brandPrimary, alignItems: 'center' }}
                     onPress={handleSubmitReview}
                     disabled={reviewSubmitting}
                     activeOpacity={0.7}
                   >
                     {reviewSubmitting ? (
-                      <ActivityIndicator color="#FFFFFF" />
+                      <ActivityIndicator color={colors.white} />
                     ) : (
-                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#FFFFFF' }}>{t('submit')}</Text>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: colors.white }}>{t('submit')}</Text>
                     )}
                   </TouchableOpacity>
                 </View>
