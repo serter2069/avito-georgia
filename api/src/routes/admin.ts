@@ -360,4 +360,70 @@ router.get('/audit-log', async (req: Request, res: Response) => {
   res.json({ logs, total, page, totalPages: Math.ceil(total / limit) });
 });
 
+// GET /api/admin/settings — return auto-moderation settings (with safe defaults)
+router.get('/settings', async (_req: Request, res: Response) => {
+  const rows = await prisma.appSettings.findMany({
+    where: { key: { in: ['autoModerationEnabled', 'bannedWords'] } },
+  });
+  const byKey: Record<string, string> = {};
+  for (const row of rows) byKey[row.key] = row.value;
+
+  res.json({
+    autoModerationEnabled: byKey['autoModerationEnabled'] === 'true',
+    bannedWords: byKey['bannedWords'] ? JSON.parse(byKey['bannedWords']) as string[] : [],
+  });
+});
+
+// PATCH /api/admin/settings — save auto-moderation settings
+router.patch('/settings', async (req: Request, res: Response) => {
+  const { autoModerationEnabled, bannedWords } = req.body;
+
+  if (autoModerationEnabled !== undefined && typeof autoModerationEnabled !== 'boolean') {
+    res.status(400).json({ error: 'autoModerationEnabled must be a boolean' });
+    return;
+  }
+  if (bannedWords !== undefined && !Array.isArray(bannedWords)) {
+    res.status(400).json({ error: 'bannedWords must be an array of strings' });
+    return;
+  }
+  if (bannedWords !== undefined && bannedWords.some((w: unknown) => typeof w !== 'string')) {
+    res.status(400).json({ error: 'bannedWords must be an array of strings' });
+    return;
+  }
+
+  const updates: Promise<unknown>[] = [];
+
+  if (autoModerationEnabled !== undefined) {
+    updates.push(
+      prisma.appSettings.upsert({
+        where: { key: 'autoModerationEnabled' },
+        create: { key: 'autoModerationEnabled', value: String(autoModerationEnabled) },
+        update: { value: String(autoModerationEnabled) },
+      }),
+    );
+  }
+  if (bannedWords !== undefined) {
+    // Normalize: trim, lowercase, filter empty
+    const normalized = (bannedWords as string[])
+      .map((w) => w.trim().toLowerCase())
+      .filter((w) => w.length > 0);
+    updates.push(
+      prisma.appSettings.upsert({
+        where: { key: 'bannedWords' },
+        create: { key: 'bannedWords', value: JSON.stringify(normalized) },
+        update: { value: JSON.stringify(normalized) },
+      }),
+    );
+  }
+
+  await Promise.all(updates);
+
+  logAudit(req.user!.userId, req.user!.email, 'settings.update', 'settings', 'app', {
+    ...(autoModerationEnabled !== undefined ? { autoModerationEnabled } : {}),
+    ...(bannedWords !== undefined ? { bannedWordsCount: (bannedWords as string[]).length } : {}),
+  });
+
+  res.json({ ok: true });
+});
+
 export default router;

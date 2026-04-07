@@ -413,8 +413,44 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
     }
   }
 
-  // Non-draft listings go to pending_moderation for admin review
-  const initialStatus: ListingStatus = isDraft ? 'draft' : 'pending_moderation';
+  // Determine initial status based on admin settings (skip for drafts)
+  let initialStatus: ListingStatus = isDraft ? 'draft' : 'pending_moderation';
+  let autoRejectionReason: string | null = null;
+  let autoActivatedAt: Date | null = null;
+  let autoExpiresAt: Date | null = null;
+
+  if (!isDraft) {
+    // Load admin settings: auto-moderation toggle + banned words
+    const settingsRows = await prisma.appSettings.findMany({
+      where: { key: { in: ['autoModerationEnabled', 'bannedWords'] } },
+    });
+    const settingsByKey: Record<string, string> = {};
+    for (const row of settingsRows) settingsByKey[row.key] = row.value;
+
+    const autoModerationEnabled = settingsByKey['autoModerationEnabled'] === 'true';
+    const bannedWords: string[] = settingsByKey['bannedWords']
+      ? (JSON.parse(settingsByKey['bannedWords']) as string[])
+      : [];
+
+    if (bannedWords.length > 0) {
+      const textToCheck = `${safeTitle} ${safeDescription ?? ''}`.toLowerCase();
+      const matchedWord = bannedWords.find((w) => textToCheck.includes(w));
+      if (matchedWord) {
+        // Auto-reject: listing contains a banned word
+        initialStatus = 'rejected';
+        autoRejectionReason = `Auto-rejected: contains banned word`;
+      }
+    }
+
+    // Only auto-approve if not already auto-rejected
+    if (initialStatus === 'pending_moderation' && autoModerationEnabled) {
+      initialStatus = 'active';
+      const now = new Date();
+      autoActivatedAt = now;
+      autoExpiresAt = new Date(now.getTime() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+    }
+  }
+
   // Geocode coordinates — best-effort, never blocks listing creation
   // If address is provided: try address-level first, fall back to city-level
   let lat: number | null = null;
@@ -448,6 +484,9 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
         address: address ?? null,
         userId,
         status: initialStatus,
+        ...(autoRejectionReason ? { rejectionReason: autoRejectionReason } : {}),
+        ...(autoActivatedAt ? { activatedAt: autoActivatedAt } : {}),
+        ...(autoExpiresAt ? { expiresAt: autoExpiresAt } : {}),
         lat,
         lng,
       },

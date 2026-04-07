@@ -13,6 +13,7 @@ const TABS = [
   { key: 'adminCategories', path: '/admin/categories' },
   { key: 'adminPayments', path: '/admin/payments' },
   { key: 'adminReports', path: '/admin/reports' },
+  { key: 'adminSettings', path: '/admin/settings' },
 ] as const;
 
 export default function AdminLayout() {
