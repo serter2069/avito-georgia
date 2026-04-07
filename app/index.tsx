@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/layout/Header';
 import { CategoryIcon, CategoryType } from '../components/common/CategoryIcon';
 import { ListingCard, Listing } from '../components/listing/ListingCard';
+import { CitySelector, City } from '../components/common/CitySelector';
+import { Footer } from '../components/layout/Footer';
 import { useAuthStore } from '../stores/authStore';
 import { api } from '../lib/api';
 import { colors } from '../lib/colors';
@@ -96,6 +98,7 @@ export default function HomeScreen() {
   const { user, isReady } = useAuthStore();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCity, setSelectedCity] = useState<City>('all');
   const [listings, setListings] = useState<Listing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
 
@@ -112,8 +115,9 @@ export default function HomeScreen() {
   useEffect(() => {
     let cancelled = false;
     setLoadingListings(true);
+    const cityParam = selectedCity !== 'all' ? `&city=${selectedCity}` : '';
     api
-      .get<{ listings: ApiListing[] }>('/listings?limit=6&sort=createdAt_desc')
+      .get<{ listings: ApiListing[] }>(`/listings?limit=6&sort=createdAt_desc${cityParam}`)
       .then((res) => {
         if (!cancelled && res.data) {
           setListings(res.data.listings.map((l) => mapListing(l, i18n.language, t)));
@@ -128,7 +132,7 @@ export default function HomeScreen() {
     return () => {
       cancelled = true;
     };
-  }, [i18n.language]); // re-map city names when language changes
+  }, [i18n.language, selectedCity]); // re-map city names when language changes; refetch on city filter change
 
   // Categories grid: 5 per row — use flexWrap on web, horizontal scroll on native
   const isWeb = Platform.OS === 'web';
@@ -173,6 +177,11 @@ export default function HomeScreen() {
               <Ionicons name="search" size={20} color={colors.white} />
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* City filter */}
+        <View className="mt-3">
+          <CitySelector selected={selectedCity} onSelect={setSelectedCity} />
         </View>
 
         {/* Categories grid */}
@@ -274,21 +283,26 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              // Guest CTA: register
+              // Guest CTA: post free ad (requires auth)
               <View style={{ gap: 8 }}>
-                <Text className="text-text-primary text-base font-semibold">{t('authTitle')}</Text>
+                <Text className="text-text-primary text-base font-semibold">{t('postAd')}</Text>
                 <Text className="text-text-secondary text-sm">{t('authSubtitle')}</Text>
                 <TouchableOpacity
                   className="bg-primary rounded-lg py-3 items-center mt-1"
                   onPress={() => router.push('/(auth)')}
                   activeOpacity={0.8}
                 >
-                  <Text className="text-white font-semibold text-sm">{t('login')}</Text>
+                  <Text className="text-white font-semibold text-sm">{t('postAd')}</Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
         )}
+
+        {/* Footer */}
+        <View className="mt-6">
+          <Footer onNavigate={(path) => router.push(path as any)} />
+        </View>
       </ScrollView>
     </View>
   );
