@@ -176,6 +176,14 @@ router.get('/:id', async (req: Request, res: Response) => {
       name: true,
       avatarUrl: true,
       createdAt: true,
+      promotions: {
+        where: {
+          promotionType: 'unlimited_sub',
+          isActive: true,
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+        select: { id: true },
+      },
       _count: {
         select: {
           listings: {
@@ -189,12 +197,16 @@ router.get('/:id', async (req: Request, res: Response) => {
     },
   });
   if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+  // UC-16: isPremium = seller has active unlimited_sub promotion
+  const { promotions: _promos, ...userBase } = user;
+  const isPremium = _promos.length > 0;
   res.json({
-    id: user.id,
-    name: user.name || 'User',
-    avatarUrl: user.avatarUrl,
-    createdAt: user.createdAt,
-    activeListings: user._count.listings,
+    id: userBase.id,
+    name: userBase.name || 'User',
+    avatarUrl: userBase.avatarUrl,
+    createdAt: userBase.createdAt,
+    activeListings: userBase._count.listings,
+    isPremium,
   });
 });
 
