@@ -204,7 +204,7 @@ export default function PromoteListingScreen() {
                   <Ionicons
                     name={TYPE_ICONS[option.type] || 'flash-outline'}
                     size={20}
-                    color={isBundle ? '#EAB308' : colors.brandPrimary}
+                    color={isBundle ? colors.statusWarning : colors.brandPrimary}
                   />
                   <Text className="text-text-primary text-base font-bold">
                     {t(TYPE_I18N[option.type] || option.type)}
