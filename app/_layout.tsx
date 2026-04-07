@@ -21,6 +21,13 @@ import * as SplashScreen from 'expo-splash-screen';
 // Prevent splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
 
+// Detect admin mode: admin.* subdomain or port 8084
+function isAdminDomain(): boolean {
+  if (typeof window === 'undefined') return false;
+  const { hostname, port } = window.location;
+  return hostname.startsWith('admin.') || port === '8084';
+}
+
 function useProtectedRoute() {
   const user = useAuthStore((s) => s.user);
   const isReady = useAuthStore((s) => s.isReady);
@@ -72,6 +79,7 @@ export default function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate);
   const isReady = useAuthStore((s) => s.isReady);
   const maxWidth = useResponsiveMaxWidth();
+  const router = useRouter();
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -89,6 +97,17 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  // On admin subdomain (admin.* or port 8084): redirect to /admin if not already there
+  useEffect(() => {
+    if (!fontsLoaded) return;
+    if (isAdminDomain()) {
+      const currentPath = window.location.pathname;
+      if (!currentPath.startsWith('/admin')) {
+        router.replace('/admin');
+      }
     }
   }, [fontsLoaded]);
 
