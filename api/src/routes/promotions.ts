@@ -159,6 +159,84 @@ router.get('/prices', (_req: Request, res: Response) => {
   res.json({ prices });
 });
 
+// POST /api/promotions/purchase-listing-slot — create Stripe Checkout for a per-listing slot
+// Called when user has exceeded free quota and category has paidListingPrice > 0.
+// Creates a one-time Checkout Session. On success, frontend re-submits listing creation with paymentId.
+router.post('/purchase-listing-slot', requireAuth, async (req: Request, res: Response) => {
+  const { categoryId } = req.body;
+  const userId = req.user!.userId;
+
+  if (!categoryId || typeof categoryId !== 'string') {
+    res.status(400).json({ error: 'categoryId required' });
+    return;
+  }
+
+  // Load category with parent for price inheritance (same logic as listings.ts quota check)
+  const cat = await prisma.category.findUnique({
+    where: { id: categoryId },
+    include: { parent: { select: { freeListingQuota: true, paidListingPrice: true } } },
+  });
+  if (!cat) {
+    res.status(404).json({ error: 'Category not found' });
+    return;
+  }
+
+  // Subcategory inherits price from parent if own freeListingQuota is 0
+  const paidPrice = (cat.freeListingQuota === 0 && cat.parent)
+    ? cat.parent.paidListingPrice
+    : cat.paidListingPrice;
+
+  if (!paidPrice || paidPrice <= 0) {
+    res.status(400).json({ error: 'This category does not allow paid listings' });
+    return;
+  }
+
+  const amountTetri = Math.round(paidPrice * 100); // GEL → tetri (Stripe smallest unit)
+  const categoryName = cat.nameEn || cat.nameRu || cat.name;
+
+  try {
+    // Create a pending Payment record first to get its ID for the success URL
+    const payment = await prisma.payment.create({
+      data: {
+        userId,
+        amount: paidPrice,
+        currency: 'GEL',
+        status: 'pending',
+        provider: 'stripe',
+        promotionType: null, // listing_slot is not a PromotionType enum value
+      },
+    });
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8081';
+    const session = await getStripe().checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'gel',
+          product_data: { name: `Listing slot — ${categoryName}` },
+          unit_amount: amountTetri,
+        },
+        quantity: 1,
+      }],
+      metadata: { userId, categoryId, paymentId: payment.id, type: 'listing_slot' },
+      success_url: `${frontendUrl}/listings/slot-success?paymentId=${payment.id}`,
+      cancel_url: `${frontendUrl}/listings/create`,
+    });
+
+    // Store externalId now that we have the session id
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: { externalId: session.id },
+    });
+
+    res.json({ url: session.url, paymentId: payment.id });
+  } catch (err: any) {
+    console.error('[promotions] listing-slot Stripe error:', err.message);
+    res.status(500).json({ error: 'Payment creation failed' });
+  }
+});
+
 // GET /api/promotions/my — list user's active promotions
 router.get('/my', requireAuth, async (req: Request, res: Response) => {
   const userId = req.user!.userId;

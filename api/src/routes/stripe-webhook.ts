@@ -118,11 +118,23 @@ router.post('/', async (req: Request, res: Response) => {
       }
 
       case 'checkout.session.completed': {
-        // Subscription checkout completed
         const session = event.data.object as Stripe.Checkout.Session;
-        const { userId, type } = session.metadata || {};
+        const { userId, type, paymentId } = session.metadata || {};
 
-        if (!userId || type !== 'unlimited_sub') break;
+        if (!userId || !type) break;
+
+        if (type === 'listing_slot') {
+          // Listing slot purchase: just mark payment completed.
+          // No promotion to create — the payment record is consumed when the listing is created.
+          await prisma.payment.updateMany({
+            where: { externalId: session.id },
+            data: { status: 'completed' },
+          });
+          console.log(`[stripe-webhook] listing_slot payment completed: session ${session.id}, paymentId ${paymentId}`);
+          break;
+        }
+
+        if (type !== 'unlimited_sub') break;
 
         await prisma.payment.updateMany({
           where: { externalId: session.id },

@@ -1,7 +1,7 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator, Platform, BackHandler } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Alert, ActivityIndicator, Platform, BackHandler, Linking } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Header } from '../../components/layout/Header';
 import { Input } from '../../components/ui/Input';
@@ -41,6 +41,7 @@ export default function CreateListingScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const params = useLocalSearchParams<{ paymentId?: string }>();
 
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
@@ -68,6 +69,9 @@ export default function CreateListingScreen() {
   // Quota info for selected category
   const [quotaInfo, setQuotaInfo] = useState<{ used: number; freeQuota: number; remaining: number; paidPrice: number } | null>(null);
   const [loadingQuota, setLoadingQuota] = useState(false);
+
+  // Slot payment state — set when quota exceeded and user needs to pay
+  const [slotPaymentPending, setSlotPaymentPending] = useState(false);
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -110,6 +114,34 @@ export default function CreateListingScreen() {
       // Draft save is best-effort; ignore errors
     }
   }, [user, selectedCategoryId, selectedCityId, title, description, price, selectedDistrictId, address, photos]);
+
+  // Save pending listing data to sessionStorage before Stripe redirect
+  const savePendingSlotData = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const data = {
+        fields: {
+          title: title.trim(),
+          description: description.trim() || undefined,
+          price: price.trim() || undefined,
+          categoryId: selectedCategoryId,
+          cityId: selectedCityId,
+          districtId: selectedDistrictId || undefined,
+          address: address.trim() || undefined,
+        },
+        photos,
+      };
+      window.sessionStorage.setItem('pending_listing_slot', JSON.stringify(data));
+    } catch (_) {}
+  }, [title, description, price, selectedCategoryId, selectedCityId, selectedDistrictId, address, photos]);
+
+  // On return from Stripe (paymentId in URL) — the slot-success screen handles submission.
+  // But if user lands back on create page somehow, clear stale pending data.
+  useEffect(() => {
+    if (!params.paymentId) return;
+    // Redirect to slot-success which will auto-submit
+    router.replace(`/listings/slot-success?paymentId=${params.paymentId}`);
+  }, [params.paymentId]);
 
   // Show draft save prompt when user presses hardware back on Android
   useFocusEffect(
@@ -258,8 +290,8 @@ export default function CreateListingScreen() {
 
     setSubmitting(true);
     try {
-      // Create listing
-      const createRes = await api.post<{ id: string }>('/listings', {
+      // Create listing (data may be success { id } or error { error, allowPaid, price })
+      const createRes = await api.post<{ id: string } & { error?: string; allowPaid?: boolean; price?: number }>('/listings', {
         title: title.trim(),
         description: description.trim() || undefined,
         price: price.trim() ? price.trim() : undefined,
@@ -269,8 +301,41 @@ export default function CreateListingScreen() {
         address: address.trim() || undefined,
       });
 
-      if (!createRes.ok || !createRes.data) {
+      if (!createRes.ok) {
+        // Handle quota exceeded with paid listing option
+        if (createRes.status === 402) {
+          const errData = createRes.data;
+          if (errData?.allowPaid && errData?.price && selectedCategoryId) {
+            // Show paywall confirmation
+            const priceGEL = errData.price;
+            Alert.alert(
+              t('quotaExceededTitle'),
+              t('quotaExceededPayAlert', { price: priceGEL }),
+              [
+                { text: t('cancel'), style: 'cancel', onPress: () => setSubmitting(false) },
+                {
+                  text: t('payAndPublish', { price: priceGEL }),
+                  onPress: async () => {
+                    await handleSlotPayment(selectedCategoryId!);
+                  },
+                },
+              ]
+            );
+            return;
+          }
+          // Quota exceeded but no paid option
+          Alert.alert(t('error'), t('quotaExceeded'));
+          setSubmitting(false);
+          return;
+        }
+
         Alert.alert(t('error'), createRes.error || t('error'));
+        setSubmitting(false);
+        return;
+      }
+
+      if (!createRes.data) {
+        Alert.alert(t('error'), t('error'));
         setSubmitting(false);
         return;
       }
@@ -299,6 +364,34 @@ export default function CreateListingScreen() {
     } catch (err) {
       Alert.alert(t('error'), t('error'));
     } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Initiate Stripe Checkout for a listing slot purchase
+  const handleSlotPayment = async (catId: string) => {
+    setSlotPaymentPending(true);
+    try {
+      const res = await api.post<{ url: string; paymentId: string }>('/promotions/purchase-listing-slot', {
+        categoryId: catId,
+      });
+
+      if (!res.ok || !res.data?.url) {
+        Alert.alert(t('error'), res.error || t('error'));
+        setSlotPaymentPending(false);
+        setSubmitting(false);
+        return;
+      }
+
+      // Save form data before leaving the page
+      savePendingSlotData();
+
+      // Redirect to Stripe Checkout
+      Linking.openURL(res.data.url);
+      // Submitting state stays true — user left the page
+    } catch (_) {
+      Alert.alert(t('error'), t('error'));
+      setSlotPaymentPending(false);
       setSubmitting(false);
     }
   };
@@ -379,13 +472,13 @@ export default function CreateListingScreen() {
 
       {/* Quota status for selected category */}
       {selectedCategoryId && quotaInfo && !loadingQuota && (
-        <View className={`p-3 rounded-lg border ${quotaInfo.remaining > 0 ? 'border-border bg-surface-card' : 'border-error/50 bg-error/10'}`}>
+        <View className={`p-3 rounded-lg border ${quotaInfo.remaining > 0 ? 'border-border bg-surface-card' : quotaInfo.paidPrice > 0 ? 'border-yellow-500/50 bg-yellow-500/10' : 'border-error/50 bg-error/10'}`}>
           <Text className="text-text-secondary text-xs">
             {t('remainingFree')}: <Text className={`font-semibold ${quotaInfo.remaining > 0 ? 'text-primary' : 'text-error'}`}>{quotaInfo.remaining}/{quotaInfo.freeQuota}</Text>
           </Text>
           {quotaInfo.remaining === 0 && quotaInfo.paidPrice > 0 && (
-            <Text className="text-text-muted text-xs mt-1">
-              {t('paidListing')}: {quotaInfo.paidPrice} GEL
+            <Text className="text-yellow-400 text-xs mt-1 font-medium">
+              {t('paidListingAvailable', { price: quotaInfo.paidPrice })}
             </Text>
           )}
           {quotaInfo.remaining === 0 && quotaInfo.paidPrice === 0 && (
