@@ -2,6 +2,16 @@ const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || 'noreply@diagrams.love';
 const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'Avito Georgia';
 
+// Escape user-controlled strings before inserting into HTML email templates
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 async function sendBrevoEmail(to: string, subject: string, htmlContent: string, textContent: string): Promise<void> {
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
@@ -55,7 +65,7 @@ export async function sendPriceDropNotification(
   await sendBrevoEmail(
     to,
     `Price drop: ${title} — Avito Georgia`,
-    `<p>The listing <strong>${title}</strong> you favorited dropped in price from <s>${oldPrice}</s> to <strong>${newPrice}</strong>.</p>`,
+    `<p>The listing <strong>${escapeHtml(title)}</strong> you favorited dropped in price from <s>${oldPrice}</s> to <strong>${newPrice}</strong>.</p>`,
     `The listing "${title}" you favorited dropped in price from ${oldPrice} to ${newPrice}.`
   );
 }
@@ -71,7 +81,7 @@ export async function sendListingRemovedNotification(
   await sendBrevoEmail(
     to,
     `Listing removed: ${title} — Avito Georgia`,
-    `<p>The listing <strong>${title}</strong> you favorited has been removed by the seller.</p>`,
+    `<p>The listing <strong>${escapeHtml(title)}</strong> you favorited has been removed by the seller.</p>`,
     `The listing "${title}" you favorited has been removed by the seller.`
   );
 }
@@ -105,7 +115,7 @@ export async function sendListingApprovedEmail(
   await sendBrevoEmail(
     to,
     `Ваше объявление опубликовано — Avito Georgia`,
-    `<p>Ваше объявление <strong>${title}</strong> прошло модерацию и теперь опубликовано.</p>`,
+    `<p>Ваше объявление <strong>${escapeHtml(title)}</strong> прошло модерацию и теперь опубликовано.</p>`,
     `Ваше объявление "${title}" прошло модерацию и теперь опубликовано.`
   );
 }
@@ -128,7 +138,7 @@ export async function sendNewMessageEmail(
   await sendBrevoEmail(
     to,
     `Новое сообщение от ${senderName} — Avito Georgia`,
-    `<p>У вас новое сообщение от <strong>${senderName}</strong>:</p><blockquote>${preview}</blockquote><p>Войдите в приложение, чтобы ответить.</p>`,
+    `<p>У вас новое сообщение от <strong>${escapeHtml(senderName)}</strong>:</p><blockquote>${escapeHtml(preview)}</blockquote><p>Войдите в приложение, чтобы ответить.</p>`,
     `Новое сообщение от ${senderName}:\n${preview}\n\nВойдите в приложение, чтобы ответить.`
   );
 }
@@ -148,11 +158,11 @@ export async function sendExpiryReminderEmail(
     return;
   }
   const expiryDateStr = expiresAt.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-  const renewUrl = `https://avito-georgia.smartlaunchhub.com/listings/${listingId}`;
+  const renewUrl = `https://avito-georgia.smartlaunchhub.com/listings/${encodeURIComponent(listingId)}`;
   await sendBrevoEmail(
     to,
     `Ваше объявление истекает через 3 дня — Avito Georgia`,
-    `<p>Ваше объявление <strong>${title}</strong> истекает <strong>${expiryDateStr}</strong>.</p><p><a href="${renewUrl}">Продлить объявление</a></p>`,
+    `<p>Ваше объявление <strong>${escapeHtml(title)}</strong> истекает <strong>${expiryDateStr}</strong>.</p><p><a href="${renewUrl}">Продлить объявление</a></p>`,
     `Ваше объявление "${title}" истекает ${expiryDateStr}.\nПродлить: ${renewUrl}`
   );
 }
@@ -171,13 +181,13 @@ export async function sendListingRejectedEmail(
     return;
   }
   const reasonBlock = reason
-    ? `<p>Причина: ${reason}</p>`
+    ? `<p>Причина: ${escapeHtml(reason)}</p>`
     : '';
   const reasonText = reason ? `\nПричина: ${reason}` : '';
   await sendBrevoEmail(
     to,
     `Ваше объявление отклонено — Avito Georgia`,
-    `<p>Ваше объявление <strong>${title}</strong> было отклонено модератором.</p>${reasonBlock}`,
+    `<p>Ваше объявление <strong>${escapeHtml(title)}</strong> было отклонено модератором.</p>${reasonBlock}`,
     `Ваше объявление "${title}" было отклонено модератором.${reasonText}`
   );
 }
