@@ -62,12 +62,18 @@ export function startCleanupCron(): void {
               payload: { expiresAt: listing.expiresAt.toISOString() },
             },
           });
-          await sendExpiryReminderEmail(
-            listing.user.email,
-            listing.title,
-            listing.id,
-            listing.expiresAt
-          );
+          // Check notification preference — absence of row means enabled by default
+          const expiryPref = await prisma.notificationPref.findUnique({
+            where: { userId_type: { userId: listing.userId, type: 'moderation_update' } },
+          });
+          if (!expiryPref || expiryPref.enabled) {
+            await sendExpiryReminderEmail(
+              listing.user.email,
+              listing.title,
+              listing.id,
+              listing.expiresAt
+            );
+          }
           sent++;
         } catch (err) {
           console.error(`[cron] expiry reminder failed for listing ${listing.id}:`, err);

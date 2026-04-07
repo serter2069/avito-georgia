@@ -544,6 +544,11 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
       });
       const { sendPriceDropNotification } = await import('../lib/mail');
       for (const fav of favorites) {
+        // Check notification preference — absence of row means enabled by default
+        const pref = await prisma.notificationPref.findUnique({
+          where: { userId_type: { userId: fav.user.id, type: 'price_drop' } },
+        });
+        if (pref && !pref.enabled) continue;
         sendPriceDropNotification(fav.user.email, updated.title, oldPrice, newPrice)
           .catch(err => console.error('Price drop email error:', err));
       }
@@ -603,6 +608,11 @@ router.patch('/:id/status', requireAuth, async (req: Request, res: Response) => 
       });
       const { sendListingRemovedNotification } = await import('../lib/mail');
       for (const fav of favorites) {
+        // Check notification preference — price_drop covers all listing-change alerts for favoriters
+        const pref = await prisma.notificationPref.findUnique({
+          where: { userId_type: { userId: fav.user.id, type: 'price_drop' } },
+        });
+        if (pref && !pref.enabled) continue;
         sendListingRemovedNotification(fav.user.email, listing.title)
           .catch(err => console.error('Listing removed email error:', err));
       }
