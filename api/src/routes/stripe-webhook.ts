@@ -2,18 +2,9 @@ import { Router, Request, Response } from 'express';
 import Stripe from 'stripe';
 import { prisma } from '../lib/prisma';
 import { PromotionType } from '@prisma/client';
+import { getStripe } from '../lib/stripe';
 
 const router = Router();
-
-let _stripe: Stripe | null = null;
-function getStripe(): Stripe {
-  if (!_stripe) {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
-    _stripe = new Stripe(key, { apiVersion: '2026-03-25.dahlia' });
-  }
-  return _stripe;
-}
 
 const DAYS_MAP: Record<string, number | null> = {
   top_1d: 1,
