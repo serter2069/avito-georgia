@@ -4,8 +4,7 @@ import { prisma } from '../lib/prisma';
 import { requireAuth, requireAdmin } from '../middleware/auth';
 import { sendListingApprovedEmail, sendListingRejectedEmail } from '../lib/mail';
 import { isValidAdminTransition, getAdminAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
-
-const LISTING_EXPIRY_DAYS = 30;
+import { LISTING_EXPIRY_DAYS } from '../lib/constants';
 
 const router = Router();
 

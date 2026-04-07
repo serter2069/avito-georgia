@@ -10,6 +10,7 @@ import { listingCreateRateLimit, searchRateLimit, phoneRevealRateLimit } from '.
 import { geocodeCity, geocodeAddress } from '../lib/geocoder';
 import { isValidOwnerTransition, getOwnerAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
 import xss from 'xss';
+import { LISTING_EXPIRY_DAYS } from '../lib/constants';
 
 const router = Router();
 
@@ -59,8 +60,6 @@ const createDraftSchema = z.object({
 
 const updateListingSchema = createListingSchema.partial();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
-
-const LISTING_EXPIRY_DAYS = 30;
 
 function qs(val: unknown): string | undefined {
   if (typeof val === 'string') return val;

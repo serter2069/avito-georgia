@@ -4,15 +4,10 @@ import jwt from 'jsonwebtoken';
 import xss from 'xss';
 import { prisma } from './lib/prisma';
 import { sendNewMessageEmail } from './lib/mail';
+import { ALLOWED_ORIGINS } from './lib/constants';
 
 // Throttle: minimum ms between emails per thread per recipient
 const EMAIL_THROTTLE_MS = 30 * 60 * 1000; // 30 minutes
-
-const ALLOWED_ORIGINS = [
-  'https://avito-georgia.smartlaunchhub.com',
-  'http://localhost:8081',
-  'http://localhost:19006',
-];
 
 async function notifyOfflineRecipients(
   io: Server,
