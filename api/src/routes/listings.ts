@@ -343,7 +343,7 @@ router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: 
         // Subcategory inherits from parent if own freeListingQuota is 0
         const freeQuota = (cat && cat.freeListingQuota === 0 && cat.parent)
           ? cat.parent.freeListingQuota
-          : (cat?.freeListingQuota ?? 5);
+          : (cat?.freeListingQuota ?? 10);
         const paidPrice = (cat && cat.freeListingQuota === 0 && cat.parent)
           ? cat.parent.paidListingPrice
           : (cat?.paidListingPrice ?? 0);
