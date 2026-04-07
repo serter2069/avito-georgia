@@ -452,6 +452,15 @@ const resources = {
 
       // Address geocoding
       addressOptional: 'Улица, дом (необязательно)',
+
+      // Notifications inbox (UC-17)
+      notificationsInbox: 'Уведомления',
+      markAllRead: 'Прочитать все',
+      noNotifications: 'Нет уведомлений',
+      noNotificationsHint: 'Здесь появятся уведомления о сообщениях и изменениях',
+      notifTypeNewMessage: 'Новое сообщение',
+      notifTypePriceDrop: 'Снижение цены',
+      notifTypeModerationUpdate: 'Обновление модерации',
     },
   },
   en: {
@@ -865,6 +874,15 @@ const resources = {
 
       // Address geocoding
       addressOptional: 'Street, building (optional)',
+
+      // Notifications inbox (UC-17)
+      notificationsInbox: 'Notifications',
+      markAllRead: 'Mark all read',
+      noNotifications: 'No notifications',
+      noNotificationsHint: 'Notifications about messages and updates will appear here',
+      notifTypeNewMessage: 'New message',
+      notifTypePriceDrop: 'Price drop',
+      notifTypeModerationUpdate: 'Moderation update',
     },
   },
   ka: {
@@ -1278,6 +1296,15 @@ const resources = {
 
       // Address geocoding
       addressOptional: 'ქუჩა, სახლი (არასავალდებულო)',
+
+      // Notifications inbox (UC-17)
+      notificationsInbox: 'შეტყობინებები',
+      markAllRead: 'ყველას წაკითხვა',
+      noNotifications: 'შეტყობინებები არ არის',
+      noNotificationsHint: 'შეტყობინებები შეტყობინებებისა და განახლებების შესახებ გამოჩნდება აქ',
+      notifTypeNewMessage: 'ახალი შეტყობინება',
+      notifTypePriceDrop: 'ფასის შემცირება',
+      notifTypeModerationUpdate: 'მოდერაციის განახლება',
     },
   },
 };
