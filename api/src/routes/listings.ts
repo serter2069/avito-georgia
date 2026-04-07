@@ -644,6 +644,11 @@ router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: 
   if (listingWithPhotos.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
   const files = req.files as Express.Multer.File[];
   if (!files?.length) { res.status(400).json({ error: 'No files uploaded' }); return; }
+  const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const invalidFile = files.find(f => !ALLOWED_MIME.includes(f.mimetype));
+  if (invalidFile) {
+    res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, WebP, GIF allowed.' }); return;
+  }
   const currentCount = listingWithPhotos.photos.length;
   if (currentCount + files.length > 10) {
     res.status(400).json({ error: `Max 10 photos. Currently ${currentCount}, uploading ${files.length}` }); return;
