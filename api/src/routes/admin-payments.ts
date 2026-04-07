@@ -10,7 +10,7 @@ router.use(requireAuth, requireAdmin);
 // GET /api/admin/payments — list all payments (admin only)
 router.get('/', async (req: Request, res: Response) => {
 
-  const page = parseInt(String(req.query.page) || '1', 10);
+  const page = parseInt(String(req.query.page ?? '1'), 10) || 1;
   const take = 50;
   const skip = (page - 1) * take;
   const status = req.query.status as string | undefined;

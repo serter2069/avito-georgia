@@ -4,7 +4,7 @@ export const ALLOWED_ORIGINS = [
   'https://admin.avito-georgia.smartlaunchhub.com',
   'http://localhost:8081',
   'http://localhost:8083',
-  'http://localhost:8084',
+  'http://localhost:8086',
   'http://localhost:19006',
 ];
 
