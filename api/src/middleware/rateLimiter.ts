@@ -63,3 +63,13 @@ export const phoneRevealRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Report creation: 10 per hour per user
+export const reportCreateRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  keyGenerator: userOrIp,
+  message: { error: 'Too many reports submitted. Try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
