@@ -105,6 +105,8 @@ router.patch('/users/:id/role', async (req: Request, res: Response) => {
       where: { userId: id, status: 'active' },
       data: { status: 'removed' },
     });
+    // Invalidate all active sessions immediately — blocked user loses access at next request
+    await prisma.session.deleteMany({ where: { userId: id } });
   }
 
   logAudit(req.user!.userId, req.user!.email, 'user.role_change', 'user', id, {
