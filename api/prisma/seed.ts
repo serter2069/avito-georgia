@@ -2,6 +2,48 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+/**
+ * TEST PERSONAS
+ * =============
+ * alice@test.ge  — admin (Alice Admin)
+ *   • Has 1 active listing + 1 pending_moderation listing (for admin test panel)
+ *   • OTP: 000000
+ *
+ * bob@test.ge    — regular user (Bob Seller)
+ *   • Has 8 active + 2 sold + 1 expired + 1 pending_moderation + 1 draft + 1 rejected = 14 listings
+ *   • Has promotions on his active listings
+ *   • Has payments (completed + pending)
+ *   • Has received a review from Carol on a sold listing
+ *   • OTP: 000000
+ *
+ * carol@test.ge  — regular user (Carol Buyer)
+ *   • Has 3 active + 1 pending_moderation + 1 removed = 5 listings
+ *   • Wrote a review on bob's sold PS5 listing
+ *   • Has notifications (new_message, price_drop, moderation_update)
+ *   • OTP: 000000
+ *
+ * THREADS
+ * =======
+ * Thread 1: Carol ↔ Bob — about "iPhone 14 Pro 256GB" (listing thread)
+ * Thread 2: Bob ↔ Carol — about "Dyson V11 vacuum cleaner" (listing thread)
+ * Thread 3: Carol ↔ Bob — SOLD listing "PlayStation 5" (thread for review flow)
+ * Thread 4: Carol ↔ Bob — DIRECT DM (no listing, UC-20)
+ *
+ * PAYMENTS & PROMOTIONS (UC-08/UC-29)
+ * ====================================
+ * Payment 1: Bob, top_7d on iPhone listing — completed
+ * Payment 2: Bob, highlight on MacBook listing — pending
+ * Payment 3: Carol, top_3d on Dyson listing — completed
+ *
+ * REVIEWS (UC-15)
+ * ===============
+ * Carol reviews Bob for sold "PlayStation 5" listing — rating 5
+ *
+ * NOTIFICATIONS (UC-17)
+ * =====================
+ * Carol: new_message, price_drop, moderation_update
+ */
+
 const cities = [
   { id: 'tbilisi', name: 'Tbilisi', nameRu: 'Тбилиси', nameEn: 'Tbilisi', nameKa: 'თბილისი', lat: 41.6938, lng: 44.8015 },
   { id: 'batumi', name: 'Batumi', nameRu: 'Батуми', nameEn: 'Batumi', nameKa: 'ბათუმი', lat: 41.6417, lng: 41.6333 },
@@ -284,7 +326,8 @@ async function main() {
     expiresAt: thirtyDaysFromNow,
   });
 
-  await upsertListing({
+  // Sold listing used for the review flow (UC-15): Carol bought PS5 from Bob
+  const bobSoldPs5 = await upsertListing({
     title: 'PlayStation 5 with controller',
     description: 'Sold. PS5 disc edition, 2 controllers, 5 games included.',
     price: 2200,
@@ -419,8 +462,8 @@ async function main() {
     cityId: 'tbilisi',
   });
 
-  // --- Seed Alice's listing ---
-  console.log('Seeding Alice listing...');
+  // --- Seed Alice's listings ---
+  console.log('Seeding Alice listings...');
 
   await upsertListing({
     title: 'Admin test listing — do not remove',
@@ -433,6 +476,18 @@ async function main() {
     cityId: 'tbilisi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+  });
+
+  // Admin has a pending_moderation listing so admin panel shows it for self-testing
+  await upsertListing({
+    title: 'Admin pending moderation test listing',
+    description: 'Used by admin to test the moderation panel. Do not approve or reject.',
+    price: 99,
+    currency: 'GEL',
+    status: 'pending_moderation',
+    userId: alice.id,
+    categoryId: catElectronics.id,
+    cityId: 'tbilisi',
   });
 
   // --- Seed threads and messages ---
@@ -487,6 +542,61 @@ async function main() {
     });
   }
 
+  // Thread 3: sold listing thread — carol was a participant in bob's PS5 sale (UC-15: review flow)
+  let thread3 = await prisma.thread.findFirst({
+    where: { listingId: bobSoldPs5.id },
+  });
+  if (!thread3) {
+    thread3 = await prisma.thread.create({
+      data: {
+        listingId: bobSoldPs5.id,
+        participants: {
+          create: [
+            { userId: carol.id },
+            { userId: bob.id },
+          ],
+        },
+      },
+    });
+    await prisma.message.createMany({
+      data: [
+        { threadId: thread3.id, senderId: carol.id, text: 'Hi, is the PS5 still available?' },
+        { threadId: thread3.id, senderId: bob.id,   text: 'Yes, come pick it up today.' },
+        { threadId: thread3.id, senderId: carol.id, text: 'Deal! I will come at 6pm.' },
+        { threadId: thread3.id, senderId: bob.id,   text: 'Great, see you then.' },
+      ],
+    });
+  }
+
+  // Thread 4: direct DM between Carol and Bob without a listing (UC-20)
+  // participant1Id/participant2Id sorted alphabetically for uniqueness
+  const dmP1 = alice.id < bob.id ? alice.id : bob.id;
+  const dmP2 = alice.id < bob.id ? bob.id : alice.id;
+  let thread4 = await prisma.thread.findFirst({
+    where: { participant1Id: dmP1, participant2Id: dmP2 },
+  });
+  if (!thread4) {
+    thread4 = await prisma.thread.create({
+      data: {
+        listingId: null,
+        participant1Id: dmP1,
+        participant2Id: dmP2,
+        participants: {
+          create: [
+            { userId: alice.id },
+            { userId: bob.id },
+          ],
+        },
+      },
+    });
+    await prisma.message.createMany({
+      data: [
+        { threadId: thread4.id, senderId: alice.id, text: 'Hey Bob, this is Alice from admin. Just checking in.' },
+        { threadId: thread4.id, senderId: bob.id,   text: 'Hi Alice! Everything is fine, thanks.' },
+      ],
+    });
+  }
+
   // --- Seed favorites ---
   console.log('Seeding favorites...');
 
@@ -506,14 +616,196 @@ async function main() {
     create: { userId: bob.id, listingId: carolActive1.id },
   });
 
-  console.log('Seed complete.');
-  console.log('Users: alice@test.ge (admin), bob@test.ge (user), carol@test.ge (user)');
-  console.log('OTP code for all: 000000');
-  console.log('Bob listings: 8 active + 2 sold + 1 expired + 1 pending_moderation + 1 draft + 1 rejected = 14');
-  console.log('Carol listings: 3 active + 1 pending_moderation + 1 removed = 5');
-  console.log('Alice listings: 1 active = 1');
-  console.log('Total listings: 20');
-  console.log('Threads: 2 | Messages: 5 | Favorites: 4');
+  // --- Seed Review (UC-15): carol reviews bob for the sold PS5 listing ---
+  console.log('Seeding review...');
+
+  const existingReview = await prisma.review.findUnique({
+    where: { authorId_listingId: { authorId: carol.id, listingId: bobSoldPs5.id } },
+  });
+  if (!existingReview) {
+    await prisma.review.create({
+      data: {
+        listingId: bobSoldPs5.id,
+        authorId: carol.id,
+        sellerId: bob.id,
+        rating: 5,
+        text: 'Great seller! The PS5 was exactly as described. Fast response, smooth transaction. Highly recommend.',
+      },
+    });
+  }
+
+  // --- Seed Payments (UC-08/UC-29) ---
+  console.log('Seeding payments...');
+
+  // Payment 1: Bob paid for top_7d promotion on iPhone 14 Pro — completed
+  const existingPayment1 = await prisma.payment.findFirst({
+    where: { userId: bob.id, listingId: bobActive1.id, promotionType: 'top_7d' },
+  });
+  if (!existingPayment1) {
+    await prisma.payment.create({
+      data: {
+        userId: bob.id,
+        listingId: bobActive1.id,
+        amount: 15.00,
+        currency: 'GEL',
+        status: 'completed',
+        provider: 'stripe',
+        externalId: 'pi_test_iphone_top7d_001',
+        promotionType: 'top_7d',
+      },
+    });
+  }
+
+  // Payment 2: Bob has a pending payment for highlight on MacBook
+  const existingPayment2 = await prisma.payment.findFirst({
+    where: { userId: bob.id, listingId: bobActive7.id, promotionType: 'highlight' },
+  });
+  if (!existingPayment2) {
+    await prisma.payment.create({
+      data: {
+        userId: bob.id,
+        listingId: bobActive7.id,
+        amount: 8.00,
+        currency: 'GEL',
+        status: 'pending',
+        provider: 'stripe',
+        externalId: 'pi_test_macbook_highlight_002',
+        promotionType: 'highlight',
+      },
+    });
+  }
+
+  // Payment 3: Carol paid for top_3d promotion on Dyson — completed
+  const existingPayment3 = await prisma.payment.findFirst({
+    where: { userId: carol.id, listingId: carolActive1.id, promotionType: 'top_3d' },
+  });
+  if (!existingPayment3) {
+    await prisma.payment.create({
+      data: {
+        userId: carol.id,
+        listingId: carolActive1.id,
+        amount: 9.00,
+        currency: 'GEL',
+        status: 'completed',
+        provider: 'stripe',
+        externalId: 'pi_test_dyson_top3d_003',
+        promotionType: 'top_3d',
+      },
+    });
+  }
+
+  // --- Seed Promotions (UC-29) ---
+  console.log('Seeding promotions...');
+
+  // Promotion 1: Bob's iPhone 14 Pro has active top_7d promotion
+  const existingPromo1 = await prisma.promotion.findFirst({
+    where: { userId: bob.id, listingId: bobActive1.id, promotionType: 'top_7d' },
+  });
+  if (!existingPromo1) {
+    await prisma.promotion.create({
+      data: {
+        userId: bob.id,
+        listingId: bobActive1.id,
+        promotionType: 'top_7d',
+        isActive: true,
+        expiresAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+
+  // Promotion 2: Carol's Dyson has active top_3d promotion
+  const existingPromo2 = await prisma.promotion.findFirst({
+    where: { userId: carol.id, listingId: carolActive1.id, promotionType: 'top_3d' },
+  });
+  if (!existingPromo2) {
+    await prisma.promotion.create({
+      data: {
+        userId: carol.id,
+        listingId: carolActive1.id,
+        promotionType: 'top_3d',
+        isActive: true,
+        expiresAt: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+
+  // --- Seed Notifications (UC-17) for carol ---
+  console.log('Seeding notifications...');
+
+  // Notification 1: new_message — someone replied to carol's listing
+  const existingNotif1 = await prisma.notification.findFirst({
+    where: { userId: carol.id, type: 'new_message', listingId: carolActive1.id },
+  });
+  if (!existingNotif1) {
+    await prisma.notification.create({
+      data: {
+        userId: carol.id,
+        type: 'new_message',
+        listingId: carolActive1.id,
+        payload: { threadId: thread2?.id ?? '', senderName: 'Bob Seller', preview: "What's the condition?" },
+        read: false,
+      },
+    });
+  }
+
+  // Notification 2: price_drop — bob dropped price on iPhone 14 Pro (carol has it favorited)
+  const existingNotif2 = await prisma.notification.findFirst({
+    where: { userId: carol.id, type: 'price_drop', listingId: bobActive1.id },
+  });
+  if (!existingNotif2) {
+    await prisma.notification.create({
+      data: {
+        userId: carol.id,
+        type: 'price_drop',
+        listingId: bobActive1.id,
+        payload: { oldPrice: 2800, newPrice: 2500, currency: 'GEL', title: 'iPhone 14 Pro 256GB' },
+        read: false,
+      },
+    });
+  }
+
+  // Notification 3: moderation_update — carol's listing was reviewed by moderation
+  const existingNotif3 = await prisma.notification.findFirst({
+    where: { userId: carol.id, type: 'moderation_update' },
+  });
+  if (!existingNotif3) {
+    await prisma.notification.create({
+      data: {
+        userId: carol.id,
+        type: 'moderation_update',
+        listingId: null,
+        payload: { status: 'approved', listingTitle: 'Dyson V11 vacuum cleaner', message: 'Your listing has been approved and is now live.' },
+        read: true,
+      },
+    });
+  }
+
+  console.log('');
+  console.log('=== Seed complete ===');
+  console.log('');
+  console.log('PERSONAS:');
+  console.log('  alice@test.ge  — admin  (OTP: 000000)');
+  console.log('  bob@test.ge    — user   (OTP: 000000) — seller');
+  console.log('  carol@test.ge  — user   (OTP: 000000) — buyer');
+  console.log('');
+  console.log('LISTINGS:');
+  console.log('  Bob:   8 active + 2 sold + 1 expired + 1 pending_moderation + 1 draft + 1 rejected = 14');
+  console.log('  Carol: 3 active + 1 pending_moderation + 1 removed = 5');
+  console.log('  Alice: 1 active + 1 pending_moderation = 2');
+  console.log('  Total: 21');
+  console.log('');
+  console.log('THREADS:');
+  console.log('  Thread 1: Carol <-> Bob (iPhone 14 listing)');
+  console.log('  Thread 2: Bob <-> Carol (Dyson listing)');
+  console.log('  Thread 3: Carol <-> Bob (PS5 SOLD listing — review flow)');
+  console.log('  Thread 4: Alice <-> Bob (direct DM, no listing — UC-20)');
+  console.log('');
+  console.log('EXTRAS:');
+  console.log('  Reviews: 1 (Carol -> Bob, PS5, rating 5)');
+  console.log('  Payments: 3 (completed, pending, completed)');
+  console.log('  Promotions: 2 (top_7d on iPhone, top_3d on Dyson)');
+  console.log('  Notifications: 3 for Carol (new_message, price_drop, moderation_update)');
+  console.log('  Favorites: 4 (Carol favorites 3 Bob listings, Bob favorites Dyson)');
 }
 
 main()
