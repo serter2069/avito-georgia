@@ -75,7 +75,7 @@ router.post('/request-otp', async (req: Request, res: Response) => {
     where: { email },
     select: { id: true, deletedAt: true },
   });
-  if (existingUser?.deletedAt !== null && existingUser !== null) {
+  if (existingUser && existingUser.deletedAt !== null) {
     res.status(401).json({ error: 'Account deleted' });
     return;
   }
