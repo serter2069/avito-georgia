@@ -251,6 +251,9 @@ model Notification {
   payload   Json
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  // UC-40: dedup guard — one notification per user+listing+type
+  @@unique([userId, listingId, type])
 }
 
 model Payment {

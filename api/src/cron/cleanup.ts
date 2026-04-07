@@ -53,15 +53,37 @@ export function startCleanupCron(): void {
       for (const listing of listings) {
         if (!listing.expiresAt) continue;
         try {
-          // Record notification first (idempotency guard)
-          await prisma.notification.create({
-            data: {
+          // UC-40: upsert is idempotent — concurrent cron runs or retries won't
+          // create a duplicate row thanks to @@unique([userId, listingId, type]).
+          // `created` flag tells us whether this is a new reminder or a no-op.
+          const { created } = await prisma.notification.upsert({
+            where: {
+              userId_listingId_type: {
+                userId: listing.userId,
+                listingId: listing.id,
+                type: 'EXPIRY_REMINDER',
+              },
+            },
+            update: {},
+            create: {
               userId: listing.userId,
               listingId: listing.id,
               type: 'EXPIRY_REMINDER',
               payload: { expiresAt: listing.expiresAt.toISOString() },
             },
+            select: { id: true, createdAt: true },
+          }).then(async (record) => {
+            // Determine if row was just created: createdAt within the last 5 seconds
+            const justCreated = Date.now() - record.createdAt.getTime() < 5000;
+            return { created: justCreated };
           });
+
+          if (!created) {
+            // Reminder already recorded (duplicate cron run) — skip email
+            console.log(`[cron] expiry-reminder: skipped duplicate for listing ${listing.id}`);
+            continue;
+          }
+
           // Check notification preference — absence of row means enabled by default
           const expiryPref = await prisma.notificationPref.findUnique({
             where: { userId_type: { userId: listing.userId, type: 'moderation_update' } },
