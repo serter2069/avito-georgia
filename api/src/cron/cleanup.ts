@@ -182,7 +182,15 @@ export function startCleanupCron(): void {
           // 10. Sessions
           await prisma.session.deleteMany({ where: { userId } });
 
-          // 11. Listing photos (child of Listing)
+          // 11. Reviews (as author or as seller)
+          await prisma.review.deleteMany({
+            where: { OR: [{ authorId: userId }, { sellerId: userId }] },
+          });
+
+          // 12. Notification preferences
+          await prisma.notificationPref.deleteMany({ where: { userId } });
+
+          // 13. Listing photos and listing-related data (child of Listing)
           const listingIds = await prisma.listing.findMany({
             where: { userId },
             select: { id: true },
@@ -191,6 +199,7 @@ export function startCleanupCron(): void {
             const ids = listingIds.map((l) => l.id);
             await prisma.listingPhoto.deleteMany({ where: { listingId: { in: ids } } });
             // Also clean up listing-related data referencing these listings
+            await prisma.review.deleteMany({ where: { listingId: { in: ids } } });
             await prisma.favorite.deleteMany({ where: { listingId: { in: ids } } });
             await prisma.notification.deleteMany({ where: { listingId: { in: ids } } });
             await prisma.promotion.deleteMany({ where: { listingId: { in: ids } } });
@@ -201,10 +210,10 @@ export function startCleanupCron(): void {
             await prisma.thread.deleteMany({ where: { listingId: { in: ids } } });
           }
 
-          // 12. Listings
+          // 14. Listings
           await prisma.listing.deleteMany({ where: { userId } });
 
-          // 13. User record
+          // 15. User record
           await prisma.user.delete({ where: { id: userId } });
 
           console.log(`[cron] gdpr-purge: deleted user ${userId}`);
