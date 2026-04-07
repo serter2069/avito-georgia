@@ -61,6 +61,12 @@ async function notifyOfflineRecipients(
     });
     if (recentEmailNotification) continue;
 
+    // Check notification preference — absence of row means enabled by default
+    const newMsgPref = await prisma.notificationPref.findUnique({
+      where: { userId_type: { userId: recipientId, type: 'new_message' } },
+    });
+    if (newMsgPref && !newMsgPref.enabled) continue;
+
     // Record that we're sending an email (before sending, to prevent races)
     await prisma.notification.create({
       data: {

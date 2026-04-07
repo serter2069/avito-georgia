@@ -220,7 +220,7 @@ router.patch('/listings/:id/status', async (req: Request, res: Response) => {
 
   const listing = await prisma.listing.findUnique({
     where: { id },
-    include: { user: { select: { email: true } } },
+    include: { user: { select: { id: true, email: true } } },
   });
   if (!listing) {
     res.status(404).json({ error: 'Listing not found' });
@@ -262,14 +262,21 @@ router.patch('/listings/:id/status', async (req: Request, res: Response) => {
     ...(rejectReason ? { rejectReason } : {}),
   });
 
-  // Send email notification to the listing owner
-  const userEmail = listing.user.email;
-  if (targetStatus === 'active') {
-    sendListingApprovedEmail(userEmail, listing.title)
-      .catch(err => console.error('Approval email error:', err));
-  } else if (targetStatus === 'rejected') {
-    sendListingRejectedEmail(userEmail, listing.title, rejectReason || null)
-      .catch(err => console.error('Rejection email error:', err));
+  // Send email notification to the listing owner (check moderation_update pref first)
+  if (targetStatus === 'active' || targetStatus === 'rejected') {
+    const moderationPref = await prisma.notificationPref.findUnique({
+      where: { userId_type: { userId: listing.user.id, type: 'moderation_update' } },
+    });
+    if (!moderationPref || moderationPref.enabled) {
+      const userEmail = listing.user.email;
+      if (targetStatus === 'active') {
+        sendListingApprovedEmail(userEmail, listing.title)
+          .catch(err => console.error('Approval email error:', err));
+      } else {
+        sendListingRejectedEmail(userEmail, listing.title, rejectReason || null)
+          .catch(err => console.error('Rejection email error:', err));
+      }
+    }
   }
 
   res.json(updated);
