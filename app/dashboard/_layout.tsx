@@ -40,9 +40,42 @@ function useUnreadCount() {
   return count;
 }
 
+function useUnreadNotifCount() {
+  const [count, setCount] = useState(0);
+  const user = useAuthStore((s) => s.user);
+  const appStateRef = useRef(AppState.currentState);
+
+  const fetchCount = useCallback(async () => {
+    if (!user) { setCount(0); return; }
+    const res = await api.get<{ count: number }>('/notifications/unread-count');
+    if (res.ok && res.data) {
+      setCount(res.data.count);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchCount();
+    const interval = setInterval(fetchCount, 30000);
+    return () => clearInterval(interval);
+  }, [fetchCount]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (appStateRef.current.match(/inactive|background/) && nextState === 'active') {
+        fetchCount();
+      }
+      appStateRef.current = nextState;
+    });
+    return () => subscription.remove();
+  }, [fetchCount]);
+
+  return count;
+}
+
 export default function DashboardLayout() {
   const { t } = useTranslation();
   const unreadCount = useUnreadCount();
+  const unreadNotifCount = useUnreadNotifCount();
 
   return (
     <Tabs
@@ -98,6 +131,37 @@ export default function DashboardLayout() {
       <Tabs.Screen
         name="messages/[threadId]"
         options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: t('notifications'),
+          tabBarIcon: ({ focused, color }) => (
+            <View>
+              <Ionicons name={focused ? 'notifications' : 'notifications-outline'} size={22} color={color} />
+              {unreadNotifCount > 0 && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -4,
+                    right: -6,
+                    backgroundColor: colors.statusErrorAlt,
+                    borderRadius: 9,
+                    minWidth: 18,
+                    height: 18,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 3,
+                  }}
+                >
+                  <Text style={{ color: colors.white, fontSize: 10, fontWeight: '700', lineHeight: 12 }}>
+                    {unreadNotifCount > 99 ? '99+' : unreadNotifCount}
+                  </Text>
+                </View>
+              )}
+            </View>
+          ),
+        }}
       />
       <Tabs.Screen
         name="favorites"
