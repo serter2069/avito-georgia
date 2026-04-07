@@ -6,6 +6,43 @@ import { prisma } from '../lib/prisma';
 
 const router = Router();
 
+// Create in-app NEW_MESSAGE notifications for all thread participants except the sender (UC-17)
+async function createNewMessageNotifications(
+  threadId: string,
+  listingId: string | null,
+  message: { id: string; text: string; senderId: string; sender: { id: string; name: string | null; avatarUrl: string | null } }
+): Promise<void> {
+  const senderId = message.senderId;
+
+  // Get all participants except sender
+  const participants = await prisma.threadParticipant.findMany({
+    where: { threadId, userId: { not: senderId } },
+    select: { userId: true },
+  });
+
+  for (const { userId: recipientId } of participants) {
+    // Check notification preference opt-out for new_message (absence = enabled by default)
+    const pref = await prisma.notificationPref.findUnique({
+      where: { userId_type: { userId: recipientId, type: 'new_message' } },
+    });
+    if (pref && !pref.enabled) continue;
+
+    await prisma.notification.create({
+      data: {
+        userId: recipientId,
+        type: 'NEW_MESSAGE',
+        ...(listingId ? { listingId } : {}),
+        payload: {
+          threadId,
+          messageId: message.id,
+          senderName: message.sender.name || 'Someone',
+          preview: message.text.slice(0, 100),
+        },
+      },
+    });
+  }
+}
+
 // GET /api/threads — list current user's threads
 router.get('/threads', requireAuth, async (req: Request, res: Response) => {
   try {
@@ -264,6 +301,11 @@ router.post('/threads/:listingId/message', requireAuth, chatMessageRateLimit, as
 
     // Touch thread updatedAt
     await prisma.thread.update({ where: { id: thread.id }, data: { updatedAt: new Date() } });
+
+    // Create in-app NEW_MESSAGE notifications for all recipients (UC-17)
+    createNewMessageNotifications(thread.id, listingId, message).catch(err =>
+      console.error('createNewMessageNotifications error:', err)
+    );
 
     res.status(201).json({ threadId: thread.id, message });
   } catch (err) {
