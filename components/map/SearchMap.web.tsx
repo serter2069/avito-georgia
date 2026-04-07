@@ -27,6 +27,43 @@ function injectLeafletCSS() {
   document.head.appendChild(link);
 }
 
+// Inject Leaflet.markercluster CSS once
+function injectMarkerClusterCSS() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById('leaflet-cluster-css')) return;
+  const link = document.createElement('link');
+  link.id = 'leaflet-cluster-css';
+  link.rel = 'stylesheet';
+  link.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css';
+  document.head.appendChild(link);
+  const linkDefault = document.createElement('link');
+  linkDefault.id = 'leaflet-cluster-css-default';
+  linkDefault.rel = 'stylesheet';
+  linkDefault.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';
+  document.head.appendChild(linkDefault);
+}
+
+// Inject Leaflet.markercluster JS once — returns a Promise that resolves when ready
+function injectMarkerClusterJS(): Promise<void> {
+  if (typeof document === 'undefined') return Promise.resolve();
+  // Already injected and loaded
+  if ((window as any).L?.MarkerClusterGroup) return Promise.resolve();
+  // Script tag already in DOM but not yet loaded
+  const existing = document.getElementById('leaflet-cluster-js');
+  if (existing) {
+    return new Promise((resolve) => {
+      existing.addEventListener('load', () => resolve(), { once: true });
+    });
+  }
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.id = 'leaflet-cluster-js';
+    script.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+}
+
 // Fix default marker icon paths broken by bundlers
 function fixLeafletIcons(L: typeof import('leaflet')) {
   const icon = L.icon({
@@ -39,27 +76,6 @@ function fixLeafletIcons(L: typeof import('leaflet')) {
     shadowSize: [41, 41],
   });
   L.Marker.prototype.options.icon = icon;
-}
-
-// Add small random offset to separate markers sharing identical coordinates
-// Only applied when two or more listings have the exact same lat/lng (city-level fallback)
-function jitter(val: number): number {
-  return val + (Math.random() - 0.5) * 0.004;
-}
-
-// Build a set of coordinate keys that appear more than once (city-level duplicates)
-function findDuplicateCoordKeys(listings: { lat: number | null; lng: number | null }[]): Set<string> {
-  const counts = new Map<string, number>();
-  for (const l of listings) {
-    if (l.lat === null || l.lng === null) continue;
-    const key = `${l.lat}:${l.lng}`;
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
-  const duplicates = new Set<string>();
-  for (const [key, count] of counts) {
-    if (count > 1) duplicates.add(key);
-  }
-  return duplicates;
 }
 
 function formatPrice(price: number | null, currency: string): string {
@@ -75,9 +91,10 @@ export function SearchMap({ listings, onMarkerPress }: SearchMapProps) {
     if (!containerRef.current) return;
 
     injectLeafletCSS();
+    injectMarkerClusterCSS();
 
-    // Dynamically import Leaflet (web only)
-    import('leaflet').then((L) => {
+    // Dynamically import Leaflet + wait for markercluster JS to load
+    Promise.all([import('leaflet'), injectMarkerClusterJS()]).then(([L]) => {
       fixLeafletIcons(L);
 
       // Destroy existing map if remounting
@@ -101,15 +118,16 @@ export function SearchMap({ listings, onMarkerPress }: SearchMapProps) {
         maxZoom: 19,
       }).addTo(map);
 
-      // Add markers — jitter only when multiple listings share identical coords
-      const duplicateKeys = findDuplicateCoordKeys(validListings);
-      validListings.forEach((listing) => {
-        const coordKey = `${listing.lat}:${listing.lng}`;
-        const needsJitter = duplicateKeys.has(coordKey);
-        const lat = needsJitter ? jitter(listing.lat as number) : listing.lat as number;
-        const lng = needsJitter ? jitter(listing.lng as number) : listing.lng as number;
+      // Create marker cluster group — groups nearby pins when zoomed out
+      const clusterGroup = (L as any).markerClusterGroup({
+        maxClusterRadius: 60,
+        showCoverageOnHover: false,
+        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 17,
+      });
 
-        const marker = L.marker([lat, lng]).addTo(map);
+      validListings.forEach((listing) => {
+        const marker = L.marker([listing.lat as number, listing.lng as number]);
 
         const popupContent = `
           <div style="min-width:140px;font-family:sans-serif;">
@@ -119,11 +137,14 @@ export function SearchMap({ listings, onMarkerPress }: SearchMapProps) {
         `;
 
         marker.bindPopup(popupContent);
-
         marker.on('click', () => {
           onMarkerPress?.(listing.id);
         });
+
+        clusterGroup.addLayer(marker);
       });
+
+      map.addLayer(clusterGroup);
 
       // Fit bounds if multiple markers
       if (validListings.length > 1) {
