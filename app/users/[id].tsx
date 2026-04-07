@@ -14,6 +14,7 @@ interface SellerProfile {
   avatarUrl: string | null;
   createdAt: string;
   activeListings: number;
+  isPremium?: boolean;
 }
 
 interface ApiListing {
@@ -188,6 +189,11 @@ export default function SellerProfileScreen() {
             </Text>
           </View>
           <Text className="text-text-primary text-xl font-bold mb-1">{seller.name}</Text>
+          {seller.isPremium === true && (
+            <View className="flex-row items-center bg-primary/10 rounded-full px-3 py-1 mb-1">
+              <Text style={{ color: colors.brandPrimary, fontSize: 13, fontWeight: '600' }}>✓ {t('verifiedSeller')}</Text>
+            </View>
+          )}
           <Text className="text-text-muted text-sm">
             {t('memberSince')} {formatDate(seller.createdAt)}
           </Text>
