@@ -7,44 +7,55 @@ const router = Router();
 // GET /api/reviews/stats/:userId — average rating + total for a seller (public)
 // IMPORTANT: registered before GET / and GET ?sellerId to avoid "stats" matching as a query param
 router.get('/stats/:userId', async (req: Request, res: Response) => {
-  const sellerId = String(req.params.userId);
+  try {
+    const sellerId = String(req.params.userId);
 
-  const result = await prisma.review.aggregate({
-    where: { sellerId },
-    _avg: { rating: true },
-    _count: { id: true },
-  });
+    const result = await prisma.review.aggregate({
+      where: { sellerId },
+      _avg: { rating: true },
+      _count: { id: true },
+    });
 
-  res.json({
-    averageRating: result._avg.rating ? Math.round(result._avg.rating * 10) / 10 : null,
-    totalReviews: result._count.id,
-  });
+    res.json({
+      averageRating: result._avg.rating ? Math.round(result._avg.rating * 10) / 10 : null,
+      totalReviews: result._count.id,
+    });
+  } catch (err) {
+    console.error('GET /reviews/stats/:userId error:', err);
+    res.status(500).json({ error: 'Failed to fetch review stats' });
+  }
 });
 
 // GET /api/reviews?sellerId= — list reviews for a seller (public)
 router.get('/', async (req: Request, res: Response) => {
-  const sellerId = req.query.sellerId ? String(req.query.sellerId) : undefined;
+  try {
+    const sellerId = req.query.sellerId ? String(req.query.sellerId) : undefined;
 
-  if (!sellerId) {
-    res.status(400).json({ error: 'sellerId query param is required' });
-    return;
+    if (!sellerId) {
+      res.status(400).json({ error: 'sellerId query param is required' });
+      return;
+    }
+
+    const reviews = await prisma.review.findMany({
+      where: { sellerId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        author: { select: { id: true, name: true, avatarUrl: true } },
+        listing: { select: { id: true, title: true } },
+      },
+    });
+
+    res.json({ reviews, total: reviews.length });
+  } catch (err) {
+    console.error('GET /reviews error:', err);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
   }
-
-  const reviews = await prisma.review.findMany({
-    where: { sellerId },
-    orderBy: { createdAt: 'desc' },
-    include: {
-      author: { select: { id: true, name: true, avatarUrl: true } },
-      listing: { select: { id: true, title: true } },
-    },
-  });
-
-  res.json({ reviews, total: reviews.length });
 });
 
 // POST /api/reviews — create a review (auth required)
 // Guards: listing exists → listing.status === 'sold' → caller !== seller → ThreadParticipant check → unique (409)
 router.post('/', requireAuth, async (req: Request, res: Response) => {
+  try {
   const authorId = req.user!.userId;
   const { listingId, rating, text } = req.body;
 
@@ -119,6 +130,10 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   });
 
   res.status(201).json(review);
+  } catch (err) {
+    console.error('POST /reviews error:', err);
+    res.status(500).json({ error: 'Failed to create review' });
+  }
 });
 
 export default router;
