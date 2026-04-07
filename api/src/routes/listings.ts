@@ -157,6 +157,7 @@ router.get('/', searchRateLimit, async (req: Request, res: Response) => {
 
   const where: Prisma.ListingWhereInput = {
     status: 'active',
+    user: { role: { not: 'blocked' } },
     AND: [
       { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
       ...(q
