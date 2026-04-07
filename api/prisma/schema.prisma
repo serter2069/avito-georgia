@@ -99,7 +99,7 @@ model Category {
   nameEn           String     @default("")
   slug             String     @unique
   customFields     Json?
-  freeListingQuota Int        @default(5)
+  freeListingQuota Int        @default(10)
   paidListingPrice Float      @default(0.0)
   parentId         String?
   parent           Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
