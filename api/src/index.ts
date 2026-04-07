@@ -6,6 +6,7 @@ import { otpRateLimit, otpVerifyRateLimit } from './middleware/rateLimiter';
 import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
 import { setupSocket } from './socket';
+import { ALLOWED_ORIGINS } from './lib/constants';
 import authRouter from './routes/auth';
 import listingsRouter from './routes/listings';
 import favoritesRouter from './routes/favorites';
@@ -40,11 +41,7 @@ const httpServer = http.createServer(app);
 const PORT = parseInt(process.env.PORT || '3813', 10);
 
 app.use(cors({
-  origin: [
-    'https://avito-georgia.smartlaunchhub.com',
-    'http://localhost:8081',
-    'http://localhost:19006',
-  ],
+  origin: ALLOWED_ORIGINS,
   credentials: true,
 }));
 app.use(cookieParser());
