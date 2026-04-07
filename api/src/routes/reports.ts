@@ -1,11 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { requireAuth } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
+import { reportCreateRateLimit } from '../middleware/rateLimiter';
 
 const router = Router();
 
 // POST /api/reports — create a report
-router.post('/', requireAuth, async (req: Request, res: Response) => {
+router.post('/', requireAuth, reportCreateRateLimit, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
     const { listingId, targetUserId, reason, description } = req.body;
