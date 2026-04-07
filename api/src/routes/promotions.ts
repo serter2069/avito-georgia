@@ -1,20 +1,9 @@
 import { Router, Request, Response } from 'express';
-import Stripe from 'stripe';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
+import { getStripe } from '../lib/stripe';
 
 const router = Router();
-
-// Lazy Stripe initialization — avoids crash on startup if key is missing
-let _stripe: Stripe | null = null;
-function getStripe(): Stripe {
-  if (!_stripe) {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
-    _stripe = new Stripe(key, { apiVersion: '2026-03-25.dahlia' });
-  }
-  return _stripe;
-}
 
 // Price config: amount in tetri (1 GEL = 100 tetri), Stripe uses smallest unit
 // UC-08 pricing: top_3d=5 GEL, top_7d=8 GEL, highlight=8 GEL, bundle=14 GEL
