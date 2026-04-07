@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireAdmin } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import { reportCreateRateLimit } from '../middleware/rateLimiter';
 
@@ -21,11 +21,22 @@ router.post('/', requireAuth, reportCreateRateLimit, async (req: Request, res: R
       return;
     }
 
+    // Prevent self-reporting
+    if (targetUserId === userId) {
+      res.status(400).json({ error: 'Cannot report yourself' });
+      return;
+    }
+
     // Verify listing exists if provided
     if (listingId) {
       const listing = await prisma.listing.findUnique({ where: { id: listingId } });
       if (!listing) {
         res.status(404).json({ error: 'Listing not found' });
+        return;
+      }
+      // Prevent reporting own listing
+      if (listing.userId === userId) {
+        res.status(400).json({ error: 'Cannot report your own listing' });
         return;
       }
     }
@@ -56,13 +67,9 @@ router.post('/', requireAuth, reportCreateRateLimit, async (req: Request, res: R
   }
 });
 
-// GET /api/admin/reports — list all reports (admin only)
-router.get('/admin', requireAuth, async (req: Request, res: Response) => {
+// GET /api/reports/admin — list all reports (admin only)
+router.get('/admin', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
-    if (req.user!.role !== 'admin') {
-      res.status(403).json({ error: 'Admin access required' });
-      return;
-    }
 
     const status = req.query.status as string | undefined;
     const page = Math.max(parseInt(req.query.page as string) || 1, 1);
