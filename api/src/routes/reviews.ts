@@ -58,6 +58,11 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
     res.status(400).json({ error: 'rating must be an integer between 1 and 5' });
     return;
   }
+  // UC-15: review text max 500 characters
+  if (text && typeof text === 'string' && text.trim().length > 500) {
+    res.status(400).json({ error: 'Review text must be 500 characters or fewer' });
+    return;
+  }
 
   // Guard 1: listing must exist
   const listing = await prisma.listing.findUnique({ where: { id: listingId } });

@@ -754,14 +754,23 @@ export default function ListingDetailScreen() {
                     borderWidth: 1, borderColor: colors.borderSoft, borderRadius: 10,
                     paddingHorizontal: 14, paddingVertical: 12, fontSize: 15,
                     color: colors.textPrimary, backgroundColor: colors.bgSubtle,
-                    minHeight: 90, textAlignVertical: 'top', marginBottom: 16,
+                    minHeight: 90, textAlignVertical: 'top', marginBottom: 4,
                   }}
                   value={reviewText}
                   onChangeText={setReviewText}
                   placeholder={t('reviewPlaceholder') || 'Tell about your experience...'}
                   placeholderTextColor={colors.textDisabled}
+                  maxLength={500}
                   multiline
                 />
+                <Text style={{
+                  fontSize: 12,
+                  color: reviewText.length >= 480 ? colors.statusErrorAlt : colors.textMuted,
+                  textAlign: 'right',
+                  marginBottom: 12,
+                }}>
+                  {reviewText.length}/500
+                </Text>
                 {reviewError ? (
                   <Text style={{ color: colors.statusErrorAlt, fontSize: 13, marginBottom: 12, textAlign: 'center' }}>{reviewError}</Text>
                 ) : null}
