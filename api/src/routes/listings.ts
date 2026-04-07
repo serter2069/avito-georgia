@@ -30,14 +30,17 @@ function stripHtml(str: string): string {
   return str.replace(/<[^>]*>/g, '').trim();
 }
 
+// Prisma uses cuid() for IDs — validate as non-empty string with min length
+const cuid = z.string().min(1);
+
 const createListingSchema = z.object({
   title: z.string().min(5).max(100).transform(stripHtml),
   description: z.string().min(20).max(5000).transform(stripHtml).optional(),
   price: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(0)).optional().nullable(),
   currency: z.enum(['GEL', 'USD', 'EUR']).default('GEL'),
-  categoryId: z.string().uuid(),
-  cityId: z.string().uuid(),
-  districtId: z.string().uuid().optional(),
+  categoryId: cuid,
+  cityId: cuid,
+  districtId: cuid.optional(),
   address: z.string().max(200).optional(),
 });
 
@@ -47,9 +50,9 @@ const createDraftSchema = z.object({
   description: z.string().max(5000).transform(stripHtml).optional(),
   price: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(0)).optional().nullable(),
   currency: z.enum(['GEL', 'USD', 'EUR']).default('GEL'),
-  categoryId: z.string().uuid(),
-  cityId: z.string().uuid(),
-  districtId: z.string().uuid().optional(),
+  categoryId: cuid,
+  cityId: cuid,
+  districtId: cuid.optional(),
   address: z.string().max(200).optional(),
   status: z.literal('draft'),
 });
