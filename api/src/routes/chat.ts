@@ -108,17 +108,16 @@ router.get('/threads/unread-count', requireAuth, async (req: Request, res: Respo
     }
 
     // Count unread per participation and sum
-    let total = 0;
-    await Promise.all(participations.map(async (p: { threadId: string; lastSeenAt: Date | null }) => {
-      const count = await prisma.message.count({
+    const counts = await Promise.all(participations.map(async (p: { threadId: string; lastSeenAt: Date | null }) => {
+      return prisma.message.count({
         where: {
           threadId: p.threadId,
           senderId: { not: userId },
           ...(p.lastSeenAt ? { createdAt: { gt: p.lastSeenAt } } : {}),
         },
       });
-      total += count;
     }));
+    const total = counts.reduce((sum, c) => sum + c, 0);
 
     res.json({ count: total });
   } catch (err) {
