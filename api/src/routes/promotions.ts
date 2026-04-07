@@ -17,13 +17,14 @@ function getStripe(): Stripe {
 }
 
 // Price config: amount in tetri (1 GEL = 100 tetri), Stripe uses smallest unit
+// UC-08 pricing: top_3d=5 GEL, top_7d=8 GEL, highlight=8 GEL, bundle=14 GEL
 const PRICES: Record<string, { amount: number; label: string; days: number | null; recurring: boolean }> = {
   top_1d:        { amount: 500,  label: 'Top 1 day',                     days: 1,    recurring: false },
-  top_3d:        { amount: 1200, label: 'Top 3 days',                    days: 3,    recurring: false },
-  top_7d:        { amount: 2000, label: 'Top 7 days',                    days: 7,    recurring: false },
+  top_3d:        { amount: 500,  label: 'Top 3 days',                    days: 3,    recurring: false },
+  top_7d:        { amount: 800,  label: 'Top 7 days',                    days: 7,    recurring: false },
   highlight:     { amount: 800,  label: 'Highlight 7 days',              days: 7,    recurring: false },
   unlimited_sub: { amount: 999,  label: 'Unlimited listings',            days: null, recurring: true  },
-  bundle:        { amount: 2800, label: 'Top 7 days + Highlight Bundle', days: 7,    recurring: false },
+  bundle:        { amount: 1400, label: 'Top 7 days + Highlight Bundle', days: 7,    recurring: false },
 };
 
 // Bundle maps to two sub-promotion types created on webhook fulfillment

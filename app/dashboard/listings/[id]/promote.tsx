@@ -215,7 +215,7 @@ export default function PromoteListingScreen() {
                     {option.amountGEL} GEL
                   </Text>
                   {isBundle && (
-                    <Text className="text-text-muted text-xs line-through">30 GEL</Text>
+                    <Text className="text-text-muted text-xs line-through">16 GEL</Text>
                   )}
                 </View>
               </View>
