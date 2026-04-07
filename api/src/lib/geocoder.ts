@@ -1,3 +1,9 @@
+// Nominatim response shape (only fields we use)
+interface NominatimResult {
+  lat: string;
+  lon: string;
+}
+
 // Geocode a city name using OpenStreetMap Nominatim (free, no API key required)
 // Fault-tolerant: returns null on any error, never throws
 export async function geocodeCity(cityName: string): Promise<{ lat: number; lng: number } | null> {
@@ -8,7 +14,7 @@ export async function geocodeCity(cityName: string): Promise<{ lat: number; lng:
       signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return null;
-    const data = await res.json();
+    const data = (await res.json()) as NominatimResult[];
     if (data[0]) {
       return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
     }
@@ -31,7 +37,7 @@ export async function geocodeAddress(address: string, cityName: string): Promise
       signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) return null;
-    const data = await res.json();
+    const data = (await res.json()) as NominatimResult[];
     if (data[0]) {
       return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
     }
