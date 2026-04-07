@@ -39,6 +39,12 @@ jobs:
           sudo chown -R github-runner:www-data /var/www/avito-georgia/web/
           sudo chmod -R g+rw /var/www/avito-georgia/web/
 
+      - name: Apply nginx config
+        run: |
+          sudo cp nginx.conf /etc/nginx/sites-available/avito-georgia
+          sudo ln -sf /etc/nginx/sites-available/avito-georgia /etc/nginx/sites-enabled/avito-georgia
+          sudo nginx -t && sudo systemctl reload nginx
+
   deploy-api:
     runs-on: self-hosted
     steps:
