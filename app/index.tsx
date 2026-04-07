@@ -276,7 +276,7 @@ export default function HomeScreen() {
                 <Text className="text-text-secondary text-sm">{t('activeListings')}</Text>
                 <TouchableOpacity
                   className="bg-primary rounded-lg py-3 items-center mt-1"
-                  onPress={() => router.push('/create-listing')}
+                  onPress={() => router.push('/listings/create')}
                   activeOpacity={0.8}
                 >
                   <Text className="text-white font-semibold text-sm">{t('postAd')}</Text>
