@@ -100,7 +100,7 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  // On admin subdomain (admin.* or port 8086): redirect to /admin if not already there.
+  // On admin subdomain (admin.* or port 8086): redirect to /admin equivalent if not already there.
   // Both fontsLoaded and isReady must be true before navigating — ensures Root Layout is
   // fully mounted before router.replace is called (avoids "navigate before mounting" crash).
   useEffect(() => {
@@ -108,8 +108,16 @@ export default function RootLayout() {
     if (isAdminDomain()) {
       const currentPath = window.location.pathname;
       if (!currentPath.startsWith('/admin')) {
+        // Map known admin routes to their /admin/* equivalents; fall back to /admin index
+        const ADMIN_ROUTES = [
+          'users', 'settings', 'moderation', 'categories', 'payments', 'reports',
+        ];
+        const segment = currentPath.replace(/^\//, '').split('/')[0];
+        const target = ADMIN_ROUTES.includes(segment)
+          ? `/admin/${currentPath.replace(/^\//, '')}`
+          : '/admin';
         // Defer one tick so expo-router finishes mounting the Root Layout
-        setTimeout(() => router.replace('/admin'), 0);
+        setTimeout(() => router.replace(target as any), 0);
       }
     }
   }, [fontsLoaded, isReady]);
