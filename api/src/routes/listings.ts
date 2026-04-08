@@ -11,6 +11,7 @@ import { geocodeCity, geocodeAddress } from '../lib/geocoder';
 import { isValidOwnerTransition, getOwnerAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
 import xss from 'xss';
 import { LISTING_EXPIRY_DAYS } from '../lib/constants';
+import { validateImageMagicBytes } from '../lib/magic-bytes';
 
 const router = Router();
 
@@ -726,10 +727,13 @@ router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: 
   if (listingWithPhotos.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
   const files = req.files as Express.Multer.File[];
   if (!files?.length) { res.status(400).json({ error: 'No files uploaded' }); return; }
-  const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-  const invalidFile = files.find(f => !ALLOWED_MIME.includes(f.mimetype));
-  if (invalidFile) {
-    res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, WebP, GIF allowed.' }); return;
+  // Validate real file content via magic bytes (prevents MIME type spoofing)
+  for (const file of files) {
+    try {
+      validateImageMagicBytes(file.buffer);
+    } catch {
+      res.status(400).json({ error: 'Invalid file content. Only JPEG, PNG, WebP, GIF images are allowed.' }); return;
+    }
   }
   const currentCount = listingWithPhotos.photos.length;
   if (currentCount + files.length > 10) {
@@ -737,7 +741,8 @@ router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: 
   }
   const uploaded = await Promise.all(
     files.map(async (file, i) => {
-      const { url, key } = await uploadFile(file.buffer, file.mimetype);
+      const detectedMime = validateImageMagicBytes(file.buffer);
+      const { url, key } = await uploadFile(file.buffer, detectedMime);
       return prisma.listingPhoto.create({
         data: { listingId: id, url, key, order: currentCount + i },
       });
