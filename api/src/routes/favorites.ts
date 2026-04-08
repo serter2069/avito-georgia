@@ -56,9 +56,10 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
     const page = Math.max(parseInt(req.query.page as string) || 1, 1);
     const take = 20;
     const skip = (page - 1) * take;
+    const blockedFilter = { listing: { user: { role: { not: 'blocked' } } } };
     const [favorites, total] = await Promise.all([
       prisma.favorite.findMany({
-        where: { userId },
+        where: { userId, ...blockedFilter },
         skip,
         take,
         orderBy: { createdAt: 'desc' },
@@ -72,7 +73,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
           },
         },
       }),
-      prisma.favorite.count({ where: { userId } }),
+      prisma.favorite.count({ where: { userId, ...blockedFilter } }),
     ]);
     res.json({ favorites, total, page, limit: take });
   } catch (err) {

@@ -170,7 +170,7 @@ router.delete('/me', requireAuth, async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const user = await prisma.user.findUnique({
-    where: { id },
+    where: { id, role: { not: 'blocked' } },
     select: {
       id: true,
       name: true,
