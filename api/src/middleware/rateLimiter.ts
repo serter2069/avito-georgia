@@ -1,5 +1,22 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { Store } from 'express-rate-limit';
+import RedisStore from 'rate-limit-redis';
 import { Request } from 'express';
+import { redis } from '../lib/redis';
+
+// Build a RedisStore with the given prefix, using the existing ioredis singleton.
+// Falls back to undefined (MemoryStore) if Redis is unavailable — safe for local dev.
+function makeStore(prefix: string): Store | undefined {
+  try {
+    return new RedisStore({
+      prefix,
+      // sendCommand routes raw commands through ioredis (Valkey-compatible)
+      sendCommand: (...args: string[]) => (redis as any).call(...args),
+    });
+  } catch (err) {
+    console.warn('[RateLimit] Redis store init failed, falling back to in-memory:', err);
+    return undefined; // express-rate-limit defaults to MemoryStore
+  }
+}
 
 // Real TCP socket IP — not spoofable via X-Forwarded-For header
 function socketIp(req: Request): string {
@@ -16,6 +33,7 @@ function userOrIp(req: Request): string {
 export const otpRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 3,
+  store: makeStore('rl:otp-req:'),
   keyGenerator: (req: Request) => {
     const email = req.body?.email || '';
     const ip = socketIp(req);
@@ -31,6 +49,7 @@ export const otpRateLimit = rateLimit({
 export const otpVerifyRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
+  store: makeStore('rl:otp-ver:'),
   keyGenerator: socketIp,
   message: { error: 'Too many verification attempts. Try again later.' },
   standardHeaders: true,
@@ -41,6 +60,7 @@ export const otpVerifyRateLimit = rateLimit({
 export const listingCreateRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,
+  store: makeStore('rl:listing-create:'),
   keyGenerator: userOrIp,
   message: { error: 'Too many listings created. Try again later.' },
   standardHeaders: true,
@@ -51,6 +71,7 @@ export const listingCreateRateLimit = rateLimit({
 export const chatMessageRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 60,
+  store: makeStore('rl:chat-msg:'),
   keyGenerator: userOrIp,
   message: { error: 'Too many messages. Slow down.' },
   standardHeaders: true,
@@ -61,6 +82,7 @@ export const chatMessageRateLimit = rateLimit({
 export const searchRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
+  store: makeStore('rl:search:'),
   message: { error: 'Too many search requests. Try again in a moment.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -70,6 +92,7 @@ export const searchRateLimit = rateLimit({
 export const phoneRevealRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 20,
+  store: makeStore('rl:phone-reveal:'),
   keyGenerator: userOrIp,
   message: { error: 'Phone number reveal limit reached. Try again later.' },
   standardHeaders: true,
@@ -80,6 +103,7 @@ export const phoneRevealRateLimit = rateLimit({
 export const reportCreateRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
+  store: makeStore('rl:report-create:'),
   keyGenerator: userOrIp,
   message: { error: 'Too many reports submitted. Try again later.' },
   standardHeaders: true,
