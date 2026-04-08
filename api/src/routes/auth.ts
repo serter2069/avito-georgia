@@ -183,6 +183,12 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     return;
   }
 
+  // Security: blocked accounts cannot obtain new tokens
+  if (user.role === 'blocked') {
+    res.status(403).json({ error: 'Account suspended' });
+    return;
+  }
+
   const tokens = signTokens(user.id, user.email, user.role);
 
   // Persist session in DB for sliding window refresh and server-side revocation
@@ -235,6 +241,10 @@ router.post('/refresh', async (req: Request, res: Response) => {
     }
     if (user.deletedAt !== null) {
       res.status(401).json({ error: 'Account deleted' });
+      return;
+    }
+    if (user.role === 'blocked') {
+      res.status(403).json({ error: 'Account suspended' });
       return;
     }
 
