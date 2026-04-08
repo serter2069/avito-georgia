@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import http from 'http';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -78,6 +79,9 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: err.message });
+  }
   console.error('Unhandled error:', err.message);
   res.status(500).json({ error: 'Internal server error' });
 });
