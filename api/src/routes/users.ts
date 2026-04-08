@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma';
 import { uploadFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
 import { NotificationPrefType } from '@prisma/client';
+import { validateImageMagicBytes } from '../lib/magic-bytes';
 
 const router = Router();
 
@@ -148,12 +149,15 @@ router.post('/avatar', requireAuth, upload.single('avatar'), async (req: Request
     const file = req.file;
     if (!file) { res.status(400).json({ error: 'No file uploaded' }); return; }
 
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowed.includes(file.mimetype)) {
-      res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, WebP, GIF allowed.' }); return;
+    // Validate real file content via magic bytes (prevents MIME type spoofing)
+    let detectedMime: string;
+    try {
+      detectedMime = validateImageMagicBytes(file.buffer);
+    } catch {
+      res.status(400).json({ error: 'Invalid file content. Only JPEG, PNG, WebP, GIF images are allowed.' }); return;
     }
 
-    const { url } = await uploadFile(file.buffer, file.mimetype, 'avatars');
+    const { url } = await uploadFile(file.buffer, detectedMime, 'avatars');
 
     const user = await prisma.user.update({
       where: { id: userId },
