@@ -12,21 +12,9 @@ import { isValidOwnerTransition, getOwnerAllowedTransitions, ALL_LISTING_STATUSE
 import xss from 'xss';
 import { LISTING_EXPIRY_DAYS } from '../lib/constants';
 import { validateImageMagicBytes } from '../lib/magic-bytes';
+import { redis } from '../lib/redis';
 
 const router = Router();
-
-// View deduplication: track {ip}:{listingId}:{date} to count only 1 view per IP per listing per day.
-// In-memory only — does not survive restarts, single-process assumption.
-// Future: replace with Redis when cluster mode is introduced.
-const viewedToday = new Map<string, Set<string>>();
-
-// Purge stale date keys every hour to prevent unbounded memory growth.
-setInterval(() => {
-  const today = new Date().toISOString().slice(0, 10);
-  for (const date of viewedToday.keys()) {
-    if (date !== today) viewedToday.delete(date);
-  }
-}, 60 * 60 * 1000).unref();
 
 function stripHtml(str: string): string {
   return str.replace(/<[^>]*>/g, '').trim();
@@ -285,15 +273,20 @@ router.get('/:id', async (req: Request, res: Response) => {
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
 
   // UC-05: increment views only once per IP per listing per day.
+  // Stored in Redis/Valkey with 24h TTL — survives server restarts.
   const today = new Date().toISOString().slice(0, 10);
-  const viewKey = `${req.ip || 'unknown'}:${id}:${today}`;
-  if (!viewedToday.has(today)) viewedToday.set(today, new Set());
-  const todaySet = viewedToday.get(today)!;
+  const viewKey = `view:${id}:${req.ip || 'unknown'}:${today}`;
   let updatedViews = listing.views;
-  if (!todaySet.has(viewKey)) {
-    todaySet.add(viewKey);
-    await prisma.listing.update({ where: { id }, data: { views: { increment: 1 } } });
-    updatedViews = listing.views + 1;
+  try {
+    // NX = set only if not exists; returns 'OK' if set, null if already exists
+    const isNew = await redis.set(viewKey, '1', 'EX', 24 * 60 * 60, 'NX');
+    if (isNew === 'OK') {
+      await prisma.listing.update({ where: { id }, data: { views: { increment: 1 } } });
+      updatedViews = listing.views + 1;
+    }
+  } catch (redisErr) {
+    // Redis unavailable: fall back to always incrementing (better than breaking the page)
+    console.error('[Redis] view dedup failed, skipping increment:', (redisErr as Error).message);
   }
 
   // UC-16: compute isPremium — seller has active unlimited_sub promotion
