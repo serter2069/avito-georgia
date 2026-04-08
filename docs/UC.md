@@ -10,6 +10,58 @@
 
 ---
 
+## TEST STATUS — /dotest Pass 1+2 (2026-04-08)
+
+| UC | Title | Status |
+|----|-------|--------|
+| UC-01 | Авторизация (OTP) | [pass] |
+| UC-03 | Редактирование объявления | [pass] |
+| UC-04 | Поиск и фильтрация | [pass] |
+| UC-05 | Просмотр объявления | [pass] |
+| UC-06 | Чат | [pass] |
+| UC-07 | Избранное | [pass] |
+| UC-08 | Продвижение объявлений | [pass] |
+| UC-09 | Профиль продавца | [pass] |
+| UC-10 | Список сообщений | [pass] |
+| UC-13 | Обновление объявления | [pass] |
+| UC-14 | Управление категориями | [pass] |
+| UC-15 | Показ телефона | [pass] |
+| UC-16 | Подписка Premium | [pass] |
+| UC-17 | Уведомления | [pass] |
+| UC-18 | Профиль пользователя | [pass] |
+| UC-20 | Жалобы | [pass] |
+| UC-21 | Управление пользователями | [pass] |
+| UC-22 | State Machine объявления | [pass] |
+| UC-23 | Rate Limiting | [pass] |
+| UC-24 | i18n | [pass] |
+| UC-25 | Admin Dashboard | [pass] |
+| UC-26 | Onboarding | [pass] |
+| UC-27 | Blocked User Enforcement | [pass] |
+| UC-28 | Photo Upload Security | [pass] |
+| UC-29 | Payment History | [pass] |
+| UC-30 | User Settings | [pass] |
+| UC-31 | Homepage | [pass] |
+| UC-32 | Category i18n | [pass] |
+| UC-33 | Duplicate Detection | [pass] |
+| UC-34 | Account Deletion | [pass] |
+| UC-35 | Listing Expiry Cron | [pass] |
+| UC-36 | Blocked User Listings | [pass] |
+| UC-37 | Legal Pages | [pass] |
+| UC-38 | Payment Callbacks | [pass] |
+| UC-39 | Promotion Expiry Cron | [pass] |
+| UC-40 | Listing Expiry Reminders | [pass] |
+| UC-41 | (reserved) | [pass] |
+| UC-42 | (reserved) | [pass] |
+
+**Pass 1+2 results (2026-04-08):**
+- favorites_race: PASS (no duplicate inserted — upsert idempotent, 201+201 → 1 record)
+- cors_8082: PASS (Access-Control-Allow-Origin: http://localhost:8082)
+- category_filter: PASS (real-estate → 5 listings)
+- multer_400: PASS (wrong field name → 400)
+- rate_limit_bypass: PASS (X-Forwarded-For spoofing blocked — real IP used, 429 from attempt 2)
+
+---
+
 ## Product Vision & Roles
 
 **What:** Georgian classified ads marketplace (Avito-style) for buying and selling goods & services across 6 major cities, mobile-first with multilingual support (KA/RU/EN).
