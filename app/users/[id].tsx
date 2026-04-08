@@ -208,7 +208,7 @@ export default function SellerProfileScreen() {
           {reviewStats && reviewStats.totalReviews > 0 && (
             <View className="items-center">
               <View className="flex-row items-center gap-1">
-                <Text style={{ color: '#F59E0B', fontSize: 18 }}>★</Text>
+                <Text style={{ color: colors.statusWarning, fontSize: 18 }}>★</Text>
                 <Text className="text-text-primary text-2xl font-bold">
                   {reviewStats.averageRating?.toFixed(1)}
                 </Text>

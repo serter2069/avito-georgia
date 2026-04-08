@@ -99,7 +99,7 @@ export default function AdminSettings() {
         disabled={saving}
       >
         {saving ? (
-          <ActivityIndicator size="small" color="#fff" />
+          <ActivityIndicator size="small" color={colors.white} />
         ) : (
           <Text className="text-white font-semibold text-base">{t('save')}</Text>
         )}
