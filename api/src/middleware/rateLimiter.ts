@@ -7,14 +7,18 @@ import { redis } from '../lib/redis';
 // Falls back to undefined (MemoryStore) if Redis is unavailable — safe for local dev.
 function makeStore(prefix: string): Store | undefined {
   try {
+    // Only use Redis store if client is ready (connected to Valkey)
+    if (redis.status !== 'ready') {
+      console.warn(`[RateLimit] Redis not ready (${redis.status}), using in-memory store for ${prefix}`);
+      return undefined;
+    }
     return new RedisStore({
       prefix,
-      // sendCommand routes raw commands through ioredis (Valkey-compatible)
       sendCommand: (...args: string[]) => (redis as any).call(...args),
     });
   } catch (err) {
     console.warn('[RateLimit] Redis store init failed, falling back to in-memory:', err);
-    return undefined; // express-rate-limit defaults to MemoryStore
+    return undefined;
   }
 }
 
