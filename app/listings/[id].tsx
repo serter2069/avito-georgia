@@ -360,7 +360,8 @@ export default function ListingDetailScreen() {
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    const locale = i18n.language === 'en' ? 'en-GB' : i18n.language === 'ka' ? 'ka-GE' : 'ru-RU';
+    return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   if (loading) {
@@ -461,7 +462,7 @@ export default function ListingDetailScreen() {
             {formatDate(listing.createdAt)}
           </Text>
           <Text className="text-text-muted text-xs">
-            {listing.views} {t('views')}
+            {listing.views} {i18n.language === 'en' ? (listing.views === 1 ? 'view' : 'views') : t('views')}
           </Text>
         </View>
 
