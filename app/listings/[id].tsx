@@ -195,7 +195,8 @@ export default function ListingDetailScreen() {
 
   const handleFavorite = useCallback(async () => {
     if (!user) {
-      router.push('/(auth)');
+      const listingId = Array.isArray(id) ? id[0] : id;
+      router.push(`/(auth)?returnTo=${encodeURIComponent(`/listings/${listingId}`)}`);
       return;
     }
     if (!id || favoriteLoading) return;
@@ -213,7 +214,8 @@ export default function ListingDetailScreen() {
 
   const openContactSheet = useCallback(async () => {
     if (!user) {
-      router.push('/(auth)');
+      const listingId = Array.isArray(id) ? id[0] : id;
+      router.push(`/(auth)?returnTo=${encodeURIComponent(`/listings/${listingId}`)}`);
       return;
     }
     if (!id || !listing?.user?.id || contactLoading) return;
@@ -274,7 +276,8 @@ export default function ListingDetailScreen() {
 
   const handleRevealPhone = useCallback(async () => {
     if (!user) {
-      router.push('/(auth)');
+      const listingId = Array.isArray(id) ? id[0] : id;
+      router.push(`/(auth)?returnTo=${encodeURIComponent(`/listings/${listingId}`)}`);
       return;
     }
     if (phoneRevealed && phone) {
