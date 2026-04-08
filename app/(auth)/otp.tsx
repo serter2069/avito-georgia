@@ -8,6 +8,7 @@ import { useAuthStore } from '../../stores/authStore';
 
 const OTP_LENGTH = 6;
 const RESEND_COOLDOWN = 60;
+const TURNSTILE_SITE_KEY = process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 
 export default function OtpScreen() {
   const { t } = useTranslation();
@@ -19,6 +20,8 @@ export default function OtpScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
+  const [captchaRequired, setCaptchaRequired] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -66,19 +69,67 @@ export default function OtpScreen() {
     }
   }, [code]);
 
+  // Inject Turnstile script and widget into the page (web-only)
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !captchaRequired) return;
+
+    // Load Turnstile script once
+    const scriptId = 'cf-turnstile-script';
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://challenges.cloudflare.com/turnstile/v1/api.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
+    // Render widget after script loads
+    const renderWidget = () => {
+      const container = document.getElementById('cf-turnstile-container');
+      if (!container || container.children.length > 0) return;
+      // @ts-ignore — Turnstile is loaded via CDN
+      if (window.turnstile) {
+        // @ts-ignore
+        window.turnstile.render(container, {
+          sitekey: TURNSTILE_SITE_KEY,
+          callback: (token: string) => {
+            setCaptchaToken(token);
+          },
+          'expired-callback': () => {
+            setCaptchaToken(null);
+          },
+        });
+      }
+    };
+
+    // Small delay to let script load
+    const timer = setTimeout(renderWidget, 500);
+    return () => clearTimeout(timer);
+  }, [captchaRequired]);
+
   const handleVerify = async () => {
     const otp = code.join('');
     if (otp.length !== OTP_LENGTH) return;
+
+    // If CAPTCHA is required but not yet solved, block submission
+    if (captchaRequired && !captchaToken) {
+      setError(t('solveCaptcha') || 'Please complete the CAPTCHA');
+      return;
+    }
 
     setError('');
     setLoading(true);
 
     try {
+      const body: Record<string, string> = { email: email as string, code: otp };
+      if (captchaToken) body.captchaToken = captchaToken;
+
       const res = await api.post<{
         accessToken: string;
         refreshToken: string;
+        captchaRequired?: boolean;
         user: { id: string; email: string; role: string; isOnboarded: boolean };
-      }>('/auth/verify-otp', { email, code: otp });
+      }>('/auth/verify-otp', body);
 
       if (res.ok && res.data) {
         // Set Zustand in-memory state synchronously BEFORE navigation.
@@ -99,6 +150,12 @@ export default function OtpScreen() {
           router.replace('/');
         }
       } else {
+        // Check if server requires CAPTCHA now
+        const errData = res.data as { captchaRequired?: boolean } | undefined;
+        if (errData?.captchaRequired) {
+          setCaptchaRequired(true);
+          setCaptchaToken(null);
+        }
         setError(res.error || t('invalidCode'));
       }
     } catch {
@@ -164,6 +221,14 @@ export default function OtpScreen() {
           <Text className="text-error text-sm text-center mb-4">{error}</Text>
         ) : null}
 
+        {/* Turnstile CAPTCHA widget — shown on web after 3 failed attempts */}
+        {captchaRequired && Platform.OS === 'web' ? (
+          <View className="items-center mb-4">
+            {/* @ts-ignore — web-only div element */}
+            <div id="cf-turnstile-container" />
+          </View>
+        ) : null}
+
         {/* Verify button */}
         <View className="mb-4">
           <Button
@@ -171,7 +236,7 @@ export default function OtpScreen() {
             title={t('confirmCode')}
             size="lg"
             loading={loading}
-            disabled={fullCode.length !== OTP_LENGTH}
+            disabled={fullCode.length !== OTP_LENGTH || (captchaRequired && !captchaToken)}
           />
         </View>
 
