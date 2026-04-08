@@ -93,6 +93,9 @@ async function upsertListing(data: {
   activatedAt?: Date;
   expiresAt?: Date;
   rejectionReason?: string;
+  lat?: number;
+  lng?: number;
+  address?: string;
 }) {
   const existing = await prisma.listing.findFirst({
     where: { title: data.title, userId: data.userId },
@@ -233,6 +236,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6450, lng: 41.6370, address: 'Rustaveli 12, Batumi',
   });
 
   const bobActive2 = await upsertListing({
@@ -246,6 +250,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6420, lng: 41.6400, address: 'Chavchavadze 5, Batumi',
   });
 
   const bobActive3 = await upsertListing({
@@ -259,6 +264,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6390, lng: 41.6430, address: 'Gorgiladze 22, Batumi',
   });
 
   const bobActive4 = await upsertListing({
@@ -272,6 +278,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6510, lng: 41.6280, address: 'Zubalashvili 8, Batumi',
   });
 
   const bobActive5 = await upsertListing({
@@ -285,6 +292,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6360, lng: 41.6500, address: 'Agmashenebeli 31, Batumi',
   });
 
   const bobActive6 = await upsertListing({
@@ -298,6 +306,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6480, lng: 41.6310, address: 'Memed Abashidze 14, Batumi',
   });
 
   const bobActive7 = await upsertListing({
@@ -311,6 +320,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6530, lng: 41.6260, address: 'Konstantine Gamsakhurdia 3, Batumi',
   });
 
   const bobActive8 = await upsertListing({
@@ -324,6 +334,7 @@ async function main() {
     cityId: 'batumi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6320, lng: 41.6550, address: 'Parnavaz Mepe 7, Batumi',
   });
 
   // Sold listing used for the review flow (UC-15): Carol bought PS5 from Bob
@@ -412,6 +423,7 @@ async function main() {
     cityId: 'tbilisi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6930, lng: 44.8010, address: 'Rustaveli 20, Tbilisi',
   });
 
   await upsertListing({
@@ -425,6 +437,7 @@ async function main() {
     cityId: 'tbilisi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6970, lng: 44.7960, address: 'Kostava 15, Tbilisi',
   });
 
   await upsertListing({
@@ -438,6 +451,7 @@ async function main() {
     cityId: 'tbilisi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6890, lng: 44.8090, address: 'Agmashenebeli 55, Tbilisi',
   });
 
   await upsertListing({
@@ -476,6 +490,7 @@ async function main() {
     cityId: 'tbilisi',
     activatedAt: now,
     expiresAt: thirtyDaysFromNow,
+    lat: 41.6950, lng: 44.8030, address: 'Freedom Square, Tbilisi',
   });
 
   // Admin has a pending_moderation listing so admin panel shows it for self-testing
