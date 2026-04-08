@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -19,6 +19,7 @@ interface City {
 export default function OnboardingScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const user = useAuthStore((s) => s.user);
 
   const [name, setName] = useState('');
@@ -69,7 +70,7 @@ export default function OnboardingScreen() {
         if (currentUser) {
           useAuthStore.setState({ user: { ...currentUser, isOnboarded: true } });
         }
-        router.replace('/');
+        router.replace((returnTo as string | undefined) || '/');
       }
     } catch {
       // Non-blocking: navigate anyway
@@ -77,7 +78,7 @@ export default function OnboardingScreen() {
       if (currentUser) {
         useAuthStore.setState({ user: { ...currentUser, isOnboarded: true } });
       }
-      router.replace('/');
+      router.replace((returnTo as string | undefined) || '/');
     } finally {
       setLoading(false);
     }
@@ -94,7 +95,7 @@ export default function OnboardingScreen() {
     if (currentUser) {
       useAuthStore.setState({ user: { ...currentUser, isOnboarded: true } });
     }
-    router.replace('/');
+    router.replace((returnTo as string | undefined) || '/');
   };
 
   return (

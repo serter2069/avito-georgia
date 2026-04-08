@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -11,6 +11,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function EmailScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,10 @@ export default function EmailScreen() {
       const res = await api.post('/auth/request-otp', { email: email.trim() });
 
       if (res.ok) {
-        router.push(`/(auth)/otp?email=${encodeURIComponent(email.trim())}`);
+        const otpUrl = returnTo
+          ? `/(auth)/otp?email=${encodeURIComponent(email.trim())}&returnTo=${encodeURIComponent(returnTo)}`
+          : `/(auth)/otp?email=${encodeURIComponent(email.trim())}`;
+        router.push(otpUrl);
       } else {
         setError(res.error || t('error'));
       }

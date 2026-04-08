@@ -12,7 +12,7 @@ const TURNSTILE_SITE_KEY = process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY || '1x0000
 
 export default function OtpScreen() {
   const { t } = useTranslation();
-  const { email } = useLocalSearchParams<{ email: string }>();
+  const { email, returnTo } = useLocalSearchParams<{ email: string; returnTo?: string }>();
   const setAuth = useAuthStore((s) => s.setAuth);
   const router = useRouter();
 
@@ -145,9 +145,12 @@ export default function OtpScreen() {
         setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
         // Route based on onboarding status
         if (!res.data.user.isOnboarded) {
-          router.replace('/onboarding');
+          const onboardingUrl = returnTo
+            ? `/onboarding?returnTo=${encodeURIComponent(returnTo)}`
+            : '/onboarding';
+          router.replace(onboardingUrl);
         } else {
-          router.replace('/');
+          router.replace((returnTo as string | undefined) || '/');
         }
       } else {
         // Check if server requires CAPTCHA now
