@@ -7,12 +7,14 @@ import { colors } from '../../lib/colors';
 interface Settings {
   autoModerationEnabled: boolean;
   bannedWords: string[];
+  listingExpiryDays: number;
 }
 
 export default function AdminSettings() {
   const { t } = useTranslation();
-  const [settings, setSettings] = useState<Settings>({ autoModerationEnabled: false, bannedWords: [] });
+  const [settings, setSettings] = useState<Settings>({ autoModerationEnabled: false, bannedWords: [], listingExpiryDays: 30 });
   const [bannedWordsText, setBannedWordsText] = useState('');
+  const [listingExpiryDaysText, setListingExpiryDaysText] = useState('30');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -21,12 +23,19 @@ export default function AdminSettings() {
       if (res.ok && res.data) {
         setSettings(res.data);
         setBannedWordsText(res.data.bannedWords.join('\n'));
+        setListingExpiryDaysText(String(res.data.listingExpiryDays));
       }
       setLoading(false);
     });
   }, []);
 
   const handleSave = async () => {
+    const expiryDays = parseInt(listingExpiryDaysText, 10);
+    if (isNaN(expiryDays) || expiryDays < 1 || expiryDays > 365) {
+      Alert.alert(t('error'), t('listingExpiryDaysInvalid'));
+      return;
+    }
+
     setSaving(true);
     const bannedWords = bannedWordsText
       .split('\n')
@@ -36,11 +45,12 @@ export default function AdminSettings() {
     const res = await api.patch('/admin/settings', {
       autoModerationEnabled: settings.autoModerationEnabled,
       bannedWords,
+      listingExpiryDays: expiryDays,
     });
 
     setSaving(false);
     if (res.ok) {
-      setSettings((prev) => ({ ...prev, bannedWords }));
+      setSettings((prev) => ({ ...prev, bannedWords, listingExpiryDays: expiryDays }));
       Alert.alert(t('success'), t('settingsSaved'));
     } else {
       Alert.alert(t('error'), t('settingsSaveError'));
@@ -72,6 +82,22 @@ export default function AdminSettings() {
             thumbColor={colors.textPrimary}
           />
         </View>
+      </View>
+
+      {/* Listing expiry days */}
+      <View className="bg-surface-card border border-border rounded-lg p-4">
+        <Text className="text-text-primary text-base font-bold mb-1">{t('listingExpiryDaysTitle')}</Text>
+        <Text className="text-text-muted text-sm mb-3">{t('listingExpiryDaysDesc')}</Text>
+        <TextInput
+          className="bg-surface border border-border rounded-lg p-3 text-text-primary text-sm"
+          keyboardType="number-pad"
+          value={listingExpiryDaysText}
+          onChangeText={setListingExpiryDaysText}
+          placeholder="30"
+          placeholderTextColor={colors.textMuted}
+          maxLength={3}
+        />
+        <Text className="text-text-muted text-xs mt-2">{t('listingExpiryDaysHint')}</Text>
       </View>
 
       {/* Banned words */}
