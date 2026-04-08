@@ -112,6 +112,35 @@ router.put('/me/notification-prefs', requireAuth, async (req: Request, res: Resp
   }
 });
 
+// PATCH /api/users/me/notification-prefs — alias for PUT (same semantics, supports both HTTP methods)
+router.patch('/me/notification-prefs', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { type, enabled } = req.body;
+
+    if (!NOTIFICATION_PREF_TYPES.includes(type as NotificationPrefType)) {
+      res.status(400).json({ error: `Invalid type. Must be one of: ${NOTIFICATION_PREF_TYPES.join(', ')}` });
+      return;
+    }
+    if (typeof enabled !== 'boolean') {
+      res.status(400).json({ error: 'enabled must be a boolean' });
+      return;
+    }
+
+    const pref = await prisma.notificationPref.upsert({
+      where: { userId_type: { userId, type: type as NotificationPrefType } },
+      create: { userId, type: type as NotificationPrefType, enabled },
+      update: { enabled },
+      select: { type: true, enabled: true },
+    });
+
+    res.json({ pref });
+  } catch (err) {
+    console.error('PATCH /users/me/notification-prefs error:', err);
+    res.status(500).json({ error: 'Failed to update notification preference' });
+  }
+});
+
 // POST /api/users/avatar — upload avatar image
 router.post('/avatar', requireAuth, upload.single('avatar'), async (req: Request, res: Response) => {
   try {
