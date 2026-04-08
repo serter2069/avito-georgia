@@ -43,7 +43,7 @@ const STATUS_BADGE_VARIANT: Record<string, 'success' | 'warning' | 'error' | 'de
 };
 
 export default function MyListingsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
 
@@ -213,7 +213,7 @@ export default function MyListingsScreen() {
               variant={STATUS_BADGE_VARIANT[item.status] || 'default'}
             />
             <Text className="text-text-muted text-xs">
-              {item.views} {t('views')}
+              {item.views} {i18n.language === 'en' ? (item.views === 1 ? 'view' : 'views') : t('views')}
             </Text>
           </View>
         </View>
