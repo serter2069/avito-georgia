@@ -134,8 +134,11 @@ export default function SearchScreen() {
   const buildMapQuery = useCallback(() => {
     const parts: string[] = [];
     if (selectedCity !== 'all') parts.push(`city=${selectedCity}`);
+    if (selectedCategory) parts.push(`category=${CATEGORY_SLUG[selectedCategory]}`);
+    if (priceMin) parts.push(`price_min=${priceMin}`);
+    if (priceMax) parts.push(`price_max=${priceMax}`);
     return `/listings/map?${parts.join('&')}`;
-  }, [selectedCity]);
+  }, [selectedCity, selectedCategory, priceMin, priceMax]);
 
   const doSearch = useCallback(async (resetPage = true) => {
     const p = resetPage ? 1 : page;

@@ -93,23 +93,37 @@ router.get('/my', requireAuth, async (req: Request, res: Response) => {
   res.json({ listings, total, page, limit });
 });
 
-// GET /api/listings/map?city= — MUST be before /:id
-// city param is optional: omit to get all cities
+// GET /api/listings/map?city=&category=&price_min=&price_max= — MUST be before /:id
+// Returns up to 500 pins; listings without own coords fall back to city-center coords.
 router.get('/map', async (req: Request, res: Response) => {
   const city = qs(req.query.city);
+  const category = qs(req.query.category);
+  const priceMin = qs(req.query.price_min);
+  const priceMax = qs(req.query.price_max);
+
+  const where: Prisma.ListingWhereInput = {
+    status: 'active',
+    user: { role: { not: 'blocked' } },
+    OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    ...(city ? { cityId: city } : {}),
+    ...(category ? { category: { slug: category } } : {}),
+    ...(priceMin || priceMax ? {
+      price: {
+        ...(priceMin ? { gte: parseFloat(priceMin) } : {}),
+        ...(priceMax ? { lte: parseFloat(priceMax) } : {}),
+      },
+    } : {}),
+  };
+
   const listings = await prisma.listing.findMany({
-    where: {
-      ...(city ? { cityId: city } : {}),
-      status: 'active',
-      user: { role: { not: 'blocked' } },
-      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-    },
+    where,
     select: {
       id: true, title: true, price: true, currency: true,
       lat: true, lng: true,
       city: { select: { lat: true, lng: true } },
       photos: { orderBy: { order: 'asc' }, take: 1, select: { url: true } },
     },
+    take: 500,
   });
   res.json(
     listings.map((l) => ({
