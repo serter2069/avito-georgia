@@ -1,25 +1,37 @@
 import rateLimit from 'express-rate-limit';
 import { Request } from 'express';
 
-// Helper: extract user ID from authenticated request, fallback to IP
-function userOrIp(req: Request): string {
-  return (req as any).user?.userId || req.ip || 'unknown';
+// Real TCP socket IP — not spoofable via X-Forwarded-For header
+function socketIp(req: Request): string {
+  return req.socket.remoteAddress || 'unknown';
 }
 
-// OTP request: 3 per minute per email
+// Helper: extract user ID from authenticated request, fallback to real socket IP
+function userOrIp(req: Request): string {
+  return (req as any).user?.userId || socketIp(req);
+}
+
+// OTP request: 3 per minute per email+IP combo
+// Using socketIp (not req.ip) prevents X-Forwarded-For spoofing bypass
 export const otpRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 3,
-  keyGenerator: (req: Request) => req.body?.email || req.ip || 'unknown',
+  keyGenerator: (req: Request) => {
+    const email = req.body?.email || '';
+    const ip = socketIp(req);
+    return `${ip}:${email}`;
+  },
   message: { error: 'Too many OTP requests. Try again in 1 minute.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// OTP verify: 10 per 15 minutes per IP (brute-force protection)
+// OTP verify: 10 per 15 minutes per real socket IP (brute-force protection)
+// Using socketIp prevents X-Forwarded-For spoofing bypass
 export const otpVerifyRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
+  keyGenerator: socketIp,
   message: { error: 'Too many verification attempts. Try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
