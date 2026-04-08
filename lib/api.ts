@@ -1,7 +1,10 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://avito-georgia.smartlaunchhub.com/api';
+// In dev mode without explicit EXPO_PUBLIC_API_URL, fall back to local API server
+const BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (__DEV__ ? 'http://localhost:3813/api' : 'https://avito-georgia.smartlaunchhub.com/api');
 
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
