@@ -100,16 +100,19 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  // On admin subdomain (admin.* or port 8086): redirect to /admin if not already there
+  // On admin subdomain (admin.* or port 8086): redirect to /admin if not already there.
+  // Both fontsLoaded and isReady must be true before navigating — ensures Root Layout is
+  // fully mounted before router.replace is called (avoids "navigate before mounting" crash).
   useEffect(() => {
-    if (!fontsLoaded) return;
+    if (!fontsLoaded || !isReady) return;
     if (isAdminDomain()) {
       const currentPath = window.location.pathname;
       if (!currentPath.startsWith('/admin')) {
-        router.replace('/admin');
+        // Defer one tick so expo-router finishes mounting the Root Layout
+        setTimeout(() => router.replace('/admin'), 0);
       }
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, isReady]);
 
   // Proactive token refresh: every 20 min + on tab/app focus (auth.md Level 2)
   useAuthRefresh();
