@@ -11,9 +11,11 @@ router.post('/:listingId', requireAuth, async (req: Request, res: Response) => {
     const userId = req.user!.userId;
     const listing = await prisma.listing.findUnique({ where: { id: listingId } });
     if (!listing) { res.status(404).json({ error: 'Listing not found' }); return; }
-    const existing = await prisma.favorite.findUnique({ where: { userId_listingId: { userId, listingId } } });
-    if (existing) { res.json({ ok: true, alreadyFavorited: true }); return; }
-    await prisma.favorite.create({ data: { userId, listingId } });
+    await prisma.favorite.upsert({
+      where: { userId_listingId: { userId, listingId } },
+      create: { userId, listingId },
+      update: {},
+    });
     res.status(201).json({ ok: true });
   } catch (err) {
     console.error('POST /favorites/:listingId error:', err);
