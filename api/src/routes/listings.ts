@@ -112,6 +112,7 @@ router.get('/map', async (req: Request, res: Response) => {
     where: {
       ...(city ? { cityId: city } : {}),
       status: 'active',
+      user: { role: { not: 'blocked' } },
       OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     },
     select: {
