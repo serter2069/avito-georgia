@@ -104,9 +104,22 @@ router.post('/request-otp', async (req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
+// Verify Cloudflare Turnstile token
+async function verifyTurnstile(token: string): Promise<boolean> {
+  const formData = new FormData();
+  formData.append('secret', process.env.TURNSTILE_SECRET_KEY!);
+  formData.append('response', token);
+  const cfRes = await fetch('https://challenges.cloudflare.com/turnstile/v1/siteverify', {
+    method: 'POST',
+    body: formData,
+  });
+  const cfData = await cfRes.json() as { success: boolean };
+  return cfData.success === true;
+}
+
 // POST /api/auth/verify-otp
 router.post('/verify-otp', async (req: Request, res: Response) => {
-  const { email, code } = req.body;
+  const { email, code, captchaToken } = req.body;
   if (!email || !code) {
     res.status(400).json({ error: 'Email and code required' });
     return;
@@ -123,10 +136,19 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     return;
   }
 
-  // Brute-force protection: block after MAX_OTP_ATTEMPTS wrong codes
+  // Brute-force protection: after MAX_OTP_ATTEMPTS wrong codes require CAPTCHA
   if (otpRecord.attempts >= MAX_OTP_ATTEMPTS) {
-    res.status(429).json({ error: 'Too many attempts. Request a new OTP.' });
-    return;
+    // If CAPTCHA not provided, ask frontend to show it
+    if (!captchaToken) {
+      res.status(400).json({ error: 'CAPTCHA required', captchaRequired: true });
+      return;
+    }
+    // Verify CAPTCHA token
+    const captchaOk = await verifyTurnstile(captchaToken);
+    if (!captchaOk) {
+      res.status(400).json({ error: 'CAPTCHA verification failed', captchaRequired: true });
+      return;
+    }
   }
 
   // Wrong code: increment attempts counter
@@ -135,8 +157,11 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
       where: { id: otpRecord.id },
       data: { attempts: { increment: 1 } },
     });
-    const attemptsLeft = MAX_OTP_ATTEMPTS - (otpRecord.attempts + 1);
-    res.status(400).json({ error: 'Invalid code', attemptsLeft });
+    const newAttempts = otpRecord.attempts + 1;
+    const attemptsLeft = Math.max(0, MAX_OTP_ATTEMPTS - newAttempts);
+    // After this wrong attempt hits MAX_OTP_ATTEMPTS, tell frontend CAPTCHA is needed next time
+    const captchaRequired = newAttempts >= MAX_OTP_ATTEMPTS;
+    res.status(400).json({ error: 'Invalid code', attemptsLeft, captchaRequired });
     return;
   }
 
