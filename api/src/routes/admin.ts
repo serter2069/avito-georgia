@@ -359,10 +359,10 @@ router.get('/audit-log', async (req: Request, res: Response) => {
   res.json({ logs, total, page, totalPages: Math.ceil(total / limit) });
 });
 
-// GET /api/admin/settings — return auto-moderation settings (with safe defaults)
+// GET /api/admin/settings — return platform settings (with safe defaults)
 router.get('/settings', async (_req: Request, res: Response) => {
   const rows = await prisma.appSettings.findMany({
-    where: { key: { in: ['autoModerationEnabled', 'bannedWords'] } },
+    where: { key: { in: ['autoModerationEnabled', 'bannedWords', 'listingExpiryDays'] } },
   });
   const byKey: Record<string, string> = {};
   for (const row of rows) byKey[row.key] = row.value;
@@ -370,12 +370,13 @@ router.get('/settings', async (_req: Request, res: Response) => {
   res.json({
     autoModerationEnabled: byKey['autoModerationEnabled'] === 'true',
     bannedWords: byKey['bannedWords'] ? JSON.parse(byKey['bannedWords']) as string[] : [],
+    listingExpiryDays: byKey['listingExpiryDays'] ? parseInt(byKey['listingExpiryDays'], 10) : LISTING_EXPIRY_DAYS,
   });
 });
 
-// PATCH /api/admin/settings — save auto-moderation settings
+// PATCH /api/admin/settings — save platform settings
 router.patch('/settings', async (req: Request, res: Response) => {
-  const { autoModerationEnabled, bannedWords } = req.body;
+  const { autoModerationEnabled, bannedWords, listingExpiryDays } = req.body;
 
   if (autoModerationEnabled !== undefined && typeof autoModerationEnabled !== 'boolean') {
     res.status(400).json({ error: 'autoModerationEnabled must be a boolean' });
@@ -388,6 +389,13 @@ router.patch('/settings', async (req: Request, res: Response) => {
   if (bannedWords !== undefined && bannedWords.some((w: unknown) => typeof w !== 'string')) {
     res.status(400).json({ error: 'bannedWords must be an array of strings' });
     return;
+  }
+  if (listingExpiryDays !== undefined) {
+    const days = parseInt(String(listingExpiryDays), 10);
+    if (isNaN(days) || days < 1 || days > 365) {
+      res.status(400).json({ error: 'listingExpiryDays must be an integer between 1 and 365' });
+      return;
+    }
   }
 
   const updates: Promise<unknown>[] = [];
@@ -414,12 +422,23 @@ router.patch('/settings', async (req: Request, res: Response) => {
       }),
     );
   }
+  if (listingExpiryDays !== undefined) {
+    const days = parseInt(String(listingExpiryDays), 10);
+    updates.push(
+      prisma.appSettings.upsert({
+        where: { key: 'listingExpiryDays' },
+        create: { key: 'listingExpiryDays', value: String(days) },
+        update: { value: String(days) },
+      }),
+    );
+  }
 
   await Promise.all(updates);
 
   logAudit(req.user!.userId, req.user!.email, 'settings.update', 'settings', 'app', {
     ...(autoModerationEnabled !== undefined ? { autoModerationEnabled } : {}),
     ...(bannedWords !== undefined ? { bannedWordsCount: (bannedWords as string[]).length } : {}),
+    ...(listingExpiryDays !== undefined ? { listingExpiryDays } : {}),
   });
 
   res.json({ ok: true });
