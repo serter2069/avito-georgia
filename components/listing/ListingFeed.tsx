@@ -142,7 +142,9 @@ export function ListingFeed({
 
   const [selectedCity, setSelectedCity] = useState<City>('all');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
-    (initialCategory as CategoryType) || null
+    initialCategory
+      ? ((SLUG_TO_I18N_KEY[initialCategory] as CategoryType) || (initialCategory as CategoryType))
+      : null
   );
   const [sortBy, setSortBy] = useState<SortOption>('createdAt_desc');
   const [showSort, setShowSort] = useState(false);
