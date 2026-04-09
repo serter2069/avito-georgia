@@ -1,0 +1,103 @@
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { StateSection } from '../StateSection';
+import { mockListings } from '../../../constants/protoMockData';
+
+function FilterBar() {
+  return (
+    <View className="flex-row gap-2 mb-4 flex-wrap">
+      <TouchableOpacity className="flex-row items-center bg-surface border border-border rounded-lg px-3 py-2">
+        <Text className="text-text-secondary text-sm">Категория</Text>
+        <Ionicons name="chevron-down" size={14} color="#1A4A6E" className="ml-1" />
+      </TouchableOpacity>
+      <TouchableOpacity className="flex-row items-center bg-surface border border-border rounded-lg px-3 py-2">
+        <Text className="text-text-secondary text-sm">Город</Text>
+        <Ionicons name="chevron-down" size={14} color="#1A4A6E" className="ml-1" />
+      </TouchableOpacity>
+      <TouchableOpacity className="flex-row items-center bg-surface border border-border rounded-lg px-3 py-2">
+        <Text className="text-text-secondary text-sm">Цена</Text>
+        <Ionicons name="chevron-down" size={14} color="#1A4A6E" className="ml-1" />
+      </TouchableOpacity>
+      <TouchableOpacity className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
+        <Ionicons name="swap-vertical" size={14} color="#0A7B8A" />
+        <Text className="text-primary text-sm ml-1">Новые</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function ListingRow({ title, price, currency, city, photo, isPromoted }: { title: string; price: number | null; currency: string; city: string; photo: string; isPromoted: boolean }) {
+  return (
+    <View className="flex-row bg-white border border-border rounded-lg overflow-hidden mb-3">
+      <Image source={{ uri: photo }} className="w-28 h-28" resizeMode="cover" />
+      <View className="flex-1 p-3 justify-between">
+        <View>
+          {isPromoted && <View className="bg-secondary/20 px-2 py-0.5 rounded-full self-start mb-1"><Text className="text-secondary text-[10px] font-medium">TOP</Text></View>}
+          <Text className="text-text-primary text-sm font-semibold" numberOfLines={2}>{title}</Text>
+        </View>
+        <View>
+          <Text className="text-primary font-bold text-base">{price ? `${price.toLocaleString()} ${currency}` : 'Договорная'}</Text>
+          <Text className="text-text-muted text-xs">{city}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+export default function ListingsFeedStates() {
+  return (
+    <View>
+      <StateSection title="default">
+        <View>
+          <FilterBar />
+          {mockListings.filter(l => l.status === 'active').map((l) => (
+            <ListingRow key={l.id} title={l.title} price={l.price} currency={l.currency} city={l.city} photo={l.photos[0]} isPromoted={l.isPromoted} />
+          ))}
+        </View>
+      </StateSection>
+
+      <StateSection title="loading">
+        <View>
+          <FilterBar />
+          <View className="py-12 items-center">
+            <ActivityIndicator size="large" color="#0A7B8A" />
+          </View>
+        </View>
+      </StateSection>
+
+      <StateSection title="empty">
+        <View>
+          <FilterBar />
+          <View className="py-12 items-center">
+            <Ionicons name="file-tray-outline" size={48} color="#6A8898" />
+            <Text className="text-text-primary text-lg font-semibold mt-3">Нет объявлений</Text>
+            <Text className="text-text-muted text-sm mt-1">Попробуйте изменить параметры поиска</Text>
+          </View>
+        </View>
+      </StateSection>
+
+      <StateSection title="filtered_empty">
+        <View>
+          <View className="flex-row gap-2 mb-4 flex-wrap">
+            <View className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
+              <Text className="text-primary text-sm">Электроника</Text>
+              <Ionicons name="close" size={14} color="#0A7B8A" className="ml-1" />
+            </View>
+            <View className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
+              <Text className="text-primary text-sm">Кутаиси</Text>
+              <Ionicons name="close" size={14} color="#0A7B8A" className="ml-1" />
+            </View>
+          </View>
+          <View className="py-12 items-center">
+            <Ionicons name="search-outline" size={48} color="#6A8898" />
+            <Text className="text-text-primary text-lg font-semibold mt-3">Ничего не найдено</Text>
+            <Text className="text-text-muted text-sm mt-1 text-center">По вашим фильтрам нет объявлений. Попробуйте убрать фильтры.</Text>
+            <TouchableOpacity className="mt-4 border border-primary px-4 py-2 rounded-lg">
+              <Text className="text-primary font-semibold">Сбросить фильтры</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </StateSection>
+    </View>
+  );
+}

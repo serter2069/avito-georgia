@@ -49,7 +49,8 @@ function useProtectedRoute() {
       segments[0] === 'about' ||
       segments[0] === 'terms' ||
       segments[0] === 'privacy' ||
-      segments[0] === 'help';
+      segments[0] === 'help' ||
+      segments[0] === 'proto';
     const inDashboard = segments[0] === 'dashboard' || segments[0] === 'my';
 
     if (!user && inDashboard) {
