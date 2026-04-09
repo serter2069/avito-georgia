@@ -39,8 +39,14 @@ export async function uploadFile(
         })
       );
     } catch (err: unknown) {
-      const msg = err instanceof Error && err.message ? err.message : 'connection failed';
-      throw new Error(`Storage service unavailable: ${msg}`);
+      // AWS SDK v3 errors may be non-standard objects
+      let errMsg = 'connection failed';
+      if (err instanceof Error) {
+        errMsg = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        errMsg = (err as any).message || (err as any).code || JSON.stringify(err).slice(0, 200);
+      }
+      throw new Error(`Storage service unavailable: ${errMsg}`);
     }
     const url = `${process.env.MINIO_PUBLIC_URL}/${key}`;
     return { url, key };

@@ -323,7 +323,11 @@ router.get('/:id/phone', requireAuth, phoneRevealRateLimit, async (req: Request,
 
 // POST /api/listings
 router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: Response) => {
-  const isDraft = req.body.status === 'draft' || req.body.isDraft === true;
+  // Normalize isDraft flag to status field before schema parsing
+  if (req.body.isDraft === true || req.body.isDraft === 'true') {
+    req.body.status = 'draft';
+  }
+  const isDraft = req.body.status === 'draft';
   let data: z.infer<typeof createListingSchema> | z.infer<typeof createDraftSchema>;
   try {
     data = isDraft ? createDraftSchema.parse(req.body) : createListingSchema.parse(req.body);
@@ -758,8 +762,8 @@ router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: 
       })
     );
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Unknown storage error';
-    if (msg.startsWith('Storage service unavailable')) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes('Storage service unavailable') || msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND') || msg.includes('connect')) {
       res.status(503).json({ error: 'Photo storage unavailable, try again later' }); return;
     }
     throw err;
