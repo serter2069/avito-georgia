@@ -252,8 +252,9 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  // UC-40: dedup guard — partial unique index in migration SQL (excludes NEW_MESSAGE types)
-  // See migration 20260408100000_fix_notification_unique_partial
+  // UC-40: dedup guard — partial unique index enforced via @@unique
+  // Partial filtering (excluding NEW_MESSAGE) is handled in migration SQL
+  @@unique([userId, listingId, type])
 }
 
 model Payment {
