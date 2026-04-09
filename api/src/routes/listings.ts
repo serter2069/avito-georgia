@@ -746,15 +746,24 @@ router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: 
   if (currentCount + files.length > 10) {
     res.status(400).json({ error: `Max 10 photos. Currently ${currentCount}, uploading ${files.length}` }); return;
   }
-  const uploaded = await Promise.all(
-    files.map(async (file, i) => {
-      const detectedMime = validateImageMagicBytes(file.buffer);
-      const { url, key } = await uploadFile(file.buffer, detectedMime);
-      return prisma.listingPhoto.create({
-        data: { listingId: id, url, key, order: currentCount + i },
-      });
-    })
-  );
+  let uploaded;
+  try {
+    uploaded = await Promise.all(
+      files.map(async (file, i) => {
+        const detectedMime = validateImageMagicBytes(file.buffer);
+        const { url, key } = await uploadFile(file.buffer, detectedMime);
+        return prisma.listingPhoto.create({
+          data: { listingId: id, url, key, order: currentCount + i },
+        });
+      })
+    );
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Unknown storage error';
+    if (msg.startsWith('Storage service unavailable')) {
+      res.status(503).json({ error: 'Photo storage unavailable, try again later' }); return;
+    }
+    throw err;
+  }
   res.status(201).json(uploaded);
 });
 

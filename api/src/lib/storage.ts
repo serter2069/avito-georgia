@@ -29,14 +29,19 @@ export async function uploadFile(
   const key = `${folder}/${randomUUID()}.${ext}`;
 
   if (s3) {
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: process.env.MINIO_BUCKET!,
-        Key: key,
-        Body: buffer,
-        ContentType: mimetype,
-      })
-    );
+    try {
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.MINIO_BUCKET!,
+          Key: key,
+          Body: buffer,
+          ContentType: mimetype,
+        })
+      );
+    } catch (err: unknown) {
+      const msg = err instanceof Error && err.message ? err.message : 'connection failed';
+      throw new Error(`Storage service unavailable: ${msg}`);
+    }
     const url = `${process.env.MINIO_PUBLIC_URL}/${key}`;
     return { url, key };
   }
