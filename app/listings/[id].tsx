@@ -390,7 +390,7 @@ export default function ListingDetailScreen() {
     );
   }
 
-  const photoUrls = listing.photos.map(p => p.url);
+  const photoUrls = (listing.photos || []).map(p => p.url);
 
   const seoTitle = listing.city
     ? `${listing.title} — ${i18n.language === 'en' ? (listing.city.nameEn || listing.city.nameRu) : i18n.language === 'ka' ? (listing.city.nameKa || listing.city.nameRu) : listing.city.nameRu} | Авито Грузия`
