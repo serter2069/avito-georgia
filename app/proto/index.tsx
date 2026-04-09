@@ -1,34 +1,71 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Platform, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { protoPages, protoGroups } from '../../constants/protoRegistry';
 import { ProtoCard } from '../../components/proto/ProtoCard';
 
 export default function ProtoIndex() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+
+  const isWeb = Platform.OS === 'web';
+  const padding = isWeb ? 32 : 16;
+  const gap = 12;
+  const cols = isWeb
+    ? width > 1280 ? 4 : width > 1024 ? 3 : width > 640 ? 2 : 1
+    : 1;
+  const contentWidth = width - padding * 2;
+  const cardWidth = cols > 1 ? (contentWidth - (cols - 1) * gap) / cols : contentWidth;
+
+  const totalStates = protoPages.reduce((s, p) => s + p.states.length, 0);
 
   return (
-    <View className="flex-1 bg-surface" style={{ maxWidth: 430 }}>
-      <View className="bg-primary px-4 py-6">
-        <Text className="text-white text-2xl font-bold">Proto Showcase</Text>
-        <Text className="text-white/80 text-sm mt-1">
-          {protoPages.length} pages / {protoPages.reduce((s, p) => s + p.states.length, 0)} states
-        </Text>
+    <View style={{ flex: 1, backgroundColor: '#E8F4F8' }}>
+      {/* Header */}
+      <View style={{ backgroundColor: '#0A7B8A', paddingHorizontal: padding, paddingVertical: 20 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+          <Text style={{ color: '#fff', fontSize: 24, fontWeight: '700' }}>Proto Showcase</Text>
+          <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>
+            {protoPages.length} pages / {totalStates} states
+          </Text>
+        </View>
       </View>
-      <ScrollView className="flex-1 px-4 pt-4" contentContainerStyle={{ paddingBottom: 48 }}>
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 48, paddingHorizontal: padding, paddingTop: 24 }}
+      >
         {protoGroups.map((group) => {
           const pages = protoPages.filter((p) => p.group === group);
           return (
-            <View key={group} className="mb-6">
-              <Text className="text-text-secondary text-sm font-semibold mb-2 uppercase tracking-wide">
-                {group}
-              </Text>
-              {pages.map((page) => (
-                <ProtoCard
-                  key={page.id}
-                  page={page}
-                  onPress={() => router.push(`/proto/states/${page.id}` as any)}
-                />
-              ))}
+            <View key={group} style={{ marginBottom: 32 }}>
+              {/* Section header */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                <Text style={{
+                  color: '#6A8898',
+                  fontSize: 12,
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: 1.2,
+                }}>
+                  {group}
+                </Text>
+                <View style={{ flex: 1, height: 1, backgroundColor: '#C8E0E8', marginLeft: 12 }} />
+                <Text style={{ color: '#6A8898', fontSize: 12, marginLeft: 8 }}>
+                  {pages.length}
+                </Text>
+              </View>
+
+              {/* Cards grid */}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }}>
+                {pages.map((page) => (
+                  <View key={page.id} style={{ width: cardWidth }}>
+                    <ProtoCard
+                      page={page}
+                      onPress={() => router.push(`/proto/states/${page.id}` as any)}
+                    />
+                  </View>
+                ))}
+              </View>
             </View>
           );
         })}

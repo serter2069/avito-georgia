@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 import type { ReactNode } from 'react';
 
 interface StateSectionProps {
@@ -7,12 +7,35 @@ interface StateSectionProps {
 }
 
 export function StateSection({ title, children }: StateSectionProps) {
+  const isWeb = Platform.OS === 'web';
+
   return (
-    <View className="mb-8">
-      <View className="bg-primary/10 px-3 py-2 rounded-lg mb-4 self-start">
-        <Text className="text-primary text-sm font-semibold">{title}</Text>
+    <View style={{
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#C8E0E8',
+      borderRadius: 12,
+      overflow: 'hidden',
+    }}>
+      {/* Badge header */}
+      <View style={{
+        backgroundColor: '#E8F4F8',
+        borderBottomWidth: 1,
+        borderBottomColor: '#C8E0E8',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+      }}>
+        <Text style={{
+          color: '#0A7B8A',
+          fontSize: 12,
+          fontWeight: '600',
+        }}>
+          {title}
+        </Text>
       </View>
-      <View className="border border-border rounded-lg p-4 bg-white">
+
+      {/* Content */}
+      <View style={{ padding: 16 }}>
         {children}
       </View>
     </View>

@@ -1,6 +1,7 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Platform, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import React, { Children, isValidElement } from 'react';
 import type { ReactNode } from 'react';
 
 interface ProtoLayoutProps {
@@ -12,21 +13,78 @@ interface ProtoLayoutProps {
 
 export function ProtoLayout({ pagId, title, route, children }: ProtoLayoutProps) {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isWeb = Platform.OS === 'web';
+
+  const padding = isWeb ? 32 : 16;
+  const gap = 16;
+  const cols = isWeb
+    ? width > 1280 ? 3 : width > 768 ? 2 : 1
+    : 1;
+  const contentWidth = width - padding * 2;
+  const itemWidth = cols > 1 ? (contentWidth - (cols - 1) * gap) / cols : contentWidth;
+
+  // Flatten children to extract StateSection elements for grid layout
+  const childArray = flattenChildren(children);
 
   return (
-    <View className="flex-1 bg-surface" style={{ maxWidth: 430 }}>
-      <View className="bg-white border-b border-border px-4 py-3 flex-row items-center gap-3">
+    <View style={{ flex: 1, backgroundColor: '#E8F4F8' }}>
+      {/* Header */}
+      <View style={{
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#C8E0E8',
+        paddingHorizontal: padding,
+        paddingVertical: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+      }}>
         <TouchableOpacity onPress={() => router.push('/proto' as any)} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color="#0A2840" />
+          <Ionicons name="arrow-back" size={22} color="#0A2840" />
         </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-text-primary text-base font-semibold">{pagId} — {title}</Text>
-          <Text className="text-text-muted text-xs">{route}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: '#0A2840', fontSize: 16, fontWeight: '600' }}>
+            {pagId} — {title}
+          </Text>
+          <Text style={{ color: '#6A8898', fontSize: 12, marginTop: 2 }}>{route}</Text>
         </View>
       </View>
-      <ScrollView className="flex-1 px-4 pt-4" contentContainerStyle={{ paddingBottom: 48 }}>
-        {children}
+
+      {/* States grid */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 48, paddingHorizontal: padding, paddingTop: 20 }}
+      >
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }}>
+          {childArray.map((child, i) => (
+            <View key={i} style={{ width: itemWidth }}>
+              {child}
+            </View>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
+}
+
+/**
+ * Recursively flatten React children to get individual StateSection elements.
+ * State components wrap StateSections in a plain <View>, so we unwrap them.
+ */
+function flattenChildren(children: ReactNode): ReactNode[] {
+  const result: ReactNode[] = [];
+  Children.forEach(children, (child) => {
+    if (!isValidElement(child)) return;
+    // If it's a View wrapper (from state components), recurse into its children
+    if (child.type === View) {
+      const nested = (child.props as { children?: ReactNode }).children;
+      if (nested) {
+        result.push(...flattenChildren(nested));
+      }
+    } else {
+      result.push(child);
+    }
+  });
+  return result;
 }
