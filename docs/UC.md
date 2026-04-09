@@ -15,7 +15,7 @@
 | UC | Title | Status |
 |----|-------|--------|
 | UC-01 | Авторизация (OTP) | [pass] |
-| UC-02 | Создание объявления | [fail] |
+| UC-02 | Создание объявления | [pass] |
 | UC-11 | Карта объявлений | [pass] |
 | UC-12 | Модерация | [pass] |
 | UC-19 | Истечение объявления (cron) | [pass] |
@@ -64,8 +64,8 @@
 **Pass 3 results (2026-04-09):**
 - UC-12 moderation: PASS (queue, approve, reject, security, state machine all ok)
 - UC-19 expiry cron: PASS (expired listings filtered from feed, renew endpoint works; no HTTP trigger — by design)
-- UC-02 listing creation: FAIL — #241 P2 photo upload 500 when MinIO unreachable, #242 P3 isDraft:true ignored
-- UC-11 map: FAIL — #236 P1 markerClusterGroup crash (FIXED PR#239), #237 P2 /listings/map route crash (FIXED PR#240), #238 P2 pending listings in map (was already fixed)
+- UC-02 listing creation: PASS (re-verified 2026-04-09) — isDraft:true→draft fixed (PR#248), photo upload 503 handler confirmed, pending_moderation flow ok
+- UC-11 map: PASS (re-verified 2026-04-09) — #236/#237 fixed (PR#239/240), map returns active listings with lat/lng ok
 
 **Pass 1+2 results (2026-04-08):**
 - favorites_race: PASS (no duplicate inserted — upsert idempotent, 201+201 → 1 record)
