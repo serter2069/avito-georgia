@@ -5,7 +5,7 @@ export const ALLOWED_ORIGINS = [
   'http://localhost:8081',
   'http://localhost:8082',
   'http://localhost:8083',
-  'http://localhost:8086',
+  'http://admin.localhost:8086',
   'http://localhost:19006',
 ];
 
