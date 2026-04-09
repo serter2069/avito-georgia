@@ -323,7 +323,7 @@ router.get('/:id/phone', requireAuth, phoneRevealRateLimit, async (req: Request,
 
 // POST /api/listings
 router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: Response) => {
-  const isDraft = req.body.status === 'draft';
+  const isDraft = req.body.status === 'draft' || req.body.isDraft === true;
   let data: z.infer<typeof createListingSchema> | z.infer<typeof createDraftSchema>;
   try {
     data = isDraft ? createDraftSchema.parse(req.body) : createListingSchema.parse(req.body);
