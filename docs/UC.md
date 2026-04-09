@@ -1,8 +1,11 @@
 # USE CASES — Авито Грузия
 
-**Версия:** 1.1
-**Дата:** 2026-04-03
+**Версия:** 1.2
+**Дата:** 2026-04-09
 **Основа:** PRODUCT document + Collegium review
+
+## STATUS: QA
+## PAGE_PROGRESS: 35/35 built
 
 **Роли:** Гость, Пользователь (зарег.), Премиум продавец, Администратор
 **Города:** Тбилиси, Батуми, Кутаиси, Рустави, Гори, Зугдиди
@@ -14,48 +17,48 @@
 
 | UC | Title | Status |
 |----|-------|--------|
-| UC-01 | Авторизация (OTP) | [pass] |
-| UC-02 | Создание объявления | [pass] |
-| UC-11 | Карта объявлений | [pass] |
-| UC-12 | Модерация | [pass] |
-| UC-19 | Истечение объявления (cron) | [pass] |
-| UC-03 | Редактирование объявления | [pass] |
-| UC-04 | Поиск и фильтрация | [pass] |
-| UC-05 | Просмотр объявления | [pass] |
-| UC-06 | Чат | [pass] |
-| UC-07 | Избранное | [pass] |
-| UC-08 | Продвижение объявлений | [pass] |
-| UC-09 | Профиль продавца | [pass] |
-| UC-10 | Список сообщений | [pass] |
-| UC-13 | Обновление объявления | [pass] |
-| UC-14 | Управление категориями | [pass] |
-| UC-15 | Показ телефона | [pass] |
-| UC-16 | Подписка Premium | [pass] |
-| UC-17 | Уведомления | [pass] |
-| UC-18 | Профиль пользователя | [pass] |
-| UC-20 | Жалобы | [pass] |
-| UC-21 | Управление пользователями | [pass] |
-| UC-22 | State Machine объявления | [pass] |
-| UC-23 | Rate Limiting | [pass] |
-| UC-24 | i18n | [pass] |
-| UC-25 | Admin Dashboard | [pass] |
-| UC-26 | Onboarding | [pass] |
-| UC-27 | Blocked User Enforcement | [pass] |
-| UC-28 | Photo Upload Security | [pass] |
-| UC-29 | Payment History | [pass] |
-| UC-30 | User Settings | [pass] |
-| UC-31 | Homepage | [pass] |
-| UC-32 | Category i18n | [pass] |
-| UC-33 | Duplicate Detection | [pass] |
-| UC-34 | Account Deletion | [pass] |
-| UC-35 | Listing Expiry Cron | [pass] |
-| UC-36 | Blocked User Listings | [pass] |
-| UC-37 | Legal Pages | [pass] |
-| UC-38 | Payment Callbacks | [pass] |
-| UC-39 | Promotion Expiry Cron | [pass] |
-| UC-40 | Listing Expiry Reminders | [pass] |
-| UC-41 | (reserved) | [pass] |
-| UC-42 | (reserved) | [pass] |
+| UC-01 | Авторизация (OTP) | [x] |
+| UC-02 | Создание объявления | [x] |
+| UC-11 | Карта объявлений | [x] |
+| UC-12 | Модерация | [x] |
+| UC-19 | Истечение объявления (cron) | [x] |
+| UC-03 | Редактирование объявления | [x] |
+| UC-04 | Поиск и фильтрация | [x] |
+| UC-05 | Просмотр объявления | [x] |
+| UC-06 | Чат | [x] |
+| UC-07 | Избранное | [x] |
+| UC-08 | Продвижение объявлений | [x] |
+| UC-09 | Профиль продавца | [x] |
+| UC-10 | Список сообщений | [x] |
+| UC-13 | Обновление объявления | [x] |
+| UC-14 | Управление категориями | [x] |
+| UC-15 | Показ телефона | [x] |
+| UC-16 | Подписка Premium | [x] |
+| UC-17 | Уведомления | [x] |
+| UC-18 | Профиль пользователя | [x] |
+| UC-20 | Жалобы | [x] |
+| UC-21 | Управление пользователями | [x] |
+| UC-22 | State Machine объявления | [x] |
+| UC-23 | Rate Limiting | [x] |
+| UC-24 | i18n | [x] |
+| UC-25 | Admin Dashboard | [x] |
+| UC-26 | Onboarding | [x] |
+| UC-27 | Blocked User Enforcement | [x] |
+| UC-28 | Photo Upload Security | [x] |
+| UC-29 | Payment History | [x] |
+| UC-30 | User Settings | [x] |
+| UC-31 | Homepage | [x] |
+| UC-32 | Category i18n | [x] |
+| UC-33 | Duplicate Detection | [x] |
+| UC-34 | Account Deletion | [x] |
+| UC-35 | Listing Expiry Cron | [x] |
+| UC-36 | Blocked User Listings | [x] |
+| UC-37 | Legal Pages | [x] |
+| UC-38 | Payment Callbacks | [x] |
+| UC-39 | Promotion Expiry Cron | [x] |
+| UC-40 | Listing Expiry Reminders | [x] |
+| UC-41 | (reserved) | [x] |
+| UC-42 | (reserved) | [x] |
 | UC-43 | Pay-Per-Listing | [ ] |
 | UC-44 | Stripe Webhook Processing | [ ] |
 | UC-45 | SEO & Social Sharing | [ ] |
@@ -118,6 +121,422 @@
 - **Responsibilities:** Listing expiry (UC-19), rate limiting (UC-23), promotion scheduling (UC-08), notification dispatch (UC-17)
 - **Triggers:** time-based (cron) and event-based (webhooks, payment callbacks)
 - **Failure mode:** silent — must log all actions to audit trail
+
+---
+
+## PAGES
+
+### Auth (PUBLIC)
+
+- [x] PAG-001: Email Login
+  Роли: PUBLIC
+  Что видит: поле email, кнопка "Получить код", логотип приложения
+  Действия: ввести email → PAG-002 OTP
+  Состояния: default, validation_error, loading
+  Элементы:
+    - Input(email): placeholder "your@email.com"
+    - Button(primary): "Получить код" — отправка OTP
+    - Text: логотип/название приложения
+
+- [x] PAG-002: OTP Verification
+  Роли: PUBLIC
+  Что видит: 6 ячеек для кода, таймер повторной отправки, кнопка подтверждения
+  Действия: ввести код → onboarding (новый) или homepage (вернувшийся), resend → новый код
+  Состояния: default, error, loading, resend_available, captcha_required (web, после 3 попыток)
+  Элементы:
+    - Input(otp) x6: автоперевод фокуса, paste support
+    - Button(primary): "Подтвердить" — disabled пока не 6 цифр
+    - Button(ghost): "Отправить снова" — disabled до истечения таймера
+    - Timer: обратный отсчёт 60с
+    - Turnstile CAPTCHA: только web, только после 3 неверных попыток
+
+### Onboarding (USER)
+
+- [x] PAG-003: Onboarding
+  Роли: USER (isOnboarded: false)
+  Что видит: форма первичного заполнения профиля (имя, телефон, город)
+  Действия: заполнить поля → сохранить → перейти в приложение (или returnTo)
+  Состояния: default, validation_error, loading, city_picker_open
+  Элементы:
+    - Input(text): "Имя" — обязательное
+    - Input(phone): "Телефон" — опциональное
+    - Input(select): "Город" — dropdown из 6 городов
+    - Button(primary): "Продолжить"
+
+### Public (PUBLIC / USER)
+
+- [x] PAG-010: Homepage
+  Роли: PUBLIC, USER
+  Что видит: поиск, фильтр города, сетка из 10 категорий, свежие объявления (6 шт, 2 col), CTA блок, footer
+  Действия: поиск → /search, выбрать категорию → /listings?category=, "Смотреть все" → /listings, клик объявления → /listings/:id, выбрать город → фильтр свежих объявлений
+  Состояния: default, loading_listings, empty_listings, guest_cta (не авторизован), user_cta (авторизован)
+  Элементы:
+    - Input(search) + Button(icon): "Найти" — переход на search
+    - CitySelector: горизонтальный скролл, кнопки городов
+    - CategoryIcon x10: сетка 5×2 (web) / 2 ряда scroll (native)
+    - ListingCard x6: 2-col grid с promoted/highlighted бейджами
+    - Button(ghost): "Смотреть все"
+    - Button(primary): CTA "Подать объявление"
+    - Footer: ссылки на about/help/privacy/terms
+
+- [x] PAG-011: Listings Feed
+  Роли: PUBLIC, USER
+  Что видит: лента объявлений с фильтрами (категория, город, цена, сортировка), infinite scroll
+  Действия: выбрать категорию/город/цену → обновить ленту, клик объявления → деталь
+  Состояния: default, loading, empty, filtered_empty, error
+  Элементы:
+    - ListingFeed: infinite scroll с фильтрами
+    - Header: заголовок "Объявления"
+    - FilterBar: категория, город, цена, сортировка
+
+- [x] PAG-012: Listing Detail
+  Роли: PUBLIC, USER
+  Что видит: галерея фото, заголовок, цена, город, категория, описание, контакты продавца, кнопки действий, отзывы, похожие объявления
+  Действия: написать продавцу → тред, добавить в избранное/убрать, показать телефон, пожаловаться → modal, поделиться; owner: редактировать/удалить/продвинуть
+  Состояния: default, loading, error_not_found, phone_revealed, report_modal_open, favorite_added, favorite_removed
+  Элементы:
+    - PhotoGallery: свайп + счётчик
+    - PriceTag: цена + валюта
+    - Badge(status): active/sold/archived/pending_moderation
+    - Button(primary): "Написать продавцу"
+    - Button(ghost): "Показать телефон"
+    - Button(icon): избранное (heart), поделиться
+    - Button(ghost): "Пожаловаться" — открывает Modal
+    - Modal(report): причина жалобы + отправить
+    - ReviewCard: список отзывов продавца
+    - ListingCard x3: похожие объявления
+
+- [x] PAG-013: Search
+  Роли: PUBLIC, USER
+  Что видит: строка поиска, фильтры (город, категория), результаты список/карта, пагинация
+  Действия: изменить запрос → новые результаты, фильтровать по городу/категории, переключить вид список↔карта
+  Состояния: default, loading, empty, filtered_empty, map_view
+  Элементы:
+    - TextInput(search): с подсветкой запроса
+    - CitySelector: горизонтальный скролл
+    - CategoryIcon chips: фильтр по категории
+    - Button(toggle): список / карта
+    - ListingCard (list): результаты
+    - SearchMap: карта с маркерами
+    - Spinner: загрузка
+
+- [x] PAG-014: Map View
+  Роли: PUBLIC
+  Что видит: заглушка "coming soon"
+  Действия: назад
+  Состояния: coming_soon
+  Элементы:
+    - Text: "Map view coming soon"
+    - Button(ghost): "Назад"
+
+- [x] PAG-015: Seller Profile
+  Роли: PUBLIC, USER
+  Что видит: аватар, имя, дата регистрации, кол-во активных объявлений, бейдж Premium, лента объявлений продавца
+  Действия: листать объявления, клик → деталь
+  Состояния: default, loading, error, empty_listings
+  Элементы:
+    - Avatar: 64px
+    - Text: имя продавца
+    - Badge(premium): если isPremium
+    - Text: дата регистрации, кол-во объявлений
+    - ListingCard (grid): объявления продавца с пагинацией
+
+### My Listings (USER)
+
+- [x] PAG-020: My Listings
+  Роли: USER
+  Что видит: табы по статусам (active/pending/draft/sold/removed), список своих объявлений с кнопками действий
+  Действия: переключить таб, редактировать → edit, удалить → confirmation, продвинуть → promote, создать новое
+  Состояния: default, empty, loading, confirm_delete_modal
+  Элементы:
+    - Tabs: active / pending_moderation / draft / sold / removed
+    - ListingCard (compact): фото, заголовок, цена, дата, просмотры
+    - Badge(status): цветовой индикатор статуса
+    - Button(ghost): "Редактировать"
+    - Button(ghost): "Продвинуть"
+    - Button(danger): "Удалить" → Alert confirmation
+    - Button(primary): "Создать объявление" — FAB
+
+- [x] PAG-021: Create Listing
+  Роли: USER
+  Что видит: 4-шаговая форма (категория → город/район → детали → фото)
+  Действия: пройти 4 шага → опубликовать, загрузить фото (до 10), выйти с подтверждением (exit guard)
+  Состояния: step1_category, step2_city, step3_details, step4_photos, submitting, error, quota_exceeded_payment
+  Элементы:
+    - Stepper(4): прогресс-индикатор
+    - Input(select): категория + подкатегория
+    - Input(select): город + район
+    - Input(text): "Заголовок" — обязательное
+    - Input(textarea): "Описание"
+    - Input(number): "Цена"
+    - Input(select): "Валюта" (GEL/USD)
+    - Input(text): "Адрес"
+    - Input(toggle): "Показывать телефон"
+    - ImagePicker: до 10 фото, drag-to-reorder
+    - Button(primary): "Далее" / "Опубликовать"
+    - Button(ghost): "Назад"
+
+- [x] PAG-022: Edit Listing
+  Роли: USER (owner)
+  Что видит: форма редактирования существующего объявления
+  Действия: изменить поля → сохранить
+  Состояния: loading_data, default, saving, success, error
+  Элементы:
+    - Input(text): заголовок
+    - Input(textarea): описание
+    - Input(number): цена + select валюта
+    - Input(select): категория, город, район
+    - ImagePicker: управление фото
+    - Button(primary): "Сохранить"
+
+### Dashboard (USER)
+
+- [x] PAG-030: Messages List
+  Роли: USER
+  Что видит: список диалогов — аватар, имя, превью последнего сообщения, дата, счётчик непрочитанных
+  Действия: открыть диалог → PAG-031, pull-to-refresh, auto-refresh (AppState)
+  Состояния: default, loading, empty, error
+  Элементы:
+    - FlatList(threads): бесконечный скролл
+    - Avatar: 48px
+    - Badge(unread): счётчик непрочитанных
+    - Text: превью сообщения + дата
+    - Empty: иконка + "Нет сообщений"
+
+- [x] PAG-031: Chat Thread
+  Роли: USER
+  Что видит: история сообщений с собеседником, инфо об объявлении треда, поле ввода
+  Действия: написать → отправить, real-time получение сообщений (Socket.io)
+  Состояния: default, loading, empty, sending, error
+  Элементы:
+    - FlatList(messages): bubble layout (своё/чужое)
+    - Input(text): поле сообщения
+    - Button(icon): "Отправить"
+    - ActivityIndicator: загрузка истории
+    - Socket.io: real-time updates
+
+- [x] PAG-032: Favorites
+  Роли: USER
+  Что видит: список избранных объявлений
+  Действия: открыть объявление → деталь, убрать из избранного
+  Состояния: default, loading, empty
+  Элементы:
+    - FlatList: 2-col grid
+    - ListingCard: с кнопкой удаления
+    - Button(icon): убрать из избранного
+    - Empty: иллюстрация + "Нет избранного"
+
+- [x] PAG-033: Notifications
+  Роли: USER
+  Что видит: список уведомлений (новые сообщения, статус модерации, истечение объявления)
+  Действия: нажать уведомление → связанный экран, отметить прочитанным
+  Состояния: default, loading, empty
+  Элементы:
+    - FlatList(notifications): сгруппированы по типу
+    - Badge(unread): непрочитанные
+    - Ionicons: иконка по типу уведомления
+    - Text: время + описание
+
+- [x] PAG-034: Profile
+  Роли: USER
+  Что видит: аватар с кнопкой смены, поля имя и телефон
+  Действия: изменить имя/телефон, загрузить новый аватар → сохранить
+  Состояния: default, loading_data, saving, saved, uploading_avatar, error
+  Элементы:
+    - Avatar 96px + Button(icon): "Сменить фото" — ImagePicker
+    - Input(text): "Имя"
+    - Input(phone): "Телефон"
+    - Button(primary): "Сохранить"
+    - Toast(success): "Сохранено"
+
+- [x] PAG-035: Settings
+  Роли: USER
+  Что видит: язык интерфейса, настройки уведомлений, раздел удаления аккаунта
+  Действия: сменить язык (KA/RU/EN), toggle уведомлений, удалить аккаунт → подтверждение → logout
+  Состояния: default, loading, delete_confirm_alert
+  Элементы:
+    - Input(select): "Язык" (RU/EN/KA)
+    - Switch: push-уведомления
+    - Button(danger): "Удалить аккаунт" → Alert(confirm)
+    - Button(ghost): "Выйти"
+
+- [x] PAG-036: Payment History
+  Роли: USER
+  Что видит: история всех платежей (тип, сумма, дата, статус)
+  Действия: просмотр
+  Состояния: default, loading, empty
+  Элементы:
+    - ScrollView(payments): список транзакций
+    - Badge(status): success/failed/pending
+    - Ionicons: иконка по типу платежа
+    - Text: сумма + дата
+
+- [x] PAG-037: Premium Subscription
+  Роли: USER
+  Что видит: текущий статус подписки или карточки тарифов с ценами
+  Действия: оформить подписку → Stripe Checkout → success/cancel
+  Состояния: no_subscription, active_subscription, loading, purchasing
+  Элементы:
+    - Card(plan): название, цена, список фич
+    - Button(primary): "Оформить подписку" — Stripe Checkout
+    - Badge(active): "Активна до ..."
+    - ActivityIndicator: загрузка
+
+### Promotions (USER)
+
+- [x] PAG-040: Promote Listing
+  Роли: USER (owner)
+  Что видит: пакеты продвижения с описанием и ценой
+  Действия: выбрать пакет → Stripe Checkout → success/cancel
+  Состояния: default, loading, purchasing, error
+  Элементы:
+    - Card(package) x3: название, цена, описание эффекта
+    - Button(primary): "Продвинуть" — Stripe Checkout
+    - ActivityIndicator
+
+- [x] PAG-041: Promotion Success
+  Роли: USER
+  Что видит: экран успеха после оплаты продвижения
+  Действия: перейти к своим объявлениям, на главную
+  Состояния: success
+  Элементы:
+    - Ionicons(checkmark-circle): 72px зелёный
+    - Text: заголовок + описание
+    - Button(primary): "Мои объявления"
+    - Button(ghost): "На главную"
+
+- [x] PAG-042: Promotion Cancelled
+  Роли: USER
+  Что видит: экран отмены/отказа от оплаты
+  Действия: попробовать снова, на главную
+  Состояния: cancelled
+  Элементы:
+    - Ionicons(close-circle): 72px красный
+    - Text: заголовок + описание
+    - Button(primary): "Попробовать снова"
+    - Button(ghost): "На главную"
+
+- [x] PAG-043: Listing Slot Success
+  Роли: USER
+  Что видит: статус восстановления и публикации объявления после оплаты слота
+  Действия: ждёт авто-публикации → переходит к объявлению
+  Состояния: restoring, submitting, done, error
+  Элементы:
+    - ActivityIndicator: loading states
+    - Ionicons(checkmark / close-circle): результат
+    - Button(primary): "Перейти к объявлению" (состояние done)
+    - Text(error): сообщение об ошибке (состояние error)
+
+### Admin (ADMIN)
+
+- [x] PAG-050: Admin Dashboard
+  Роли: ADMIN
+  Что видит: статистика платформы (пользователи, объявления, доходы), навигационные карточки по разделам
+  Действия: перейти в раздел (users/moderation/categories/reports/payments/settings)
+  Состояния: default, loading
+  Элементы:
+    - Card(stat): ключевые метрики
+    - Navigation cards: Users / Moderation / Categories / Reports / Payments / Settings
+
+- [x] PAG-051: Admin Users
+  Роли: ADMIN
+  Что видит: таблица пользователей с поиском, ролями, статусом блокировки
+  Действия: поиск по email/имени, заблокировать/разблокировать пользователя
+  Состояния: default, loading, empty, search_results
+  Элементы:
+    - Input(search): поиск
+    - FlatList(users): email, имя, роль, статус, дата
+    - Badge(role): user/premium/admin
+    - Badge(status): active/blocked
+    - Button(danger): "Заблокировать"
+    - Button(success): "Разблокировать"
+
+- [x] PAG-052: Admin Moderation
+  Роли: ADMIN
+  Что видит: очередь объявлений на проверке — фото, текст, автор, дата
+  Действия: одобрить → active, отклонить → rejected (с причиной)
+  Состояния: default, loading, empty_queue, reject_reason_modal
+  Элементы:
+    - FlatList(pending): список на модерации
+    - Photo preview: первое фото объявления
+    - Button(success): "Одобрить"
+    - Button(danger): "Отклонить" → Modal
+    - Input(textarea): причина отклонения (в модале)
+
+- [x] PAG-053: Admin Categories
+  Роли: ADMIN
+  Что видит: дерево категорий с подкатегориями, мультиязычные названия
+  Действия: создать категорию, редактировать, управлять иерархией
+  Состояния: default, loading, add_modal, edit_modal
+  Элементы:
+    - FlatList(categories): название (RU/EN/KA), кол-во объявлений
+    - Button(primary): "Добавить категорию"
+    - Modal(form): Input(text) x3 языка
+
+- [x] PAG-054: Admin Reports
+  Роли: ADMIN
+  Что видит: список жалоб — от кого, на что, тип жалобы, дата
+  Действия: рассмотреть (перейти к объявлению), отклонить жалобу
+  Состояния: default, loading, empty
+  Элементы:
+    - FlatList(reports): детали жалобы
+    - Badge(type): тип жалобы
+    - Button(primary): "Перейти к объявлению"
+    - Button(ghost): "Отклонить жалобу"
+
+- [x] PAG-055: Admin Payments
+  Роли: ADMIN
+  Что видит: история платежей платформы (пользователь, тип, сумма, статус)
+  Действия: просмотр
+  Состояния: default, loading, empty
+  Элементы:
+    - ScrollView(payments): транзакции
+    - Badge(status): success/failed
+    - Text: пользователь, сумма, дата
+
+- [x] PAG-056: Admin Settings
+  Роли: ADMIN
+  Что видит: настройки платформы (AppSettings)
+  Действия: изменить параметры → сохранить
+  Состояния: default, loading, saving, saved
+  Элементы:
+    - Input fields: настройки платформы
+    - Button(primary): "Сохранить"
+    - Toast(success): "Сохранено"
+
+### Static (PUBLIC)
+
+- [x] PAG-060: About
+  Роли: PUBLIC
+  Что видит: информация о платформе
+  Действия: просмотр
+  Состояния: default
+  Элементы:
+    - ScrollView, Text sections, Header
+
+- [x] PAG-061: Help
+  Роли: PUBLIC
+  Что видит: FAQ и контакты поддержки
+  Действия: просмотр
+  Состояния: default
+  Элементы:
+    - ScrollView, Text sections, Header
+
+- [x] PAG-062: Privacy Policy
+  Роли: PUBLIC
+  Что видит: текст политики конфиденциальности
+  Действия: просмотр
+  Состояния: default
+  Элементы:
+    - ScrollView, Text, Header
+
+- [x] PAG-063: Terms of Service
+  Роли: PUBLIC
+  Что видит: текст пользовательского соглашения
+  Действия: просмотр
+  Состояния: default
+  Элементы:
+    - ScrollView, Text, Header
 
 ---
 
@@ -1704,7 +2123,7 @@ body: { locale: "ka" | "ru" | "en" }
 
 ---
 
-## SCREEN INVENTORY
+## SCREEN INVENTORY (LEGACY — see PAGES)
 
 | Screen | Route | UC | Status |
 |--------|-------|----|--------|
