@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { requireAuth, requireAdmin } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
+import { Prisma } from '@prisma/client';
 import { reportCreateRateLimit } from '../middleware/rateLimiter';
 
 const router = Router();
@@ -61,8 +62,8 @@ router.post('/', requireAuth, reportCreateRateLimit, async (req: Request, res: R
     });
 
     res.status(201).json(report);
-  } catch (err: any) {
-    if (err?.code === 'P2002') {
+  } catch (err: unknown) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
       res.status(409).json({ error: 'You have already reported this listing' });
       return;
     }
