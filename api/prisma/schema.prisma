@@ -286,6 +286,8 @@ model Report {
   status       String   @default("pending")
   createdAt    DateTime @default(now())
 
+  @@unique([reporterId, listingId])
+  @@unique([reporterId, targetUserId])
   @@index([reporterId])
   @@index([status])
 }

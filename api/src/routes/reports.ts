@@ -61,7 +61,11 @@ router.post('/', requireAuth, reportCreateRateLimit, async (req: Request, res: R
     });
 
     res.status(201).json(report);
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.code === 'P2002') {
+      res.status(409).json({ error: 'You have already reported this listing' });
+      return;
+    }
     console.error('POST /reports error:', err);
     res.status(500).json({ error: 'Failed to create report' });
   }
