@@ -119,7 +119,8 @@ export function SearchMap({ listings, onMarkerPress }: SearchMapProps) {
       }).addTo(map);
 
       // Create marker cluster group — groups nearby pins when zoomed out
-      const clusterGroup = (L as any).markerClusterGroup({
+      // CDN-injected leaflet.markercluster attaches to window.L, not to the ESM L instance
+      const clusterGroup = (window as any).L.markerClusterGroup({
         maxClusterRadius: 60,
         showCoverageOnHover: false,
         spiderfyOnMaxZoom: true,
