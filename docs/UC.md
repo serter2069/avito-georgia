@@ -10,11 +10,15 @@
 
 ---
 
-## TEST STATUS — /dotest Pass 1+2 (2026-04-08)
+## TEST STATUS — /dotest Pass 3 (2026-04-09)
 
 | UC | Title | Status |
 |----|-------|--------|
 | UC-01 | Авторизация (OTP) | [pass] |
+| UC-02 | Создание объявления | [fail] |
+| UC-11 | Карта объявлений | [fail] |
+| UC-12 | Модерация | [pass] |
+| UC-19 | Истечение объявления (cron) | [pass] |
 | UC-03 | Редактирование объявления | [pass] |
 | UC-04 | Поиск и фильтрация | [pass] |
 | UC-05 | Просмотр объявления | [pass] |
@@ -52,6 +56,16 @@
 | UC-40 | Listing Expiry Reminders | [pass] |
 | UC-41 | (reserved) | [pass] |
 | UC-42 | (reserved) | [pass] |
+| UC-43 | Pay-Per-Listing | [ ] |
+| UC-44 | Stripe Webhook Processing | [ ] |
+| UC-45 | SEO & Social Sharing | [ ] |
+| UC-46 | Health Check & Monitoring | [ ] |
+
+**Pass 3 results (2026-04-09):**
+- UC-12 moderation: PASS (queue, approve, reject, security, state machine all ok)
+- UC-19 expiry cron: PASS (expired listings filtered from feed, renew endpoint works; no HTTP trigger — by design)
+- UC-02 listing creation: FAIL — #241 P2 photo upload 500 when MinIO unreachable, #242 P3 isDraft:true ignored
+- UC-11 map: FAIL — #236 P1 markerClusterGroup crash (FIXED PR#239), #237 P2 /listings/map route crash (FIXED PR#240), #238 P2 pending listings in map (was already fixed)
 
 **Pass 1+2 results (2026-04-08):**
 - favorites_race: PASS (no duplicate inserted — upsert idempotent, 201+201 → 1 record)
@@ -186,6 +200,8 @@
 ---
 
 ## UC-02: Создание объявления
+
+> Note (Architect): EUR currency accepted in Zod schema but UC specifies GEL/USD only. GIF format accepted by multer but UC says JPG/PNG/WEBP. Sync needed.
 
 **Актор:** Пользователь (зарег.)
 **Цель:** Опубликовать объявление о продаже/услуге
@@ -356,6 +372,10 @@
 - Re-geocoding: при изменении address или cityId координаты пересчитываются (geocodeAddress → geocodeCity fallback)
 - Удалённые фото: DELETE /api/listings/:id/photos/:photoId удаляет из MinIO
 
+**Responsive:**
+- Mobile (430px): форма редактирования на полный экран, кнопки действий ("Снять", "Продано") в bottom sheet
+- Desktop (>768px): форма редактирования центрированная, кнопки действий в sidebar
+
 > [FLAG Architect 2026-04-06]: UC ссылается на UC-15 (отзывы) через действие "Продано", но Review model не существует в Prisma. Task #2240 создана для реализации UC-15.
 
 ---
@@ -446,6 +466,9 @@
 ---
 
 ## UC-05: Просмотр объявления
+
+> Note (Architect): View deduplication uses in-memory Map — resets on server restart. Redis fallback not documented.
+> Note (Marketing): SEO not described — meta title, OG tags critical for classifieds discoverability.
 
 **Актор:** Гость или Пользователь
 **Цель:** Изучить детали объявления для принятия решения о покупке
@@ -659,6 +682,8 @@
 
 ## UC-08: Платное продвижение объявления
 
+> Note (Architect): Verify that highlight price sync (3 GEL vs 8 GEL, flagged 2026-04-06) is truly resolved.
+
 **Актор:** Пользователь (владелец объявления)
 **Цель:** Повысить видимость объявления через платные инструменты
 **Предусловие:** Объявление со статусом active
@@ -741,6 +766,8 @@
 
 ## UC-09: Профиль продавца
 
+> Note (Marketing): SEO for seller profile page /users/:id not described. Public page needs meta tags, structured data.
+
 **Актор:** Гость или Пользователь
 **Страница:** /users/:id
 **Цель:** Оценить надёжность продавца перед покупкой
@@ -772,6 +799,10 @@
 **Edge cases:**
 - Пользователь не найден → 404 "User not found"
 - Имя не задано → отображается "User"
+
+**Responsive:**
+- Mobile (430px): профиль продавца в одну колонку — аватар + инфо сверху, объявления списком ниже
+- Desktop (>768px): двухколоночный layout — профиль слева, объявления продавца справа в сетке
 
 > Note (Collegium 2026-04-06): Монетизация по категориям (free_quota + price_per_listing в admin panel) управляется через UC-14/UC-25, не является частью UC-09.
 
@@ -836,6 +867,10 @@
 - POST /api/threads/:threadId/seen → обновляет ThreadParticipant.lastSeenAt = now()
 - GET /api/threads/unread-count → общий счётчик непрочитанных по всем тредам
 
+**Responsive:**
+- Mobile (430px): список диалогов на полный экран, тред — полноэкранный чат с bubble-сообщениями
+- Desktop (>768px): двухпанельный layout — список диалогов слева (30%), тред справа (70%)
+
 ---
 
 ## UC-11: Карта объявлений
@@ -882,11 +917,17 @@
 - Геокодирование: geocodeAddress(address, cityName) → fallback geocodeCity(cityName)
 - Кластеризация: не реализована на бэкенде, может быть на фронте
 
+**Responsive:**
+- Mobile (430px): карта на полный экран, фильтры в bottom sheet, popup-превью маркера — компактная карточка внизу экрана
+- Desktop (>768px): карта занимает основную область, фильтры слева, popup-превью при hover на маркер
+
 > [FLAG Architect 2026-04-06]: Текущая реализация показывает city-level координаты (один пин на весь город). Пользователь одобрил реализацию address-level geocoding. Task #2239: поле address при создании объявления + геокодирование в реальные lat/lng + кластеризация маркеров.
 
 ---
 
 ## UC-12: Модерация (Администратор)
+
+> Note (AdminMirror): UC should clarify two moderation queues: (1) new listing pending_moderation, (2) report-based moderation for active listings.
 
 **Актор:** Администратор
 **Цель:** Проверить жалобы пользователей и управлять объявлениями
@@ -1017,6 +1058,10 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 - Дедупликация: Notification с type='EXPIRY_REMINDER' (none проверка при выборке)
 - При истечении: cron 03:00 UTC, status → expired
 
+**Responsive:**
+- Mobile (430px): кнопка "Продлить" на полную ширину, badge "Истекает" на карточке объявления
+- Desktop (>768px): кнопка "Продлить" в sidebar объявления, badge "Истекает" на карточке
+
 ---
 
 ## UC-14: Категории и подкатегории
@@ -1075,6 +1120,10 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 - PATCH /api/admin/categories/:id: admin, обновление freeListingQuota и paidListingPrice
 
 **Гость видит:** полный каталог категорий с иконками и счётчиками, переход к объявлениям.
+
+**Responsive:**
+- Mobile (430px): категории в grid 2 колонки с иконками, подкатегории в списке
+- Desktop (>768px): категории в grid 3-4 колонки, подкатегории в sidebar при выборе категории
 
 ---
 
@@ -1139,6 +1188,10 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 
 **Гость видит:** Отзывы на странице продавца (GET /api/reviews?sellerId=). Форму оставить — нет (requireAuth).
 
+**Responsive:**
+- Mobile (430px): форма отзыва — звёзды + textarea на полный экран, список отзывов — карточки в одну колонку
+- Desktop (>768px): форма отзыва в модальном окне, список отзывов в табе профиля продавца
+
 > Note (Collegium 2026-04-06): Утверждено к реализации в MVP. Task #2240.
 
 ---
@@ -1184,12 +1237,18 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 - Объявления остаются active до естественного истечения (30 дней)
 - Квота-bypass: при создании объявления проверяется hasUnlimited → если true, категорийная квота не применяется
 
+**Responsive:**
+- Mobile (430px): страница Premium — описание преимуществ + CTA кнопка на всю ширину, Stripe checkout в webview
+- Desktop (>768px): карточка Premium с преимуществами, кнопка подписки, управление подпиской в sidebar
+
 > [FLAG Architect 2026-04-06]: Badge "Проверенный продавец" и повышенная видимость не реализованы. User model не имеет поля premium_badge. Сортировка поиска учитывает только isPromoted (top_* типы), подписка не влияет на позицию. Task #2238.
 > [SYNC 2026-04-06]: Boosted search position IS implemented (premium sorted after top, before regular). Cancellation: let-expire-naturally approach (no forced draft).
 
 ---
 
 ## UC-17: Центр уведомлений
+
+> Note (Architect): NEW_MESSAGE in-app notification not implemented — only email exists. Code needs in-app notification creation on new message.
 
 **Актор:** Пользователь (зарег.)
 **Цель:** Просматривать системные уведомления
@@ -1234,6 +1293,10 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 - EXPIRY_REMINDER: создаётся в cron/cleanup.ts за 3 дня до истечения (UC-19)
 - NEW_MESSAGE: не реализовано в коде как in-app notification
 
+**Responsive:**
+- Mobile (430px): уведомления в полноэкранном списке, badge на иконке колокольчика в хедере
+- Desktop (>768px): уведомления в dropdown popup при клике на колокольчик
+
 ---
 
 ## UC-18: Редактирование профиля
@@ -1274,6 +1337,10 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 - Лимит: 5 MB (multer limit — меньше чем для фото объявлений!)
 - Форматы: JPEG, PNG, WebP, GIF
 - Хранение: MinIO, папка "avatars"
+
+**Responsive:**
+- Mobile (430px): форма профиля на полный экран, загрузка аватара через камеру/галерею
+- Desktop (>768px): форма профиля центрированная, drag-and-drop для аватара
 
 ---
 
@@ -1338,6 +1405,10 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 - Uniqueness: participant IDs сортируются (p1 < p2), unique constraint на (participant1Id, participant2Id)
 - Idempotent: upsert — если тред существует, возвращает его
 
+**Responsive:**
+- Mobile (430px): кнопка "Написать" на профиле продавца, полноэкранный чат
+- Desktop (>768px): кнопка "Написать" в sidebar профиля, чат в slide-in панели
+
 > [FLAG Architect 2026-04-06]: ~~Нет проверки role=blocked при создании DM треда~~ ИСПРАВЛЕНО: POST /api/threads проверяет otherUser.role === 'blocked' → 403. Task #2241 (закрыть).
 
 ---
@@ -1376,6 +1447,10 @@ Admin-configurable auto-moderation: toggle enabled/disabled from admin settings.
 - При role='blocked': объявления пользователя принудительно переводятся в status='removed' (listing.updateMany)
 - Middleware auth.ts: если JWT payload.role === 'blocked' → 403 "Account suspended"
 - Audit log: "user.role_change" с previousRole и newRole
+
+**Responsive:**
+- Mobile (430px): список пользователей — компактные карточки, действия в bottom sheet
+- Desktop (>768px): таблица пользователей с inline-действиями, поиск и фильтры в toolbar
 
 ---
 
@@ -1455,6 +1530,8 @@ Admin transitions:
 
 ## UC-23: Rate Limiting & Anti-Abuse
 
+> Note (SecOfficer): CAPTCHA after 3x rate limit violations — described in UC but not implemented. Remove from UC or implement.
+
 **Актор:** SYSTEM
 **Цель:** Защита платформы от злоупотреблений
 
@@ -1520,6 +1597,33 @@ Report rate limiting: 10/час на пользователя (pending implement
 - AC-03: Грузинский — язык по умолчанию
 - AC-04: RTL не нужен (KA/RU/EN — все LTR)
 
+**UI States:**
+- **Loading:** Spinner при переключении языка (перезагрузка строк)
+- **Empty:** N/A — всегда есть fallback язык
+- **Error:** Перевод не найден → fallback на nameEn → fallback на ключ
+- **Success:** Интерфейс переключён на выбранный язык, localStorage/профиль обновлён
+
+**Валидация:**
+- locale: enum "ka" | "ru" | "en" — невалидное значение → 400 "Invalid locale. Must be one of: ka, ru, en"
+- Accept-Language header: парсится для определения языка (ka, ru, en), fallback = ka
+
+**Edge cases:**
+- Пользователь меняет язык будучи гостем → сохраняется в localStorage → при регистрации переносится в профиль
+- Отсутствующий перевод категории → fallback: nameEn → name (legacy field)
+- Email шаблоны: язык определяется по профилю пользователя, не по Accept-Language
+
+**Responsive:**
+- Mobile (430px): переключатель языка в hamburger-меню или footer
+- Desktop (>768px): переключатель языка в header (dropdown KA/RU/EN)
+
+**API Contract:**
+```
+PATCH /api/users/me
+body: { locale: "ka" | "ru" | "en" }
+→ 200: { id, name, locale, ... }
+→ 400: { error: "Invalid locale. Must be one of: ka, ru, en" }
+```
+
 ---
 
 ## UC-25: Admin Dashboard & Audit Log
@@ -1553,6 +1657,10 @@ Report rate limiting: 10/час на пользователя (pending implement
 - Фильтр: targetType (optional)
 - Поля: adminId, adminEmail, action, targetType, targetId, details (JSON), createdAt
 - Actions: "listing.status_change", "user.role_change", "report.status_change", "category.update"
+
+**Responsive:**
+- Mobile (430px): dashboard метрики в вертикальных карточках, таблицы со скроллом
+- Desktop (>768px): dashboard с grid метрик, полноширинные таблицы, sidebar навигация
 
 > Note (Collegium 2026-04-06): admin/payments.tsx экран относится к этому UC — добавить /admin/payments в список экранов. API /api/admin/payments уже реализован.
 
@@ -1589,6 +1697,10 @@ Report rate limiting: 10/час на пользователя (pending implement
 - city: string, trim, optional (nullable)
 - isOnboarded: true (устанавливается при завершении onboarding)
 - Условие показа: user.isOnboarded === false (после verify-otp возвращается isOnboarded)
+
+**Responsive:**
+- Mobile (430px): onboarding на полный экран, поля и кнопки на всю ширину
+- Desktop (>768px): центрированная карточка onboarding, max-width 480px
 
 ---
 
@@ -1698,9 +1810,13 @@ Report rate limiting: 10/час на пользователя (pending implement
 > [FLAG SecOfficer 2026-04-06]: Сессии не инвалидируются при блокировке — нужен prisma.session.deleteMany({where:{userId}}) в admin block route. Refresh token с валидным токеном продолжает работать до истечения.
 > [FLAG QA 2026-04-06]: Объявления заблокированного пользователя не скрываются — нет фильтра user.role в GET /listings. Task #2263 (UC-36).
 
+**Responsive:** N/A — system/background process, no UI.
+
 ---
 
 ## UC-28: Photo Upload Security
+
+> Note (SecOfficer): Magic bytes validation (file content check) not implemented — only MIME type header check. MVP gap.
 
 **Актор:** SYSTEM
 **Цель:** Предотвратить загрузку вредоносных файлов через форму фото объявлений
@@ -1721,9 +1837,30 @@ Report rate limiting: 10/час на пользователя (pending implement
 > [FLAG QA 2026-04-06]: Аватар принимает image/gif, UC-28 разрешает только jpeg/png/webp. Нужна унификация допустимых форматов.
 > [DECISION 2026-04-06]: Magic bytes validation added to p1 task. GIF to be removed from accepted formats when magic bytes implemented.
 
+**UI States:**
+- **Loading:** Progress bar при загрузке файла
+- **Error (тип файла):** "Invalid file type. Only JPEG, PNG, WebP allowed." — multer отклоняет на middleware уровне
+- **Error (размер):** "File too large. Maximum size is 10MB." — multer limit
+- **Error (magic bytes):** "File content does not match declared type." — содержимое файла не соответствует MIME
+- **Success:** Фото загружено, превью отображается в форме создания объявления
+
+**Responsive:**
+- Mobile (430px): загрузка фото через камеру/галерею, превью в горизонтальном скролле
+- Desktop (>768px): drag-and-drop зона, превью в сетке 3-4 колонки
+
+**Edge cases:**
+- SVG с embedded JavaScript → отклоняется по magic bytes (не image/svg+xml в whitelist)
+- Файл с подменённым расширением (.exe → .jpg) → magic bytes не совпадают → reject
+- Двойное расширение (photo.jpg.exe) → multer проверяет MIME, не расширение
+- Аватар upload (POST /api/users/avatar) должен проходить ту же валидацию
+
+**Уведомления:** N/A — системная валидация, уведомления не отправляются.
+
 ---
 
 ## UC-29: User Payment History
+
+> Note (BizComplete): GET /api/payments/my endpoint does not exist. Frontend uses GET /api/promotions/my as workaround. Users cannot see full payment history.
 
 **Актор:** Пользователь (зарег.)
 **Страница:** /dashboard/payments
@@ -1748,12 +1885,18 @@ Report rate limiting: 10/час на пользователя (pending implement
 - Payment model: amount, currency, status (pending/completed/failed/refunded), provider, externalId, promotionType, listingId
 - admin-payments.ts: GET /api/admin/payments (пагинация, фильтр по status/userId)
 
+**Responsive:**
+- Mobile (430px): список транзакций — компактные карточки с суммой, датой и статусом
+- Desktop (>768px): таблица платежей с сортировкой и фильтрами по типу/статусу
+
 > [FLAG QA 2026-04-06]: GET /api/payments/my не существует — фронт берёт /promotions/my (только активные промо). Payment records в БД недоступны пользователю.
 > [FLAG Product 2026-04-06]: Frontend хардкодит цены в TYPE_PRICES, не читает из API. Task #2264 для добавления /api/promotions/prices.
 
 ---
 
 ## UC-30: User Settings
+
+> Note (Detail Guardian): API Contract section incomplete — PUT/PATCH /api/users/me/notification-prefs request/response not documented.
 
 **Актор:** Пользователь (зарег.)
 **Страница:** /dashboard/settings
@@ -1779,12 +1922,18 @@ Report rate limiting: 10/час на пользователя (pending implement
 - NotificationPref model: userId + type (unique), enabled boolean
 - Типы: new_message, price_drop, moderation_update
 
+**Responsive:**
+- Mobile (430px): настройки в одну колонку, toggles для уведомлений, кнопка удаления аккаунта внизу
+- Desktop (>768px): настройки в секциях (язык, уведомления, аккаунт), sidebar навигация
+
 > [FLAG QA 2026-04-06]: Notification preferences хранятся только в localStorage — backend не знает об opt-out при отправке email. Нужны поля в User model.
 > [FLAG Product 2026-04-06]: Удаление аккаунта (AC-03): нет User.deletedAt, нет DELETE /api/users/me, нет cron. Выделено в отдельный UC-34 (Task #2261).
 
 ---
 
 ## UC-31: Homepage / Landing Page
+
+> Note (CMO): No H1 tag, hero CTA copy, trust signals (listing/user counts), or value proposition text specified. Homepage conversion-critical.
 
 **Актор:** Гость или Пользователь
 **Страница:** /
@@ -1808,12 +1957,18 @@ Report rate limiting: 10/час на пользователя (pending implement
 - AC-04: Выбор города → фильтрует "Свежие объявления"
 - AC-05: CTA "Подать объявление" → логин для гостя → UC-02 для авторизованного
 
+**Responsive:**
+- Mobile (430px): поисковая строка на всю ширину, категории в горизонтальном скролле, объявления в одну колонку
+- Desktop (>768px): hero-секция с поиском, категории в grid, объявления в сетке 3-4 колонки
+
 > [FLAG QA 2026-04-06]: Homepage implementation gap — нет блока категорий (grid), нет топ-объявлений, нет footer, city selector не подключён к фильтрации. Task #2232.
 > [FLAG Product 2026-04-06]: CTA "Подать объявление" на главной отсутствует — критично для конверсии.
 
 ---
 
 ## UC-32: Category Names i18n
+
+> Note (Detail Guardian): Contradiction — UC body says nameKa/nameRu/nameEn fields missing, but Prisma schema and UC-14 confirm they exist. Verify and remove false flag.
 
 **Актор:** SYSTEM / Администратор
 **Цель:** Отображать названия категорий на языке пользователя
@@ -1831,6 +1986,29 @@ Report rate limiting: 10/час на пользователя (pending implement
 - AC-04: Seed data содержит переводы для всех категорий
 
 > [FLAG Backend 2026-04-06]: Category model в Prisma имеет только 'name'. nameKa/nameRu/nameEn отсутствуют. Admin panel не имеет формы для переводов. Task #2233.
+
+**UI States:**
+- **Loading:** Spinner при загрузке категорий с переводами
+- **Empty:** Категория без перевода → отображается nameEn или name (fallback)
+- **Error (admin):** "nameEn is required" — при сохранении категории без английского названия
+- **Success (admin):** Категория сохранена с переводами на 3 языка
+
+**Валидация:**
+- nameKa: string, optional (fallback to nameEn)
+- nameRu: string, optional (fallback to nameEn)
+- nameEn: string, required (используется как fallback для всех языков)
+- Все names: trim, max 100 символов
+
+**Edge cases:**
+- Язык пользователя = ka, перевод nameKa отсутствует → показывается nameEn
+- Seed data: все базовые категории должны иметь переводы на 3 языка
+- Смена языка на frontend → категории перерендериваются с новыми названиями (без reload)
+
+**Responsive:**
+- Mobile (430px): категории в списке с локализованными названиями
+- Desktop (>768px): admin-форма с тремя полями названия рядом (KA / RU / EN)
+
+**Уведомления:** N/A — системная настройка, уведомления не отправляются.
 
 ---
 
@@ -1900,6 +2078,10 @@ Report rate limiting: 10/час на пользователя (pending implement
 - Cascade порядок: Message → ThreadParticipant → Thread (orphaned) → Notification → Favorite → Promotion → Payment → Report → OtpCode → Session → ListingPhoto → Listing → User
 - Также чистит связанные данные: Favorites/Notifications/Promotions/Reports/Threads для listing-ов пользователя
 
+**Responsive:**
+- Mobile (430px): кнопка "Удалить аккаунт" внизу настроек, confirmation dialog на полный экран
+- Desktop (>768px): кнопка "Удалить аккаунт" в секции "Опасная зона" настроек, модальный confirmation dialog
+
 ---
 
 ## UC-35: Listing Expiry Cron Verification
@@ -1925,6 +2107,8 @@ Report rate limiting: 10/час на пользователя (pending implement
 
 ## UC-36: Blocked User Listings Deactivation
 
+> Note (Architect): Conflict with UC-27 — this UC uses query filter approach (reversible), UC-27 bulk updates listings to removed (irreversible). Pick one approach.
+
 **Актор:** SYSTEM
 **Цель:** Скрыть объявления заблокированного пользователя из поиска
 **Приоритет:** p2 (Task #2263)
@@ -1941,6 +2125,25 @@ Report rate limiting: 10/час на пользователя (pending implement
 - AC-01: Реализован через Query Filter (не bulk update) — обратимо
 - AC-02: GET /api/listings JOIN users WHERE user.role != 'blocked'
 - AC-03: Прямой доступ GET /api/listings/:id для заблокированного продавца → 410 или скрыт
+
+**UI States:**
+- **Loading:** N/A — фильтрация прозрачна для пользователя
+- **Empty:** Если все объявления в результатах принадлежат заблокированным → стандартное "Ничего не найдено"
+- **Error (410):** "This listing is no longer available" — при прямом доступе к объявлению заблокированного продавца
+- **Success:** Объявления заблокированных пользователей не отображаются в результатах поиска
+
+**Валидация:**
+- Query filter добавляется на уровне Prisma query (не middleware) — `user: { role: { not: 'blocked' } }`
+- Прямой доступ: GET /api/listings/:id проверяет user.role после получения объявления
+
+**Edge cases:**
+- Разблокировка пользователя → объявления мгновенно появляются в поиске (query filter подход)
+- Кэширование: если фронт кэширует результаты поиска — заблокированные объявления могут отображаться до инвалидации кэша
+- Favorites: объявления заблокированного продавца в избранном → серая карточка "Продавец заблокирован"
+
+**Responsive:**
+- Mobile (430px): N/A — системная фильтрация, не влияет на UI layout
+- Desktop (>768px): N/A — системная фильтрация, не влияет на UI layout
 
 ---
 
@@ -1963,6 +2166,10 @@ Report rate limiting: 10/час на пользователя (pending implement
 - AC-02: Privacy policy содержит: данные которые собираем, срок хранения, права пользователя, контакт DPO
 - AC-03: Terms содержат: запрещённый контент, политику блокировки, disclaimer
 - AC-04: Все тексты переведены на KA/RU/EN
+
+**Responsive:**
+- Mobile (430px): статические страницы на полную ширину с читаемой типографикой, якорные ссылки для навигации
+- Desktop (>768px): центрированный контент max-width 800px, sidebar с оглавлением
 
 > [CREATED 2026-04-06]: Required for launch. Legal review needed before go-live.
 
@@ -1989,6 +2196,10 @@ Report rate limiting: 10/час на пользователя (pending implement
 - Browser closed during payment → orphaned pending Payment record
 - session_id already used → show success anyway (idempotent)
 - Backend returns 404 for session_id → show "payment pending" (async webhook)
+
+**Responsive:**
+- Mobile (430px): success/cancel страницы на полный экран, крупная иконка + текст + CTA кнопка на всю ширину
+- Desktop (>768px): центрированная карточка с иконкой, текстом и кнопками
 
 **Acceptance criteria:**
 - AC-01: Success page validates that promotion became active
@@ -2017,6 +2228,8 @@ Report rate limiting: 10/час на пользователя (pending implement
 - AC-03: Action logged to audit log
 - AC-04: No cascade effects (listing remains active, only promotion badge removed)
 
+**Responsive:** N/A — system/background process, no UI.
+
 > [CREATED 2026-04-06]: Cron already implemented in code. UC documents expected behavior.
 
 ---
@@ -2037,7 +2250,234 @@ Report rate limiting: 10/час на пользователя (pending implement
 - AC-02: Email contains: listing title, expiry date, renew link
 - AC-03: Only sent for active listings (not draft/removed)
 
+**Responsive:** N/A — system/background process, no UI.
+
 > [CREATED 2026-04-06]: Cron already implemented in code. Add deduplication check (don't send multiple times).
+
+---
+
+## UC-43: Pay-Per-Listing (Quota Exceeded Slot Purchase)
+
+> **Story:** As a free-tier seller who has reached the category listing quota,
+> I want to purchase an additional listing slot,
+> so that I can post more listings without upgrading to Premium.
+
+**Актор:** Пользователь (зарег., free tier)
+**Страница:** /listings/create → quota error → Stripe checkout → /listings/slot-success
+**Цель:** Купить дополнительный слот объявления в категории с исчерпанной квотой
+
+**Гость видит:** Редирект на /login
+
+**Основной поток:**
+1. Пользователь создаёт объявление → POST /api/listings → 402 { error: "Quota exceeded", allowPaid: true }
+2. UI показывает экран "Квота исчерпана" с опцией купить слот
+3. Пользователь нажимает "Купить слот" → POST /api/promotions/purchase-listing-slot { listingId, categoryId }
+4. Система создаёт Stripe Checkout session → возвращает { url: "stripe.com/..." }
+5. Пользователь проходит оплату на Stripe
+6. Stripe webhook → UC-38 обрабатывает → listing slot активирован
+7. Редирект на /listings/slot-success
+
+**Альтернативные потоки:**
+- Пользователь закрывает Stripe → редирект обратно на /listings/create (черновик сохранён)
+- Оплата не прошла → Stripe возвращает ошибку → toast "Оплата не прошла, попробуйте снова"
+- Пользователь — Premium → квота не применяется, этот UC не срабатывает
+
+**Бизнес-правила:**
+- Только для free tier пользователей у которых freeListingQuota исчерпана в данной категории
+- Цена: paidListingPrice из Category модели (задаётся в /admin/categories)
+- Слот действует 30 дней (один листинг в данной категории)
+- Premium пользователи: неограниченные объявления, этот flow не показывается
+
+**Валидация:**
+- listingId: uuid, обязателен, must belong to authenticated user
+- categoryId: uuid, обязателен
+- Проверка: пользователь не Premium (иначе 400 "Premium users have unlimited listings")
+
+**Данные (поля):**
+- Экран quota exceeded: category name, current count, quota limit, slot price (из Category.paidListingPrice)
+- Экран success: listing title, expiry date, link to /listings/[id]
+
+**Переходы:**
+- /listings/create → quota 402 → stripe checkout → /listings/slot-success
+- /listings/slot-success → кнопка "Просмотреть объявление" → /listings/[id]
+
+**UI States:**
+- **Loading:** Spinner при создании Stripe session
+- **Empty:** N/A
+- **Error:** "Оплата не прошла. Попробуйте снова." + [Повторить]
+- **Success:** /listings/slot-success — "Слот куплен! Ваше объявление будет опубликовано."
+
+**Edge cases:**
+- Двойной клик "Купить" → второй запрос игнорируется (кнопка disabled)
+- Webhook приходит до редиректа → listing уже active при открытии success страницы
+- Webhook не приходит (Stripe delay) → success страница показывается, listing активируется позже
+
+**Responsive:**
+- Mobile (430px): bottom sheet с описанием квоты + CTA кнопка на всю ширину
+- Desktop (>768px): модальное окно с информацией и кнопкой оплаты
+
+**Out of Scope:**
+- Subscription upgrade → UC-16
+- Regular promotions (Top/Highlight) → UC-08
+
+**Acceptance criteria:**
+
+**AC-01: Quota exceeded → offer slot**
+- Given: free user has 5/5 active listings in Electronics
+- When: tries to create 6th listing in Electronics
+- Then: POST /api/listings returns 402, UI shows "Quota exceeded" with "Buy slot" button and price
+
+**AC-02: Slot purchase flow**
+- Given: user clicks "Buy slot"
+- When: POST /api/promotions/purchase-listing-slot succeeds
+- Then: redirected to Stripe Checkout page
+
+**AC-03: Success page**
+- Given: payment completed
+- When: Stripe webhook processed (UC-38)
+- Then: user arrives at /listings/slot-success, sees listing title and "View listing" button
+
+**API Contract:**
+```
+GET /api/categories/:id/quota
+→ 200: { categoryId, used: 3, limit: 5, canPost: false, paidSlotPrice: 5.00, currency: "GEL" }
+
+POST /api/promotions/purchase-listing-slot
+body: { listingId: string, categoryId: string }
+→ 200: { checkoutUrl: "https://checkout.stripe.com/..." }
+→ 400: { error: "Premium users have unlimited listings" }
+→ 402: { error: "Payment required", paidSlotPrice: 5.00 }
+```
+
+**Эндпоинты:**
+- GET /api/categories/:id/quota [auth: yes]
+- POST /api/promotions/purchase-listing-slot [auth: yes]
+- POST /api/stripe-webhook (UC-44) — обрабатывает checkout.session.completed
+
+---
+
+## UC-44: Stripe Webhook Processing (Idempotency + Signature Verification)
+
+**Актор:** SYSTEM (Stripe)
+**Страница:** POST /api/stripe-webhook
+**Цель:** Безопасно обработать события оплаты от Stripe с гарантией однократной обработки
+
+**Основной поток:**
+1. Stripe отправляет POST /api/stripe-webhook с Stripe-Signature header
+2. Система верифицирует подпись: stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET)
+3. Проверяет идемпотентность: Payment.externalId уже существует → skip (уже обработан)
+4. Обрабатывает событие по типу:
+   - checkout.session.completed → активирует Promotion или listing slot
+   - payment_intent.payment_failed → логирует, опционально уведомляет пользователя
+5. Возвращает 200 (Stripe не будет ретраить)
+
+**Альтернативные потоки:**
+- Подпись невалидна → 400 (Stripe логирует как failed delivery)
+- Неизвестный event type → 200 (acknowledge без обработки)
+- DB error при обработке → 500 (Stripe ретраит до 72 часов)
+- Дубликат event ID → skip + 200 (idempotency)
+
+**Бизнес-правила:**
+- НИКОГДА не обрабатывать без верификации подписи
+- Идемпотентность через Payment.externalId (Stripe event ID или session ID)
+- Все обработанные события логируются в AuditLog
+
+**Acceptance criteria:**
+
+**AC-01: Signature verification**
+- Given: webhook request without valid Stripe-Signature
+- When: POST /api/stripe-webhook received
+- Then: 400 returned, event not processed, logged as security warning
+
+**AC-02: Idempotency**
+- Given: same Stripe event delivered twice (Stripe retry)
+- When: second POST /api/stripe-webhook with same event ID
+- Then: 200 returned, payment/promotion NOT duplicated
+
+**AC-03: Promotion activation**
+- Given: valid checkout.session.completed for promotion purchase
+- When: webhook processed
+- Then: Promotion record created, listing gets isPromoted=true, user gets notification
+
+**API Contract:**
+```
+POST /api/stripe-webhook
+Headers: Stripe-Signature: t=...,v1=...
+Body: raw Stripe event JSON
+→ 200: { received: true }
+→ 400: { error: "Invalid signature" }
+```
+
+**Эндпоинты:** POST /api/stripe-webhook [auth: no, signature-verified]
+
+**Responsive:** N/A — system/background process, no UI.
+
+---
+
+## UC-45: SEO & Social Sharing
+
+**Актор:** SYSTEM (search engines, social platforms)
+**Страница:** /, /listings/[id], /users/[id], /search, /listings
+**Цель:** Обеспечить индексируемость и корректный вид при шаринге в соцсетях
+
+**Основной поток:**
+1. Search engine crawls /listings/[id]
+2. Page returns: unique <title>, <meta description>, OG tags, structured data (JSON-LD Product)
+3. Social platform renders link preview from OG tags
+
+**Acceptance criteria:**
+
+**AC-01: Listing page SEO**
+- Given: GET /listings/[id]
+- When: rendered
+- Then: <title> = "{title} — {price} {currency} | Avito Georgia", OG:image = first photo, structured data = Product JSON-LD
+
+**AC-02: Homepage SEO**
+- Given: GET /
+- When: rendered
+- Then: <title> = "Avito Georgia — объявления в Грузии", OG:description = "Покупай и продавай в Тбилиси, Батуми и других городах Грузии"
+
+**AC-03: Canonical URLs**
+- Given: filtered search /search?category=electronics&city=tbilisi
+- When: rendered
+- Then: canonical = /search?category=electronics&city=tbilisi (no pagination duplicates)
+
+**SEO Specs:**
+- /: title "Avito Georgia — объявления в Грузии", description dynamic (top categories + listing count)
+- /listings/[id]: title "{title} — {price} в {city}", description first 150 chars of description, OG:image first photo
+- /users/[id]: title "{name} — продавец на Avito Georgia", description "{N} активных объявлений"
+- /search: title "Объявления{category?} в {city?} — Avito Georgia"
+- Structured data: Product (listings), Person (sellers)
+- Robots: index all public pages, noindex /admin/*, /dashboard/*
+
+**Responsive:** N/A — metadata, not UI.
+
+---
+
+## UC-46: Health Check & Monitoring
+
+**Актор:** SYSTEM (load balancer, uptime monitor)
+**Страница:** GET /api/health
+**Цель:** Подтвердить что сервис работает
+
+**Основной поток:**
+1. Load balancer / monitoring service sends GET /api/health
+2. API checks: DB connection, Redis connection
+3. Returns 200 with status details
+
+**Acceptance criteria:**
+
+**AC-01:** GET /api/health → 200 { status: "ok", db: "ok", redis: "ok|degraded" }
+**AC-02:** If DB unreachable → 503 { status: "error", db: "error" }
+
+**API Contract:**
+```
+GET /api/health
+→ 200: { status: "ok", db: "ok", redis: "ok" }
+→ 503: { status: "error", db: "error", message: "..." }
+```
+
+**Responsive:** N/A — no UI.
 
 <!-- COLLEGIUM_DECISIONS
 {
@@ -2056,6 +2496,12 @@ Report rate limiting: 10/час на пользователя (pending implement
   "UC-22": { "decision": "document_rejected", "reason": "rejected state and inactive transitions already in code, need UC documentation", "date": "2026-04-06", "by": "user" },
   "Q-report-rate-limit": { "decision": "mvp", "reason": "user selected: add to MVP", "date": "2026-04-06", "by": "user" },
   "Q-session-invalidation": { "decision": "mvp", "reason": "user selected: add to MVP", "date": "2026-04-06", "by": "user" },
-  "Q-magic-bytes": { "decision": "mvp", "reason": "user selected: add to MVP", "date": "2026-04-06", "by": "user" }
+  "Q-magic-bytes": { "decision": "mvp", "reason": "user selected: add to MVP", "date": "2026-04-06", "by": "user" },
+  "UC-43": {"decision": "approved", "reason": "pay-per-listing monetization — user confirmed", "date": "2026-04-09", "by": "user"},
+  "UC-44": {"decision": "auto", "reason": "stripe webhook security — critical", "date": "2026-04-09", "by": "collegium"},
+  "UC-45": {"decision": "auto", "reason": "SEO — marketing requirement", "date": "2026-04-09", "by": "collegium"},
+  "UC-46": {"decision": "auto", "reason": "health check — ops requirement", "date": "2026-04-09", "by": "collegium"},
+  "Q-detail-block-autofill": {"decision": "approved", "reason": "auto-fill all BLOCK and FLAG UCs", "date": "2026-04-09", "by": "user"},
+  "Q-security-webhook-session": {"decision": "fix-both", "reason": "both security gaps to be fixed", "date": "2026-04-09", "by": "user"}
 }
 -->
