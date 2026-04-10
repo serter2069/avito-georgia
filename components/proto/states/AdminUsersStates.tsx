@@ -1,15 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockUsers } from '../../../constants/protoMockData';
 
 function UserRow({ user }: { user: typeof mockUsers[0] }) {
   const isBlocked = user.status === 'blocked';
   return (
     <View className="flex-row items-center gap-3 py-3 border-b border-border">
-      <ProtoPlaceholderImage type="avatar" width={40} height={40} style={{ borderRadius: 20 }} />
+      <Image source={{ uri: `https://picsum.photos/seed/${user.id}/40/40` }} style={{ width: 40, height: 40, borderRadius: 20 }} />
       <View className="flex-1">
         <View className="flex-row items-center gap-2">
           <Text className="text-text-primary text-sm font-semibold">{user.name}</Text>

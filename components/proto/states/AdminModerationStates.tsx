@@ -1,8 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings } from '../../../constants/protoMockData';
 
 const pendingListings = mockListings.filter(l => l.status === 'pending_moderation');
@@ -10,7 +9,7 @@ const pendingListings = mockListings.filter(l => l.status === 'pending_moderatio
 function ModerationCard({ listing, onReject }: { listing: typeof mockListings[0]; onReject: () => void }) {
   return (
     <View className="border border-border rounded-lg overflow-hidden mb-3">
-      <ProtoPlaceholderImage type="photo" width="100%" height={128} />
+      <Image source={{ uri: `https://picsum.photos/seed/${listing.id}/400/128` }} style={{ width: '100%', height: 128 }} />
       <View className="p-3">
         <Text className="text-text-primary text-sm font-semibold mb-1">{listing.title}</Text>
         <Text className="text-text-muted text-xs mb-3">{listing.city} | {listing.category}</Text>
