@@ -65,6 +65,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/onboarding',
     stateCount: 4,
     nav: 'none',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Заполняется только при первом входе. Поля: имя, город (выбор из 6: Тбилиси, Батуми, Кутаиси, Рустави, Гори, Зугдиди), номер телефона (опционально). Пропустить нельзя' }],
   },
 
@@ -76,6 +78,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/',
     stateCount: 5,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Главная страница — лента свежих объявлений + категории. Гость видит CTA \'Разместить объявление\'. Авторизованный пользователь видит персонализированные рекомендации. Показывать объявления без авторизации' }],
   },
   {
@@ -85,6 +89,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/listings',
     stateCount: 4,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Список объявлений с фильтрами: город, категория, цена (min/max), сортировка. Пагинация 20 штук. Поддержка переключения лист/сетка' }],
   },
   {
@@ -94,6 +100,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/listings/[id]',
     stateCount: 5,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Детальная страница объявления. Телефон скрыт до нажатия \'Показать номер\' (записывается в аналитику). Кнопка \'Написать\' открывает чат. Кнопка \'Пожаловаться\' для авторизованных' }],
   },
   {
@@ -103,6 +111,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/search',
     stateCount: 5,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Поиск по ключевым словам + фильтры. Результаты в реальном времени (debounce 300ms). История поиска сохраняется локально. Переключение в режим карты' }],
   },
   {
@@ -112,6 +122,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/search?view=map',
     stateCount: 1,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Карта объявлений — Leaflet + OpenStreetMap. Кластеризация маркеров. Клик по маркеру — превью объявления. Фильтры работают с картой' }],
   },
   {
@@ -121,6 +133,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/users/[id]',
     stateCount: 3,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Публичный профиль продавца: фото, имя, город, рейтинг, все активные объявления. Кнопка \'Написать продавцу\'' }],
   },
 
