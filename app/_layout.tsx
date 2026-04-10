@@ -1,7 +1,7 @@
 import '../global.css';
 import '../lib/i18n';
 import { initI18n } from '../lib/i18n';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -33,9 +33,11 @@ function useProtectedRoute() {
   const isReady = useAuthStore((s) => s.isReady);
   const segments = useSegments();
   const router = useRouter();
+  const isRedirectingRef = useRef(false);
 
   useEffect(() => {
     if (!isReady) return;
+    if (isRedirectingRef.current) return;
 
     const inAuthGroup = segments[0] === '(auth)';
     const inOnboarding = segments[0] === 'onboarding';
@@ -54,15 +56,21 @@ function useProtectedRoute() {
     const inDashboard = segments[0] === 'dashboard' || segments[0] === 'my';
 
     if (!user && inDashboard) {
+      isRedirectingRef.current = true;
       router.replace('/(auth)');
     } else if (!user && inOnboarding) {
       // Unauthenticated users cannot access onboarding
+      isRedirectingRef.current = true;
       router.replace('/(auth)');
     } else if (user && inAuthGroup) {
+      isRedirectingRef.current = true;
       router.replace('/');
     } else if (user && inOnboarding && user.isOnboarded === true) {
       // Already onboarded users skip the onboarding screen
+      isRedirectingRef.current = true;
       router.replace('/');
+    } else {
+      isRedirectingRef.current = false;
     }
   }, [user, isReady, segments]);
 }
