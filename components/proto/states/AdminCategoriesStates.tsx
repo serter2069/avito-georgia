@@ -1,7 +1,69 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useState } from 'react';
 import { StateSection } from '../StateSection';
-import { mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
+import { mockCategoryIcons } from '../../../constants/protoMockData';
+
+const categoryTree = [
+  {
+    id: 'transport',
+    name: 'Транспорт',
+    children: ['Легковые автомобили', 'Мотоциклы', 'Грузовики', 'Запчасти'],
+  },
+  {
+    id: 'realty',
+    name: 'Недвижимость',
+    children: ['Квартиры', 'Дома', 'Коммерческая', 'Земля'],
+  },
+  {
+    id: 'electronics',
+    name: 'Электроника',
+    children: ['Телефоны', 'Ноутбуки', 'Планшеты', 'Аксессуары'],
+  },
+  { id: 'clothes', name: 'Одежда', children: ['Мужская', 'Женская', 'Детская'] },
+  { id: 'furniture', name: 'Мебель', children: ['Диваны', 'Столы', 'Кровати'] },
+  { id: 'services', name: 'Услуги', children: ['Ремонт', 'Уборка', 'Красота'] },
+  { id: 'jobs', name: 'Работа', children: ['Полная занятость', 'Подработка', 'Удалённо'] },
+  { id: 'kids', name: 'Детское', children: ['Игрушки', 'Одежда', 'Коляски'] },
+  { id: 'animals', name: 'Животные', children: ['Собаки', 'Кошки', 'Птицы'] },
+  { id: 'hobby', name: 'Хобби', children: ['Спорт', 'Книги', 'Музыка'] },
+];
+
+function CategoryRow({ cat }: { cat: typeof categoryTree[0] }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <View className="border-b border-border">
+      <TouchableOpacity className="flex-row items-center gap-3 py-3" onPress={() => setExpanded(!expanded)}>
+        <View className="w-10 h-10 bg-surface rounded-lg items-center justify-center">
+          <Feather name={mockCategoryIcons[cat.name] as any || 'grid'} size={18} color="#0A7B8A" />
+        </View>
+        <Text className="text-text-primary text-base flex-1">{cat.name}</Text>
+        <Text className="text-text-muted text-xs mr-2">{cat.children.length}</Text>
+        <Feather name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color="#6A8898" />
+        <TouchableOpacity className="ml-2">
+          <Feather name="edit-2" size={18} color="#6A8898" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+      {expanded && (
+        <View className="pl-14 pb-2">
+          {cat.children.map((child) => (
+            <View key={child} className="flex-row items-center gap-2 py-1.5">
+              <View className="w-1.5 h-1.5 bg-border rounded-full" />
+              <Text className="text-text-secondary text-sm flex-1">{child}</Text>
+              <TouchableOpacity className="mr-3">
+                <Feather name="edit-2" size={14} color="#6A8898" />
+              </TouchableOpacity>
+            </View>
+          ))}
+          <TouchableOpacity className="flex-row items-center gap-2 py-1.5 mt-1">
+            <Feather name="plus" size={14} color="#0A7B8A" />
+            <Text className="text-primary text-sm">Добавить подкатегорию</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  );
+}
 
 export default function AdminCategoriesStates() {
   return (
@@ -9,21 +71,13 @@ export default function AdminCategoriesStates() {
       <StateSection title="default">
         <View>
           <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-text-primary text-lg font-bold">Категории ({mockCategories.length})</Text>
+            <Text className="text-text-primary text-lg font-bold">Категории ({categoryTree.length})</Text>
             <TouchableOpacity className="bg-primary px-3 py-2 rounded-lg">
               <Text className="text-white text-sm font-semibold">Добавить</Text>
             </TouchableOpacity>
           </View>
-          {mockCategories.map((cat) => (
-            <View key={cat} className="flex-row items-center gap-3 py-3 border-b border-border">
-              <View className="w-10 h-10 bg-surface rounded-lg items-center justify-center">
-                <Feather name={mockCategoryIcons[cat] as any || 'grid'} size={18} color="#0A7B8A" />
-              </View>
-              <Text className="text-text-primary text-base flex-1">{cat}</Text>
-              <TouchableOpacity>
-                <Feather name="edit-2" size={18} color="#6A8898" />
-              </TouchableOpacity>
-            </View>
+          {categoryTree.map((cat) => (
+            <CategoryRow key={cat.id} cat={cat} />
           ))}
         </View>
       </StateSection>

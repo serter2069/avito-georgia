@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockPayments, mockUsers } from '../../../constants/protoMockData';
@@ -14,7 +14,13 @@ export default function AdminPaymentsStates() {
     <View>
       <StateSection title="default">
         <View>
-          <Text className="text-text-primary text-lg font-bold mb-4">Платежи</Text>
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="text-text-primary text-lg font-bold">Платежи</Text>
+            <TouchableOpacity className="flex-row items-center gap-2 border border-border px-3 py-2 rounded-lg">
+              <Feather name="download" size={14} color="#0A7B8A" />
+              <Text className="text-primary text-sm font-medium">CSV</Text>
+            </TouchableOpacity>
+          </View>
           {mockPayments.map((p, i) => {
             const badge = statusBadge[p.status];
             const user = mockUsers[i % mockUsers.length];
