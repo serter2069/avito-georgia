@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
 export default function OnboardingStates() {
@@ -21,7 +21,7 @@ export default function OnboardingStates() {
             <Text className="text-text-secondary text-sm mb-1 font-medium">Город</Text>
             <TouchableOpacity className="bg-surface border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
               <Text className="text-text-muted">Выберите город</Text>
-              <Ionicons name="chevron-down" size={20} color="#6A8898" />
+              <Feather name="chevron-down" size={20} color="#6A8898" />
             </TouchableOpacity>
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
@@ -48,7 +48,7 @@ export default function OnboardingStates() {
             <Text className="text-text-secondary text-sm mb-1 font-medium">Город</Text>
             <TouchableOpacity className="bg-surface border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
               <Text className="text-text-muted">Выберите город</Text>
-              <Ionicons name="chevron-down" size={20} color="#6A8898" />
+              <Feather name="chevron-down" size={20} color="#6A8898" />
             </TouchableOpacity>
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center opacity-50">
@@ -90,7 +90,7 @@ export default function OnboardingStates() {
             <View className="bg-surface border border-border-focus rounded-lg overflow-hidden">
               <View className="px-4 py-3 flex-row items-center justify-between">
                 <Text className="text-text-muted">Выберите город</Text>
-                <Ionicons name="chevron-up" size={20} color="#0A7B8A" />
+                <Feather name="chevron-up" size={20} color="#0A7B8A" />
               </View>
               {['Тбилиси', 'Батуми', 'Кутаиси', 'Рустави', 'Гори', 'Зугдиди'].map((city) => (
                 <TouchableOpacity key={city} className="px-4 py-3 border-t border-border">

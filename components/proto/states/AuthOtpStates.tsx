@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { StateSection } from '../StateSection';
 
@@ -17,13 +18,25 @@ function OtpInputRow({ values, hasError }: { values: string[]; hasError?: boolea
 }
 
 export default function AuthOtpStates() {
+  const [otp, setOtp] = useState('');
+
   return (
     <View>
       <StateSection title="default">
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
-          <OtpInputRow values={['', '', '', '', '', '']} />
+          <View className="w-full mb-4">
+            <TextInput
+              className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary text-center text-xl tracking-widest"
+              placeholder="000000"
+              placeholderTextColor="#6A8898"
+              value={otp}
+              onChangeText={(v) => setOtp(v.replace(/[^0-9]/g, '').slice(0, 6))}
+              keyboardType="number-pad"
+              maxLength={6}
+            />
+          </View>
           <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center mb-3">
             <Text className="text-white font-semibold text-base">Подтвердить</Text>
           </TouchableOpacity>
