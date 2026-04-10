@@ -42,7 +42,7 @@ export default function EditListingStates() {
               </View>
             </View>
           </View>
-          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
+          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center" onPress={() => {}}>
             <Text className="text-white font-semibold">Сохранить</Text>
           </TouchableOpacity>
         </View>
@@ -70,7 +70,7 @@ export default function EditListingStates() {
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} onChangeText={setTitle} />
           </View>
-          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
+          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center" onPress={() => {}}>
             <Text className="text-white font-semibold">Сохранить</Text>
           </TouchableOpacity>
         </View>

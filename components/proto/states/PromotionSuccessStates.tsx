@@ -23,10 +23,10 @@ export default function PromotionSuccessStates() {
               {shared ? 'Ссылка скопирована' : 'Поделиться объявлением'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-3 w-full items-center">
+          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-3 w-full items-center" onPress={() => {}}>
             <Text className="text-white font-semibold">Мои объявления</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="border border-primary py-3 px-6 rounded-lg mt-3 w-full items-center">
+          <TouchableOpacity className="border border-primary py-3 px-6 rounded-lg mt-3 w-full items-center" onPress={() => {}}>
             <Text className="text-primary font-semibold">На главную</Text>
           </TouchableOpacity>
         </View>

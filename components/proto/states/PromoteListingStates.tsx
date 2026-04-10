@@ -41,12 +41,12 @@ export default function PromoteListingStates() {
       <StateSection title="default">
         <View className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Продвижение объявления</Text>
-          <PackageCard name="TOP" price="15 GEL" description="Поднятие в топ на 3 дня" icon="trending-up" color="#0A7B8A"
-            selected={selected === 'top'} onSelect={() => setSelected(selected === 'top' ? null : 'top')} />
-          <PackageCard name="VIP" price="25 GEL" description="VIP-метка + топ на 7 дней" icon="star" color="#f59e0b"
-            selected={selected === 'vip'} onSelect={() => setSelected(selected === 'vip' ? null : 'vip')} />
-          <PackageCard name="Выделение" price="10 GEL" description="Цветная рамка на 5 дней" icon="award" color="#2E7D30"
-            selected={selected === 'highlight'} onSelect={() => setSelected(selected === 'highlight' ? null : 'highlight')} />
+          <PackageCard name="1 день" price="2.99 GEL" description="Поднятие в топ на 1 день" icon="trending-up" color="#0A7B8A"
+            selected={selected === 'day1'} onSelect={() => setSelected(selected === 'day1' ? null : 'day1')} />
+          <PackageCard name="3 дня" price="6.99 GEL" description="Поднятие в топ на 3 дня" icon="star" color="#f59e0b"
+            selected={selected === 'day3'} onSelect={() => setSelected(selected === 'day3' ? null : 'day3')} />
+          <PackageCard name="7 дней" price="12.99 GEL" description="Поднятие в топ на 7 дней" icon="award" color="#2E7D30"
+            selected={selected === 'day7'} onSelect={() => setSelected(selected === 'day7' ? null : 'day7')} />
         </View>
       </StateSection>
 
