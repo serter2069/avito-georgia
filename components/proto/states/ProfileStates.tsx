@@ -11,7 +11,7 @@ export default function ProfileStates() {
   const [name, setName] = useState('Ираклий Гоциридзе');
 
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View className="py-4 items-center">
           <View className="relative mb-4">

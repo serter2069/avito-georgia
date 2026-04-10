@@ -27,7 +27,7 @@ export default function ListingDetailStates() {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
 
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           <Image source={{ uri: 'https://picsum.photos/seed/listing-detail/800/600' }} style={{ width: '100%', height: 192, borderRadius: 8, marginBottom: 16 }} />

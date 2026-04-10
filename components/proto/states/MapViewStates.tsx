@@ -4,7 +4,7 @@ import { StateSection } from '../StateSection';
 
 export default function MapViewStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="coming_soon">
         <View className="py-16 items-center">
           <Feather name="map" size={64} color="#6A8898" />

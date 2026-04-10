@@ -46,7 +46,7 @@ function ListingRow({ title, price, currency, city, isPromoted, seed }: { title:
 
 export default function ListingsFeedStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           <FilterBar />

@@ -3,7 +3,7 @@ import { StateSection } from '../StateSection';
 
 export default function PrivacyStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View className="py-4">
           <Text className="text-primary text-2xl font-bold mb-4">Политика конфиденциальности</Text>

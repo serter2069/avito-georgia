@@ -5,7 +5,7 @@ import { mockListings } from '../../../constants/protoMockData';
 
 export default function FavoritesStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View className="flex-row flex-wrap gap-3">
           {mockListings.filter(l => l.status === 'active').slice(0, 4).map((l) => (

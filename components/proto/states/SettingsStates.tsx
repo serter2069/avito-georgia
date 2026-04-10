@@ -21,7 +21,7 @@ export default function SettingsStates() {
   };
 
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View className="py-4">
           <View className="mb-4">

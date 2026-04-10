@@ -8,7 +8,7 @@ export default function SearchStates() {
   const [query, setQuery] = useState('');
 
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           <TextInput

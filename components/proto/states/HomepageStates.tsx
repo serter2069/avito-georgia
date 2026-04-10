@@ -33,7 +33,7 @@ export default function HomepageStates() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           <View className="flex-row items-center gap-2 mb-4">

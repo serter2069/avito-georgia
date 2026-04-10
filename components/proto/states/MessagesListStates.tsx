@@ -26,7 +26,7 @@ function ThreadRow({ msg }: { msg: typeof mockMessages[0] }) {
 
 export default function MessagesListStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           {mockMessages.map((msg) => (
