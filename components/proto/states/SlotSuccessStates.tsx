@@ -45,7 +45,7 @@ export default function SlotSuccessStates() {
           </View>
           <Text className="text-text-primary text-xl font-bold mt-4">Ошибка</Text>
           <Text className="text-text-muted text-sm mt-2 text-center">Не удалось активировать слот. Попробуйте позже.</Text>
-          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-6 w-full items-center">
+          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-6 w-full items-center" onPress={() => {}}>
             <Text className="text-white font-semibold">К объявлению</Text>
           </TouchableOpacity>
         </View>

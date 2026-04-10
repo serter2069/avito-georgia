@@ -26,10 +26,10 @@ function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
         </View>
         <Text className="text-primary font-bold text-sm">{listing.price ? `${listing.price.toLocaleString()} ${listing.currency}` : 'Договорная'}</Text>
         <View className="flex-row gap-2 mt-2">
-          <TouchableOpacity className="border border-primary px-2 py-1 rounded-md">
+          <TouchableOpacity className="border border-primary px-2 py-1 rounded-md" onPress={() => {}}>
             <Text className="text-primary text-xs font-medium">Редактировать</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="border border-error px-2 py-1 rounded-md">
+          <TouchableOpacity className="border border-error px-2 py-1 rounded-md" onPress={() => {}}>
             <Text className="text-error text-xs font-medium">Удалить</Text>
           </TouchableOpacity>
         </View>
@@ -55,7 +55,7 @@ export default function MyListingsStates() {
           {mockListings.slice(0, 4).map((l) => (
             <CompactListingCard key={l.id} listing={l} />
           ))}
-          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center mt-2">
+          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center mt-2" onPress={() => {}}>
             <Text className="text-white font-semibold">Создать объявление</Text>
           </TouchableOpacity>
         </View>
@@ -66,7 +66,7 @@ export default function MyListingsStates() {
           <Feather name="file-text" size={48} color="#6A8898" />
           <Text className="text-text-primary text-lg font-semibold mt-3">У вас пока нет объявлений</Text>
           <Text className="text-text-muted text-sm mt-1">Создайте первое объявление!</Text>
-          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-4">
+          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-4" onPress={() => {}}>
             <Text className="text-white font-semibold">Создать объявление</Text>
           </TouchableOpacity>
         </View>
@@ -83,10 +83,10 @@ export default function MyListingsStates() {
           <Text className="text-text-primary text-lg font-bold mb-2">Удалить объявление?</Text>
           <Text className="text-text-muted text-sm mb-4">Объявление "Toyota Camry 2020" будет удалено. Это действие нельзя отменить.</Text>
           <View className="flex-row gap-3">
-            <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center">
+            <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center" onPress={() => {}}>
               <Text className="text-text-secondary font-semibold">Отмена</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="flex-1 bg-error py-3 rounded-lg items-center">
+            <TouchableOpacity className="flex-1 bg-error py-3 rounded-lg items-center" onPress={() => {}}>
               <Text className="text-white font-semibold">Удалить</Text>
             </TouchableOpacity>
           </View>
