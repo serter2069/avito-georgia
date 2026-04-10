@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Platform, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import { protoPages, protoGroups } from '../../constants/protoRegistry';
+import { pageRegistry, pageGroups } from '../../constants/pageRegistry';
 import { ProtoCard } from '../../components/proto/ProtoCard';
 
 export default function ProtoIndex() {
@@ -16,7 +16,7 @@ export default function ProtoIndex() {
   const contentWidth = width - padding * 2;
   const cardWidth = cols > 1 ? (contentWidth - (cols - 1) * gap) / cols : contentWidth;
 
-  const totalStates = protoPages.reduce((s, p) => s + p.states.length, 0);
+  const totalStates = pageRegistry.reduce((s, p) => s + p.stateCount, 0);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#E8F4F8' }}>
@@ -25,7 +25,7 @@ export default function ProtoIndex() {
         <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
           <Text style={{ color: '#fff', fontSize: 24, fontWeight: '700' }}>Proto Showcase</Text>
           <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>
-            {protoPages.length} pages / {totalStates} states
+            {pageRegistry.length} pages / {totalStates} states
           </Text>
         </View>
       </View>
@@ -34,8 +34,8 @@ export default function ProtoIndex() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 48, paddingHorizontal: padding, paddingTop: 24 }}
       >
-        {protoGroups.map((group) => {
-          const pages = protoPages.filter((p) => p.group === group);
+        {pageGroups.map((group) => {
+          const pages = pageRegistry.filter((p) => p.group === group);
           return (
             <View key={group} style={{ marginBottom: 32 }}>
               {/* Section header */}

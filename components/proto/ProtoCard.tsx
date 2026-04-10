@@ -1,19 +1,22 @@
 import { View, Text, TouchableOpacity, Platform } from 'react-native';
-import type { ProtoPage } from '../../constants/protoRegistry';
+import type { PageEntry } from '../../constants/pageRegistry';
 
 interface ProtoCardProps {
-  page: ProtoPage;
+  page: PageEntry;
   onPress: () => void;
 }
 
-const roleBadgeColors: Record<string, { bg: string; text: string }> = {
-  PUBLIC: { bg: 'rgba(16,185,129,0.15)', text: '#059669' },
-  USER: { bg: 'rgba(10,123,138,0.15)', text: '#0A7B8A' },
-  ADMIN: { bg: 'rgba(239,68,68,0.15)', text: '#DC2626' },
+const navBadgeColors: Record<string, { bg: string; text: string }> = {
+  none: { bg: 'rgba(156,163,175,0.2)', text: '#6B7280' },
+  public: { bg: 'rgba(16,185,129,0.15)', text: '#059669' },
+  auth: { bg: 'rgba(10,123,138,0.15)', text: '#0A7B8A' },
+  client: { bg: 'rgba(10,123,138,0.15)', text: '#0A7B8A' },
+  admin: { bg: 'rgba(239,68,68,0.15)', text: '#DC2626' },
 };
 
 export function ProtoCard({ page, onPress }: ProtoCardProps) {
   const isWeb = Platform.OS === 'web';
+  const navColors = navBadgeColors[page.nav] || navBadgeColors.client;
 
   return (
     <TouchableOpacity
@@ -41,23 +44,16 @@ export function ProtoCard({ page, onPress }: ProtoCardProps) {
         e.currentTarget.style.transform = 'translateY(0)';
       } : undefined}
     >
-      {/* Top row: PAG-ID + role badges */}
+      {/* Top row: page id + nav badge */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <Text style={{ color: '#6A8898', fontSize: 11, fontWeight: '500' }}>{page.pagId}</Text>
-        <View style={{ flexDirection: 'row', gap: 4 }}>
-          {page.roles.map((role) => {
-            const colors = roleBadgeColors[role] || roleBadgeColors.USER;
-            return (
-              <View key={role} style={{
-                backgroundColor: colors.bg,
-                paddingHorizontal: 8,
-                paddingVertical: 2,
-                borderRadius: 99,
-              }}>
-                <Text style={{ color: colors.text, fontSize: 10, fontWeight: '600' }}>{role}</Text>
-              </View>
-            );
-          })}
+        <Text style={{ color: '#6A8898', fontSize: 11, fontWeight: '500' }}>{page.id}</Text>
+        <View style={{
+          backgroundColor: navColors.bg,
+          paddingHorizontal: 8,
+          paddingVertical: 2,
+          borderRadius: 99,
+        }}>
+          <Text style={{ color: navColors.text, fontSize: 10, fontWeight: '600' }}>{page.nav}</Text>
         </View>
       </View>
 
@@ -66,10 +62,17 @@ export function ProtoCard({ page, onPress }: ProtoCardProps) {
         {page.title}
       </Text>
 
-      {/* States count */}
-      <Text style={{ color: '#6A8898', fontSize: 12 }}>
-        {page.states.length} states
-      </Text>
+      {/* States count + notes indicator */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={{ color: '#6A8898', fontSize: 12 }}>
+          {page.stateCount} states
+        </Text>
+        {page.notes && page.notes.length > 0 && (
+          <Text style={{ color: '#9CA3AF', fontSize: 11 }}>
+            {page.notes.length} note{page.notes.length > 1 ? 's' : ''}
+          </Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 }

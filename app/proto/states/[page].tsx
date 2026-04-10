@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { getProtoPage } from '../../../constants/protoRegistry';
+import { getPage } from '../../../constants/pageRegistry';
 import { ProtoLayout } from '../../../components/proto/ProtoLayout';
 
 import AuthEmailStates from '../../../components/proto/states/AuthEmailStates';
@@ -80,7 +80,7 @@ const stateComponents: Record<string, React.ComponentType> = {
 
 export default function ProtoStatesPage() {
   const { page } = useLocalSearchParams<{ page: string }>();
-  const protoPage = getProtoPage(page);
+  const protoPage = getPage(page);
 
   if (!protoPage) {
     return (
@@ -101,7 +101,7 @@ export default function ProtoStatesPage() {
   }
 
   return (
-    <ProtoLayout pagId={protoPage.pagId} title={protoPage.title} route={protoPage.route}>
+    <ProtoLayout pagId={protoPage.id} title={protoPage.title} route={protoPage.route}>
       <Component />
     </ProtoLayout>
   );
