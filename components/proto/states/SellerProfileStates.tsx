@@ -7,7 +7,7 @@ const seller = mockUsers[0];
 
 export default function SellerProfileStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           <View className="items-center mb-4">

@@ -6,7 +6,7 @@ export default function AuthEmailStates() {
   const [email, setEmail] = useState('');
 
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>

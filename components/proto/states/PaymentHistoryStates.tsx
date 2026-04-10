@@ -29,7 +29,7 @@ function PaymentRow({ p }: { p: typeof mockPayments[0] }) {
 
 export default function PaymentHistoryStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           {mockPayments.map((p) => (

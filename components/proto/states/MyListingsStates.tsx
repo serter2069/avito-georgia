@@ -39,7 +39,7 @@ function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
 
 export default function MyListingsStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View>
           <View className="flex-row gap-2 mb-4 flex-wrap">

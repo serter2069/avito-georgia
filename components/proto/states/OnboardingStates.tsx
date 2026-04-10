@@ -4,7 +4,7 @@ import { StateSection } from '../StateSection';
 
 export default function OnboardingStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="default">
         <View className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>

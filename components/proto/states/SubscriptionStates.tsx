@@ -23,7 +23,7 @@ function PlanCard({ name, price, features, isPrimary }: { name: string; price: s
 
 export default function SubscriptionStates() {
   return (
-    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
+    <View>
       <StateSection title="no_subscription">
         <View className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Выберите план</Text>
