@@ -105,7 +105,7 @@ export default function ProtoStatesPage() {
   }
 
   return (
-    <ProtoLayout pagId={protoPage.id} title={protoPage.title} route={protoPage.route}>
+    <ProtoLayout pagId={protoPage.id} title={protoPage.title} route={protoPage.route} nav={protoPage.nav}>
       <Component />
     </ProtoLayout>
   );
