@@ -5,6 +5,7 @@ import { getPage } from '../../../constants/pageRegistry';
 import { ProtoLayout } from '../../../components/proto/ProtoLayout';
 
 import OverviewStates from '../../../components/proto/states/OverviewStates';
+import BrandStates from '../../../components/proto/states/BrandStates';
 import AuthEmailStates from '../../../components/proto/states/AuthEmailStates';
 import AuthOtpStates from '../../../components/proto/states/AuthOtpStates';
 import OnboardingStates from '../../../components/proto/states/OnboardingStates';
@@ -43,6 +44,7 @@ import TermsStates from '../../../components/proto/states/TermsStates';
 
 const stateComponents: Record<string, React.ComponentType> = {
   'overview': OverviewStates,
+  'brand': BrandStates,
   'auth-email': AuthEmailStates,
   'auth-otp': AuthOtpStates,
   'onboarding': OnboardingStates,
