@@ -47,6 +47,9 @@ export default function MessagesListStates() {
           <Feather name="message-circle" size={48} color="#6A8898" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет сообщений</Text>
           <Text className="text-text-muted text-sm mt-1">Начните общение с продавцами</Text>
+          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-4" onPress={() => {}}>
+            <Text className="text-white font-semibold">Найти объявления</Text>
+          </TouchableOpacity>
         </View>
       </StateSection>
     </View>
