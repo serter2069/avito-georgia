@@ -34,6 +34,13 @@ export default function ProfileStates() {
                   <Text className="text-text-primary">{user.phone}</Text>
                 </View>
               </View>
+              <View className="w-full mb-4">
+                <Text className="text-text-secondary text-sm mb-1 font-medium">Email</Text>
+                <View className="bg-surface/50 border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
+                  <Text className="text-text-muted">{user.email}</Text>
+                  <Feather name="lock" size={14} color="#6A8898" />
+                </View>
+              </View>
               <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center" onPress={() => setIsEditing(true)}>
                 <Text className="text-white font-semibold">Редактировать</Text>
               </TouchableOpacity>
@@ -52,6 +59,13 @@ export default function ProfileStates() {
               <View className="w-full mb-4">
                 <Text className="text-text-secondary text-sm mb-1 font-medium">Телефон</Text>
                 <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={user.phone} editable={false} />
+              </View>
+              <View className="w-full mb-4">
+                <Text className="text-text-secondary text-sm mb-1 font-medium">Email</Text>
+                <View className="bg-surface/50 border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
+                  <Text className="text-text-muted">{user.email}</Text>
+                  <Feather name="lock" size={14} color="#6A8898" />
+                </View>
               </View>
               <View className="flex-row gap-3">
                 <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center" onPress={() => setIsEditing(false)}>

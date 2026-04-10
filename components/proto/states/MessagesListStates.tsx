@@ -4,18 +4,19 @@ import { StateSection } from '../StateSection';
 import { mockMessages } from '../../../constants/protoMockData';
 
 function ThreadRow({ msg }: { msg: typeof mockMessages[0] }) {
+  const hasUnread = msg.unreadCount > 0;
   return (
-    <TouchableOpacity className="flex-row items-center gap-3 py-3 border-b border-border">
+    <TouchableOpacity className={`flex-row items-center gap-3 py-3 border-b border-border ${hasUnread ? 'bg-primary/5' : ''}`}>
       <Image source={{ uri: 'https://picsum.photos/seed/user1/48/48' }} style={{ width: 48, height: 48, borderRadius: 24 }} />
       <View className="flex-1">
         <View className="flex-row items-center justify-between mb-0.5">
-          <Text className="text-text-primary text-sm font-semibold">{msg.senderName}</Text>
+          <Text className={`text-text-primary text-sm ${hasUnread ? 'font-bold' : 'font-semibold'}`}>{msg.senderName}</Text>
           <Text className="text-text-muted text-xs">{new Date(msg.createdAt).toLocaleDateString('ru')}</Text>
         </View>
         <Text className="text-text-muted text-xs mb-0.5">{msg.listingTitle}</Text>
-        <Text className="text-text-secondary text-sm" numberOfLines={1}>{msg.lastMessage}</Text>
+        <Text className={`text-sm ${hasUnread ? 'text-text-primary font-medium' : 'text-text-secondary'}`} numberOfLines={1}>{msg.lastMessage}</Text>
       </View>
-      {msg.unreadCount > 0 && (
+      {hasUnread && (
         <View className="bg-primary w-5 h-5 rounded-full items-center justify-center">
           <Text className="text-white text-[10px] font-bold">{msg.unreadCount}</Text>
         </View>

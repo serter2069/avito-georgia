@@ -5,8 +5,13 @@ import { mockNotifications } from '../../../constants/protoMockData';
 
 const iconMap: Record<string, string> = {
   message: 'message-circle',
+  new_message: 'message-circle',
   moderation: 'check-circle',
+  moderation_update: 'check-circle',
   promotion: 'bell',
+  favorite_added: 'heart',
+  listing_expiring: 'clock',
+  price_drop: 'tag',
   system: 'info',
 };
 

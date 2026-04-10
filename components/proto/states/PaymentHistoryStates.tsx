@@ -1,4 +1,5 @@
-import { View, Text, ActivityIndicator } from 'react-native';
+import { useState } from 'react';
+import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockPayments } from '../../../constants/protoMockData';
@@ -8,6 +9,12 @@ const statusBadge: Record<string, { bg: string; text: string; label: string }> =
   failed: { bg: 'bg-error/20', text: 'text-error', label: 'Ошибка' },
   pending: { bg: 'bg-warning/20', text: 'text-warning', label: 'Ожидание' },
 };
+
+const TYPE_FILTERS = [
+  { key: 'all', label: 'Все' },
+  { key: 'subscription', label: 'Premium' },
+  { key: 'promotion', label: 'Boost' },
+] as const;
 
 function PaymentRow({ p }: { p: typeof mockPayments[0] }) {
   const badge = statusBadge[p.status];
@@ -27,12 +34,32 @@ function PaymentRow({ p }: { p: typeof mockPayments[0] }) {
   );
 }
 
+function FilterBar({ active, onSelect }: { active: string; onSelect: (k: string) => void }) {
+  return (
+    <View className="flex-row gap-2 mb-3">
+      {TYPE_FILTERS.map((f) => (
+        <TouchableOpacity
+          key={f.key}
+          onPress={() => onSelect(f.key)}
+          className={`px-3 py-1.5 rounded-full border ${active === f.key ? 'bg-primary border-primary' : 'border-border'}`}
+        >
+          <Text className={`text-xs font-medium ${active === f.key ? 'text-white' : 'text-text-secondary'}`}>{f.label}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
 export default function PaymentHistoryStates() {
+  const [filter, setFilter] = useState<string>('all');
+  const filtered = filter === 'all' ? mockPayments : mockPayments.filter((p) => p.type === filter);
+
   return (
     <View>
       <StateSection title="default">
         <View>
-          {mockPayments.map((p) => (
+          <FilterBar active={filter} onSelect={setFilter} />
+          {filtered.map((p) => (
             <PaymentRow key={p.id} p={p} />
           ))}
         </View>
