@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
@@ -17,6 +17,8 @@ interface UserItem {
 
 export default function AdminUsers() {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -123,19 +125,25 @@ export default function AdminUsers() {
                       {user.name && (
                         <Text className="text-text-muted text-xs">{user.email}</Text>
                       )}
+                      {isDesktop && user.phone && (
+                        <Text className="text-text-muted text-xs">{user.phone}</Text>
+                      )}
                     </View>
                     <View className={`px-2 py-0.5 rounded ${badge.bg}`}>
                       <Text className={`text-xs font-medium ${badge.text}`}>{badge.label}</Text>
                     </View>
                   </View>
 
-                  <View className="flex-row justify-between items-center mb-3">
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: isDesktop ? 'nowrap' : 'wrap', gap: isDesktop ? 16 : 4 }}>
                     <Text className="text-text-muted text-xs">
                       {t('registrationDate')}: {formatDate(user.createdAt)}
                     </Text>
                     <Text className="text-text-secondary text-xs">
                       {t('listingsCount')}: {user._count.listings}
                     </Text>
+                    {isDesktop && (
+                      <Text className="text-text-muted text-xs">ID: {user.id.slice(0, 8)}...</Text>
+                    )}
                   </View>
 
                   {user.role !== 'admin' && (
