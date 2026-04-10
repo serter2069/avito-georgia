@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
 
@@ -17,11 +17,11 @@ export default function AdminCategoriesStates() {
           {mockCategories.map((cat) => (
             <View key={cat} className="flex-row items-center gap-3 py-3 border-b border-border">
               <View className="w-10 h-10 bg-surface rounded-lg items-center justify-center">
-                <Ionicons name={mockCategoryIcons[cat] as any || 'grid'} size={18} color="#0A7B8A" />
+                <Feather name={mockCategoryIcons[cat] as any || 'grid'} size={18} color="#0A7B8A" />
               </View>
               <Text className="text-text-primary text-base flex-1">{cat}</Text>
               <TouchableOpacity>
-                <Ionicons name="create-outline" size={18} color="#6A8898" />
+                <Feather name="edit-2" size={18} color="#6A8898" />
               </TouchableOpacity>
             </View>
           ))}

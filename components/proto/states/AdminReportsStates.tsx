@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockReports } from '../../../constants/protoMockData';
 
@@ -54,7 +54,7 @@ export default function AdminReportsStates() {
 
       <StateSection title="empty">
         <View className="py-16 items-center">
-          <Ionicons name="flag-outline" size={48} color="#6A8898" />
+          <Feather name="flag" size={48} color="#6A8898" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет жалоб</Text>
           <Text className="text-text-muted text-sm mt-1">Новые жалобы появятся здесь</Text>
         </View>

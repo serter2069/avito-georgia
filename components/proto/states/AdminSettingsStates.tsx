@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
 export default function AdminSettingsStates() {
@@ -52,7 +52,7 @@ export default function AdminSettingsStates() {
       <StateSection title="saved">
         <View className="py-4">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4">
-            <Ionicons name="checkmark-circle" size={24} color="#2E7D30" />
+            <Feather name="check-circle" size={24} color="#2E7D30" />
             <Text className="text-success text-sm font-medium">Настройки сохранены</Text>
           </View>
           <View className="mb-4">
