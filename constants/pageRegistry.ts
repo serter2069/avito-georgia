@@ -50,8 +50,10 @@ export const pageRegistry: PageEntry[] = [
     title: 'OTP Verification',
     group: 'Auth',
     route: '/(auth)/otp',
-    stateCount: 5,
+    stateCount: 6,
     nav: 'auth',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: '6-значный код вводится вручную. 3 попытки затем блокировка на 5 минут. Кнопка \'Отправить снова\' появляется через 60 секунд. Captcha после 2 неверных попыток' }],
   },
 

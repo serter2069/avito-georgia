@@ -67,6 +67,21 @@ export default function AuthOtpStates() {
         </View>
       </StateSection>
 
+      <StateSection title="blocked">
+        <View className="items-center py-8">
+          <Text className="text-text-primary text-xl font-bold mb-2">Слишком много попыток</Text>
+          <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
+          <View className="w-full bg-error/10 border border-error rounded-lg p-4 mb-6 items-center">
+            <Text className="text-error font-semibold text-base mb-1">Аккаунт временно заблокирован</Text>
+            <Text className="text-error text-sm text-center">Вы исчерпали 3 попытки. Попробуйте снова через</Text>
+            <Text className="text-error text-2xl font-bold mt-2">4:58</Text>
+          </View>
+          <TouchableOpacity className="bg-primary/30 w-full py-3 rounded-lg items-center" disabled>
+            <Text className="text-white font-semibold text-base">Подтвердить</Text>
+          </TouchableOpacity>
+        </View>
+      </StateSection>
+
       <StateSection title="resend_available">
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
