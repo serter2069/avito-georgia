@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
 
 function CategoryChip({ name, icon, selected, onPress }: { name: string; icon: string; selected?: boolean; onPress?: () => void }) {
@@ -16,10 +15,10 @@ function CategoryChip({ name, icon, selected, onPress }: { name: string; icon: s
   );
 }
 
-function ListingCardMini({ title, price, currency, city }: { title: string; price: number | null; currency: string; city: string }) {
+function ListingCardMini({ title, price, currency, city, seed }: { title: string; price: number | null; currency: string; city: string; seed: string }) {
   return (
     <View className="bg-white border border-border rounded-lg overflow-hidden mb-3">
-      <ProtoPlaceholderImage type="photo" width="100%" height={128} />
+      <Image source={{ uri: `https://picsum.photos/seed/${seed}/400/300` }} style={{ width: '100%', height: 128 }} />
       <View className="p-3">
         <Text className="text-text-primary text-sm font-semibold mb-1" numberOfLines={1}>{title}</Text>
         <Text className="text-primary font-bold text-base">{price ? `${price.toLocaleString()} ${currency}` : 'Договорная'}</Text>
@@ -34,7 +33,7 @@ export default function HomepageStates() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           <View className="flex-row items-center gap-2 mb-4">
@@ -64,9 +63,9 @@ export default function HomepageStates() {
           </View>
           <Text className="text-text-primary text-lg font-bold mb-3">Последние объявления</Text>
           <View className="flex-row flex-wrap gap-3">
-            {mockListings.filter(l => l.status === 'active').slice(0, 6).map((l) => (
+            {mockListings.filter(l => l.status === 'active').slice(0, 6).map((l, idx) => (
               <View key={l.id} className="w-[48%]">
-                <ListingCardMini title={l.title} price={l.price} currency={l.currency} city={l.city} />
+                <ListingCardMini title={l.title} price={l.price} currency={l.currency} city={l.city} seed={`listing${idx + 1}`} />
               </View>
             ))}
           </View>

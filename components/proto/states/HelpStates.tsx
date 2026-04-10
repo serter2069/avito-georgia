@@ -20,7 +20,7 @@ function FaqItem({ question, answer, expanded }: { question: string; answer: str
 
 export default function HelpStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View className="py-4">
           <Text className="text-primary text-2xl font-bold mb-2">Помощь</Text>
