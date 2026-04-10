@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
 export default function EditListingStates() {
+  const [title, setTitle] = useState('Toyota Camry 2020, 2.5L');
+  const [description, setDescription] = useState('Отличное состояние, один владелец.');
+  const [price, setPrice] = useState('28500');
+
   return (
     <View>
       <StateSection title="loading_data">
@@ -16,15 +21,15 @@ export default function EditListingStates() {
         <View className="py-4">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="Toyota Camry 2020, 2.5L" editable={false} />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} onChangeText={setTitle} />
           </View>
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Описание</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary h-24" value="Отличное состояние, один владелец." editable={false} multiline />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary h-24" value={description} onChangeText={setDescription} multiline />
           </View>
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Цена</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="28500" editable={false} />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={price} onChangeText={setPrice} keyboardType="numeric" />
           </View>
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Фотографии</Text>
@@ -47,7 +52,7 @@ export default function EditListingStates() {
         <View className="py-4 opacity-50">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="Toyota Camry 2020, 2.5L" editable={false} />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} editable={false} />
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
             <ActivityIndicator color="#ffffff" />
@@ -63,7 +68,7 @@ export default function EditListingStates() {
           </View>
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="Toyota Camry 2020, 2.5L" editable={false} />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} onChangeText={setTitle} />
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
             <Text className="text-white font-semibold">Сохранить</Text>

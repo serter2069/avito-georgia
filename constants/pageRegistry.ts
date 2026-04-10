@@ -146,6 +146,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/my/listings',
     stateCount: 4,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Управление своими объявлениями. Фильтры: активные / на модерации / архив / черновики. Кнопки: редактировать, архивировать, удалить, продвинуть' }],
   },
   {
@@ -155,6 +157,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/my/listings/create',
     stateCount: 3,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: '4 шага: 1-категория, 2-город, 3-детали (название/цена/описание/телефон), 4-фото (до 10 штук, макс 5МБ каждое). Можно сохранить как черновик' }],
   },
   {
@@ -164,6 +168,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/my/listings/[id]/edit',
     stateCount: 4,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Редактирование существующего объявления. Нельзя менять категорию после публикации. Новые фото добавляются к существующим' }],
   },
 
@@ -382,6 +388,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/about',
     stateCount: 1,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'О проекте: миссия, команда, контакты, версия приложения' }],
   },
   {
@@ -391,6 +399,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/help',
     stateCount: 2,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'FAQ и справка. Категории вопросов. Поиск по FAQ. Кнопка обратной связи' }],
   },
   {
@@ -400,6 +410,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/privacy',
     stateCount: 1,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Политика конфиденциальности. Только текст. На трёх языках' }],
   },
   {
@@ -409,6 +421,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/terms',
     stateCount: 1,
     nav: 'public',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Пользовательское соглашение. Только текст. На трёх языках' }],
   },
 ];

@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings } from '../../../constants/protoMockData';
@@ -38,14 +39,16 @@ function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
 }
 
 export default function MyListingsStates() {
+  const [activeTab, setActiveTab] = useState(0);
+
   return (
     <View>
       <StateSection title="default">
         <View>
           <View className="flex-row gap-2 mb-4 flex-wrap">
             {['Активные', 'На модерации', 'Черновики', 'Проданные', 'Удалённые'].map((tab, i) => (
-              <TouchableOpacity key={tab} className={`px-3 py-2 rounded-lg ${i === 0 ? 'bg-primary' : 'bg-surface border border-border'}`}>
-                <Text className={`text-sm font-medium ${i === 0 ? 'text-white' : 'text-text-secondary'}`}>{tab}</Text>
+              <TouchableOpacity key={tab} onPress={() => setActiveTab(i)} className={`px-3 py-2 rounded-lg ${i === activeTab ? 'bg-primary' : 'bg-surface border border-border'}`}>
+                <Text className={`text-sm font-medium ${i === activeTab ? 'text-white' : 'text-text-secondary'}`}>{tab}</Text>
               </TouchableOpacity>
             ))}
           </View>
