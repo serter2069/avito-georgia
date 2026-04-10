@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
 function PlanCard({ name, price, features, isPrimary }: { name: string; price: string; features: string[]; isPrimary?: boolean }) {
@@ -10,7 +10,7 @@ function PlanCard({ name, price, features, isPrimary }: { name: string; price: s
       <Text className="text-primary text-2xl font-bold my-2">{price}</Text>
       {features.map((f, i) => (
         <View key={i} className="flex-row items-center gap-2 mb-1">
-          <Ionicons name="checkmark" size={16} color="#2E7D30" />
+          <Feather name="check" size={16} color="#2E7D30" />
           <Text className="text-text-secondary text-sm">{f}</Text>
         </View>
       ))}

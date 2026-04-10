@@ -1,5 +1,5 @@
 import { View, Text, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockPayments } from '../../../constants/protoMockData';
 
@@ -46,7 +46,7 @@ export default function PaymentHistoryStates() {
 
       <StateSection title="empty">
         <View className="py-16 items-center">
-          <Ionicons name="card-outline" size={48} color="#6A8898" />
+          <Feather name="credit-card" size={48} color="#6A8898" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет платежей</Text>
           <Text className="text-text-muted text-sm mt-1">История ваших платежей будет здесь</Text>
         </View>

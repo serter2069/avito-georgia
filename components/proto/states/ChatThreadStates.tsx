@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockChatMessages } from '../../../constants/protoMockData';
 
@@ -15,21 +16,32 @@ function ChatBubble({ text, isOwn, time }: { text: string; isOwn: boolean; time:
 }
 
 export default function ChatThreadStates() {
+  const [message, setMessage] = useState('');
+
   return (
     <View>
       <StateSection title="default">
         <View>
           <View className="bg-surface rounded-lg p-3 mb-4 flex-row items-center gap-2">
-            <Ionicons name="car" size={16} color="#0A7B8A" />
+            <Feather name="tag" size={16} color="#0A7B8A" />
             <Text className="text-text-secondary text-sm font-medium">Toyota Camry 2020</Text>
           </View>
           {mockChatMessages.map((msg) => (
             <ChatBubble key={msg.id} text={msg.text} isOwn={msg.isOwn} time={new Date(msg.createdAt).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })} />
           ))}
           <View className="flex-row items-center gap-2 mt-4 border-t border-border pt-3">
-            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Сообщение..." placeholderTextColor="#6A8898" editable={false} />
-            <TouchableOpacity className="bg-primary p-3 rounded-lg">
-              <Ionicons name="send" size={20} color="#fff" />
+            <TextInput
+              className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
+              placeholder="Сообщение..."
+              placeholderTextColor="#6A8898"
+              value={message}
+              onChangeText={setMessage}
+            />
+            <TouchableOpacity
+              className={`p-3 rounded-lg ${message.length > 0 ? 'bg-primary' : 'bg-border'}`}
+              disabled={message.length === 0}
+            >
+              <Feather name="send" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -43,12 +55,21 @@ export default function ChatThreadStates() {
 
       <StateSection title="empty">
         <View className="py-12 items-center">
-          <Ionicons name="chatbubble-outline" size={48} color="#6A8898" />
+          <Feather name="message-circle" size={48} color="#6A8898" />
           <Text className="text-text-muted text-sm mt-3">Начните диалог</Text>
           <View className="flex-row items-center gap-2 mt-6 w-full">
-            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Сообщение..." placeholderTextColor="#6A8898" editable={false} />
-            <TouchableOpacity className="bg-primary p-3 rounded-lg">
-              <Ionicons name="send" size={20} color="#fff" />
+            <TextInput
+              className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
+              placeholder="Сообщение..."
+              placeholderTextColor="#6A8898"
+              value={message}
+              onChangeText={setMessage}
+            />
+            <TouchableOpacity
+              className={`p-3 rounded-lg ${message.length > 0 ? 'bg-primary' : 'bg-border'}`}
+              disabled={message.length === 0}
+            >
+              <Feather name="send" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
