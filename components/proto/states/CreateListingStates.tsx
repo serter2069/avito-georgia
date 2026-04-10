@@ -21,6 +21,9 @@ function Stepper({ current }: { current: number }) {
 
 export default function CreateListingStates() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [formTitle, setFormTitle] = useState('Toyota Camry 2020, 2.5L');
+  const [formDescription, setFormDescription] = useState('Отличное состояние, один владелец, полная история обслуживания.');
+  const [formPrice, setFormPrice] = useState('28500');
 
   return (
     <View>
@@ -72,16 +75,16 @@ export default function CreateListingStates() {
               <Text className="text-text-primary text-lg font-bold mb-4">Детали объявления</Text>
               <View className="mb-4">
                 <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
-                <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="Toyota Camry 2020, 2.5L" editable={false} />
+                <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={formTitle} onChangeText={setFormTitle} />
               </View>
               <View className="mb-4">
                 <Text className="text-text-secondary text-sm mb-1 font-medium">Описание</Text>
-                <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary h-24" value="Отличное состояние, один владелец, полная история обслуживания." editable={false} multiline />
+                <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary h-24" value={formDescription} onChangeText={setFormDescription} multiline />
               </View>
               <View className="flex-row gap-3 mb-4">
                 <View className="flex-1">
                   <Text className="text-text-secondary text-sm mb-1 font-medium">Цена</Text>
-                  <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="28500" editable={false} keyboardType="numeric" />
+                  <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={formPrice} onChangeText={setFormPrice} keyboardType="numeric" />
                 </View>
                 <View className="w-24">
                   <Text className="text-text-secondary text-sm mb-1 font-medium">Валюта</Text>

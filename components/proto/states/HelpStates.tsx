@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { StateSection } from '../StateSection';
 import { mockFaqItems } from '../../../constants/protoMockData';
 
-function FaqItem({ question, answer, expanded }: { question: string; answer: string; expanded?: boolean }) {
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [expanded, setExpanded] = useState(false);
   return (
     <View className="border-b border-border">
-      <TouchableOpacity className="flex-row items-center justify-between py-4">
+      <TouchableOpacity className="flex-row items-center justify-between py-4" onPress={() => setExpanded(!expanded)}>
         <Text className="text-text-primary text-base font-medium flex-1 mr-2">{question}</Text>
         <Feather name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color="#6A8898" />
       </TouchableOpacity>
@@ -36,7 +37,7 @@ export default function HelpStates() {
           <Text className="text-primary text-2xl font-bold mb-2">Помощь</Text>
           <Text className="text-text-muted text-sm mb-6">Часто задаваемые вопросы</Text>
           {mockFaqItems.map((item, i) => (
-            <FaqItem key={i} question={item.question} answer={item.answer} expanded={i === 0} />
+            <FaqItem key={i} question={item.question} answer={item.answer} />
           ))}
         </View>
       </StateSection>
