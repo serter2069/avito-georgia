@@ -62,6 +62,25 @@ export default function PromoteListingStates() {
           <Text className="text-text-muted text-sm mt-3">Обработка платежа...</Text>
         </View>
       </StateSection>
+
+      <StateSection title="error">
+        <View className="py-12 items-center px-4">
+          <View className="w-16 h-16 rounded-full bg-error/10 items-center justify-center mb-2">
+            <Feather name="alert-circle" size={40} color="#ef4444" />
+          </View>
+          <Text className="text-text-primary text-xl font-bold mt-4">Ошибка оплаты</Text>
+          <Text className="text-text-muted text-sm mt-2 text-center">Платёж отклонён банком. Проверьте данные карты и попробуйте снова.</Text>
+          <View className="bg-error/10 border border-error/30 rounded-lg p-3 mt-4 w-full">
+            <Text className="text-error text-xs text-center">Код ошибки: insufficient_funds</Text>
+          </View>
+          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-6 w-full items-center" onPress={() => {}}>
+            <Text className="text-white font-semibold">Попробовать снова</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="border border-border py-3 px-6 rounded-lg mt-3 w-full items-center" onPress={() => {}}>
+            <Text className="text-text-secondary font-semibold">Отмена</Text>
+          </TouchableOpacity>
+        </View>
+      </StateSection>
     </View>
   );
 }

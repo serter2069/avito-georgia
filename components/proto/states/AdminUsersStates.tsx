@@ -65,6 +65,17 @@ export default function AdminUsersStates() {
           <UserRow user={mockUsers[1]} />
         </View>
       </StateSection>
+
+      <StateSection title="empty_search">
+        <View>
+          <TextInput className="bg-surface border border-border-focus rounded-lg px-4 py-3 text-base mb-4 text-text-primary" value="qwerty123" editable={false} />
+          <View className="py-12 items-center">
+            <Feather name="user-x" size={48} color="#6A8898" />
+            <Text className="text-text-primary text-lg font-semibold mt-3">Пользователь не найден</Text>
+            <Text className="text-text-muted text-sm mt-1 text-center">Нет совпадений по запросу "qwerty123"</Text>
+          </View>
+        </View>
+      </StateSection>
     </View>
   );
 }
