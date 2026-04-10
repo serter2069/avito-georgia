@@ -37,6 +37,9 @@ export default function FavoritesStates() {
           <Feather name="heart" size={48} color="#6A8898" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет избранных</Text>
           <Text className="text-text-muted text-sm mt-1 text-center">Добавляйте объявления в избранное, чтобы не потерять</Text>
+          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-4" onPress={() => {}}>
+            <Text className="text-white font-semibold">Перейти в каталог</Text>
+          </TouchableOpacity>
         </View>
       </StateSection>
     </View>
