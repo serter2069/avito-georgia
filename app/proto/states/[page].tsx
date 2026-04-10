@@ -4,6 +4,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { getPage } from '../../../constants/pageRegistry';
 import { ProtoLayout } from '../../../components/proto/ProtoLayout';
 
+import OverviewStates from '../../../components/proto/states/OverviewStates';
 import AuthEmailStates from '../../../components/proto/states/AuthEmailStates';
 import AuthOtpStates from '../../../components/proto/states/AuthOtpStates';
 import OnboardingStates from '../../../components/proto/states/OnboardingStates';
@@ -41,6 +42,7 @@ import PrivacyStates from '../../../components/proto/states/PrivacyStates';
 import TermsStates from '../../../components/proto/states/TermsStates';
 
 const stateComponents: Record<string, React.ComponentType> = {
+  'overview': OverviewStates,
   'auth-email': AuthEmailStates,
   'auth-otp': AuthOtpStates,
   'onboarding': OnboardingStates,
