@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { StateSection } from '../StateSection';
 
 export default function AuthEmailStates() {
+  const [email, setEmail] = useState('');
+
   return (
     <View>
       <StateSection title="default">
@@ -14,7 +17,10 @@ export default function AuthEmailStates() {
               className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary text-base"
               placeholder="your@email.com"
               placeholderTextColor="#6A8898"
-              editable={false}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
           </View>
           <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center">

@@ -1,6 +1,8 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image, TextInput } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings, mockUsers } from '../../../constants/protoMockData';
 
 const listing = mockListings[0];
@@ -13,7 +15,7 @@ function ReviewCard({ name, text, rating }: { name: string; text: string; rating
         <Text className="text-text-primary text-sm font-semibold">{name}</Text>
         <View className="flex-row">
           {[1, 2, 3, 4, 5].map((i) => (
-            <Ionicons key={i} name={i <= rating ? 'star' : 'star-outline'} size={12} color="#f59e0b" />
+            <Feather key={i} name="star" size={12} color={i <= rating ? '#f59e0b' : '#D1D5DB'} />
           ))}
         </View>
       </View>
@@ -23,11 +25,13 @@ function ReviewCard({ name, text, rating }: { name: string; text: string; rating
 }
 
 export default function ListingDetailStates() {
+  const [phoneRevealed, setPhoneRevealed] = useState(false);
+
   return (
     <View>
       <StateSection title="default">
         <View>
-          <Image source={{ uri: listing.photos[0] }} className="w-full h-48 rounded-lg mb-4" resizeMode="cover" />
+          <ProtoPlaceholderImage type="photo" width="100%" height={192} style={{ borderRadius: 8, marginBottom: 16 }} />
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-primary font-bold text-2xl">{listing.price?.toLocaleString()} {listing.currency}</Text>
             <View className="bg-success/20 px-2 py-1 rounded-full">
@@ -36,32 +40,39 @@ export default function ListingDetailStates() {
           </View>
           <Text className="text-text-primary text-lg font-semibold mb-1">{listing.title}</Text>
           <View className="flex-row items-center gap-1 mb-4">
-            <Ionicons name="location-outline" size={14} color="#6A8898" />
+            <Feather name="map-pin" size={14} color="#6A8898" />
             <Text className="text-text-muted text-sm">{listing.city}</Text>
             <Text className="text-text-muted text-sm mx-1">|</Text>
-            <Ionicons name="eye-outline" size={14} color="#6A8898" />
+            <Feather name="eye" size={14} color="#6A8898" />
             <Text className="text-text-muted text-sm">{listing.views}</Text>
           </View>
           <View className="flex-row gap-2 mb-4">
             <TouchableOpacity className="flex-1 bg-primary py-3 rounded-lg items-center">
               <Text className="text-white font-semibold">Написать</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="border border-primary py-3 px-4 rounded-lg">
-              <Text className="text-primary font-semibold">Показать телефон</Text>
+            <TouchableOpacity
+              className="border border-primary py-3 px-4 rounded-lg"
+              onPress={() => setPhoneRevealed(true)}
+            >
+              {phoneRevealed ? (
+                <Text className="text-primary font-semibold">+995 555 12 34 56</Text>
+              ) : (
+                <Text className="text-primary font-semibold">Показать телефон</Text>
+              )}
             </TouchableOpacity>
           </View>
           <View className="flex-row gap-3 mb-4">
             <TouchableOpacity className="flex-row items-center gap-1">
-              <Ionicons name="heart-outline" size={20} color="#0A7B8A" />
+              <Feather name="heart" size={20} color="#0A7B8A" />
               <Text className="text-primary text-sm">В избранное</Text>
             </TouchableOpacity>
             <TouchableOpacity className="flex-row items-center gap-1">
-              <Ionicons name="share-outline" size={20} color="#0A7B8A" />
+              <Feather name="share-2" size={20} color="#0A7B8A" />
               <Text className="text-primary text-sm">Поделиться</Text>
             </TouchableOpacity>
           </View>
           <View className="flex-row items-center gap-3 bg-surface rounded-lg p-3 mb-4">
-            <Image source={{ uri: seller.avatar }} className="w-12 h-12 rounded-full" />
+            <ProtoPlaceholderImage type="avatar" width={48} height={48} />
             <View className="flex-1">
               <Text className="text-text-primary font-semibold">{seller.name}</Text>
               <Text className="text-text-muted text-xs">На сайте с {seller.createdAt}</Text>
@@ -74,7 +85,7 @@ export default function ListingDetailStates() {
           <Text className="text-text-primary text-base font-semibold mb-2 mt-4">Похожие объявления</Text>
           {mockListings.filter(l => l.id !== listing.id && l.status === 'active').slice(0, 3).map((l) => (
             <View key={l.id} className="flex-row bg-surface rounded-lg overflow-hidden mb-2">
-              <Image source={{ uri: l.photos[0] }} className="w-20 h-20" resizeMode="cover" />
+              <ProtoPlaceholderImage type="photo" width={80} height={80} />
               <View className="flex-1 p-2">
                 <Text className="text-text-primary text-sm font-medium" numberOfLines={1}>{l.title}</Text>
                 <Text className="text-primary font-bold text-sm">{l.price ? `${l.price.toLocaleString()} ${l.currency}` : 'Договорная'}</Text>
@@ -92,7 +103,7 @@ export default function ListingDetailStates() {
 
       <StateSection title="error_not_found">
         <View className="py-16 items-center">
-          <Ionicons name="alert-circle-outline" size={48} color="#C0392B" />
+          <Feather name="alert-circle" size={48} color="#C0392B" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Объявление не найдено</Text>
           <Text className="text-text-muted text-sm mt-1">Возможно, оно было удалено</Text>
         </View>
@@ -100,7 +111,7 @@ export default function ListingDetailStates() {
 
       <StateSection title="phone_revealed">
         <View className="bg-surface rounded-lg p-4 items-center">
-          <Ionicons name="call" size={24} color="#0A7B8A" />
+          <Feather name="phone" size={24} color="#0A7B8A" />
           <Text className="text-text-primary text-lg font-bold mt-2">+995 555 12 34 56</Text>
           <Text className="text-text-muted text-sm mt-1">{seller.name}</Text>
         </View>

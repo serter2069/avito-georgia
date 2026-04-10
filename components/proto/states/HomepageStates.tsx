@@ -1,23 +1,25 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
 
-function CategoryChip({ name, icon }: { name: string; icon: string }) {
+function CategoryChip({ name, icon, selected, onPress }: { name: string; icon: string; selected?: boolean; onPress?: () => void }) {
   return (
-    <TouchableOpacity className="items-center mr-4 mb-3">
-      <View className="w-14 h-14 bg-surface rounded-xl items-center justify-center mb-1">
-        <Ionicons name={icon as any} size={24} color="#0A7B8A" />
+    <TouchableOpacity className="items-center mr-4 mb-3" onPress={onPress}>
+      <View className={`w-14 h-14 rounded-xl items-center justify-center mb-1 ${selected ? 'bg-primary/20' : 'bg-surface'}`}>
+        <Feather name={icon as any} size={24} color="#0A7B8A" />
       </View>
       <Text className="text-text-muted text-[10px] text-center">{name}</Text>
     </TouchableOpacity>
   );
 }
 
-function ListingCardMini({ title, price, currency, city, photo }: { title: string; price: number | null; currency: string; city: string; photo: string }) {
+function ListingCardMini({ title, price, currency, city }: { title: string; price: number | null; currency: string; city: string }) {
   return (
     <View className="bg-white border border-border rounded-lg overflow-hidden mb-3">
-      <Image source={{ uri: photo }} className="w-full h-32" resizeMode="cover" />
+      <ProtoPlaceholderImage type="photo" width="100%" height={128} />
       <View className="p-3">
         <Text className="text-text-primary text-sm font-semibold mb-1" numberOfLines={1}>{title}</Text>
         <Text className="text-primary font-bold text-base">{price ? `${price.toLocaleString()} ${currency}` : 'Договорная'}</Text>
@@ -28,6 +30,9 @@ function ListingCardMini({ title, price, currency, city, photo }: { title: strin
 }
 
 export default function HomepageStates() {
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   return (
     <View>
       <StateSection title="default">
@@ -35,24 +40,33 @@ export default function HomepageStates() {
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
-              <Ionicons name="search" size={20} color="#fff" />
+              <Feather name="search" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity className="flex-row items-center gap-2 mb-4 bg-surface px-3 py-2 rounded-lg self-start">
-            <Ionicons name="location" size={16} color="#0A7B8A" />
-            <Text className="text-primary text-sm font-medium">Тбилиси</Text>
-            <Ionicons name="chevron-down" size={14} color="#0A7B8A" />
+          <TouchableOpacity
+            className="flex-row items-center gap-2 mb-4 bg-surface px-3 py-2 rounded-lg self-start"
+            onPress={() => setSelectedCity(selectedCity ? null : 'Тбилиси')}
+          >
+            <Feather name="map-pin" size={16} color="#0A7B8A" />
+            <Text className="text-primary text-sm font-medium">{selectedCity || 'Тбилиси'}</Text>
+            <Feather name="chevron-down" size={14} color="#0A7B8A" />
           </TouchableOpacity>
           <View className="flex-row flex-wrap mb-4">
             {mockCategories.map((cat) => (
-              <CategoryChip key={cat} name={cat} icon={mockCategoryIcons[cat] || 'grid'} />
+              <CategoryChip
+                key={cat}
+                name={cat}
+                icon={mockCategoryIcons[cat] || 'grid'}
+                selected={selectedCategory === cat}
+                onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+              />
             ))}
           </View>
           <Text className="text-text-primary text-lg font-bold mb-3">Последние объявления</Text>
           <View className="flex-row flex-wrap gap-3">
             {mockListings.filter(l => l.status === 'active').slice(0, 6).map((l) => (
               <View key={l.id} className="w-[48%]">
-                <ListingCardMini title={l.title} price={l.price} currency={l.currency} city={l.city} photo={l.photos[0]} />
+                <ListingCardMini title={l.title} price={l.price} currency={l.currency} city={l.city} />
               </View>
             ))}
           </View>
@@ -70,7 +84,7 @@ export default function HomepageStates() {
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
-              <Ionicons name="search" size={20} color="#fff" />
+              <Feather name="search" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
           <View className="py-12 items-center">
@@ -85,11 +99,11 @@ export default function HomepageStates() {
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
-              <Ionicons name="search" size={20} color="#fff" />
+              <Feather name="search" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
           <View className="py-12 items-center">
-            <Ionicons name="file-tray-outline" size={48} color="#6A8898" />
+            <Feather name="inbox" size={48} color="#6A8898" />
             <Text className="text-text-primary text-lg font-semibold mt-3">Пока нет объявлений</Text>
             <Text className="text-text-muted text-sm mt-1">Будьте первым, кто разместит!</Text>
           </View>
