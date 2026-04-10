@@ -120,7 +120,7 @@ export const pageRegistry: PageEntry[] = [
     title: 'Create Listing',
     group: 'My Listings',
     route: '/my/listings/create',
-    stateCount: 6,
+    stateCount: 3,
     nav: 'client',
     notes: [{ date: '2026-04-10', text: '4 шага: 1-категория, 2-город, 3-детали (название/цена/описание/телефон), 4-фото (до 10 штук, макс 5МБ каждое). Можно сохранить как черновик' }],
   },
