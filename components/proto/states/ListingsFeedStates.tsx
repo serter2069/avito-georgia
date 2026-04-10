@@ -1,9 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings } from '../../../constants/protoMockData';
 
-function FilterBar() {
+type SortOption = 'new' | 'price_asc' | 'price_desc';
+
+function FilterBar({ sort, onSort }: { sort: SortOption; onSort: (s: SortOption) => void }) {
   return (
     <View className="flex-row gap-2 mb-4 flex-wrap">
       <TouchableOpacity className="flex-row items-center bg-surface border border-border rounded-lg px-3 py-2">
@@ -18,9 +21,19 @@ function FilterBar() {
         <Text className="text-text-secondary text-sm">Цена</Text>
         <Feather name="chevron-down" size={14} color="#1A4A6E" />
       </TouchableOpacity>
-      <TouchableOpacity className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
-        <Feather name="arrow-up-down" size={14} color="#0A7B8A" />
-        <Text className="text-primary text-sm ml-1">Новые</Text>
+      <TouchableOpacity
+        className={`flex-row items-center rounded-lg px-3 py-2 ${sort === 'new' ? 'bg-primary/10 border border-primary' : 'bg-surface border border-border'}`}
+        onPress={() => onSort('new')}
+      >
+        <Feather name="arrow-up-down" size={14} color={sort === 'new' ? '#0A7B8A' : '#1A4A6E'} />
+        <Text className={`text-sm ml-1 ${sort === 'new' ? 'text-primary' : 'text-text-secondary'}`}>Новые</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        className={`flex-row items-center rounded-lg px-3 py-2 ${sort === 'price_asc' ? 'bg-primary/10 border border-primary' : 'bg-surface border border-border'}`}
+        onPress={() => onSort('price_asc')}
+      >
+        <Feather name="trending-up" size={14} color={sort === 'price_asc' ? '#0A7B8A' : '#1A4A6E'} />
+        <Text className={`text-sm ml-1 ${sort === 'price_asc' ? 'text-primary' : 'text-text-secondary'}`}>Дешевле</Text>
       </TouchableOpacity>
     </View>
   );
@@ -45,11 +58,13 @@ function ListingRow({ title, price, currency, city, isPromoted, seed }: { title:
 }
 
 export default function ListingsFeedStates() {
+  const [sort, setSort] = useState<SortOption>('new');
+
   return (
     <View>
       <StateSection title="default">
         <View>
-          <FilterBar />
+          <FilterBar sort={sort} onSort={setSort} />
           {mockListings.filter(l => l.status === 'active').map((l, idx) => (
             <ListingRow key={l.id} title={l.title} price={l.price} currency={l.currency} city={l.city} isPromoted={l.isPromoted} seed={`feed${idx + 1}`} />
           ))}
@@ -58,7 +73,7 @@ export default function ListingsFeedStates() {
 
       <StateSection title="loading">
         <View>
-          <FilterBar />
+          <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
             <ActivityIndicator size="large" color="#0A7B8A" />
           </View>
@@ -67,7 +82,7 @@ export default function ListingsFeedStates() {
 
       <StateSection title="empty">
         <View>
-          <FilterBar />
+          <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
             <Feather name="inbox" size={48} color="#6A8898" />
             <Text className="text-text-primary text-lg font-semibold mt-3">Нет объявлений</Text>
