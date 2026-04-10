@@ -38,7 +38,7 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
     <View style={{
       backgroundColor: '#fff',
       borderBottomWidth: 1,
-      borderBottomColor: '#C8E0E8',
+      borderBottomColor: '#E0E0E0',
       paddingHorizontal: padding,
       paddingVertical: 12,
       flexDirection: 'row',
@@ -46,13 +46,13 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
       gap: 12,
     }}>
       <TouchableOpacity onPress={() => router.push('/proto' as any)} activeOpacity={0.7}>
-        <Ionicons name="arrow-back" size={22} color="#0A2840" />
+        <Ionicons name="arrow-back" size={22} color="#1A1A1A" />
       </TouchableOpacity>
       <View style={{ flex: 1 }}>
-        <Text style={{ color: '#0A2840', fontSize: 16, fontWeight: '600' }}>
+        <Text style={{ color: '#1A1A1A', fontSize: 16, fontWeight: '600' }}>
           {pagId} — {title}
         </Text>
-        <Text style={{ color: '#6A8898', fontSize: 12, marginTop: 2 }}>{route}</Text>
+        <Text style={{ color: '#737373', fontSize: 12, marginTop: 2 }}>{route}</Text>
       </View>
     </View>
   );
@@ -75,7 +75,7 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
   if (isAdminNav) {
     // Admin: sidebar on the left, content on the right
     return (
-      <View style={{ flex: 1, backgroundColor: '#E8F4F8' }}>
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         {showNav && <ProtoNav variant={nav!} />}
         {backBar}
         <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -86,7 +86,7 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#E8F4F8' }}>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       {showNav && !isBottomNav && <ProtoNav variant={nav!} />}
       {backBar}
       {statesGrid}

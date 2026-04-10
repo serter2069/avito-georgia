@@ -11,28 +11,28 @@ function FilterBar({ sort, onSort }: { sort: SortOption; onSort: (s: SortOption)
     <View className="flex-row gap-2 mb-4 flex-wrap">
       <TouchableOpacity className="flex-row items-center bg-surface border border-border rounded-lg px-3 py-2">
         <Text className="text-text-secondary text-sm">Категория</Text>
-        <Feather name="chevron-down" size={14} color="#1A4A6E" />
+        <Feather name="chevron-down" size={14} color="#1A1A1A" />
       </TouchableOpacity>
       <TouchableOpacity className="flex-row items-center bg-surface border border-border rounded-lg px-3 py-2">
         <Text className="text-text-secondary text-sm">Город</Text>
-        <Feather name="chevron-down" size={14} color="#1A4A6E" />
+        <Feather name="chevron-down" size={14} color="#1A1A1A" />
       </TouchableOpacity>
       <TouchableOpacity className="flex-row items-center bg-surface border border-border rounded-lg px-3 py-2">
         <Text className="text-text-secondary text-sm">Цена</Text>
-        <Feather name="chevron-down" size={14} color="#1A4A6E" />
+        <Feather name="chevron-down" size={14} color="#1A1A1A" />
       </TouchableOpacity>
       <TouchableOpacity
         className={`flex-row items-center rounded-lg px-3 py-2 ${sort === 'new' ? 'bg-primary/10 border border-primary' : 'bg-surface border border-border'}`}
         onPress={() => onSort('new')}
       >
-        <Feather name="arrow-up-down" size={14} color={sort === 'new' ? '#0A7B8A' : '#1A4A6E'} />
+        <Feather name="arrow-up-down" size={14} color={sort === 'new' ? '#00AA6C' : '#1A1A1A'} />
         <Text className={`text-sm ml-1 ${sort === 'new' ? 'text-primary' : 'text-text-secondary'}`}>Новые</Text>
       </TouchableOpacity>
       <TouchableOpacity
         className={`flex-row items-center rounded-lg px-3 py-2 ${sort === 'price_asc' ? 'bg-primary/10 border border-primary' : 'bg-surface border border-border'}`}
         onPress={() => onSort('price_asc')}
       >
-        <Feather name="trending-up" size={14} color={sort === 'price_asc' ? '#0A7B8A' : '#1A4A6E'} />
+        <Feather name="trending-up" size={14} color={sort === 'price_asc' ? '#00AA6C' : '#1A1A1A'} />
         <Text className={`text-sm ml-1 ${sort === 'price_asc' ? 'text-primary' : 'text-text-secondary'}`}>Дешевле</Text>
       </TouchableOpacity>
     </View>
@@ -104,7 +104,7 @@ export default function ListingsFeedStates() {
         <View style={containerStyle}>
           <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
-            <ActivityIndicator size="large" color="#0A7B8A" />
+            <ActivityIndicator size="large" color="#00AA6C" />
           </View>
         </View>
       </StateSection>
@@ -113,7 +113,7 @@ export default function ListingsFeedStates() {
         <View style={containerStyle}>
           <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
-            <Feather name="inbox" size={48} color="#6A8898" />
+            <Feather name="inbox" size={48} color="#737373" />
             <Text className="text-text-primary text-lg font-semibold mt-3">Нет объявлений</Text>
             <Text className="text-text-muted text-sm mt-1">Попробуйте изменить параметры поиска</Text>
           </View>
@@ -125,15 +125,15 @@ export default function ListingsFeedStates() {
           <View className="flex-row gap-2 mb-4 flex-wrap">
             <View className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
               <Text className="text-primary text-sm">Электроника</Text>
-              <Feather name="x" size={14} color="#0A7B8A" />
+              <Feather name="x" size={14} color="#00AA6C" />
             </View>
             <View className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
               <Text className="text-primary text-sm">Кутаиси</Text>
-              <Feather name="x" size={14} color="#0A7B8A" />
+              <Feather name="x" size={14} color="#00AA6C" />
             </View>
           </View>
           <View className="py-12 items-center">
-            <Feather name="search" size={48} color="#6A8898" />
+            <Feather name="search" size={48} color="#737373" />
             <Text className="text-text-primary text-lg font-semibold mt-3">Ничего не найдено</Text>
             <Text className="text-text-muted text-sm mt-1 text-center">По вашим фильтрам нет объявлений. Попробуйте убрать фильтры.</Text>
             <TouchableOpacity className="mt-4 border border-primary px-4 py-2 rounded-lg">

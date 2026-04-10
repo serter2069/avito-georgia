@@ -69,13 +69,13 @@ export default function PaymentHistoryStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty">
         <View className="py-16 items-center">
-          <Feather name="credit-card" size={48} color="#6A8898" />
+          <Feather name="credit-card" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет платежей</Text>
           <Text className="text-text-muted text-sm mt-1">История ваших платежей будет здесь</Text>
         </View>

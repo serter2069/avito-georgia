@@ -39,7 +39,7 @@ export default function AdminSettingsStates() {
             <Switch
               value={maintenanceMode}
               onValueChange={setMaintenanceMode}
-              trackColor={{ false: '#D1D5DB', true: '#0A7B8A' }}
+              trackColor={{ false: '#D1D5DB', true: '#00AA6C' }}
               thumbColor="#ffffff"
             />
           </View>
@@ -57,7 +57,7 @@ export default function AdminSettingsStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
@@ -74,7 +74,7 @@ export default function AdminSettingsStates() {
           </View>
           <View className="flex-row items-center justify-between bg-surface border border-border rounded-lg px-4 py-3 mb-6">
             <Text className="text-text-primary text-sm font-medium">Режим обслуживания</Text>
-            <Switch value={false} trackColor={{ false: '#D1D5DB', true: '#0A7B8A' }} thumbColor="#ffffff" />
+            <Switch value={false} trackColor={{ false: '#D1D5DB', true: '#00AA6C' }} thumbColor="#ffffff" />
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
             <ActivityIndicator color="#ffffff" />
@@ -98,7 +98,7 @@ export default function AdminSettingsStates() {
           </View>
           <View className="flex-row items-center justify-between bg-surface border border-border rounded-lg px-4 py-3 mb-6">
             <Text className="text-text-primary text-sm font-medium">Режим обслуживания</Text>
-            <Switch value={false} trackColor={{ false: '#D1D5DB', true: '#0A7B8A' }} thumbColor="#ffffff" />
+            <Switch value={false} trackColor={{ false: '#D1D5DB', true: '#00AA6C' }} thumbColor="#ffffff" />
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
             <Text className="text-white font-semibold">Сохранить</Text>

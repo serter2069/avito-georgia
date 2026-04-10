@@ -14,7 +14,7 @@ export default function EditListingStates() {
     <View>
       <StateSection title="loading_data">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Загрузка данных...</Text>
         </View>
       </StateSection>
@@ -37,10 +37,10 @@ export default function EditListingStates() {
             <Text className="text-text-secondary text-sm mb-1 font-medium">Фотографии</Text>
             <View className="flex-row gap-3">
               <View className="w-20 h-20 bg-surface border border-border rounded-lg items-center justify-center">
-                <Feather name="image" size={24} color="#0A7B8A" />
+                <Feather name="image" size={24} color="#00AA6C" />
               </View>
               <View className="w-20 h-20 bg-surface border-2 border-dashed border-border rounded-lg items-center justify-center">
-                <Feather name="plus" size={24} color="#6A8898" />
+                <Feather name="plus" size={24} color="#737373" />
               </View>
             </View>
           </View>

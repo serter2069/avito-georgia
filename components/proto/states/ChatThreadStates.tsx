@@ -25,7 +25,7 @@ export default function ChatThreadStates() {
       <StateSection title="default">
         <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined}>
           <View className="bg-surface rounded-lg p-3 mb-4 flex-row items-center gap-2">
-            <Feather name="tag" size={16} color="#0A7B8A" />
+            <Feather name="tag" size={16} color="#00AA6C" />
             <Text className="text-text-secondary text-sm font-medium">Toyota Camry 2020</Text>
           </View>
           {mockChatMessages.map((msg) => (
@@ -35,7 +35,7 @@ export default function ChatThreadStates() {
             <TextInput
               className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
               placeholder="Сообщение..."
-              placeholderTextColor="#6A8898"
+              placeholderTextColor="#737373"
               value={message}
               onChangeText={setMessage}
             />
@@ -51,19 +51,19 @@ export default function ChatThreadStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty">
         <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined} className="py-12 items-center">
-          <Feather name="message-circle" size={48} color="#6A8898" />
+          <Feather name="message-circle" size={48} color="#737373" />
           <Text className="text-text-muted text-sm mt-3">Начните диалог</Text>
           <View className="flex-row items-center gap-2 mt-6 w-full">
             <TextInput
               className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
               placeholder="Сообщение..."
-              placeholderTextColor="#6A8898"
+              placeholderTextColor="#737373"
               value={message}
               onChangeText={setMessage}
             />
@@ -86,7 +86,7 @@ export default function ChatThreadStates() {
             <View className="max-w-[80%] px-4 py-3 rounded-2xl bg-primary rounded-br-sm opacity-50">
               <Text className="text-white text-sm">Отлично, договорились!</Text>
             </View>
-            <ActivityIndicator size="small" color="#0A7B8A" className="mt-1" />
+            <ActivityIndicator size="small" color="#00AA6C" className="mt-1" />
           </View>
         </View>
       </StateSection>

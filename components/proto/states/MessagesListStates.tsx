@@ -41,13 +41,13 @@ export default function MessagesListStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty">
         <View className="py-16 items-center">
-          <Feather name="message-circle" size={48} color="#6A8898" />
+          <Feather name="message-circle" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет сообщений</Text>
           <Text className="text-text-muted text-sm mt-1">Начните общение с продавцами</Text>
           <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-4" onPress={() => {}}>

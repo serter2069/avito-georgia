@@ -35,13 +35,13 @@ function CategoryRow({ cat }: { cat: typeof categoryTree[0] }) {
     <View className="border-b border-border">
       <TouchableOpacity className="flex-row items-center gap-3 py-3" onPress={() => setExpanded(!expanded)}>
         <View className="w-10 h-10 bg-surface rounded-lg items-center justify-center">
-          <Feather name={mockCategoryIcons[cat.name] as any || 'grid'} size={18} color="#0A7B8A" />
+          <Feather name={mockCategoryIcons[cat.name] as any || 'grid'} size={18} color="#00AA6C" />
         </View>
         <Text className="text-text-primary text-base flex-1">{cat.name}</Text>
         <Text className="text-text-muted text-xs mr-2">{cat.children.length}</Text>
-        <Feather name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color="#6A8898" />
+        <Feather name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color="#737373" />
         <TouchableOpacity className="ml-2">
-          <Feather name="edit-2" size={18} color="#6A8898" />
+          <Feather name="edit-2" size={18} color="#737373" />
         </TouchableOpacity>
       </TouchableOpacity>
       {expanded && (
@@ -51,12 +51,12 @@ function CategoryRow({ cat }: { cat: typeof categoryTree[0] }) {
               <View className="w-1.5 h-1.5 bg-border rounded-full" />
               <Text className="text-text-secondary text-sm flex-1">{child}</Text>
               <TouchableOpacity className="mr-3">
-                <Feather name="edit-2" size={14} color="#6A8898" />
+                <Feather name="edit-2" size={14} color="#737373" />
               </TouchableOpacity>
             </View>
           ))}
           <TouchableOpacity className="flex-row items-center gap-2 py-1.5 mt-1">
-            <Feather name="plus" size={14} color="#0A7B8A" />
+            <Feather name="plus" size={14} color="#00AA6C" />
             <Text className="text-primary text-sm">Добавить подкатегорию</Text>
           </TouchableOpacity>
         </View>
@@ -84,7 +84,7 @@ export default function AdminCategoriesStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
@@ -93,15 +93,15 @@ export default function AdminCategoriesStates() {
           <Text className="text-text-primary text-lg font-bold mb-4">Новая категория</Text>
           <View className="mb-3">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Название (RU)</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" placeholder="Электроника" placeholderTextColor="#6A8898" editable={false} />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" placeholder="Электроника" placeholderTextColor="#737373" editable={false} />
           </View>
           <View className="mb-3">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Название (KA)</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" placeholder="ელექტრონიკა" placeholderTextColor="#6A8898" editable={false} />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" placeholder="ელექტრონიკა" placeholderTextColor="#737373" editable={false} />
           </View>
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Название (EN)</Text>
-            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" placeholder="Electronics" placeholderTextColor="#6A8898" editable={false} />
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" placeholder="Electronics" placeholderTextColor="#737373" editable={false} />
           </View>
           <View className="flex-row gap-3">
             <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center">

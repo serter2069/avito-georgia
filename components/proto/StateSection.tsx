@@ -15,39 +15,47 @@ export function StateSection({ title, children }: StateSectionProps) {
     const url = window.location.href;
     const pageSlug = url.split('/proto/states/')[1]?.split('?')[0] ?? url;
     const text = `Page: ${pageSlug}\nState: ${title}\nURL: ${url}`;
-    const write = () => {
-      navigator.clipboard.writeText(text).then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      }).catch(() => {
-        try {
-          const el = document.createElement('textarea');
-          el.value = text;
-          document.body.appendChild(el);
-          el.select();
-          document.execCommand('copy');
-          document.body.removeChild(el);
+    const writeClipboard = () => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
           setCopied(true);
           setTimeout(() => setCopied(false), 1500);
-        } catch {}
-      });
+        }).catch(() => fallbackCopy());
+      } else {
+        fallbackCopy();
+      }
     };
-    write();
+    const fallbackCopy = () => {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+      document.body.appendChild(el);
+      el.select();
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      } catch (e) {
+        // silent fail
+      }
+      document.body.removeChild(el);
+    };
+    writeClipboard();
   }, [title]);
 
   return (
     <View style={{
       backgroundColor: '#fff',
       borderWidth: 1,
-      borderColor: '#C8E0E8',
+      borderColor: '#E0E0E0',
       borderRadius: 12,
       overflow: 'hidden',
     }}>
       {/* Badge header */}
       <View style={{
-        backgroundColor: '#E8F4F8',
+        backgroundColor: '#F4F4F4',
         borderBottomWidth: 1,
-        borderBottomColor: '#C8E0E8',
+        borderBottomColor: '#E0E0E0',
         paddingHorizontal: 12,
         paddingVertical: 6,
         flexDirection: 'row',
@@ -55,7 +63,7 @@ export function StateSection({ title, children }: StateSectionProps) {
         justifyContent: 'space-between',
       }}>
         <Text style={{
-          color: '#0A7B8A',
+          color: '#00AA6C',
           fontSize: 12,
           fontWeight: '600',
         }}>

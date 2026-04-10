@@ -35,7 +35,7 @@ export default function AuthOtpStates() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary text-center text-xl tracking-widest"
                 placeholder="000000"
-                placeholderTextColor="#6A8898"
+                placeholderTextColor="#737373"
                 value={otp}
                 onChangeText={(v) => setOtp(v.replace(/[^0-9]/g, '').slice(0, 6))}
                 keyboardType="number-pad"

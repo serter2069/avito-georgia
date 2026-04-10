@@ -44,7 +44,7 @@ export default function AdminModerationStates() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary h-24 mb-4"
                 placeholder="Укажите причину отклонения..."
-                placeholderTextColor="#6A8898"
+                placeholderTextColor="#737373"
                 multiline
                 value={rejectReason}
                 onChangeText={setRejectReason}
@@ -64,7 +64,7 @@ export default function AdminModerationStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
@@ -83,7 +83,7 @@ export default function AdminModerationStates() {
           <TextInput
             className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary h-24 mb-4"
             placeholder="Укажите причину отклонения..."
-            placeholderTextColor="#6A8898"
+            placeholderTextColor="#737373"
             multiline
             value={rejectReason}
             onChangeText={setRejectReason}

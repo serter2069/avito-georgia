@@ -41,7 +41,7 @@ export default function PromoteListingStates() {
       <StateSection title="default">
         <View className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Продвижение объявления</Text>
-          <PackageCard name="1 день" price="2.99 GEL" description="Поднятие в топ на 1 день" icon="trending-up" color="#0A7B8A"
+          <PackageCard name="1 день" price="2.99 GEL" description="Поднятие в топ на 1 день" icon="trending-up" color="#00AA6C"
             selected={selected === 'day1'} onSelect={() => setSelected(selected === 'day1' ? null : 'day1')} />
           <PackageCard name="3 дня" price="6.99 GEL" description="Поднятие в топ на 3 дня" icon="star" color="#f59e0b"
             selected={selected === 'day3'} onSelect={() => setSelected(selected === 'day3' ? null : 'day3')} />
@@ -52,13 +52,13 @@ export default function PromoteListingStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="purchasing">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Обработка платежа...</Text>
         </View>
       </StateSection>

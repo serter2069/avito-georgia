@@ -12,7 +12,7 @@ export default function MapViewStates() {
     <View>
       <StateSection title="coming_soon">
         <View style={containerStyle} className="py-16 items-center">
-          <Feather name="map" size={64} color="#6A8898" />
+          <Feather name="map" size={64} color="#737373" />
           <Text className="text-text-primary text-xl font-bold mt-4">Карта объявлений — скоро</Text>
           <Text className="text-text-muted text-sm mt-2 text-center" style={isDesktop ? { maxWidth: 480 } : {}}>
             Мы работаем над картой объявлений. Скоро здесь появится интерактивная карта.

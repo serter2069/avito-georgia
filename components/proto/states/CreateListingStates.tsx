@@ -43,10 +43,10 @@ export default function CreateListingStates() {
                   onPress={() => setCurrentStep(2)}
                 >
                   <View className="w-10 h-10 bg-surface rounded-lg items-center justify-center">
-                    <Feather name={(mockCategoryIcons[cat] as any) || 'grid'} size={20} color="#0A7B8A" />
+                    <Feather name={(mockCategoryIcons[cat] as any) || 'grid'} size={20} color="#00AA6C" />
                   </View>
                   <Text className="text-text-primary text-base flex-1">{cat}</Text>
-                  <Feather name="chevron-right" size={16} color="#6A8898" />
+                  <Feather name="chevron-right" size={16} color="#737373" />
                 </TouchableOpacity>
               ))}
             </View>
@@ -61,9 +61,9 @@ export default function CreateListingStates() {
                   className="flex-row items-center gap-3 py-3 border-b border-border"
                   onPress={() => setCurrentStep(3)}
                 >
-                  <Feather name="map-pin" size={20} color="#0A7B8A" />
+                  <Feather name="map-pin" size={20} color="#00AA6C" />
                   <Text className="text-text-primary text-base flex-1">{city}</Text>
-                  <Feather name="chevron-right" size={16} color="#6A8898" />
+                  <Feather name="chevron-right" size={16} color="#737373" />
                 </TouchableOpacity>
               ))}
               <TouchableOpacity className="mt-4 py-2" onPress={() => setCurrentStep(1)}>
@@ -92,7 +92,7 @@ export default function CreateListingStates() {
                   <Text className="text-text-secondary text-sm mb-1 font-medium">Валюта</Text>
                   <TouchableOpacity className="bg-surface border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
                     <Text className="text-text-primary">USD</Text>
-                    <Feather name="chevron-down" size={14} color="#6A8898" />
+                    <Feather name="chevron-down" size={14} color="#737373" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -112,14 +112,14 @@ export default function CreateListingStates() {
               <Text className="text-text-primary text-lg font-bold mb-4">Добавьте фотографии</Text>
               <View className="flex-row flex-wrap gap-3 mb-4">
                 <View className="w-24 h-24 bg-surface border-2 border-dashed border-border rounded-lg items-center justify-center">
-                  <Feather name="camera" size={24} color="#6A8898" />
+                  <Feather name="camera" size={24} color="#737373" />
                   <Text className="text-text-muted text-[10px] mt-1">Добавить</Text>
                 </View>
                 <View className="w-24 h-24 bg-surface border border-border rounded-lg items-center justify-center">
-                  <Feather name="image" size={32} color="#0A7B8A" />
+                  <Feather name="image" size={32} color="#00AA6C" />
                 </View>
                 <View className="w-24 h-24 bg-surface border border-border rounded-lg items-center justify-center">
-                  <Feather name="image" size={32} color="#0A7B8A" />
+                  <Feather name="image" size={32} color="#00AA6C" />
                 </View>
               </View>
               <View className="flex-row gap-3">
@@ -137,7 +137,7 @@ export default function CreateListingStates() {
 
       <StateSection title="submitting">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Публикация объявления...</Text>
         </View>
       </StateSection>

@@ -26,7 +26,7 @@ export default function OnboardingStates() {
             <TextInput
               className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary"
               placeholder="Ваше имя"
-              placeholderTextColor="#6A8898"
+              placeholderTextColor="#737373"
               value={name}
               onChangeText={setName}
             />
@@ -36,7 +36,7 @@ export default function OnboardingStates() {
             <TextInput
               className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary"
               placeholder="+995 555 XX XX XX"
-              placeholderTextColor="#6A8898"
+              placeholderTextColor="#737373"
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
@@ -49,7 +49,7 @@ export default function OnboardingStates() {
               onPress={() => setCityOpen(!cityOpen)}
             >
               <Text className={city ? 'text-text-primary' : 'text-text-muted'}>{city || 'Выберите город'}</Text>
-              <Feather name={cityOpen ? 'chevron-up' : 'chevron-down'} size={20} color="#6A8898" />
+              <Feather name={cityOpen ? 'chevron-up' : 'chevron-down'} size={20} color="#737373" />
             </TouchableOpacity>
             {cityOpen && (
               <View className="bg-surface border border-border-focus rounded-lg overflow-hidden mt-1">
@@ -89,7 +89,7 @@ export default function OnboardingStates() {
             <Text className="text-text-secondary text-sm mb-1 font-medium">Город</Text>
             <TouchableOpacity className="bg-surface border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
               <Text className="text-text-muted">Выберите город</Text>
-              <Feather name="chevron-down" size={20} color="#6A8898" />
+              <Feather name="chevron-down" size={20} color="#737373" />
             </TouchableOpacity>
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center opacity-50">
@@ -131,7 +131,7 @@ export default function OnboardingStates() {
             <View className="bg-surface border border-border-focus rounded-lg overflow-hidden">
               <View className="px-4 py-3 flex-row items-center justify-between">
                 <Text className="text-text-muted">Выберите город</Text>
-                <Feather name="chevron-up" size={20} color="#0A7B8A" />
+                <Feather name="chevron-up" size={20} color="#00AA6C" />
               </View>
               {CITIES.map((c) => (
                 <TouchableOpacity key={c} className="px-4 py-3 border-t border-border">

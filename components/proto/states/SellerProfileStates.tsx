@@ -28,7 +28,7 @@ export default function SellerProfileStates() {
                   </View>
                   <Text className="text-text-muted text-sm mt-1">На сайте с {seller.createdAt}</Text>
                   <View className="flex-row items-center gap-1 mt-1">
-                    <Feather name="map-pin" size={14} color="#6A8898" />
+                    <Feather name="map-pin" size={14} color="#737373" />
                     <Text className="text-text-muted text-sm">{seller.city}</Text>
                   </View>
                   <TouchableOpacity className="bg-primary py-2 px-4 rounded-lg mt-4 flex-row items-center gap-2 self-center">
@@ -63,7 +63,7 @@ export default function SellerProfileStates() {
                 </View>
                 <Text className="text-text-muted text-sm mt-1">На сайте с {seller.createdAt}</Text>
                 <View className="flex-row items-center gap-1 mt-1">
-                  <Feather name="map-pin" size={14} color="#6A8898" />
+                  <Feather name="map-pin" size={14} color="#737373" />
                   <Text className="text-text-muted text-sm">{seller.city}</Text>
                 </View>
                 <TouchableOpacity className="bg-primary py-2 px-6 rounded-lg mt-4 flex-row items-center gap-2">
@@ -90,7 +90,7 @@ export default function SellerProfileStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
@@ -102,7 +102,7 @@ export default function SellerProfileStates() {
             <Text className="text-text-muted text-sm mt-1">{mockUsers[2].city}</Text>
           </View>
           <View className="py-8 items-center">
-            <Feather name="inbox" size={48} color="#6A8898" />
+            <Feather name="inbox" size={48} color="#737373" />
             <Text className="text-text-muted text-sm mt-3">У продавца пока нет активных объявлений</Text>
           </View>
         </View>

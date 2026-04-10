@@ -10,14 +10,14 @@ export default function SlotSuccessStates() {
     <View>
       <StateSection title="restoring">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Восстановление объявления...</Text>
         </View>
       </StateSection>
 
       <StateSection title="submitting">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Обработка слота...</Text>
         </View>
       </StateSection>
@@ -25,7 +25,7 @@ export default function SlotSuccessStates() {
       <StateSection title="done">
         <View className="py-12 items-center">
           <View className="w-16 h-16 rounded-full bg-primary/20 items-center justify-center mb-2">
-            <Feather name="check-circle" size={40} color="#0A7B8A" />
+            <Feather name="check-circle" size={40} color="#00AA6C" />
           </View>
           <Text className="text-text-primary text-xl font-bold mt-4">Слот активирован</Text>
           <Text className="text-text-muted text-sm mt-2 text-center">Ваше объявление восстановлено и активно.</Text>

@@ -60,10 +60,10 @@ export default function ListingDetailStates() {
                 </View>
                 <Text className="text-text-primary text-lg font-semibold mb-1">{listing.title}</Text>
                 <View className="flex-row items-center gap-1 mb-4">
-                  <Feather name="map-pin" size={14} color="#6A8898" />
+                  <Feather name="map-pin" size={14} color="#737373" />
                   <Text className="text-text-muted text-sm">{listing.city}</Text>
                   <Text className="text-text-muted text-sm mx-1">|</Text>
-                  <Feather name="eye" size={14} color="#6A8898" />
+                  <Feather name="eye" size={14} color="#737373" />
                   <Text className="text-text-muted text-sm">{listing.views}</Text>
                 </View>
                 <View className="flex-row gap-2 mb-4">
@@ -85,11 +85,11 @@ export default function ListingDetailStates() {
                 <Text className="text-text-secondary text-sm leading-5 mb-4">Автомобиль в отличном состоянии. Один хозяин, не бита, не крашена. Полный комплект обслуживания. Возможен обмен. Торг уместен.</Text>
                 <View className="flex-row gap-3 mb-4">
                   <TouchableOpacity className="flex-row items-center gap-1">
-                    <Feather name="heart" size={20} color="#0A7B8A" />
+                    <Feather name="heart" size={20} color="#00AA6C" />
                     <Text className="text-primary text-sm">В избранное</Text>
                   </TouchableOpacity>
                   <TouchableOpacity className="flex-row items-center gap-1">
-                    <Feather name="share-2" size={20} color="#0A7B8A" />
+                    <Feather name="share-2" size={20} color="#00AA6C" />
                     <Text className="text-primary text-sm">Поделиться</Text>
                   </TouchableOpacity>
                 </View>
@@ -118,10 +118,10 @@ export default function ListingDetailStates() {
               </View>
               <Text className="text-text-primary text-lg font-semibold mb-1">{listing.title}</Text>
               <View className="flex-row items-center gap-1 mb-4">
-                <Feather name="map-pin" size={14} color="#6A8898" />
+                <Feather name="map-pin" size={14} color="#737373" />
                 <Text className="text-text-muted text-sm">{listing.city}</Text>
                 <Text className="text-text-muted text-sm mx-1">|</Text>
-                <Feather name="eye" size={14} color="#6A8898" />
+                <Feather name="eye" size={14} color="#737373" />
                 <Text className="text-text-muted text-sm">{listing.views}</Text>
               </View>
               <View className="flex-row gap-2 mb-4">
@@ -143,11 +143,11 @@ export default function ListingDetailStates() {
               <Text className="text-text-secondary text-sm leading-5 mb-4">Автомобиль в отличном состоянии. Один хозяин, не бита, не крашена. Полный комплект обслуживания. Возможен обмен. Торг уместен.</Text>
               <View className="flex-row gap-3 mb-4">
                 <TouchableOpacity className="flex-row items-center gap-1">
-                  <Feather name="heart" size={20} color="#0A7B8A" />
+                  <Feather name="heart" size={20} color="#00AA6C" />
                   <Text className="text-primary text-sm">В избранное</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="flex-row items-center gap-1">
-                  <Feather name="share-2" size={20} color="#0A7B8A" />
+                  <Feather name="share-2" size={20} color="#00AA6C" />
                   <Text className="text-primary text-sm">Поделиться</Text>
                 </TouchableOpacity>
               </View>
@@ -179,7 +179,7 @@ export default function ListingDetailStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
@@ -193,7 +193,7 @@ export default function ListingDetailStates() {
 
       <StateSection title="phone_revealed">
         <View className="bg-surface rounded-lg p-4 items-center">
-          <Feather name="phone" size={24} color="#0A7B8A" />
+          <Feather name="phone" size={24} color="#00AA6C" />
           <Text className="text-text-primary text-lg font-bold mt-2">+995 555 12 34 56</Text>
           <Text className="text-text-muted text-sm mt-1">{seller.name}</Text>
         </View>
@@ -208,7 +208,7 @@ export default function ListingDetailStates() {
               <Text className="text-text-primary text-base">{reason}</Text>
             </TouchableOpacity>
           ))}
-          <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 mt-4 text-text-primary" placeholder="Опишите проблему..." placeholderTextColor="#6A8898" multiline numberOfLines={3} editable={false} />
+          <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 mt-4 text-text-primary" placeholder="Опишите проблему..." placeholderTextColor="#737373" multiline numberOfLines={3} editable={false} />
           <TouchableOpacity className="bg-error py-3 rounded-lg items-center mt-4">
             <Text className="text-white font-semibold">Отправить жалобу</Text>
           </TouchableOpacity>

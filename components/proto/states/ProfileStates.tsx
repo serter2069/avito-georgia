@@ -49,7 +49,7 @@ export default function ProfileStates() {
                       <Text className="text-text-secondary text-sm mb-1 font-medium">Email</Text>
                       <View className="bg-surface/50 border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
                         <Text className="text-text-muted">{user.email}</Text>
-                        <Feather name="lock" size={14} color="#6A8898" />
+                        <Feather name="lock" size={14} color="#737373" />
                       </View>
                     </View>
                     <TouchableOpacity className="bg-primary py-3 rounded-lg items-center" onPress={() => setIsEditing(true)}>
@@ -75,7 +75,7 @@ export default function ProfileStates() {
                       <Text className="text-text-secondary text-sm mb-1 font-medium">Email</Text>
                       <View className="bg-surface/50 border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
                         <Text className="text-text-muted">{user.email}</Text>
-                        <Feather name="lock" size={14} color="#6A8898" />
+                        <Feather name="lock" size={14} color="#737373" />
                       </View>
                     </View>
                     <View className="flex-row gap-3">
@@ -112,7 +112,7 @@ export default function ProfileStates() {
                   <Text className="text-text-secondary text-sm mb-1 font-medium">Email</Text>
                   <View className="bg-surface/50 border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
                     <Text className="text-text-muted">{user.email}</Text>
-                    <Feather name="lock" size={14} color="#6A8898" />
+                    <Feather name="lock" size={14} color="#737373" />
                   </View>
                 </View>
                 <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center" onPress={() => setIsEditing(true)}>
@@ -138,7 +138,7 @@ export default function ProfileStates() {
                   <Text className="text-text-secondary text-sm mb-1 font-medium">Email</Text>
                   <View className="bg-surface/50 border border-border rounded-lg px-4 py-3 flex-row items-center justify-between">
                     <Text className="text-text-muted">{user.email}</Text>
-                    <Feather name="lock" size={14} color="#6A8898" />
+                    <Feather name="lock" size={14} color="#737373" />
                   </View>
                 </View>
                 <View className="flex-row gap-3">

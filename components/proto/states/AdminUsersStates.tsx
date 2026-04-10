@@ -42,7 +42,7 @@ export default function AdminUsersStates() {
           <TextInput
             className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-4"
             placeholder="Поиск пользователей..."
-            placeholderTextColor="#6A8898"
+            placeholderTextColor="#737373"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -54,7 +54,7 @@ export default function AdminUsersStates() {
 
       <StateSection title="loading">
         <View className="py-16 items-center">
-          <ActivityIndicator size="large" color="#0A7B8A" />
+          <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
@@ -70,7 +70,7 @@ export default function AdminUsersStates() {
         <View>
           <TextInput className="bg-surface border border-border-focus rounded-lg px-4 py-3 text-base mb-4 text-text-primary" value="qwerty123" editable={false} />
           <View className="py-12 items-center">
-            <Feather name="user-x" size={48} color="#6A8898" />
+            <Feather name="user-x" size={48} color="#737373" />
             <Text className="text-text-primary text-lg font-semibold mt-3">Пользователь не найден</Text>
             <Text className="text-text-muted text-sm mt-1 text-center">Нет совпадений по запросу "qwerty123"</Text>
           </View>

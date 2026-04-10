@@ -10,7 +10,7 @@ function FaqItem({ question, answer, forceExpanded }: { question: string; answer
     <View className="border-b border-border">
       <TouchableOpacity className="flex-row items-center justify-between py-4" onPress={() => setExpanded(!expanded)}>
         <Text className="text-text-primary text-base font-medium flex-1 mr-2">{question}</Text>
-        <Feather name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color="#6A8898" />
+        <Feather name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color="#737373" />
       </TouchableOpacity>
       {expanded && (
         <Text className="text-text-secondary text-sm pb-4 leading-5">{answer}</Text>

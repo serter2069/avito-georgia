@@ -33,7 +33,7 @@ export default function SettingsStates() {
               onPress={cycleLanguage}
             >
               <Text className="text-text-primary">{languageLabels[language]}</Text>
-              <Feather name="chevron-down" size={16} color="#6A8898" />
+              <Feather name="chevron-down" size={16} color="#737373" />
             </TouchableOpacity>
           </View>
           <View className="flex-row items-center justify-between py-3 border-b border-border mb-4">
@@ -41,7 +41,7 @@ export default function SettingsStates() {
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ true: '#0A7B8A', false: '#C8E0E8' }}
+              trackColor={{ true: '#00AA6C', false: '#E0E0E0' }}
             />
           </View>
           <View className="flex-row items-center justify-between py-3 border-b border-border mb-6">
@@ -49,7 +49,7 @@ export default function SettingsStates() {
             <Switch
               value={emailNotifications}
               onValueChange={setEmailNotifications}
-              trackColor={{ true: '#0A7B8A', false: '#C8E0E8' }}
+              trackColor={{ true: '#00AA6C', false: '#E0E0E0' }}
             />
           </View>
           <TouchableOpacity className="bg-error py-3 rounded-lg items-center mb-3">
@@ -82,7 +82,7 @@ export default function SettingsStates() {
       <StateSection title="logout_confirm">
         <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
-            <Feather name="log-out" size={48} color="#0A7B8A" />
+            <Feather name="log-out" size={48} color="#00AA6C" />
             <Text className="text-text-primary text-lg font-bold mt-2">Выйти из аккаунта?</Text>
             <Text className="text-text-muted text-sm text-center mt-2">Вы будете отключены от аккаунта на этом устройстве.</Text>
           </View>

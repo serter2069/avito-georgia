@@ -21,7 +21,7 @@ export default function AuthEmailStates() {
               <TextInput
                 className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary text-base"
                 placeholder="your@email.com"
-                placeholderTextColor="#6A8898"
+                placeholderTextColor="#737373"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"

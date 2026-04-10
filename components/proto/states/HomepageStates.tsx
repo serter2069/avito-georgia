@@ -8,7 +8,7 @@ function CategoryChip({ name, icon, selected, onPress }: { name: string; icon: s
   return (
     <TouchableOpacity className="items-center mr-4 mb-3" onPress={onPress}>
       <View className={`w-14 h-14 rounded-xl items-center justify-center mb-1 ${selected ? 'bg-primary/20' : 'bg-surface'}`}>
-        <Feather name={icon as any} size={24} color="#0A7B8A" />
+        <Feather name={icon as any} size={24} color="#00AA6C" />
       </View>
       <Text className="text-text-muted text-[10px] text-center">{name}</Text>
     </TouchableOpacity>
@@ -46,7 +46,7 @@ export default function HomepageStates() {
             <TextInput
               className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
               placeholder="Поиск по объявлениям..."
-              placeholderTextColor="#6A8898"
+              placeholderTextColor="#737373"
               editable={false}
             />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
@@ -57,9 +57,9 @@ export default function HomepageStates() {
             className="flex-row items-center gap-2 mb-4 bg-surface px-3 py-2 rounded-lg self-start"
             onPress={() => setSelectedCity(selectedCity ? null : 'Тбилиси')}
           >
-            <Feather name="map-pin" size={16} color="#0A7B8A" />
+            <Feather name="map-pin" size={16} color="#00AA6C" />
             <Text className="text-primary text-sm font-medium">{selectedCity || 'Тбилиси'}</Text>
-            <Feather name="chevron-down" size={14} color="#0A7B8A" />
+            <Feather name="chevron-down" size={14} color="#00AA6C" />
           </TouchableOpacity>
           <View className="flex-row flex-wrap mb-4">
             {mockCategories.map((cat) => (
@@ -92,13 +92,13 @@ export default function HomepageStates() {
       <StateSection title="loading_listings">
         <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
-            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
+            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
               <Feather name="search" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
           <View className="py-12 items-center">
-            <ActivityIndicator size="large" color="#0A7B8A" />
+            <ActivityIndicator size="large" color="#00AA6C" />
             <Text className="text-text-muted text-sm mt-3">Загрузка объявлений...</Text>
           </View>
         </View>
@@ -107,13 +107,13 @@ export default function HomepageStates() {
       <StateSection title="empty_listings">
         <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
-            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
+            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
               <Feather name="search" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
           <View className="py-12 items-center">
-            <Feather name="inbox" size={48} color="#6A8898" />
+            <Feather name="inbox" size={48} color="#737373" />
             <Text className="text-text-primary text-lg font-semibold mt-3">Пока нет объявлений</Text>
             <Text className="text-text-muted text-sm mt-1">Будьте первым, кто разместит!</Text>
           </View>

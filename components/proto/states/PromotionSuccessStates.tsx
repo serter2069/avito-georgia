@@ -11,7 +11,7 @@ export default function PromotionSuccessStates() {
       <StateSection title="success">
         <View className="py-12 items-center">
           <View className="w-16 h-16 rounded-full bg-primary/20 items-center justify-center mb-2">
-            <Feather name="check-circle" size={40} color="#0A7B8A" />
+            <Feather name="check-circle" size={40} color="#00AA6C" />
           </View>
           <Text className="text-text-primary text-xl font-bold mt-4">Оплата прошла успешно!</Text>
           <Text className="text-text-muted text-sm mt-2 text-center">Ваше объявление продвинуто. Результаты будут видны в течение часа.</Text>
