@@ -1,13 +1,15 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockUsers } from '../../../constants/protoMockData';
 
 function UserRow({ user }: { user: typeof mockUsers[0] }) {
   const isBlocked = user.status === 'blocked';
   return (
     <View className="flex-row items-center gap-3 py-3 border-b border-border">
-      <Image source={{ uri: user.avatar }} className="w-10 h-10 rounded-full" />
+      <ProtoPlaceholderImage type="avatar" width={40} height={40} style={{ borderRadius: 20 }} />
       <View className="flex-1">
         <View className="flex-row items-center gap-2">
           <Text className="text-text-primary text-sm font-semibold">{user.name}</Text>
@@ -32,11 +34,19 @@ function UserRow({ user }: { user: typeof mockUsers[0] }) {
 }
 
 export default function AdminUsersStates() {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
     <View>
       <StateSection title="default">
         <View>
-          <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-4" placeholder="Поиск пользователей..." placeholderTextColor="#6A8898" editable={false} />
+          <TextInput
+            className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-4"
+            placeholder="Поиск пользователей..."
+            placeholderTextColor="#6A8898"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
           {mockUsers.map((u) => (
             <UserRow key={u.id} user={u} />
           ))}
