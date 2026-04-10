@@ -273,6 +273,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/admin',
     stateCount: 2,
     nav: 'admin',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Сводная статистика: активные объявления, пользователи, очередь модерации, доходы. Графики за 7/30 дней' }],
   },
   {
@@ -282,6 +284,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/admin/users',
     stateCount: 3,
     nav: 'admin',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Список пользователей с поиском. Статусы: активен, заблокирован. Действия: просмотр, блокировка, разблокировка' }],
   },
   {
@@ -291,6 +295,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/admin/moderation',
     stateCount: 4,
     nav: 'admin',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Очередь объявлений на проверку. Показывает фото, описание, продавца. Кнопки: Одобрить / Отклонить (с причиной)' }],
   },
   {
@@ -300,6 +306,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/admin/categories',
     stateCount: 3,
     nav: 'admin',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Управление категориями объявлений. Дерево категорий. Добавить / переименовать / скрыть категорию. i18n: KA/RU/EN' }],
   },
   {
@@ -309,6 +317,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/admin/reports',
     stateCount: 3,
     nav: 'admin',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Жалобы пользователей на объявления. Статусы: новая, рассмотрена. Действия: удалить объявление, заблокировать пользователя, отклонить жалобу' }],
   },
   {
@@ -318,6 +328,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/admin/payments',
     stateCount: 3,
     nav: 'admin',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'История всех платежей через Stripe. Фильтры: тип, дата, пользователь. Экспорт CSV' }],
   },
   {
@@ -327,6 +339,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/admin/settings',
     stateCount: 4,
     nav: 'admin',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Глобальные настройки платформы: комиссии, лимиты объявлений, email-шаблоны, режим обслуживания' }],
   },
 
