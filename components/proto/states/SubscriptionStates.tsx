@@ -26,9 +26,8 @@ export default function SubscriptionStates() {
     <View>
       <StateSection title="no_subscription">
         <View className="py-4">
-          <Text className="text-text-primary text-lg font-bold mb-4">Выберите план</Text>
-          <PlanCard name="Basic" price="19 GEL/мес" features={['5 объявлений', 'Базовая статистика', 'Email поддержка']} />
-          <PlanCard name="Premium" price="49 GEL/мес" features={['Безлимит объявлений', 'Продвижение x2', 'Приоритетная поддержка', 'Детальная аналитика']} isPrimary />
+          <Text className="text-text-primary text-lg font-bold mb-4">Premium подписка</Text>
+          <PlanCard name="Premium" price="29.99 GEL/мес" features={['Безлимитные объявления', 'Значок Premium', 'Приоритет в поиске', 'Поддержка 24/7']} isPrimary />
         </View>
       </StateSection>
 
@@ -41,7 +40,7 @@ export default function SubscriptionStates() {
                 <Text className="text-success text-xs font-medium">Активна</Text>
               </View>
             </View>
-            <Text className="text-text-secondary text-sm">49 GEL/мес</Text>
+            <Text className="text-text-secondary text-sm">29.99 GEL/мес</Text>
             <Text className="text-text-muted text-xs mt-1">Следующее списание: 15 мая 2026</Text>
           </View>
           <TouchableOpacity className="border border-error py-3 rounded-lg items-center">
