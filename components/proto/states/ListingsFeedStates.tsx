@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings } from '../../../constants/protoMockData';
@@ -39,7 +39,20 @@ function FilterBar({ sort, onSort }: { sort: SortOption; onSort: (s: SortOption)
   );
 }
 
-function ListingRow({ title, price, currency, city, isPromoted, seed }: { title: string; price: number | null; currency: string; city: string; isPromoted: boolean; seed: string }) {
+function ListingCard({ title, price, currency, city, isPromoted, seed, isGrid }: { title: string; price: number | null; currency: string; city: string; isPromoted: boolean; seed: string; isGrid?: boolean }) {
+  if (isGrid) {
+    return (
+      <View className="bg-white border border-border rounded-lg overflow-hidden mb-3">
+        <Image source={{ uri: `https://picsum.photos/seed/${seed}/400/300` }} style={{ width: '100%', height: 128 }} />
+        <View className="p-3">
+          {isPromoted && <View className="bg-secondary/20 px-2 py-0.5 rounded-full self-start mb-1"><Text className="text-secondary text-[10px] font-medium">TOP</Text></View>}
+          <Text className="text-text-primary text-sm font-semibold mb-1" numberOfLines={1}>{title}</Text>
+          <Text className="text-primary font-bold text-base">{price ? `${price.toLocaleString()} ${currency}` : 'Договорная'}</Text>
+          <Text className="text-text-muted text-xs mt-1">{city}</Text>
+        </View>
+      </View>
+    );
+  }
   return (
     <View className="flex-row bg-white border border-border rounded-lg overflow-hidden mb-3">
       <Image source={{ uri: `https://picsum.photos/seed/${seed}/400/400` }} style={{ width: 112, height: 112 }} />
@@ -59,20 +72,36 @@ function ListingRow({ title, price, currency, city, isPromoted, seed }: { title:
 
 export default function ListingsFeedStates() {
   const [sort, setSort] = useState<SortOption>('new');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+  const isWide = width >= 1280;
+
+  const colWidth = isWide ? '32%' : isDesktop ? '48%' : '100%';
+  const containerStyle = isDesktop ? { maxWidth: 1200, alignSelf: 'center' as const, width: '100%' } : {};
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={containerStyle}>
           <FilterBar sort={sort} onSort={setSort} />
-          {mockListings.filter(l => l.status === 'active').map((l, idx) => (
-            <ListingRow key={l.id} title={l.title} price={l.price} currency={l.currency} city={l.city} isPromoted={l.isPromoted} seed={`feed${idx + 1}`} />
-          ))}
+          {isDesktop ? (
+            <View className="flex-row flex-wrap gap-3">
+              {mockListings.filter(l => l.status === 'active').map((l, idx) => (
+                <View key={l.id} style={{ width: colWidth }}>
+                  <ListingCard title={l.title} price={l.price} currency={l.currency} city={l.city} isPromoted={l.isPromoted} seed={`feed${idx + 1}`} isGrid />
+                </View>
+              ))}
+            </View>
+          ) : (
+            mockListings.filter(l => l.status === 'active').map((l, idx) => (
+              <ListingCard key={l.id} title={l.title} price={l.price} currency={l.currency} city={l.city} isPromoted={l.isPromoted} seed={`feed${idx + 1}`} />
+            ))
+          )}
         </View>
       </StateSection>
 
       <StateSection title="loading">
-        <View>
+        <View style={containerStyle}>
           <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
             <ActivityIndicator size="large" color="#0A7B8A" />
@@ -81,7 +110,7 @@ export default function ListingsFeedStates() {
       </StateSection>
 
       <StateSection title="empty">
-        <View>
+        <View style={containerStyle}>
           <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
             <Feather name="inbox" size={48} color="#6A8898" />
@@ -92,7 +121,7 @@ export default function ListingsFeedStates() {
       </StateSection>
 
       <StateSection title="filtered_empty">
-        <View>
+        <View style={containerStyle}>
           <View className="flex-row gap-2 mb-4 flex-wrap">
             <View className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
               <Text className="text-primary text-sm">Электроника</Text>

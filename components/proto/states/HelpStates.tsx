@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -20,10 +20,15 @@ function FaqItem({ question, answer, forceExpanded }: { question: string; answer
 }
 
 export default function HelpStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
+  const contentStyle = isDesktop ? { maxWidth: 800, alignSelf: 'center' as const, width: '100%' } : {};
+
   return (
     <View>
       <StateSection title="default">
-        <View className="py-4">
+        <View style={contentStyle} className="py-4">
           <Text className="text-primary text-2xl font-bold mb-2">Помощь</Text>
           <Text className="text-text-muted text-sm mb-6">Часто задаваемые вопросы</Text>
           {mockFaqItems.map((item, i) => (
@@ -33,7 +38,7 @@ export default function HelpStates() {
       </StateSection>
 
       <StateSection title="faq_expanded">
-        <View className="py-4">
+        <View style={contentStyle} className="py-4">
           <Text className="text-primary text-2xl font-bold mb-2">Помощь</Text>
           <Text className="text-text-muted text-sm mb-6">Часто задаваемые вопросы</Text>
           {mockFaqItems.map((item, i) => (

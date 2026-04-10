@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
@@ -31,13 +31,24 @@ function ListingCardMini({ title, price, currency, city, seed }: { title: string
 export default function HomepageStates() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+  const isWide = width >= 1280;
+
+  const colWidth = isWide ? '32%' : isDesktop ? '32%' : '48%';
+  const containerStyle = isDesktop ? { maxWidth: 1200, alignSelf: 'center' as const, width: '100%' } : {};
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
-            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
+            <TextInput
+              className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
+              placeholder="Поиск по объявлениям..."
+              placeholderTextColor="#6A8898"
+              editable={false}
+            />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
               <Feather name="search" size={20} color="#fff" />
             </TouchableOpacity>
@@ -63,8 +74,8 @@ export default function HomepageStates() {
           </View>
           <Text className="text-text-primary text-lg font-bold mb-3">Последние объявления</Text>
           <View className="flex-row flex-wrap gap-3">
-            {mockListings.filter(l => l.status === 'active').slice(0, 6).map((l, idx) => (
-              <View key={l.id} className="w-[48%]">
+            {mockListings.filter(l => l.status === 'active').slice(0, isDesktop ? 6 : 6).map((l, idx) => (
+              <View key={l.id} style={{ width: colWidth }}>
                 <ListingCardMini title={l.title} price={l.price} currency={l.currency} city={l.city} seed={`listing${idx + 1}`} />
               </View>
             ))}
@@ -79,7 +90,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="loading_listings">
-        <View>
+        <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
@@ -94,7 +105,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="empty_listings">
-        <View>
+        <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#6A8898" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
@@ -110,7 +121,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="guest_cta">
-        <View className="bg-surface rounded-lg p-4 items-center">
+        <View style={containerStyle} className="bg-surface rounded-lg p-4 items-center">
           <Text className="text-text-primary text-lg font-bold mb-2">Присоединяйтесь!</Text>
           <Text className="text-text-muted text-sm text-center mb-4">Войдите, чтобы размещать объявления и сохранять избранное</Text>
           <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg">
@@ -120,7 +131,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="user_cta">
-        <View className="bg-surface rounded-lg p-4 items-center">
+        <View style={containerStyle} className="bg-surface rounded-lg p-4 items-center">
           <Text className="text-text-primary text-lg font-bold mb-2">Продайте быстрее!</Text>
           <Text className="text-text-muted text-sm text-center mb-4">Продвиньте ваше объявление и получите больше просмотров</Text>
           <TouchableOpacity className="bg-secondary py-3 px-6 rounded-lg">

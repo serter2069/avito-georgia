@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
@@ -10,11 +10,15 @@ export default function OnboardingStates() {
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('');
   const [cityOpen, setCityOpen] = useState(false);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
+  const formStyle = isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {};
 
   return (
     <View>
       <StateSection title="default">
-        <View className="py-6">
+        <View style={formStyle} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4">
@@ -68,7 +72,7 @@ export default function OnboardingStates() {
       </StateSection>
 
       <StateSection title="validation_error">
-        <View className="py-6">
+        <View style={formStyle} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4">
@@ -95,7 +99,7 @@ export default function OnboardingStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-6">
+        <View style={formStyle} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4 opacity-50">
@@ -119,7 +123,7 @@ export default function OnboardingStates() {
       </StateSection>
 
       <StateSection title="city_picker_open">
-        <View className="py-6">
+        <View style={formStyle} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4">
