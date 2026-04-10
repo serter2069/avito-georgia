@@ -235,6 +235,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/promotions/promote',
     stateCount: 3,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Продвижение объявления: выбор пакета (1 день / 3 дня / 7 дней), цена. Оплата через Stripe. После оплаты — объявление в топе' }],
   },
   {
@@ -244,6 +246,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/promotions/success',
     stateCount: 1,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Успешная оплата продвижения. Показывает детали: объявление, период, дата истечения. Кнопка \'Посмотреть объявление\'' }],
   },
   {
@@ -253,6 +257,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/promotions/cancelled',
     stateCount: 1,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Отменённая оплата (пользователь закрыл Stripe). Показывает причину. Кнопка \'Попробовать снова\'' }],
   },
   {
@@ -262,6 +268,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/promotions/slot-success',
     stateCount: 4,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Восстановление объявления из архива / публикация черновика. Показывает что объявление теперь активно' }],
   },
 
