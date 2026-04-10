@@ -1,11 +1,16 @@
-import { View, Text } from 'react-native';
+import { View, Text, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 
 export default function PrivacyStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
+  const contentStyle = isDesktop ? { maxWidth: 800, alignSelf: 'center' as const, width: '100%' } : {};
+
   return (
     <View>
       <StateSection title="default">
-        <View className="py-4">
+        <View style={contentStyle} className="py-4">
           <Text className="text-primary text-2xl font-bold mb-4">Политика конфиденциальности</Text>
           <Text className="text-text-muted text-sm mb-4">Последнее обновление: 1 апреля 2026</Text>
 
