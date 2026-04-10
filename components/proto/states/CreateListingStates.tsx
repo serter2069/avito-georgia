@@ -23,7 +23,7 @@ export default function CreateListingStates() {
   const [currentStep, setCurrentStep] = useState(1);
 
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="step_flow">
         <View className="py-4">
           <Stepper current={currentStep} />

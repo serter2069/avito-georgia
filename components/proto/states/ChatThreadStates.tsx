@@ -19,7 +19,7 @@ export default function ChatThreadStates() {
   const [message, setMessage] = useState('');
 
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           <View className="bg-surface rounded-lg p-3 mb-4 flex-row items-center gap-2">

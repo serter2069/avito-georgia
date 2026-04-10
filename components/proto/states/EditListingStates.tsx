@@ -4,7 +4,7 @@ import { StateSection } from '../StateSection';
 
 export default function EditListingStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="loading_data">
         <View className="py-16 items-center">
           <ActivityIndicator size="large" color="#0A7B8A" />

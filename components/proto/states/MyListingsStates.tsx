@@ -1,7 +1,6 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings } from '../../../constants/protoMockData';
 
 const statusBadge: Record<string, { bg: string; text: string; label: string }> = {
@@ -16,7 +15,7 @@ function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
   const badge = statusBadge[listing.status] || statusBadge.active;
   return (
     <View className="flex-row bg-white border border-border rounded-lg overflow-hidden mb-3">
-      <ProtoPlaceholderImage type="photo" width={96} height={96} />
+      <Image source={{ uri: 'https://picsum.photos/seed/listing1/96/96' }} style={{ width: 96, height: 96 }} />
       <View className="flex-1 p-3">
         <View className="flex-row items-center justify-between mb-1">
           <Text className="text-text-primary text-sm font-semibold flex-1" numberOfLines={1}>{listing.title}</Text>
@@ -40,7 +39,7 @@ function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
 
 export default function MyListingsStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           <View className="flex-row gap-2 mb-4 flex-wrap">

@@ -30,7 +30,7 @@ function NotificationRow({ n }: { n: typeof mockNotifications[0] }) {
 
 export default function NotificationsStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           {mockNotifications.map((n) => (

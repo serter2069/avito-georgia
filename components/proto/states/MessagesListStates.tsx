@@ -1,13 +1,12 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockMessages } from '../../../constants/protoMockData';
 
 function ThreadRow({ msg }: { msg: typeof mockMessages[0] }) {
   return (
     <TouchableOpacity className="flex-row items-center gap-3 py-3 border-b border-border">
-      <ProtoPlaceholderImage type="avatar" width={48} height={48} />
+      <Image source={{ uri: 'https://picsum.photos/seed/user1/48/48' }} style={{ width: 48, height: 48, borderRadius: 24 }} />
       <View className="flex-1">
         <View className="flex-row items-center justify-between mb-0.5">
           <Text className="text-text-primary text-sm font-semibold">{msg.senderName}</Text>
@@ -27,7 +26,7 @@ function ThreadRow({ msg }: { msg: typeof mockMessages[0] }) {
 
 export default function MessagesListStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           {mockMessages.map((msg) => (
