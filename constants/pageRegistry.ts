@@ -161,6 +161,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/messages',
     stateCount: 3,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Список всех чатов. Непрочитанные выделяются жирным. Поиск по чатам. Можно архивировать или удалить чат' }],
   },
   {
@@ -170,6 +172,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/messages/[id]',
     stateCount: 4,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Чат с покупателем/продавцом. Показывает превью объявления вверху. Отправка текста и фото. WebSocket real-time' }],
   },
   {
@@ -179,6 +183,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/favorites',
     stateCount: 3,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Сохранённые объявления. Сортировка по дате добавления. Если объявление удалено — показывать \'Объявление снято\' вместо него' }],
   },
   {
@@ -188,6 +194,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/notifications',
     stateCount: 3,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Push-уведомления: новое сообщение, объявление добавлено в избранное, истекает срок объявления, одобрено/отклонено модерацией. Пометить все прочитанными' }],
   },
   {
@@ -197,6 +205,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/profile',
     stateCount: 4,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Редактирование профиля: фото (аватар), имя, город, телефон. Нельзя менять email. Кнопка \'Премиум подписка\' если нет подписки' }],
   },
   {
@@ -206,6 +216,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/settings',
     stateCount: 2,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Настройки приложения: язык (KA/RU/EN), уведомления, конфиденциальность. Кнопка \'Удалить аккаунт\' — с подтверждением' }],
   },
   {
@@ -215,6 +227,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/payments',
     stateCount: 3,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'История платежей: дата, тип (Premium/Boost), сумма, статус. Фильтр по типу и дате. Скачать чек (PDF)' }],
   },
   {
@@ -224,6 +238,8 @@ export const pageRegistry: PageEntry[] = [
     route: '/dashboard/subscription',
     stateCount: 4,
     nav: 'client',
+    qaCycles: 1,
+    qaScore: 10,
     notes: [{ date: '2026-04-10', text: 'Premium подписка: безлимитные объявления, значок Premium, приоритет в поиске. Цена 29.99 GEL/месяц. Через Stripe' }],
   },
 
