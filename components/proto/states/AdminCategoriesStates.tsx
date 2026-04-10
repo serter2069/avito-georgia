@@ -113,6 +113,33 @@ export default function AdminCategoriesStates() {
           </View>
         </View>
       </StateSection>
+
+      <StateSection title="edit_modal">
+        <View className="bg-white border border-border rounded-lg p-4">
+          <Text className="text-text-primary text-lg font-bold mb-1">Редактировать категорию</Text>
+          <Text className="text-text-muted text-sm mb-4">Транспорт</Text>
+          <View className="mb-3">
+            <Text className="text-text-secondary text-sm mb-1 font-medium">Название (RU)</Text>
+            <TextInput className="bg-surface border border-border-focus rounded-lg px-4 py-3 text-text-primary" value="Транспорт" editable={false} />
+          </View>
+          <View className="mb-3">
+            <Text className="text-text-secondary text-sm mb-1 font-medium">Название (KA)</Text>
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="ტრანსპორტი" editable={false} />
+          </View>
+          <View className="mb-4">
+            <Text className="text-text-secondary text-sm mb-1 font-medium">Название (EN)</Text>
+            <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value="Transport" editable={false} />
+          </View>
+          <View className="flex-row gap-3">
+            <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center">
+              <Text className="text-text-secondary font-semibold">Отмена</Text>
+            </TouchableOpacity>
+            <TouchableOpacity className="flex-1 bg-primary py-3 rounded-lg items-center">
+              <Text className="text-white font-semibold">Сохранить</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </StateSection>
     </View>
   );
 }

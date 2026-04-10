@@ -10,7 +10,7 @@ const typeBadge: Record<string, { bg: string; text: string; label: string }> = {
   inappropriate: { bg: 'bg-info/20', text: 'text-info', label: 'Контент' },
 };
 
-function ReportRow({ r, reviewed, onReview }: { r: typeof mockReports[0]; reviewed: boolean; onReview: () => void }) {
+function ReportRow({ r, reviewed, onReview, onDeletePress }: { r: typeof mockReports[0]; reviewed: boolean; onReview: () => void; onDeletePress: () => void }) {
   const badge = typeBadge[r.type] || typeBadge.spam;
   return (
     <View className={`border rounded-lg p-3 mb-3 ${reviewed ? 'border-border opacity-60' : 'border-border'}`}>
@@ -32,11 +32,11 @@ function ReportRow({ r, reviewed, onReview }: { r: typeof mockReports[0]; review
       <Text className="text-text-secondary text-sm mb-3">{r.description}</Text>
       {!reviewed && (
         <View className="flex-row gap-2">
-          <TouchableOpacity className="flex-1 bg-primary py-2 rounded-lg items-center">
-            <Text className="text-white text-sm font-medium">К объявлению</Text>
+          <TouchableOpacity className="flex-1 bg-error py-2 rounded-lg items-center" onPress={onDeletePress}>
+            <Text className="text-white text-sm font-medium">Удалить объявление</Text>
           </TouchableOpacity>
           <TouchableOpacity className="flex-1 border border-border py-2 rounded-lg items-center" onPress={onReview}>
-            <Text className="text-text-secondary text-sm font-medium">Отклонить</Text>
+            <Text className="text-text-secondary text-sm font-medium">Отклонить жалобу</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -46,6 +46,7 @@ function ReportRow({ r, reviewed, onReview }: { r: typeof mockReports[0]; review
 
 export default function AdminReportsStates() {
   const [reviewed, setReviewed] = useState<Record<string, boolean>>({ r3: true });
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   return (
     <View>
@@ -58,8 +59,23 @@ export default function AdminReportsStates() {
               r={r}
               reviewed={!!reviewed[r.id]}
               onReview={() => setReviewed(prev => ({ ...prev, [r.id]: true }))}
+              onDeletePress={() => setDeleteTarget(r.id)}
             />
           ))}
+          {deleteTarget && (
+            <View className="bg-white border border-error/30 rounded-lg p-4 mt-2">
+              <Text className="text-text-primary text-base font-bold mb-1">Удалить объявление?</Text>
+              <Text className="text-text-muted text-sm mb-4">Это действие необратимо. Объявление будет удалено для всех пользователей.</Text>
+              <View className="flex-row gap-3">
+                <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center" onPress={() => setDeleteTarget(null)}>
+                  <Text className="text-text-secondary font-semibold">Отмена</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="flex-1 bg-error py-3 rounded-lg items-center" onPress={() => { setDeleteTarget(null); setReviewed(prev => ({ ...prev, [deleteTarget]: true })); }}>
+                  <Text className="text-white font-semibold">Удалить</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
       </StateSection>
 
