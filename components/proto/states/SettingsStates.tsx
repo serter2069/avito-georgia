@@ -78,6 +78,24 @@ export default function SettingsStates() {
           </View>
         </View>
       </StateSection>
+
+      <StateSection title="logout_confirm">
+        <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
+          <View className="items-center mb-4">
+            <Feather name="log-out" size={48} color="#0A7B8A" />
+            <Text className="text-text-primary text-lg font-bold mt-2">Выйти из аккаунта?</Text>
+            <Text className="text-text-muted text-sm text-center mt-2">Вы будете отключены от аккаунта на этом устройстве.</Text>
+          </View>
+          <View className="flex-row gap-3">
+            <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center">
+              <Text className="text-text-secondary font-semibold">Отмена</Text>
+            </TouchableOpacity>
+            <TouchableOpacity className="flex-1 bg-primary py-3 rounded-lg items-center">
+              <Text className="text-white font-semibold">Выйти</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </StateSection>
     </View>
   );
 }

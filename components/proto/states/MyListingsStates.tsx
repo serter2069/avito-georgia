@@ -25,10 +25,15 @@ function CompactListingCard({ listing, isDesktop }: { listing: typeof mockListin
           </View>
         </View>
         <Text className="text-primary font-bold text-sm">{listing.price ? `${listing.price.toLocaleString()} ${listing.currency}` : 'Договорная'}</Text>
-        <View className="flex-row gap-2 mt-2">
+        <View className="flex-row gap-2 mt-2 flex-wrap">
           <TouchableOpacity className="border border-primary px-2 py-1 rounded-md" onPress={() => {}}>
             <Text className="text-primary text-xs font-medium">Редактировать</Text>
           </TouchableOpacity>
+          {listing.status === 'active' && (
+            <TouchableOpacity className="border border-warning px-2 py-1 rounded-md" onPress={() => {}}>
+              <Text className="text-warning text-xs font-medium">Снять</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity className="border border-error px-2 py-1 rounded-md" onPress={() => {}}>
             <Text className="text-error text-xs font-medium">Удалить</Text>
           </TouchableOpacity>

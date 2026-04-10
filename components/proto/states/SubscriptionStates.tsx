@@ -82,6 +82,24 @@ export default function SubscriptionStates() {
           <Text className="text-text-muted text-sm mt-3">Оформляем подписку...</Text>
         </View>
       </StateSection>
+
+      <StateSection title="cancel_confirm">
+        <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
+          <View className="items-center mb-4">
+            <Feather name="alert-triangle" size={48} color="#C0392B" />
+            <Text className="text-text-primary text-lg font-bold mt-2">Отменить подписку?</Text>
+            <Text className="text-text-muted text-sm text-center mt-2">Доступ к Premium истечёт 15 мая 2026. После этого аккаунт перейдёт на тариф Basic.</Text>
+          </View>
+          <View className="flex-row gap-3">
+            <TouchableOpacity className="flex-1 border border-border py-3 rounded-lg items-center">
+              <Text className="text-text-secondary font-semibold">Оставить</Text>
+            </TouchableOpacity>
+            <TouchableOpacity className="flex-1 bg-error py-3 rounded-lg items-center">
+              <Text className="text-white font-semibold">Отменить</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </StateSection>
     </View>
   );
 }
