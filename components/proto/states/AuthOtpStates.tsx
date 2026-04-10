@@ -117,9 +117,9 @@ export default function AuthOtpStates() {
           <View style={[{ width: '100%' }, formStyle]}>
             <OtpInputRow values={['', '', '', '', '', '']} />
             <View className="w-full bg-surface border border-border rounded-lg p-4 mb-4 items-center">
-              <Text className="text-text-muted text-sm">CAPTCHA verification required</Text>
+              <Text className="text-text-muted text-sm">Подтвердите, что вы не робот</Text>
               <View className="w-full h-16 bg-border/30 rounded-md mt-2 items-center justify-center">
-                <Text className="text-text-muted text-xs">reCAPTCHA placeholder</Text>
+                <Text className="text-text-muted text-xs">reCAPTCHA</Text>
               </View>
             </View>
             <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center opacity-50">

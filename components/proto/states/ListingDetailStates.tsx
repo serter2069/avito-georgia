@@ -81,6 +81,8 @@ export default function ListingDetailStates() {
                     )}
                   </TouchableOpacity>
                 </View>
+                <Text className="text-text-primary text-base font-semibold mb-1">Описание</Text>
+                <Text className="text-text-secondary text-sm leading-5 mb-4">Автомобиль в отличном состоянии. Один хозяин, не бита, не крашена. Полный комплект обслуживания. Возможен обмен. Торг уместен.</Text>
                 <View className="flex-row gap-3 mb-4">
                   <TouchableOpacity className="flex-row items-center gap-1">
                     <Feather name="heart" size={20} color="#0A7B8A" />
@@ -137,6 +139,8 @@ export default function ListingDetailStates() {
                   )}
                 </TouchableOpacity>
               </View>
+              <Text className="text-text-primary text-base font-semibold mb-1">Описание</Text>
+              <Text className="text-text-secondary text-sm leading-5 mb-4">Автомобиль в отличном состоянии. Один хозяин, не бита, не крашена. Полный комплект обслуживания. Возможен обмен. Торг уместен.</Text>
               <View className="flex-row gap-3 mb-4">
                 <TouchableOpacity className="flex-row items-center gap-1">
                   <Feather name="heart" size={20} color="#0A7B8A" />

@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockUsers, mockListings } from '../../../constants/protoMockData';
@@ -31,6 +31,10 @@ export default function SellerProfileStates() {
                     <Feather name="map-pin" size={14} color="#6A8898" />
                     <Text className="text-text-muted text-sm">{seller.city}</Text>
                   </View>
+                  <TouchableOpacity className="bg-primary py-2 px-4 rounded-lg mt-4 flex-row items-center gap-2 self-center">
+                    <Feather name="message-circle" size={16} color="#fff" />
+                    <Text className="text-white font-semibold text-sm">Написать продавцу</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
               <View className="flex-1">
@@ -62,6 +66,10 @@ export default function SellerProfileStates() {
                   <Feather name="map-pin" size={14} color="#6A8898" />
                   <Text className="text-text-muted text-sm">{seller.city}</Text>
                 </View>
+                <TouchableOpacity className="bg-primary py-2 px-6 rounded-lg mt-4 flex-row items-center gap-2">
+                  <Feather name="message-circle" size={16} color="#fff" />
+                  <Text className="text-white font-semibold text-sm">Написать продавцу</Text>
+                </TouchableOpacity>
               </View>
               <Text className="text-text-primary text-base font-semibold mb-3">Объявления (3)</Text>
               <View className="flex-row flex-wrap gap-3">
