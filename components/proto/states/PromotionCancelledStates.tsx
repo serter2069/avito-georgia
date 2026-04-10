@@ -10,8 +10,8 @@ export default function PromotionCancelledStates() {
     <View>
       <StateSection title="cancelled">
         <View className="py-12 items-center">
-          <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-2">
-            <Feather name="x-circle" size={40} color="#0A7B8A" />
+          <View className="w-16 h-16 rounded-full bg-error/10 items-center justify-center mb-2">
+            <Feather name="x-circle" size={40} color="#ef4444" />
           </View>
           <Text className="text-text-primary text-xl font-bold mt-4">Оплата отменена</Text>
           <Text className="text-text-muted text-sm mt-2 text-center">Платёж не был завершён. Средства не списаны.</Text>

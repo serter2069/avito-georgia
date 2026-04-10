@@ -112,7 +112,7 @@ export default function AdminDashboard() {
                 </View>
               </View>
               <Text className="text-text-muted text-xs">
-                {r.reporter?.email ?? '—'} &rarr; {r.listing?.title ?? r.targetUser?.email ?? '—'} | {formatDate(r.createdAt)}
+                {r.reporter?.email ?? '—'} {'→'} {r.listing?.title ?? r.targetUser?.email ?? '—'} | {formatDate(r.createdAt)}
               </Text>
             </View>
           ))

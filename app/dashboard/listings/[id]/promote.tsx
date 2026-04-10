@@ -200,7 +200,7 @@ export default function PromoteListingScreen() {
               )}
               {isBestValue && (
                 <View className="bg-primary rounded-full px-2 py-0.5 self-start mb-2">
-                  <Text className="text-white text-xs font-bold">Best value</Text>
+                  <Text className="text-white text-xs font-bold">{t('bestValue')}</Text>
                 </View>
               )}
 
