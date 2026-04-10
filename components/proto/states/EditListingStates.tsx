@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
 export default function EditListingStates() {
@@ -30,10 +30,10 @@ export default function EditListingStates() {
             <Text className="text-text-secondary text-sm mb-1 font-medium">Фотографии</Text>
             <View className="flex-row gap-3">
               <View className="w-20 h-20 bg-surface border border-border rounded-lg items-center justify-center">
-                <Ionicons name="image" size={24} color="#0A7B8A" />
+                <Feather name="image" size={24} color="#0A7B8A" />
               </View>
               <View className="w-20 h-20 bg-surface border-2 border-dashed border-border rounded-lg items-center justify-center">
-                <Ionicons name="add" size={24} color="#6A8898" />
+                <Feather name="plus" size={24} color="#6A8898" />
               </View>
             </View>
           </View>
@@ -58,7 +58,7 @@ export default function EditListingStates() {
       <StateSection title="success">
         <View className="py-4">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4">
-            <Ionicons name="checkmark-circle" size={24} color="#2E7D30" />
+            <Feather name="check-circle" size={24} color="#2E7D30" />
             <Text className="text-success text-sm font-medium">Объявление успешно сохранено</Text>
           </View>
           <View className="mb-4">

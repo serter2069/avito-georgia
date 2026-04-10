@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings } from '../../../constants/protoMockData';
 
 const statusBadge: Record<string, { bg: string; text: string; label: string }> = {
@@ -15,7 +16,7 @@ function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
   const badge = statusBadge[listing.status] || statusBadge.active;
   return (
     <View className="flex-row bg-white border border-border rounded-lg overflow-hidden mb-3">
-      <Image source={{ uri: listing.photos[0] }} className="w-24 h-24" resizeMode="cover" />
+      <ProtoPlaceholderImage type="photo" width={96} height={96} />
       <View className="flex-1 p-3">
         <View className="flex-row items-center justify-between mb-1">
           <Text className="text-text-primary text-sm font-semibold flex-1" numberOfLines={1}>{listing.title}</Text>
@@ -60,7 +61,7 @@ export default function MyListingsStates() {
 
       <StateSection title="empty">
         <View className="py-12 items-center">
-          <Ionicons name="file-tray-outline" size={48} color="#6A8898" />
+          <Feather name="file-text" size={48} color="#6A8898" />
           <Text className="text-text-primary text-lg font-semibold mt-3">У вас пока нет объявлений</Text>
           <Text className="text-text-muted text-sm mt-1">Создайте первое объявление!</Text>
           <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg mt-4">

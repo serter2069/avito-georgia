@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings } from '../../../constants/protoMockData';
 
 export default function FavoritesStates() {
@@ -11,9 +12,9 @@ export default function FavoritesStates() {
           {mockListings.filter(l => l.status === 'active').slice(0, 4).map((l) => (
             <View key={l.id} className="w-[48%] bg-white border border-border rounded-lg overflow-hidden">
               <View className="relative">
-                <Image source={{ uri: l.photos[0] }} className="w-full h-28" resizeMode="cover" />
+                <ProtoPlaceholderImage type="photo" width="100%" height={112} />
                 <TouchableOpacity className="absolute top-2 right-2 bg-white/80 p-1.5 rounded-full">
-                  <Ionicons name="heart" size={16} color="#C0392B" />
+                  <Feather name="heart" size={16} color="#C0392B" />
                 </TouchableOpacity>
               </View>
               <View className="p-2">
@@ -34,7 +35,7 @@ export default function FavoritesStates() {
 
       <StateSection title="empty">
         <View className="py-16 items-center">
-          <Ionicons name="heart-outline" size={48} color="#6A8898" />
+          <Feather name="heart" size={48} color="#6A8898" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет избранных</Text>
           <Text className="text-text-muted text-sm mt-1 text-center">Добавляйте объявления в избранное, чтобы не потерять</Text>
         </View>
