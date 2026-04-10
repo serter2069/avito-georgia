@@ -1,15 +1,24 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings } from '../../../constants/protoMockData';
 
 export default function FavoritesStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
+  const listings = mockListings.filter(l => l.status === 'active').slice(0, 6);
+
   return (
     <View>
       <StateSection title="default">
         <View className="flex-row flex-wrap gap-3">
-          {mockListings.filter(l => l.status === 'active').slice(0, 4).map((l) => (
-            <View key={l.id} className="w-[48%] bg-white border border-border rounded-lg overflow-hidden">
+          {listings.map((l) => (
+            <View
+              key={l.id}
+              className="bg-white border border-border rounded-lg overflow-hidden"
+              style={{ width: isDesktop ? '31%' : '48%' }}
+            >
               <View className="relative">
                 <Image source={{ uri: `https://picsum.photos/seed/${l.id}/400/112` }} style={{ width: '100%', height: 112 }} />
                 <TouchableOpacity className="absolute top-2 right-2 bg-white/80 p-1.5 rounded-full">

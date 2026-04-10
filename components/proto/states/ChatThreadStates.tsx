@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockChatMessages } from '../../../constants/protoMockData';
@@ -17,11 +17,13 @@ function ChatBubble({ text, isOwn, time }: { text: string; isOwn: boolean; time:
 
 export default function ChatThreadStates() {
   const [message, setMessage] = useState('');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined}>
           <View className="bg-surface rounded-lg p-3 mb-4 flex-row items-center gap-2">
             <Feather name="tag" size={16} color="#0A7B8A" />
             <Text className="text-text-secondary text-sm font-medium">Toyota Camry 2020</Text>
@@ -54,7 +56,7 @@ export default function ChatThreadStates() {
       </StateSection>
 
       <StateSection title="empty">
-        <View className="py-12 items-center">
+        <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined} className="py-12 items-center">
           <Feather name="message-circle" size={48} color="#6A8898" />
           <Text className="text-text-muted text-sm mt-3">Начните диалог</Text>
           <View className="flex-row items-center gap-2 mt-6 w-full">
@@ -76,7 +78,7 @@ export default function ChatThreadStates() {
       </StateSection>
 
       <StateSection title="sending">
-        <View>
+        <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined}>
           {mockChatMessages.map((msg) => (
             <ChatBubble key={msg.id} text={msg.text} isOwn={msg.isOwn} time={new Date(msg.createdAt).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })} />
           ))}

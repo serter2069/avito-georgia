@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockMessages } from '../../../constants/protoMockData';
@@ -26,10 +26,13 @@ function ThreadRow({ msg }: { msg: typeof mockMessages[0] }) {
 }
 
 export default function MessagesListStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined}>
           {mockMessages.map((msg) => (
             <ThreadRow key={msg.id} msg={msg} />
           ))}

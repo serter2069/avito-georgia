@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
@@ -12,11 +12,11 @@ const statusBadge: Record<string, { bg: string; text: string; label: string }> =
   removed: { bg: 'bg-error/20', text: 'text-error', label: 'Удалено' },
 };
 
-function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
+function CompactListingCard({ listing, isDesktop }: { listing: typeof mockListings[0]; isDesktop: boolean }) {
   const badge = statusBadge[listing.status] || statusBadge.active;
   return (
     <View className="flex-row bg-white border border-border rounded-lg overflow-hidden mb-3">
-      <Image source={{ uri: 'https://picsum.photos/seed/listing1/96/96' }} style={{ width: 96, height: 96 }} />
+      <Image source={{ uri: 'https://picsum.photos/seed/listing1/96/96' }} style={{ width: isDesktop ? 120 : 96, height: isDesktop ? 120 : 96 }} />
       <View className="flex-1 p-3">
         <View className="flex-row items-center justify-between mb-1">
           <Text className="text-text-primary text-sm font-semibold flex-1" numberOfLines={1}>{listing.title}</Text>
@@ -40,11 +40,18 @@ function CompactListingCard({ listing }: { listing: typeof mockListings[0] }) {
 
 export default function MyListingsStates() {
   const [activeTab, setActiveTab] = useState(0);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
+  const listings = mockListings.slice(0, 4);
+  const half = Math.ceil(listings.length / 2);
+  const leftCol = listings.slice(0, half);
+  const rightCol = listings.slice(half);
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={isDesktop ? { maxWidth: 900, alignSelf: 'center', width: '100%' } : undefined}>
           <View className="flex-row gap-2 mb-4 flex-wrap">
             {['Активные', 'На модерации', 'Черновики', 'Проданные', 'Удалённые'].map((tab, i) => (
               <TouchableOpacity key={tab} onPress={() => setActiveTab(i)} className={`px-3 py-2 rounded-lg ${i === activeTab ? 'bg-primary' : 'bg-surface border border-border'}`}>
@@ -52,9 +59,18 @@ export default function MyListingsStates() {
               </TouchableOpacity>
             ))}
           </View>
-          {mockListings.slice(0, 4).map((l) => (
-            <CompactListingCard key={l.id} listing={l} />
-          ))}
+          {isDesktop ? (
+            <View className="flex-row gap-3">
+              <View className="flex-1">
+                {leftCol.map((l) => <CompactListingCard key={l.id} listing={l} isDesktop={isDesktop} />)}
+              </View>
+              <View className="flex-1">
+                {rightCol.map((l) => <CompactListingCard key={l.id} listing={l} isDesktop={isDesktop} />)}
+              </View>
+            </View>
+          ) : (
+            listings.map((l) => <CompactListingCard key={l.id} listing={l} isDesktop={isDesktop} />)
+          )}
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center mt-2" onPress={() => {}}>
             <Text className="text-white font-semibold">Создать объявление</Text>
           </TouchableOpacity>
@@ -79,7 +95,7 @@ export default function MyListingsStates() {
       </StateSection>
 
       <StateSection title="confirm_delete_modal">
-        <View className="bg-white border border-border rounded-lg p-4">
+        <View className="bg-white border border-border rounded-lg p-4" style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined}>
           <Text className="text-text-primary text-lg font-bold mb-2">Удалить объявление?</Text>
           <Text className="text-text-muted text-sm mb-4">Объявление "Toyota Camry 2020" будет удалено. Это действие нельзя отменить.</Text>
           <View className="flex-row gap-3">
