@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, Alert, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
@@ -19,6 +19,8 @@ interface CategoryItem {
 
 export default function AdminCategories() {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -69,7 +71,8 @@ export default function AdminCategories() {
     return (
       <View
         key={cat.id}
-        className={`border border-border rounded-lg p-4 ${isChild ? 'ml-4 bg-dark' : 'bg-surface-card'}`}
+        style={isChild ? { marginLeft: isDesktop ? 32 : 16 } : undefined}
+        className={`border border-border rounded-lg p-4 ${isChild ? 'bg-dark' : 'bg-surface-card'}`}
       >
         <View className="flex-row items-center justify-between mb-2">
           <View className="flex-1">
@@ -144,14 +147,14 @@ export default function AdminCategories() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-dark" contentContainerClassName="p-4 pb-10 gap-3">
+    <ScrollView className="flex-1 bg-dark" contentContainerStyle={isDesktop ? { padding: 24, paddingBottom: 40, gap: 12, maxWidth: 900, alignSelf: 'center', width: '100%' } : { padding: 16, paddingBottom: 40, gap: 12 }}>
       <Text className="text-text-primary text-lg font-bold mb-2">{t('adminCategories')}</Text>
 
       {loading ? (
         <ActivityIndicator size="large" color={colors.brandPrimary} />
       ) : (
         categories.map((cat) => (
-          <View key={cat.id} className="gap-2">
+          <View key={cat.id} style={{ gap: 8 }}>
             {renderCategory(cat)}
             {cat.children?.map((child) => renderCategory(child, true))}
           </View>

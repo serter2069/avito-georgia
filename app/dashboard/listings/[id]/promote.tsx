@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Linking, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -62,6 +62,8 @@ export default function PromoteListingScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id: listingId } = useLocalSearchParams<{ id: string }>();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   const [prices, setPrices] = useState<PriceOption[]>([]);
   const [activePromotions, setActivePromotions] = useState<ActivePromotion[]>([]);
@@ -142,7 +144,7 @@ export default function PromoteListingScreen() {
     <View className="flex-1 bg-dark">
       <Header title={t('promoteListing')} />
 
-      <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4">
+      <ScrollView className="flex-1" contentContainerStyle={isDesktop ? { paddingHorizontal: 32, paddingVertical: 24, gap: 16, maxWidth: 1000, alignSelf: 'center', width: '100%' } : { paddingHorizontal: 16, paddingVertical: 16, gap: 16 }}>
         {/* Active promotions for this listing */}
         {activePromotions.length > 0 && (
           <View className="bg-surface-card border border-success/30 rounded-lg p-4">
@@ -169,6 +171,8 @@ export default function PromoteListingScreen() {
           {t('promotionTypes')}
         </Text>
 
+        {/* Desktop: 3 cards in a row; Mobile: stacked */}
+        <View style={isDesktop ? { flexDirection: 'row', flexWrap: 'wrap', gap: 16 } : { gap: 16 }}>
         {prices.map((option) => {
           const active = isTypeActive(option.type);
           const isHighlight = option.type === 'highlight';
@@ -178,6 +182,7 @@ export default function PromoteListingScreen() {
           return (
             <View
               key={option.type}
+              style={isDesktop ? { flex: 1, minWidth: 220 } : undefined}
               className={`bg-surface-card border rounded-lg p-4 ${
                 isBundle
                   ? 'border-yellow-500'
@@ -241,6 +246,7 @@ export default function PromoteListingScreen() {
             </View>
           );
         })}
+        </View>
 
         {/* Checkout URL info */}
         {checkoutUrl && (

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
@@ -25,6 +25,8 @@ const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
 
 export default function AdminPayments() {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const [payments, setPayments] = useState<PaymentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -57,7 +59,7 @@ export default function AdminPayments() {
   }
 
   return (
-    <ScrollView className="flex-1" contentContainerClassName="p-4 gap-3">
+    <ScrollView className="flex-1" contentContainerStyle={isDesktop ? { padding: 24, gap: 12, maxWidth: 1000, alignSelf: 'center', width: '100%' } : { padding: 16, gap: 12 }}>
       <Text className="text-text-muted text-xs mb-1">
         {t('adminPayments')}: {total}
       </Text>

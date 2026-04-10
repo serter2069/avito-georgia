@@ -14,8 +14,9 @@ export default function PromotionSuccessScreen() {
     <View className="flex-1 bg-dark">
       <ScrollView
         className="flex-1"
-        contentContainerClassName="flex-1 items-center justify-center px-6 py-12"
+        contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 48 }}
       >
+        <View style={{ width: '100%', maxWidth: 480 }}>
         <View className="items-center mb-8">
           <Ionicons name="checkmark-circle" size={72} color={colors.statusSuccessAlt} style={{ marginBottom: 16 }} />
           <Text className="text-text-primary text-2xl font-bold text-center mb-3">
@@ -43,6 +44,7 @@ export default function PromotionSuccessScreen() {
             variant="ghost"
             size="lg"
           />
+        </View>
         </View>
       </ScrollView>
     </View>

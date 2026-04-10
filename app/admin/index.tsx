@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
@@ -45,6 +45,8 @@ function formatDate(iso: string): string {
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const [stats, setStats] = useState<Stats | null>(null);
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [payments, setPayments] = useState<PaymentItem[]>([]);
@@ -71,16 +73,24 @@ export default function AdminDashboard() {
   }
 
   return (
-    <ScrollView className="flex-1" contentContainerClassName="p-4 gap-4">
-      {/* Stats cards */}
-      <View className="flex-row flex-wrap gap-3">
-        <StatCard label={t('totalListings')} value={stats?.totalListings ?? 0} />
-        <StatCard label={t('totalUsers')} value={stats?.totalUsers ?? 0} />
-        <StatCard label={t('pendingReports')} value={stats?.pendingReports ?? 0} />
-        <StatCard
-          label={t('paymentsThisMonth')}
-          value={`${stats?.paymentsThisMonth.sum.toFixed(0) ?? 0} GEL`}
-        />
+    <ScrollView className="flex-1" contentContainerStyle={isDesktop ? { padding: 24, gap: 16, maxWidth: 1200, alignSelf: 'center', width: '100%' } : { padding: 16, gap: 16 }}>
+      {/* Stats cards — 4 columns on desktop, 2 on mobile */}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        <View style={isDesktop ? { flex: 1, minWidth: 180 } : { flex: 1, minWidth: 140 }}>
+          <StatCard label={t('totalListings')} value={stats?.totalListings ?? 0} />
+        </View>
+        <View style={isDesktop ? { flex: 1, minWidth: 180 } : { flex: 1, minWidth: 140 }}>
+          <StatCard label={t('totalUsers')} value={stats?.totalUsers ?? 0} />
+        </View>
+        <View style={isDesktop ? { flex: 1, minWidth: 180 } : { flex: 1, minWidth: 140 }}>
+          <StatCard label={t('pendingReports')} value={stats?.pendingReports ?? 0} />
+        </View>
+        <View style={isDesktop ? { flex: 1, minWidth: 180 } : { flex: 1, minWidth: 140 }}>
+          <StatCard
+            label={t('paymentsThisMonth')}
+            value={`${stats?.paymentsThisMonth.sum.toFixed(0) ?? 0} GEL`}
+          />
+        </View>
       </View>
 
       {/* Recent reports */}
