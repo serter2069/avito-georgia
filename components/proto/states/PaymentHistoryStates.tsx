@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockPayments } from '../../../constants/protoMockData';
@@ -53,11 +53,13 @@ function FilterBar({ active, onSelect }: { active: string; onSelect: (k: string)
 export default function PaymentHistoryStates() {
   const [filter, setFilter] = useState<string>('all');
   const filtered = filter === 'all' ? mockPayments : mockPayments.filter((p) => p.type === filter);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={isDesktop ? { maxWidth: 900, alignSelf: 'center', width: '100%' } : undefined}>
           <FilterBar active={filter} onSelect={setFilter} />
           {filtered.map((p) => (
             <PaymentRow key={p.id} p={p} />

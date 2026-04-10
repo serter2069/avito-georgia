@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockCategories, mockCategoryIcons, mockCities } from '../../../constants/protoMockData';
@@ -24,11 +24,13 @@ export default function CreateListingStates() {
   const [formTitle, setFormTitle] = useState('Toyota Camry 2020, 2.5L');
   const [formDescription, setFormDescription] = useState('Отличное состояние, один владелец, полная история обслуживания.');
   const [formPrice, setFormPrice] = useState('28500');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   return (
     <View>
       <StateSection title="step_flow">
-        <View className="py-4">
+        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
           <Stepper current={currentStep} />
 
           {currentStep === 1 && (

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockNotifications } from '../../../constants/protoMockData';
@@ -34,10 +34,13 @@ function NotificationRow({ n }: { n: typeof mockNotifications[0] }) {
 }
 
 export default function NotificationsStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={isDesktop ? { maxWidth: 600, alignSelf: 'center', width: '100%' } : undefined}>
           {mockNotifications.map((n) => (
             <NotificationRow key={n.id} n={n} />
           ))}

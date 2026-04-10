@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
@@ -7,6 +7,8 @@ export default function EditListingStates() {
   const [title, setTitle] = useState('Toyota Camry 2020, 2.5L');
   const [description, setDescription] = useState('Отличное состояние, один владелец.');
   const [price, setPrice] = useState('28500');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   return (
     <View>
@@ -18,7 +20,7 @@ export default function EditListingStates() {
       </StateSection>
 
       <StateSection title="default">
-        <View className="py-4">
+        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} onChangeText={setTitle} />
@@ -49,7 +51,7 @@ export default function EditListingStates() {
       </StateSection>
 
       <StateSection title="saving">
-        <View className="py-4 opacity-50">
+        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4 opacity-50">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} editable={false} />
@@ -61,7 +63,7 @@ export default function EditListingStates() {
       </StateSection>
 
       <StateSection title="success">
-        <View className="py-4">
+        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4">
             <Feather name="check-circle" size={24} color="#2E7D30" />
             <Text className="text-success text-sm font-medium">Объявление успешно сохранено</Text>

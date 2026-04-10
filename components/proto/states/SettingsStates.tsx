@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, Switch, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
@@ -13,6 +13,8 @@ export default function SettingsStates() {
   const [language, setLanguage] = useState<'ru' | 'ka' | 'en'>('ru');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(false);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   const cycleLanguage = () => {
     const order: Array<'ru' | 'ka' | 'en'> = ['ru', 'ka', 'en'];
@@ -23,7 +25,7 @@ export default function SettingsStates() {
   return (
     <View>
       <StateSection title="default">
-        <View className="py-4">
+        <View style={isDesktop ? { maxWidth: 560, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Язык</Text>
             <TouchableOpacity
@@ -60,7 +62,7 @@ export default function SettingsStates() {
       </StateSection>
 
       <StateSection title="delete_confirm_alert">
-        <View className="bg-white border border-border rounded-lg p-4">
+        <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="alert-triangle" size={48} color="#C0392B" />
             <Text className="text-text-primary text-lg font-bold mt-2">Удалить аккаунт?</Text>

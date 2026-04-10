@@ -1,10 +1,10 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
-function PlanCard({ name, price, features, isPrimary }: { name: string; price: string; features: string[]; isPrimary?: boolean }) {
+function PlanCard({ name, price, features, isPrimary, isDesktop }: { name: string; price: string; features: string[]; isPrimary?: boolean; isDesktop?: boolean }) {
   return (
-    <View className={`border rounded-lg p-4 mb-3 ${isPrimary ? 'border-primary bg-primary/5' : 'border-border'}`}>
+    <View className={`border rounded-lg p-4 ${isDesktop ? 'flex-1' : 'mb-3'} ${isPrimary ? 'border-primary bg-primary/5' : 'border-border'}`}>
       {isPrimary && <View className="bg-primary px-2 py-0.5 rounded-full self-start mb-2"><Text className="text-white text-[10px] font-medium">Популярный</Text></View>}
       <Text className="text-text-primary text-lg font-bold">{name}</Text>
       <Text className="text-primary text-2xl font-bold my-2">{price}</Text>
@@ -22,17 +22,38 @@ function PlanCard({ name, price, features, isPrimary }: { name: string; price: s
 }
 
 export default function SubscriptionStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   return (
     <View>
       <StateSection title="no_subscription">
         <View className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Premium подписка</Text>
-          <PlanCard name="Premium" price="29.99 GEL/мес" features={['Безлимитные объявления', 'Значок Premium', 'Приоритет в поиске', 'Поддержка 24/7']} isPrimary />
+          {isDesktop ? (
+            <View className="flex-row gap-4">
+              <PlanCard
+                name="Basic"
+                price="Бесплатно"
+                features={['До 5 объявлений', 'Стандартное размещение', 'Email поддержка']}
+                isDesktop
+              />
+              <PlanCard
+                name="Premium"
+                price="29.99 GEL/мес"
+                features={['Безлимитные объявления', 'Значок Premium', 'Приоритет в поиске', 'Поддержка 24/7']}
+                isPrimary
+                isDesktop
+              />
+            </View>
+          ) : (
+            <PlanCard name="Premium" price="29.99 GEL/мес" features={['Безлимитные объявления', 'Значок Premium', 'Приоритет в поиске', 'Поддержка 24/7']} isPrimary />
+          )}
         </View>
       </StateSection>
 
       <StateSection title="active_subscription">
-        <View className="py-4">
+        <View className="py-4" style={isDesktop ? { maxWidth: 560, alignSelf: 'center', width: '100%' } : undefined}>
           <View className="bg-primary/10 border border-primary rounded-lg p-4 mb-4">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-primary text-lg font-bold">Premium</Text>
