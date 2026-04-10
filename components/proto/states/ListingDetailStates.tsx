@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, TextInput, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings, mockUsers } from '../../../constants/protoMockData';
 
 const listing = mockListings[0];
@@ -28,10 +27,10 @@ export default function ListingDetailStates() {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
 
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
-          <ProtoPlaceholderImage type="photo" width="100%" height={192} style={{ borderRadius: 8, marginBottom: 16 }} />
+          <Image source={{ uri: 'https://picsum.photos/seed/listing-detail/800/600' }} style={{ width: '100%', height: 192, borderRadius: 8, marginBottom: 16 }} />
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-primary font-bold text-2xl">{listing.price?.toLocaleString()} {listing.currency}</Text>
             <View className="bg-success/20 px-2 py-1 rounded-full">
@@ -72,7 +71,7 @@ export default function ListingDetailStates() {
             </TouchableOpacity>
           </View>
           <View className="flex-row items-center gap-3 bg-surface rounded-lg p-3 mb-4">
-            <ProtoPlaceholderImage type="avatar" width={48} height={48} />
+            <Image source={{ uri: 'https://picsum.photos/seed/seller-avatar/60/60' }} style={{ width: 48, height: 48, borderRadius: 24 }} />
             <View className="flex-1">
               <Text className="text-text-primary font-semibold">{seller.name}</Text>
               <Text className="text-text-muted text-xs">На сайте с {seller.createdAt}</Text>
@@ -83,9 +82,9 @@ export default function ListingDetailStates() {
           <ReviewCard name="Нино К." text="Отличный продавец, быстро отвечает!" rating={5} />
           <ReviewCard name="Георгий Б." text="Всё как в описании, рекомендую." rating={4} />
           <Text className="text-text-primary text-base font-semibold mb-2 mt-4">Похожие объявления</Text>
-          {mockListings.filter(l => l.id !== listing.id && l.status === 'active').slice(0, 3).map((l) => (
+          {mockListings.filter(l => l.id !== listing.id && l.status === 'active').slice(0, 3).map((l, idx) => (
             <View key={l.id} className="flex-row bg-surface rounded-lg overflow-hidden mb-2">
-              <ProtoPlaceholderImage type="photo" width={80} height={80} />
+              <Image source={{ uri: `https://picsum.photos/seed/similar${idx + 1}/160/160` }} style={{ width: 80, height: 80 }} />
               <View className="flex-1 p-2">
                 <Text className="text-text-primary text-sm font-medium" numberOfLines={1}>{l.title}</Text>
                 <Text className="text-primary font-bold text-sm">{l.price ? `${l.price.toLocaleString()} ${l.currency}` : 'Договорная'}</Text>

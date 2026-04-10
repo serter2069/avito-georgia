@@ -1,7 +1,6 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings } from '../../../constants/protoMockData';
 
 function FilterBar() {
@@ -27,10 +26,10 @@ function FilterBar() {
   );
 }
 
-function ListingRow({ title, price, currency, city, isPromoted }: { title: string; price: number | null; currency: string; city: string; isPromoted: boolean }) {
+function ListingRow({ title, price, currency, city, isPromoted, seed }: { title: string; price: number | null; currency: string; city: string; isPromoted: boolean; seed: string }) {
   return (
     <View className="flex-row bg-white border border-border rounded-lg overflow-hidden mb-3">
-      <ProtoPlaceholderImage type="photo" width={112} height={112} />
+      <Image source={{ uri: `https://picsum.photos/seed/${seed}/400/400` }} style={{ width: 112, height: 112 }} />
       <View className="flex-1 p-3 justify-between">
         <View>
           {isPromoted && <View className="bg-secondary/20 px-2 py-0.5 rounded-full self-start mb-1"><Text className="text-secondary text-[10px] font-medium">TOP</Text></View>}
@@ -47,12 +46,12 @@ function ListingRow({ title, price, currency, city, isPromoted }: { title: strin
 
 export default function ListingsFeedStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           <FilterBar />
-          {mockListings.filter(l => l.status === 'active').map((l) => (
-            <ListingRow key={l.id} title={l.title} price={l.price} currency={l.currency} city={l.city} isPromoted={l.isPromoted} />
+          {mockListings.filter(l => l.status === 'active').map((l, idx) => (
+            <ListingRow key={l.id} title={l.title} price={l.price} currency={l.currency} city={l.city} isPromoted={l.isPromoted} seed={`feed${idx + 1}`} />
           ))}
         </View>
       </StateSection>

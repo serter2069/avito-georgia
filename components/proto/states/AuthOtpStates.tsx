@@ -21,7 +21,7 @@ export default function AuthOtpStates() {
   const [otp, setOtp] = useState('');
 
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>

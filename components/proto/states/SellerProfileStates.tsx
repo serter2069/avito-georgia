@@ -1,18 +1,17 @@
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockUsers, mockListings } from '../../../constants/protoMockData';
 
 const seller = mockUsers[0];
 
 export default function SellerProfileStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           <View className="items-center mb-4">
-            <ProtoPlaceholderImage type="avatar" width={96} height={96} style={{ marginBottom: 12 }} />
+            <Image source={{ uri: 'https://picsum.photos/seed/seller-profile/96/96' }} style={{ width: 96, height: 96, borderRadius: 48, marginBottom: 12 }} />
             <View className="flex-row items-center gap-2">
               <Text className="text-text-primary text-xl font-bold">{seller.name}</Text>
               {seller.isPremium && <View className="bg-secondary/20 px-2 py-0.5 rounded-full"><Text className="text-secondary text-xs font-medium">Premium</Text></View>}
@@ -25,9 +24,9 @@ export default function SellerProfileStates() {
           </View>
           <Text className="text-text-primary text-base font-semibold mb-3">Объявления (3)</Text>
           <View className="flex-row flex-wrap gap-3">
-            {mockListings.filter(l => l.status === 'active').slice(0, 3).map((l) => (
+            {mockListings.filter(l => l.status === 'active').slice(0, 3).map((l, idx) => (
               <View key={l.id} className="w-[48%] bg-white border border-border rounded-lg overflow-hidden">
-                <ProtoPlaceholderImage type="photo" width="100%" height={96} />
+                <Image source={{ uri: `https://picsum.photos/seed/seller-listing${idx + 1}/400/300` }} style={{ width: '100%', height: 96 }} />
                 <View className="p-2">
                   <Text className="text-text-primary text-sm font-medium" numberOfLines={1}>{l.title}</Text>
                   <Text className="text-primary font-bold text-sm">{l.price ? `${l.price.toLocaleString()} ${l.currency}` : 'Договорная'}</Text>
@@ -47,7 +46,7 @@ export default function SellerProfileStates() {
       <StateSection title="empty_listings">
         <View>
           <View className="items-center mb-4">
-            <ProtoPlaceholderImage type="avatar" width={96} height={96} style={{ marginBottom: 12 }} />
+            <Image source={{ uri: 'https://picsum.photos/seed/seller-empty/96/96' }} style={{ width: 96, height: 96, borderRadius: 48, marginBottom: 12 }} />
             <Text className="text-text-primary text-xl font-bold">{mockUsers[2].name}</Text>
             <Text className="text-text-muted text-sm mt-1">{mockUsers[2].city}</Text>
           </View>

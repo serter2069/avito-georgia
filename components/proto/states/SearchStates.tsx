@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
 
 export default function SearchStates() {
   const [query, setQuery] = useState('');
 
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View>
           <TextInput
@@ -43,9 +42,9 @@ export default function SearchStates() {
               </TouchableOpacity>
             </View>
           </View>
-          {mockListings.filter(l => l.status === 'active').slice(0, 3).map((l) => (
+          {mockListings.filter(l => l.status === 'active').slice(0, 3).map((l, idx) => (
             <View key={l.id} className="flex-row bg-white border border-border rounded-lg overflow-hidden mb-2">
-              <ProtoPlaceholderImage type="photo" width={96} height={96} />
+              <Image source={{ uri: `https://picsum.photos/seed/search${idx + 1}/200/200` }} style={{ width: 96, height: 96 }} />
               <View className="flex-1 p-3">
                 <Text className="text-text-primary text-sm font-semibold" numberOfLines={1}>{l.title}</Text>
                 <Text className="text-primary font-bold">{l.price ? `${l.price.toLocaleString()} ${l.currency}` : 'Договорная'}</Text>
