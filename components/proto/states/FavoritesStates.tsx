@@ -1,18 +1,17 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockListings } from '../../../constants/protoMockData';
 
 export default function FavoritesStates() {
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View className="flex-row flex-wrap gap-3">
           {mockListings.filter(l => l.status === 'active').slice(0, 4).map((l) => (
             <View key={l.id} className="w-[48%] bg-white border border-border rounded-lg overflow-hidden">
               <View className="relative">
-                <ProtoPlaceholderImage type="photo" width="100%" height={112} />
+                <Image source={{ uri: `https://picsum.photos/seed/${l.id}/400/112` }} style={{ width: '100%', height: 112 }} />
                 <TouchableOpacity className="absolute top-2 right-2 bg-white/80 p-1.5 rounded-full">
                   <Feather name="heart" size={16} color="#C0392B" />
                 </TouchableOpacity>

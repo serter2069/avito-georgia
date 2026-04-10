@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import { ProtoPlaceholderImage } from '../ProtoPlaceholderImage';
 import { mockUsers } from '../../../constants/protoMockData';
 
 const user = mockUsers[0];
@@ -12,11 +11,11 @@ export default function ProfileStates() {
   const [name, setName] = useState('Ираклий Гоциридзе');
 
   return (
-    <View>
+    <View style={{ maxWidth: 430, alignSelf: 'center', width: '100%' }}>
       <StateSection title="default">
         <View className="py-4 items-center">
           <View className="relative mb-4">
-            <ProtoPlaceholderImage type="avatar" width={96} height={96} />
+            <Image source={{ uri: 'https://picsum.photos/seed/profile1/96/96' }} style={{ width: 96, height: 96, borderRadius: 48 }} />
             <TouchableOpacity className="absolute bottom-0 right-0 bg-primary w-8 h-8 rounded-full items-center justify-center">
               <Feather name="camera" size={16} color="#fff" />
             </TouchableOpacity>
@@ -69,7 +68,7 @@ export default function ProfileStates() {
 
       <StateSection title="saving">
         <View className="py-4 items-center opacity-50">
-          <ProtoPlaceholderImage type="avatar" width={96} height={96} />
+          <Image source={{ uri: 'https://picsum.photos/seed/profile1/96/96' }} style={{ width: 96, height: 96, borderRadius: 48 }} />
           <View className="w-full mb-4 mt-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Имя</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={user.name} editable={false} />
@@ -86,7 +85,7 @@ export default function ProfileStates() {
             <Feather name="check-circle" size={24} color="#2E7D30" />
             <Text className="text-success text-sm font-medium">Профиль сохранён</Text>
           </View>
-          <ProtoPlaceholderImage type="avatar" width={96} height={96} />
+          <Image source={{ uri: 'https://picsum.photos/seed/profile1/96/96' }} style={{ width: 96, height: 96, borderRadius: 48 }} />
           <View className="w-full mb-4 mt-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Имя</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={user.name} editable={false} />
@@ -103,7 +102,7 @@ export default function ProfileStates() {
             <Feather name="alert-circle" size={24} color="#C0392B" />
             <Text className="text-error text-sm font-medium">Ошибка сохранения</Text>
           </View>
-          <ProtoPlaceholderImage type="avatar" width={96} height={96} />
+          <Image source={{ uri: 'https://picsum.photos/seed/profile1/96/96' }} style={{ width: 96, height: 96, borderRadius: 48 }} />
           <View className="w-full mb-4 mt-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Имя</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={user.name} editable={false} />
