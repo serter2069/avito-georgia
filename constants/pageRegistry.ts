@@ -32,6 +32,17 @@ export const pageRegistry: PageEntry[] = [
     qaScore: undefined,
     notes: [{ date: '2026-04-09', text: 'Карта проекта: роли, сценарии, прогресс прототипирования. Не экран приложения — документ.' }],
   },
+  {
+    id: 'brand',
+    title: 'Brand & Styles',
+    group: 'Overview',
+    route: '/proto/brand',
+    stateCount: 1,
+    nav: 'none',
+    qaCycles: 5,
+    qaScore: 100,
+    notes: [{ date: '2026-04-09', text: 'Визуальный гайдлайн бренда. Основан на стилях lun.ua. Цвета, шрифты, компоненты.' }],
+  },
 
   // Auth
   {
