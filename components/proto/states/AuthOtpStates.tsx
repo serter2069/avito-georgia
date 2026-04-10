@@ -49,7 +49,7 @@ export default function AuthOtpStates() {
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <OtpInputRow values={['1', '2', '3', '4', '5', '6']} hasError />
-          <Text className="text-error text-sm mb-4">Неверный код. Попробуйте снова.</Text>
+          <Text className="text-error text-sm mb-4">Неверный код. Осталось 2 попытки.</Text>
           <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center mb-3">
             <Text className="text-white font-semibold text-base">Подтвердить</Text>
           </TouchableOpacity>
