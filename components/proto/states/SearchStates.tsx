@@ -45,7 +45,7 @@ export default function SearchStates() {
             ))}
           </View>
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="text-text-muted text-sm">4 результата</Text>
+            <Text className="text-text-muted text-sm">3 результата</Text>
             <View className="flex-row gap-2">
               <TouchableOpacity className="bg-primary p-2 rounded-lg">
                 <Feather name="list" size={16} color="#fff" />
