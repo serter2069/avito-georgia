@@ -1,930 +1,659 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, Platform, Image,
-  useWindowDimensions} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  ScrollView,
+  Image,
+  useWindowDimensions,
+  ActivityIndicator,
+} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
-// Brand colors from tailwind.config.js — Avito Georgia Teal Batumi
+// ─── Design Tokens (aligned with BrandStates) ───────────────────────────────
 const C = {
-  primary: '#0A7B8A',
-  primaryDark: '#0A2840',
-  primaryLight: '#1A9BAA',
-  secondary: '#f59e0b',
-  accent: '#1A9BAA',
-  surface: '#E8F4F8',
-  white: '#FFFFFF',
-  bgPrimary: '#F2F8FA',
-  textPrimary: '#0A2840',
-  textSecondary: '#1A4A6E',
-  textMuted: '#6A8898',
-  textDisabled: '#94A3B8',
-  border: '#C8E0E8',
-  borderLight: '#E2E8F0',
-  success: '#2E7D30',
-  warning: '#f59e0b',
-  error: '#C0392B',
-  info: '#3b82f6',
-  successBg: '#E8F5E9',
-  warningBg: '#FFF8E1',
-  errorBg: '#FFEBEE',
-  infoBg: '#E3F2FD',
+  green:   '#00AA6C',
+  greenBg: '#E8F9F2',
+  white:   '#FFFFFF',
+  page:    '#FFFFFF',
+  text:    '#1A1A1A',
+  muted:   '#737373',
+  border:  '#E0E0E0',
+  error:   '#D32F2F',
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+const R = { xs: 2, sm: 4, md: 8, lg: 12, xl: 16, full: 9999 };
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function SectionHeading({ number, title }: { number: string; title: string }) {
   return (
-    <View style={{
-      backgroundColor: C.white,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: C.border,
-      padding: 16,
-      gap: 12,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 2,
-      elevation: 2,
-    }}>
-      <Text style={{ fontSize: 15, fontWeight: '700', color: C.primary, marginBottom: 4 }}>
-        {title}
-      </Text>
-      <View style={{ gap: 12 }}>{children}</View>
+    <View style={{ marginBottom: 20 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        <View style={{
+          width: 28, height: 28, borderRadius: R.full,
+          backgroundColor: C.green,
+          alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>{number}</Text>
+        </View>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, letterSpacing: -0.3 }}>
+          {title}
+        </Text>
+      </View>
+      <View style={{ height: 1, backgroundColor: C.border }} />
     </View>
   );
 }
 
-function Label({ text }: { text: string }) {
+function Card({ children, style }: { children: React.ReactNode; style?: any }) {
+  return (
+    <View style={[{
+      backgroundColor: C.white,
+      borderRadius: R.lg,
+      padding: 20,
+      borderWidth: 1,
+      borderColor: C.border,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    }, style]}>
+      {children}
+    </View>
+  );
+}
+
+function SubLabel({ text }: { text: string }) {
   return (
     <Text style={{
-      fontSize: 11,
-      fontWeight: '600',
-      color: C.textMuted,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
+      fontSize: 11, fontWeight: '600', color: C.muted,
+      letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10,
     }}>
       {text}
     </Text>
   );
 }
 
-// ---------------------------------------------------------------------------
-// 1. Header variants
-// ---------------------------------------------------------------------------
-function HeaderVariantsSection() {
+// ─── 1. Navigation ───────────────────────────────────────────────────────────
+function NavigationSection() {
+  const [activeTab, setActiveTab] = useState('home');
+  const tabs = [
+    { key: 'home', icon: 'home' as const, label: 'Home' },
+    { key: 'listings', icon: 'grid' as const, label: 'Listings' },
+    { key: 'chat', icon: 'message-circle' as const, label: 'Chat' },
+    { key: 'profile', icon: 'user' as const, label: 'Profile' },
+  ];
+
   return (
-    <Section title="1. Header Variants">
-      <Label text="Public nav (guest)" />
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        backgroundColor: C.white, borderWidth: 1, borderColor: C.border,
-        borderRadius: 8, paddingHorizontal: 16, paddingVertical: 10,
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <View style={{
-            width: 32, height: 32, backgroundColor: C.primary,
-            borderRadius: 8, alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Text style={{ color: C.white, fontWeight: '800', fontSize: 16 }}>A</Text>
-          </View>
-          <Text style={{ fontWeight: '700', color: C.primaryDark, fontSize: 16 }}>Avito.ge</Text>
-        </View>
-        <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
-          <Feather name="search" size={20} color={C.textSecondary} />
-          <Pressable style={{
-            backgroundColor: C.primary, borderRadius: 6,
-            paddingHorizontal: 14, paddingVertical: 6,
-          }}>
-            <Text style={{ color: C.white, fontWeight: '600', fontSize: 13 }}>Login</Text>
-          </Pressable>
-        </View>
-      </View>
-
-      <Label text="Auth nav (logged in)" />
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        backgroundColor: C.white, borderWidth: 1, borderColor: C.border,
-        borderRadius: 8, paddingHorizontal: 16, paddingVertical: 10,
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <View style={{
-            width: 32, height: 32, backgroundColor: C.primary,
-            borderRadius: 8, alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Text style={{ color: C.white, fontWeight: '800', fontSize: 16 }}>A</Text>
-          </View>
-          <Text style={{ fontWeight: '700', color: C.primaryDark, fontSize: 16 }}>Avito.ge</Text>
-        </View>
-        <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
-          <Feather name="search" size={20} color={C.textSecondary} />
-          <Feather name="bell" size={20} color={C.textSecondary} />
-          <Feather name="message-circle" size={20} color={C.textSecondary} />
-          <Image
-            source={{ uri: 'https://picsum.photos/seed/avatar1/80/80' }}
-            style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.surface }}
-          />
-        </View>
-      </View>
-
-      <Label text="Seller nav (my listings)" />
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        backgroundColor: C.white, borderWidth: 1, borderColor: C.border,
-        borderRadius: 8, paddingHorizontal: 16, paddingVertical: 10,
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Pressable>
-            <Feather name="arrow-left" size={20} color={C.textPrimary} />
-          </Pressable>
-          <Text style={{ fontWeight: '600', color: C.textPrimary, fontSize: 16 }}>My Listings</Text>
-        </View>
-        <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
-          <Feather name="plus" size={20} color={C.primary} />
-          <Feather name="settings" size={20} color={C.textSecondary} />
-        </View>
-      </View>
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 2. Bottom TabBar
-// ---------------------------------------------------------------------------
-const TAB_ITEMS = [
-  { key: 'home', icon: 'home', label: 'Home' },
-  { key: 'search', icon: 'search', label: 'Search' },
-  { key: 'create', icon: 'plus-circle', label: 'Post Ad' },
-  { key: 'messages', icon: 'message-circle', label: 'Messages' },
-  { key: 'profile', icon: 'user', label: 'Profile' },
-] as const;
-
-function TabBarSection() {
-  const [active, setActive] = useState('home');
-  return (
-    <Section title="2. Bottom TabBar">
-      <Label text={`Active: ${active}`} />
-      <View style={{
-        flexDirection: 'row', backgroundColor: C.white,
-        borderWidth: 1, borderColor: C.border, borderRadius: 12,
-        paddingVertical: 8, paddingHorizontal: 4,
-      }}>
-        {TAB_ITEMS.map((tab) => (
-          <Pressable
-            key={tab.key}
-            style={{ flex: 1, alignItems: 'center', gap: 2 }}
-            onPress={() => setActive(tab.key)}
-          >
-            <Feather
-              name={tab.icon as any}
-              size={tab.key === 'create' ? 28 : 22}
-              color={active === tab.key ? C.primary : C.textMuted}
-            />
-            <Text style={{
-              fontSize: 10, fontWeight: active === tab.key ? '700' : '500',
-              color: active === tab.key ? C.primary : C.textMuted,
+    <View>
+      <SectionHeading number="01" title="Navigation" />
+      <Card style={{ gap: 16 }}>
+        {/* Header */}
+        <SubLabel text="Header bar" />
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: C.white,
+          borderWidth: 1,
+          borderColor: C.border,
+          borderRadius: R.md,
+          paddingHorizontal: 16,
+          paddingVertical: 10,
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{
+              width: 32, height: 32, backgroundColor: C.green,
+              borderRadius: R.md, alignItems: 'center', justifyContent: 'center',
             }}>
-              {tab.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 3. Burger / Drawer
-// ---------------------------------------------------------------------------
-const DRAWER_ITEMS = [
-  { icon: 'home', label: 'Home' },
-  { icon: 'list', label: 'My Listings' },
-  { icon: 'heart', label: 'Favorites' },
-  { icon: 'message-circle', label: 'Messages' },
-  { icon: 'bell', label: 'Notifications' },
-  { icon: 'user', label: 'Profile' },
-  { icon: 'settings', label: 'Settings' },
-  { icon: 'help-circle', label: 'Help' },
-] as const;
-
-function BurgerSection() {
-  const [open, setOpen] = useState(false);
-  return (
-    <Section title="3. Burger / Drawer Menu">
-      <Label text="Tap hamburger to toggle" />
-      <Pressable
-        style={{
-          flexDirection: 'row', alignItems: 'center', gap: 8,
-          backgroundColor: C.surface, borderRadius: 8,
-          paddingHorizontal: 12, paddingVertical: 8, alignSelf: 'flex-start',
-        }}
-        onPress={() => setOpen(!open)}
-      >
-        <Feather name={open ? 'x' : 'menu'} size={20} color={C.textPrimary} />
-        <Text style={{ color: C.textPrimary, fontWeight: '600', fontSize: 14 }}>Menu</Text>
-      </Pressable>
-      {open && (
-        <View style={{
-          backgroundColor: C.white, borderWidth: 1, borderColor: C.border,
-          borderRadius: 10, overflow: 'hidden',
-          shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1, shadowRadius: 4, elevation: 4,
-        }}>
-          {DRAWER_ITEMS.map((item, i) => (
-            <Pressable
-              key={item.label}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 12,
-                paddingHorizontal: 16, paddingVertical: 12,
-                borderBottomWidth: i < DRAWER_ITEMS.length - 1 ? 1 : 0,
-                borderBottomColor: C.borderLight,
-              }}
-            >
-              <Feather name={item.icon as any} size={18} color={C.primary} />
-              <Text style={{ fontSize: 14, color: C.textPrimary, fontWeight: '500' }}>{item.label}</Text>
-            </Pressable>
-          ))}
-          <View style={{
-            paddingHorizontal: 16, paddingVertical: 12,
-            borderTopWidth: 1, borderTopColor: C.border,
-          }}>
-            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <Feather name="log-out" size={18} color={C.error} />
-              <Text style={{ fontSize: 14, color: C.error, fontWeight: '500' }}>Log Out</Text>
-            </Pressable>
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 16 }}>A</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 1 }}>
+              <Text style={{ fontWeight: '700', color: C.text, fontSize: 16 }}>avito</Text>
+              <Text style={{ fontWeight: '600', color: C.green, fontSize: 12 }}>.ge</Text>
+            </View>
           </View>
-        </View>
-      )}
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 4. Search by city/category
-// ---------------------------------------------------------------------------
-const CITIES = ['Tbilisi', 'Batumi', 'Kutaisi', 'Rustavi', 'Gori', 'Zugdidi'];
-const CATEGORIES = ['Electronics', 'Real Estate', 'Vehicles', 'Services', 'Fashion', 'Home & Garden'];
-
-function SearchAutocompleteSection() {
-  const [cityQuery, setCityQuery] = useState('');
-  const [cityResults, setCityResults] = useState<string[]>([]);
-  const [selectedCity, setSelectedCity] = useState('');
-  const [catQuery, setCatQuery] = useState('');
-  const [catResults, setCatResults] = useState<string[]>([]);
-
-  const handleCitySearch = (text: string) => {
-    setCityQuery(text);
-    setSelectedCity('');
-    setCityResults(text.length > 0
-      ? CITIES.filter(c => c.toLowerCase().includes(text.toLowerCase()))
-      : []);
-  };
-
-  const handleCatSearch = (text: string) => {
-    setCatQuery(text);
-    setCatResults(text.length > 0
-      ? CATEGORIES.filter(c => c.toLowerCase().includes(text.toLowerCase()))
-      : []);
-  };
-
-  return (
-    <Section title="4. Search by City / Category">
-      <Label text="City autocomplete" />
-      <View style={{
-        flexDirection: 'row', alignItems: 'center',
-        backgroundColor: C.bgPrimary, borderWidth: 1, borderColor: C.border,
-        borderRadius: 8, paddingHorizontal: 12, height: 44,
-      }}>
-        <Feather name="map-pin" size={16} color={C.textMuted} style={{ marginRight: 8 }} />
-        <TextInput
-          style={{ flex: 1, fontSize: 14, color: C.textPrimary, height: 44 } as any}
-          placeholder="Select city..."
-          placeholderTextColor={C.textMuted}
-          value={cityQuery}
-          onChangeText={handleCitySearch}
-        />
-        {cityQuery.length > 0 && (
-          <Pressable onPress={() => { setCityQuery(''); setCityResults([]); setSelectedCity(''); }}>
-            <Feather name="x" size={16} color={C.textMuted} />
-          </Pressable>
-        )}
-      </View>
-      {cityResults.length > 0 && (
-        <View style={{
-          backgroundColor: C.white, borderWidth: 1, borderColor: C.border,
-          borderRadius: 8, overflow: 'hidden',
-        }}>
-          {cityResults.map((city) => (
-            <Pressable
-              key={city}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 8,
-                paddingHorizontal: 12, paddingVertical: 10,
-                borderBottomWidth: 1, borderBottomColor: C.borderLight,
-              }}
-              onPress={() => { setSelectedCity(city); setCityQuery(city); setCityResults([]); }}
-            >
-              <Feather name="map-pin" size={14} color={C.textMuted} />
-              <Text style={{ fontSize: 14, color: C.textPrimary }}>{city}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-      {selectedCity !== '' && (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Feather name="check-circle" size={14} color={C.success} />
-          <Text style={{ fontSize: 13, color: C.success, fontWeight: '500' }}>Selected: {selectedCity}</Text>
-        </View>
-      )}
-
-      <Label text="Category filter" />
-      <View style={{
-        flexDirection: 'row', alignItems: 'center',
-        backgroundColor: C.bgPrimary, borderWidth: 1, borderColor: C.border,
-        borderRadius: 8, paddingHorizontal: 12, height: 44,
-      }}>
-        <Feather name="grid" size={16} color={C.textMuted} style={{ marginRight: 8 }} />
-        <TextInput
-          style={{ flex: 1, fontSize: 14, color: C.textPrimary, height: 44 } as any}
-          placeholder="Search category..."
-          placeholderTextColor={C.textMuted}
-          value={catQuery}
-          onChangeText={handleCatSearch}
-        />
-      </View>
-      {catResults.length > 0 && (
-        <View style={{
-          backgroundColor: C.white, borderWidth: 1, borderColor: C.border,
-          borderRadius: 8, overflow: 'hidden',
-        }}>
-          {catResults.map((cat) => (
-            <Pressable
-              key={cat}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 8,
-                paddingHorizontal: 12, paddingVertical: 10,
-                borderBottomWidth: 1, borderBottomColor: C.borderLight,
-              }}
-              onPress={() => { setCatQuery(cat); setCatResults([]); }}
-            >
-              <Feather name="tag" size={14} color={C.primary} />
-              <Text style={{ fontSize: 14, color: C.textPrimary }}>{cat}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 5. Text Inputs
-// ---------------------------------------------------------------------------
-function InputsSection() {
-  const [defaultVal, setDefaultVal] = useState('');
-  const [focusedVal, setFocusedVal] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
-  const [errorVal, setErrorVal] = useState('');
-  const [showError, setShowError] = useState(false);
-
-  return (
-    <Section title="5. Text Inputs">
-      <Label text="Default" />
-      <TextInput
-        style={{
-          height: 44, borderWidth: 1, borderColor: C.border, borderRadius: 8,
-          paddingHorizontal: 12, fontSize: 14, color: C.textPrimary, backgroundColor: C.bgPrimary,
-        } as any}
-        placeholder="Enter text..."
-        placeholderTextColor={C.textMuted}
-        value={defaultVal}
-        onChangeText={setDefaultVal}
-      />
-
-      <Label text="Focused" />
-      <TextInput
-        style={{
-          height: 44, borderWidth: isFocused ? 2 : 1,
-          borderColor: isFocused ? C.primary : C.border, borderRadius: 8,
-          paddingHorizontal: 12, fontSize: 14, color: C.textPrimary, backgroundColor: C.bgPrimary,
-        } as any}
-        placeholder="Tap to focus..."
-        placeholderTextColor={C.textMuted}
-        value={focusedVal}
-        onChangeText={setFocusedVal}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      />
-
-      <Label text="Error (type invalid email)" />
-      <TextInput
-        style={{
-          height: 44, borderWidth: showError ? 2 : 1,
-          borderColor: showError ? C.error : C.border, borderRadius: 8,
-          paddingHorizontal: 12, fontSize: 14, color: C.textPrimary, backgroundColor: C.bgPrimary,
-        } as any}
-        placeholder="email@example.com"
-        placeholderTextColor={C.textMuted}
-        value={errorVal}
-        onChangeText={(t) => { setErrorVal(t); setShowError(t.length > 0 && !t.includes('@')); }}
-      />
-      {showError && (
-        <Text style={{ fontSize: 12, color: C.error, marginTop: -4 }}>Enter a valid email address</Text>
-      )}
-
-      <Label text="Disabled" />
-      <TextInput
-        style={{
-          height: 44, borderWidth: 1, borderColor: C.borderLight, borderRadius: 8,
-          paddingHorizontal: 12, fontSize: 14, color: C.textDisabled,
-          backgroundColor: '#F3F4F6',
-        } as any}
-        placeholder="Cannot edit this..."
-        placeholderTextColor={C.textDisabled}
-        editable={false}
-        value="Disabled input"
-      />
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 6. Buttons
-// ---------------------------------------------------------------------------
-function ButtonsSection() {
-  return (
-    <Section title="6. Buttons">
-      <Label text="Primary" />
-      <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
-        <Pressable style={{
-          height: 44, backgroundColor: C.primary, borderRadius: 8,
-          alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24,
-        }}>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: C.white }}>Primary</Text>
-        </Pressable>
-        <Pressable style={{
-          height: 44, backgroundColor: C.border, borderRadius: 8,
-          alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24,
-        }}>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: C.textMuted }}>Disabled</Text>
-        </Pressable>
-      </View>
-
-      <Label text="Secondary" />
-      <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
-        <Pressable style={{
-          height: 44, backgroundColor: C.white, borderRadius: 8,
-          alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24,
-          borderWidth: 1, borderColor: C.primary,
-        }}>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: C.primary }}>Secondary</Text>
-        </Pressable>
-        <Pressable style={{
-          height: 44, backgroundColor: C.white, borderRadius: 8,
-          alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24,
-          borderWidth: 1, borderColor: C.borderLight,
-        }}>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: C.textDisabled }}>Disabled</Text>
-        </Pressable>
-      </View>
-
-      <Label text="Ghost" />
-      <Pressable style={{
-        height: 44, backgroundColor: 'transparent', borderRadius: 8,
-        alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24,
-        borderWidth: 1, borderColor: C.border, alignSelf: 'flex-start',
-      }}>
-        <Text style={{ fontSize: 14, fontWeight: '600', color: C.textSecondary }}>Ghost</Text>
-      </Pressable>
-
-      <Label text="Icon buttons" />
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <Pressable style={{
-          flexDirection: 'row', alignItems: 'center', gap: 6,
-          height: 44, backgroundColor: C.primary, borderRadius: 8, paddingHorizontal: 16,
-        }}>
-          <Feather name="plus" size={16} color={C.white} />
-          <Text style={{ fontSize: 14, fontWeight: '600', color: C.white }}>Post Ad</Text>
-        </Pressable>
-        <Pressable style={{
-          flexDirection: 'row', alignItems: 'center', gap: 6,
-          height: 44, backgroundColor: C.error, borderRadius: 8, paddingHorizontal: 16,
-        }}>
-          <Feather name="trash-2" size={16} color={C.white} />
-          <Text style={{ fontSize: 14, fontWeight: '600', color: C.white }}>Delete</Text>
-        </Pressable>
-      </View>
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 7. Select / Dropdown
-// ---------------------------------------------------------------------------
-const LISTING_TYPES = ['All Categories', 'Electronics', 'Real Estate', 'Vehicles', 'Services', 'Fashion'];
-
-function SelectSection() {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState('');
-
-  return (
-    <Section title="7. Select / Dropdown">
-      <Label text="Category filter" />
-      <Pressable
-        style={{
-          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-          height: 44, borderWidth: 1, borderColor: C.border, borderRadius: 8,
-          paddingHorizontal: 12, backgroundColor: C.bgPrimary,
-        }}
-        onPress={() => setOpen(!open)}
-      >
-        <Text style={{
-          fontSize: 14, color: selected ? C.textPrimary : C.textMuted,
-        }}>
-          {selected || 'Select category'}
-        </Text>
-        <Feather name={open ? 'chevron-up' : 'chevron-down'} size={16} color={C.textMuted} />
-      </Pressable>
-      {open && (
-        <View style={{
-          backgroundColor: C.white, borderWidth: 1, borderColor: C.border,
-          borderRadius: 8, overflow: 'hidden',
-          shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1, shadowRadius: 4, elevation: 4,
-        }}>
-          {LISTING_TYPES.map((type) => (
-            <Pressable
-              key={type}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 8,
-                paddingHorizontal: 12, paddingVertical: 10,
-                backgroundColor: selected === type ? C.surface : C.white,
-                borderBottomWidth: 1, borderBottomColor: C.borderLight,
-              }}
-              onPress={() => { setSelected(type); setOpen(false); }}
-            >
-              {selected === type && <Feather name="check" size={14} color={C.primary} />}
-              <Text style={{
-                fontSize: 14,
-                color: selected === type ? C.primary : C.textPrimary,
-                fontWeight: selected === type ? '600' : '400',
-              }}>{type}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 8. Cards (listing card, user card)
-// ---------------------------------------------------------------------------
-function CardsSection() {
-  return (
-    <Section title="8. Cards">
-      <Label text="Listing card" />
-      <View style={{
-        backgroundColor: C.white, borderRadius: 12, borderWidth: 1,
-        borderColor: C.border, overflow: 'hidden',
-        shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06, shadowRadius: 2, elevation: 2,
-      }}>
-        <Image
-          source={{ uri: 'https://picsum.photos/seed/listing1/400/240' }}
-          style={{ width: '100%', height: 160 }}
-        />
-        <View style={{ padding: 12, gap: 4 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 15, fontWeight: '600', color: C.textPrimary, flex: 1 }} numberOfLines={1}>
-              iPhone 15 Pro Max 256GB
-            </Text>
-            <Feather name="heart" size={18} color={C.textMuted} />
-          </View>
-          <Text style={{ fontSize: 17, fontWeight: '700', color: C.primary }}>2,800 GEL</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
-            <Feather name="map-pin" size={12} color={C.textMuted} />
-            <Text style={{ fontSize: 12, color: C.textMuted }}>Tbilisi</Text>
-            <Text style={{ fontSize: 12, color: C.textMuted, marginLeft: 8 }}>2 hours ago</Text>
-          </View>
-        </View>
-      </View>
-
-      <Label text="User / seller card" />
-      <View style={{
-        backgroundColor: C.white, borderRadius: 12, borderWidth: 1,
-        borderColor: C.border, padding: 12, gap: 8,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06, shadowRadius: 2, elevation: 2,
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Image
-            source={{ uri: 'https://picsum.photos/seed/seller1/80/80' }}
-            style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: C.surface }}
-          />
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={{ fontSize: 15, fontWeight: '600', color: C.textPrimary }}>Giorgi Beridze</Text>
-            <Text style={{ fontSize: 13, color: C.textMuted }}>Tbilisi -- Member since 2024</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Feather name="star" size={12} color={C.secondary} />
-              <Text style={{ fontSize: 12, fontWeight: '700', color: C.textPrimary }}>4.8</Text>
-              <Text style={{ fontSize: 12, color: C.textMuted }}>(23 reviews)</Text>
+          <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
+            <Feather name="search" size={20} color={C.text} />
+            <Feather name="bell" size={20} color={C.text} />
+            <View style={{
+              backgroundColor: C.green, borderRadius: R.sm,
+              paddingHorizontal: 14, paddingVertical: 7,
+            }}>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Post ad</Text>
             </View>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Pressable style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6,
-            height: 36, backgroundColor: C.primary, borderRadius: 8, paddingHorizontal: 14,
-          }}>
-            <Feather name="message-circle" size={14} color={C.white} />
-            <Text style={{ fontSize: 13, fontWeight: '600', color: C.white }}>Message</Text>
-          </Pressable>
-          <Pressable style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6,
-            height: 36, borderWidth: 1, borderColor: C.primary, borderRadius: 8, paddingHorizontal: 14,
-          }}>
-            <Feather name="phone" size={14} color={C.primary} />
-            <Text style={{ fontSize: 13, fontWeight: '600', color: C.primary }}>Show Phone</Text>
-          </Pressable>
+
+        <View style={{ height: 1, backgroundColor: C.border }} />
+
+        {/* Bottom Tab Bar */}
+        <SubLabel text={`Bottom tab bar (active: ${activeTab})`} />
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: C.white,
+          borderWidth: 1,
+          borderColor: C.border,
+          borderRadius: R.lg,
+          paddingVertical: 8,
+        }}>
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <Pressable
+                key={tab.key}
+                style={{ flex: 1, alignItems: 'center', gap: 3 }}
+                onPress={() => setActiveTab(tab.key)}
+              >
+                <Feather
+                  name={tab.icon}
+                  size={22}
+                  color={isActive ? C.green : C.muted}
+                />
+                <Text style={{
+                  fontSize: 10,
+                  fontWeight: isActive ? '700' : '500',
+                  color: isActive ? C.green : C.muted,
+                }}>
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
-      </View>
-    </Section>
+      </Card>
+    </View>
   );
 }
 
-// ---------------------------------------------------------------------------
-// 9. Badges / Chips
-// ---------------------------------------------------------------------------
-function BadgesSection() {
-  const [selectedChips, setSelectedChips] = useState<string[]>(['Electronics']);
-  const chipCategories = ['Electronics', 'Real Estate', 'Vehicles', 'Services', 'Fashion'];
+// ─── 2. Inputs ───────────────────────────────────────────────────────────────
+function InputsSection() {
+  const [search, setSearch] = useState('');
+  const [city, setCity] = useState('');
+  const [phone, setPhone] = useState('not-valid');
 
-  const toggleChip = (chip: string) => {
-    setSelectedChips(prev =>
-      prev.includes(chip) ? prev.filter(c => c !== chip) : [...prev, chip]
-    );
+  return (
+    <View>
+      <SectionHeading number="02" title="Inputs" />
+      <Card style={{ gap: 20 }}>
+        {/* Search bar */}
+        <View>
+          <SubLabel text="Search bar" />
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: C.white,
+            borderWidth: 1.5,
+            borderColor: C.green,
+            borderRadius: R.md,
+            paddingLeft: 12,
+            overflow: 'hidden',
+          }}>
+            <Feather name="search" size={18} color={C.muted} />
+            <TextInput
+              style={{ flex: 1, fontSize: 16, color: C.text, paddingVertical: 12, paddingHorizontal: 10 }}
+              placeholder="Search listings..."
+              placeholderTextColor={C.muted}
+              value={search}
+              onChangeText={setSearch}
+            />
+            <View style={{ backgroundColor: C.green, paddingHorizontal: 18, paddingVertical: 12 }}>
+              <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Search</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Default text input */}
+        <View>
+          <SubLabel text="Default input" />
+          <Text style={{ fontSize: 14, fontWeight: '500', color: C.text, marginBottom: 6 }}>City</Text>
+          <View style={{
+            borderWidth: 1, borderColor: C.border, borderRadius: R.sm,
+            backgroundColor: C.white, flexDirection: 'row',
+            alignItems: 'center', paddingHorizontal: 12,
+          }}>
+            <Feather name="map-pin" size={15} color={C.muted} />
+            <TextInput
+              style={{ flex: 1, fontSize: 16, color: C.text, paddingVertical: 11, paddingLeft: 8 }}
+              placeholder="e.g. Batumi"
+              placeholderTextColor={C.muted}
+              value={city}
+              onChangeText={setCity}
+            />
+          </View>
+        </View>
+
+        {/* Filled input */}
+        <View>
+          <SubLabel text="Filled (focused)" />
+          <Text style={{ fontSize: 14, fontWeight: '500', color: C.text, marginBottom: 6 }}>Price</Text>
+          <View style={{
+            borderWidth: 2, borderColor: C.green, borderRadius: R.sm,
+            backgroundColor: C.white, flexDirection: 'row',
+            alignItems: 'center', paddingHorizontal: 12,
+          }}>
+            <Feather name="tag" size={15} color={C.green} />
+            <TextInput
+              style={{ flex: 1, fontSize: 16, color: C.text, paddingVertical: 11, paddingLeft: 8 }}
+              value="85 000"
+              editable={false}
+            />
+            <Text style={{ fontSize: 14, color: C.muted }}>$</Text>
+          </View>
+        </View>
+
+        {/* Error input */}
+        <View>
+          <SubLabel text="Error state" />
+          <Text style={{ fontSize: 14, fontWeight: '500', color: C.text, marginBottom: 6 }}>Phone</Text>
+          <View style={{
+            borderWidth: 1.5, borderColor: C.error, borderRadius: R.sm,
+            backgroundColor: '#FFEBEE', flexDirection: 'row',
+            alignItems: 'center', paddingHorizontal: 12,
+          }}>
+            <Feather name="phone" size={15} color={C.error} />
+            <TextInput
+              style={{ flex: 1, fontSize: 16, color: C.text, paddingVertical: 11, paddingLeft: 8 }}
+              value={phone}
+              onChangeText={setPhone}
+            />
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+            <Feather name="alert-circle" size={12} color={C.error} />
+            <Text style={{ fontSize: 12, color: C.error }}>Invalid phone number</Text>
+          </View>
+        </View>
+      </Card>
+    </View>
+  );
+}
+
+// ─── 3. Buttons ──────────────────────────────────────────────────────────────
+function ButtonsSection() {
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const handlePress = (name: string) => {
+    setLoading(name);
+    setTimeout(() => setLoading(null), 1500);
   };
 
   return (
-    <Section title="9. Badges / Chips">
-      <Label text="Status badges" />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        <View style={{ backgroundColor: C.infoBg, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 99 }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: C.info }}>New</Text>
-        </View>
-        <View style={{ backgroundColor: C.warningBg, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 99 }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: C.warning }}>Pending</Text>
-        </View>
-        <View style={{ backgroundColor: C.successBg, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 99 }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: C.success }}>Active</Text>
-        </View>
-        <View style={{ backgroundColor: C.errorBg, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 99 }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: C.error }}>Rejected</Text>
-        </View>
-      </View>
-
-      <Label text="Price tags" />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        <View style={{
-          backgroundColor: C.primary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6,
-        }}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: C.white }}>2,800 GEL</Text>
-        </View>
-        <View style={{
-          backgroundColor: C.surface, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6,
-          borderWidth: 1, borderColor: C.border,
-        }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: C.textSecondary }}>Negotiable</Text>
-        </View>
-        <View style={{
-          backgroundColor: C.secondary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6,
-        }}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: C.white }}>Premium</Text>
-        </View>
-      </View>
-
-      <Label text="Category chips (toggleable)" />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        {chipCategories.map((cat) => {
-          const isSelected = selectedChips.includes(cat);
-          return (
-            <Pressable
-              key={cat}
-              style={{
-                paddingHorizontal: 14, paddingVertical: 6, borderRadius: 99,
-                backgroundColor: isSelected ? C.primary : C.white,
-                borderWidth: 1, borderColor: isSelected ? C.primary : C.border,
-              }}
-              onPress={() => toggleChip(cat)}
-            >
-              <Text style={{
-                fontSize: 13, fontWeight: '500',
-                color: isSelected ? C.white : C.textSecondary,
-              }}>{cat}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 10. Alerts
-// ---------------------------------------------------------------------------
-function AlertsSection() {
-  return (
-    <Section title="10. Alerts">
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', gap: 10,
-        padding: 12, borderRadius: 8, backgroundColor: C.infoBg, borderLeftWidth: 3, borderLeftColor: C.info,
-      }}>
-        <Feather name="info" size={16} color={C.info} />
-        <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: C.info }}>
-          Your listing is under review. It will be published within 24 hours.
-        </Text>
-      </View>
-
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', gap: 10,
-        padding: 12, borderRadius: 8, backgroundColor: C.successBg, borderLeftWidth: 3, borderLeftColor: C.success,
-      }}>
-        <Feather name="check-circle" size={16} color={C.success} />
-        <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: C.success }}>
-          Listing published successfully! It is now visible to buyers.
-        </Text>
-      </View>
-
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', gap: 10,
-        padding: 12, borderRadius: 8, backgroundColor: C.errorBg, borderLeftWidth: 3, borderLeftColor: C.error,
-      }}>
-        <Feather name="alert-circle" size={16} color={C.error} />
-        <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: C.error }}>
-          Failed to upload photos. Please check file size (max 5MB) and try again.
-        </Text>
-      </View>
-
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', gap: 10,
-        padding: 12, borderRadius: 8, backgroundColor: C.warningBg, borderLeftWidth: 3, borderLeftColor: C.warning,
-      }}>
-        <Feather name="alert-triangle" size={16} color={C.warning} />
-        <Text style={{ flex: 1, fontSize: 13, fontWeight: '500', color: C.warning }}>
-          Your listing expires in 3 days. Renew to keep it active.
-        </Text>
-      </View>
-    </Section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// 11. Price Range Slider
-// ---------------------------------------------------------------------------
-function PriceRangeSection() {
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [selectedCurrency, setSelectedCurrency] = useState<'GEL' | 'USD'>('GEL');
-
-  const presets = [
-    { label: '0 - 500', min: 0, max: 500 },
-    { label: '500 - 1000', min: 500, max: 1000 },
-    { label: '1000 - 5000', min: 1000, max: 5000 },
-    { label: '5000+', min: 5000, max: 0 },
-  ];
-
-  const [activePreset, setActivePreset] = useState<number | null>(null);
-
-  return (
-    <Section title="11. Price Range Filter">
-      <Label text="Currency toggle" />
-      <View style={{ flexDirection: 'row', gap: 0, backgroundColor: C.bgPrimary, borderRadius: 8, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
-        {(['GEL', 'USD'] as const).map((cur) => (
+    <View>
+      <SectionHeading number="03" title="Buttons" />
+      <Card style={{ gap: 16 }}>
+        <SubLabel text="Tap any button to see loading state" />
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+          {/* Primary */}
           <Pressable
-            key={cur}
+            onPress={() => handlePress('primary')}
             style={{
-              flex: 1, paddingVertical: 10, alignItems: 'center',
-              backgroundColor: selectedCurrency === cur ? C.primary : 'transparent',
-            }}
-            onPress={() => setSelectedCurrency(cur)}
-          >
-            <Text style={{ fontSize: 14, fontWeight: '600', color: selectedCurrency === cur ? C.white : C.textSecondary }}>{cur}</Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <Label text="Price range inputs" />
-      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 11, color: C.textMuted, marginBottom: 4 }}>Min</Text>
-          <TextInput
-            style={{
-              height: 44, borderWidth: 1, borderColor: C.border, borderRadius: 8,
-              paddingHorizontal: 12, fontSize: 14, color: C.textPrimary, backgroundColor: C.bgPrimary,
-            } as any}
-            placeholder="0"
-            placeholderTextColor={C.textMuted}
-            value={minPrice}
-            onChangeText={setMinPrice}
-            keyboardType="numeric"
-          />
-        </View>
-        <View style={{ width: 20, alignItems: 'center', paddingTop: 20 }}>
-          <Feather name="minus" size={16} color={C.textMuted} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 11, color: C.textMuted, marginBottom: 4 }}>Max</Text>
-          <TextInput
-            style={{
-              height: 44, borderWidth: 1, borderColor: C.border, borderRadius: 8,
-              paddingHorizontal: 12, fontSize: 14, color: C.textPrimary, backgroundColor: C.bgPrimary,
-            } as any}
-            placeholder="10000+"
-            placeholderTextColor={C.textMuted}
-            value={maxPrice}
-            onChangeText={setMaxPrice}
-            keyboardType="numeric"
-          />
-        </View>
-      </View>
-
-      <Label text="Quick presets" />
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        {presets.map((preset, idx) => (
-          <Pressable
-            key={preset.label}
-            style={{
-              paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8,
-              backgroundColor: activePreset === idx ? C.primary : C.bgPrimary,
-              borderWidth: 1, borderColor: activePreset === idx ? C.primary : C.border,
-            }}
-            onPress={() => {
-              setActivePreset(activePreset === idx ? null : idx);
-              setMinPrice(preset.min.toString());
-              setMaxPrice(preset.max > 0 ? preset.max.toString() : '');
+              backgroundColor: C.green,
+              borderRadius: R.md,
+              paddingHorizontal: 24,
+              paddingVertical: 13,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              opacity: loading === 'primary' ? 0.7 : 1,
             }}
           >
-            <Text style={{
-              fontSize: 13, fontWeight: '500',
-              color: activePreset === idx ? C.white : C.textSecondary,
-            }}>
-              {preset.label} {selectedCurrency}
+            {loading === 'primary'
+              ? <ActivityIndicator size="small" color="#fff" />
+              : <Feather name="plus" size={16} color="#fff" />
+            }
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>
+              {loading === 'primary' ? 'Loading...' : 'Primary'}
             </Text>
           </Pressable>
-        ))}
-      </View>
 
-      {minPrice || maxPrice ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.surface, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 }}>
-          <Feather name="filter" size={14} color={C.primary} />
-          <Text style={{ fontSize: 13, color: C.primary, fontWeight: '500' }}>
-            {minPrice || '0'} - {maxPrice || 'any'} {selectedCurrency}
-          </Text>
-          <Pressable onPress={() => { setMinPrice(''); setMaxPrice(''); setActivePreset(null); }} style={{ marginLeft: 'auto' }}>
-            <Feather name="x" size={14} color={C.textMuted} />
+          {/* Secondary */}
+          <Pressable
+            onPress={() => handlePress('secondary')}
+            style={{
+              backgroundColor: C.white,
+              borderRadius: R.md,
+              paddingHorizontal: 24,
+              paddingVertical: 12,
+              borderWidth: 1.5,
+              borderColor: C.green,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              opacity: loading === 'secondary' ? 0.7 : 1,
+            }}
+          >
+            {loading === 'secondary'
+              ? <ActivityIndicator size="small" color={C.green} />
+              : <Feather name="message-circle" size={16} color={C.green} />
+            }
+            <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>
+              {loading === 'secondary' ? 'Loading...' : 'Secondary'}
+            </Text>
+          </Pressable>
+
+          {/* Ghost */}
+          <Pressable
+            onPress={() => handlePress('ghost')}
+            style={{
+              backgroundColor: 'transparent',
+              borderRadius: R.md,
+              paddingHorizontal: 24,
+              paddingVertical: 13,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <Feather name="share-2" size={16} color={C.muted} />
+            <Text style={{ color: C.muted, fontWeight: '600', fontSize: 15 }}>Ghost</Text>
+          </Pressable>
+
+          {/* Destructive */}
+          <Pressable
+            onPress={() => handlePress('destructive')}
+            style={{
+              backgroundColor: '#FFEBEE',
+              borderRadius: R.md,
+              paddingHorizontal: 24,
+              paddingVertical: 13,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              opacity: loading === 'destructive' ? 0.7 : 1,
+            }}
+          >
+            {loading === 'destructive'
+              ? <ActivityIndicator size="small" color={C.error} />
+              : <Feather name="trash-2" size={16} color={C.error} />
+            }
+            <Text style={{ color: C.error, fontWeight: '700', fontSize: 15 }}>
+              {loading === 'destructive' ? 'Deleting...' : 'Destructive'}
+            </Text>
           </Pressable>
         </View>
-      ) : null}
-    </Section>
+      </Card>
+    </View>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main export
-// ---------------------------------------------------------------------------
-export default function ComponentsStates() {  const { width } = useWindowDimensions();
-  const isDesktop = width >= 768;
-  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+// ─── 4. Listing Card ─────────────────────────────────────────────────────────
+function CardsSection({ isDesktop }: { isDesktop: boolean }) {
+  const [saved, setSaved] = useState<Record<string, boolean>>({});
+
+  const listings = [
+    {
+      id: '1',
+      seed: 'apt-batumi',
+      price: '$85,000',
+      title: '3-room apartment, Batumi center, sea view',
+      location: 'Batumi, Adjara',
+      time: '2h ago',
+      badge: { label: 'Premium', bg: C.greenBg, color: C.green },
+    },
+    {
+      id: '2',
+      seed: 'car-camry',
+      price: '$12,500',
+      title: 'Toyota Camry 2019, 45,000 km, automatic',
+      location: 'Tbilisi, Vake',
+      time: '5h ago',
+      badge: { label: 'Top', bg: '#FFF3E0', color: '#E65100' },
+    },
+    {
+      id: '3',
+      seed: 'sofa-corner',
+      price: '350 GEL',
+      title: 'Corner sofa, beige, good condition, 2.4m',
+      location: 'Kutaisi',
+      time: '1d ago',
+      badge: { label: 'Urgent', bg: '#FFEBEE', color: C.error },
+    },
+  ];
+
+  return (
+    <View>
+      <SectionHeading number="04" title="Cards" />
+      <View style={{
+        flexDirection: isDesktop ? 'row' : 'column',
+        gap: 16,
+        flexWrap: 'wrap',
+      }}>
+        {listings.map((item) => (
+          <Card key={item.id} style={{ flex: 1, minWidth: 240, padding: 0, overflow: 'hidden' }}>
+            <View style={{ position: 'relative' }}>
+              <Image
+                source={{ uri: `https://picsum.photos/seed/${item.seed}/600/380` }}
+                style={{ width: '100%', height: 160 }}
+                resizeMode="cover"
+              />
+              {/* Badge */}
+              <View style={{
+                position: 'absolute', top: 8, left: 8,
+                backgroundColor: item.badge.bg,
+                borderRadius: R.sm,
+                paddingHorizontal: 8, paddingVertical: 3,
+              }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: item.badge.color }}>
+                  {item.badge.label}
+                </Text>
+              </View>
+              {/* Save button */}
+              <Pressable
+                onPress={() => setSaved((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
+                style={{
+                  position: 'absolute', top: 8, right: 8,
+                  backgroundColor: 'rgba(255,255,255,0.9)',
+                  borderRadius: R.full, width: 32, height: 32,
+                  alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Feather name="heart" size={15} color={saved[item.id] ? C.error : C.muted} />
+              </Pressable>
+            </View>
+
+            <View style={{ padding: 12 }}>
+              <Text style={{ fontSize: 20, fontWeight: '700', color: C.text, marginBottom: 2 }}>
+                {item.price}
+              </Text>
+              <Text style={{ fontSize: 14, color: C.text, marginBottom: 8, lineHeight: 20 }} numberOfLines={2}>
+                {item.title}
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Feather name="map-pin" size={12} color={C.muted} />
+                  <Text style={{ fontSize: 12, color: C.muted }}>{item.location}</Text>
+                </View>
+                <Text style={{ fontSize: 12, color: C.muted }}>{item.time}</Text>
+              </View>
+            </View>
+          </Card>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+// ─── 5. Lists ────────────────────────────────────────────────────────────────
+function ListsSection() {
+  const items = [
+    { name: 'Giorgi Beridze', detail: 'Tbilisi -- 12 active listings', rating: '4.8', seed: 'seller1' },
+    { name: 'Nino Kapanadze', detail: 'Batumi -- 8 active listings', rating: '4.6', seed: 'seller2' },
+    { name: 'Lasha Megrelidze', detail: 'Kutaisi -- 5 active listings', rating: '4.9', seed: 'seller3' },
+  ];
+
+  return (
+    <View>
+      <SectionHeading number="05" title="Lists" />
+      <Card style={{ padding: 0, overflow: 'hidden' }}>
+        {items.map((item, idx) => (
+          <View key={item.name}>
+            <Pressable style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              padding: 16,
+            }}>
+              <Image
+                source={{ uri: `https://picsum.photos/seed/${item.seed}/80/80` }}
+                style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.border }}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>{item.name}</Text>
+                <Text style={{ fontSize: 13, color: C.muted, marginTop: 1 }}>{item.detail}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Feather name="star" size={13} color="#F59E0B" />
+                <Text style={{ fontSize: 13, fontWeight: '700', color: C.text }}>{item.rating}</Text>
+              </View>
+              <Feather name="chevron-right" size={18} color={C.muted} />
+            </Pressable>
+            {idx < items.length - 1 && (
+              <View style={{ height: 1, backgroundColor: C.border, marginLeft: 72 }} />
+            )}
+          </View>
+        ))}
+      </Card>
+    </View>
+  );
+}
+
+// ─── 6. Empty State ──────────────────────────────────────────────────────────
+function EmptyStateSection() {
+  return (
+    <View>
+      <SectionHeading number="06" title="Empty States" />
+      <Card style={{ alignItems: 'center', paddingVertical: 40 }}>
+        <View style={{
+          width: 72, height: 72,
+          borderRadius: R.full,
+          backgroundColor: C.greenBg,
+          alignItems: 'center', justifyContent: 'center',
+          marginBottom: 20,
+        }}>
+          <Feather name="inbox" size={32} color={C.green} />
+        </View>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, marginBottom: 6 }}>
+          No listings yet
+        </Text>
+        <Text style={{
+          fontSize: 14, color: C.muted, textAlign: 'center',
+          maxWidth: 280, lineHeight: 20, marginBottom: 20,
+        }}>
+          You have not posted any listings. Start selling by creating your first ad.
+        </Text>
+        <Pressable style={{
+          backgroundColor: C.green,
+          borderRadius: R.md,
+          paddingHorizontal: 24,
+          paddingVertical: 13,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+        }}>
+          <Feather name="plus" size={16} color="#fff" />
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Create listing</Text>
+        </Pressable>
+      </Card>
+    </View>
+  );
+}
+
+// ─── 7. Alerts / Banners ─────────────────────────────────────────────────────
+function AlertsSection() {
+  const alerts = [
+    {
+      type: 'success',
+      icon: 'check-circle' as const,
+      bg: C.greenBg,
+      color: C.green,
+      text: 'Listing published successfully! It is now visible to buyers.',
+    },
+    {
+      type: 'error',
+      icon: 'alert-circle' as const,
+      bg: '#FFEBEE',
+      color: C.error,
+      text: 'Failed to upload photos. Please check file size (max 5MB) and try again.',
+    },
+    {
+      type: 'warning',
+      icon: 'alert-triangle' as const,
+      bg: '#FFF3E0',
+      color: '#E65100',
+      text: 'Your listing expires in 3 days. Renew to keep it active.',
+    },
+    {
+      type: 'info',
+      icon: 'info' as const,
+      bg: '#E3F2FD',
+      color: '#1565C0',
+      text: 'Your listing is under review. It will be published within 24 hours.',
+    },
+  ];
+
+  return (
+    <View>
+      <SectionHeading number="07" title="Alerts / Banners" />
+      <View style={{ gap: 12 }}>
+        {alerts.map((alert) => (
+          <Card key={alert.type} style={{
+            padding: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            borderLeftWidth: 3,
+            borderLeftColor: alert.color,
+            backgroundColor: alert.bg,
+          }}>
+            <Feather name={alert.icon} size={18} color={alert.color} />
+            <Text style={{ flex: 1, fontSize: 14, fontWeight: '500', color: alert.color, lineHeight: 20 }}>
+              {alert.text}
+            </Text>
+          </Card>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+// ─── Main Export ─────────────────────────────────────────────────────────────
+export default function ComponentsStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 900;
+  const containerStyle = isDesktop
+    ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' as const, paddingHorizontal: 48 }
+    : {};
 
   return (
     <StateSection title="SHOWCASE">
-      <View style={[{ minHeight: Platform.OS === 'web' ? '100vh' as any : 844 }, containerStyle]}>
-        <ScrollView
-          style={{ flex: 1, backgroundColor: C.bgPrimary }}
-          contentContainerStyle={{ padding: 16, gap: 24, maxWidth: 960, alignSelf: 'center', width: '100%' }}
-        >
-          <Text style={{ fontSize: 22, fontWeight: '700', color: C.textPrimary }}>
+      <ScrollView
+        style={[{ minHeight: 844 }, containerStyle]}
+        contentContainerStyle={{ padding: isDesktop ? 32 : 16, gap: 40, backgroundColor: C.page }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Page Header */}
+        <View>
+          <Text style={{ fontSize: 24, fontWeight: '700', color: C.text, marginBottom: 4 }}>
             UI Components
           </Text>
-          <Text style={{ fontSize: 14, color: C.textMuted, marginTop: -12 }}>
+          <Text style={{ fontSize: 14, color: C.muted }}>
             Interactive showcase of all reusable components -- Avito Georgia
           </Text>
-          <HeaderVariantsSection />
-          <TabBarSection />
-          <BurgerSection />
-          <SearchAutocompleteSection />
-          <InputsSection />
-          <ButtonsSection />
-          <SelectSection />
-          <CardsSection />
-          <BadgesSection />
-          <AlertsSection />
-          <PriceRangeSection />
-          <View style={{ height: 40 }} />
-        </ScrollView>
-      </View>
+        </View>
+
+        <NavigationSection />
+        <InputsSection />
+        <ButtonsSection />
+        <CardsSection isDesktop={isDesktop} />
+        <ListsSection />
+        <EmptyStateSection />
+        <AlertsSection />
+
+        <View style={{ height: 40 }} />
+      </ScrollView>
     </StateSection>
   );
 }
