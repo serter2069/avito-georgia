@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 import type { ReactNode } from 'react';
 
 interface StateSectionProps {
@@ -7,8 +7,10 @@ interface StateSectionProps {
 }
 
 export function StateSection({ title, children }: StateSectionProps) {
+  const webProps = Platform.OS === 'web' ? { 'data-state-name': title } : {};
+
   return (
-    <View style={{
+    <View {...webProps} style={{
       backgroundColor: '#fff',
       borderWidth: 1,
       borderColor: '#E0E0E0',
