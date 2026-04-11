@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -66,10 +66,6 @@ export default function AdminDashboardStates() {
   return (
     <View>
       <StateSection title="default">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View>
           <Text className="text-text-primary text-lg font-bold mb-4">Admin Dashboard</Text>
           <View className="flex-row flex-wrap gap-3 mb-4">
@@ -111,23 +107,13 @@ export default function AdminDashboardStates() {
           <NavCard title="Платежи" icon="credit-card" />
           <NavCard title="Настройки" icon="settings" />
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="loading">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
     </View>
   );
 }

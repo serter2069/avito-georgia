@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
@@ -28,10 +28,6 @@ export default function SubscriptionStates() {
   return (
     <View>
       <StateSection title="no_subscription">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Premium подписка</Text>
           {isDesktop ? (
@@ -54,16 +50,9 @@ export default function SubscriptionStates() {
             <PlanCard name="Premium" price="29.99 GEL/мес" features={['Безлимитные объявления', 'Значок Premium', 'Приоритет в поиске', 'Поддержка 24/7']} isPrimary />
           )}
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="active_subscription">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="py-4" style={isDesktop ? { maxWidth: 560, alignSelf: 'center', width: '100%' } : undefined}>
           <View className="bg-primary/10 border border-primary rounded-lg p-4 mb-4">
             <View className="flex-row items-center justify-between mb-2">
@@ -79,43 +68,22 @@ export default function SubscriptionStates() {
             <Text className="text-error font-semibold">Отменить подписку</Text>
           </TouchableOpacity>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="loading">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="purchasing">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Оформляем подписку...</Text>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="cancel_confirm">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="alert-triangle" size={48} color="#C0392B" />
@@ -131,10 +99,7 @@ export default function SubscriptionStates() {
             </TouchableOpacity>
           </View>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
     </View>
   );
 }

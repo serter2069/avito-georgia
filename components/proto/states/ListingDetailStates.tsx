@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, TextInput, Image, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, TextInput, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings, mockUsers } from '../../../constants/protoMockData';
@@ -33,10 +33,6 @@ export default function ListingDetailStates() {
   return (
     <View>
       <StateSection title="default">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={containerStyle}>
           {isDesktop ? (
             // Desktop: 2-column layout (photo left, details right)
@@ -179,59 +175,31 @@ export default function ListingDetailStates() {
             </View>
           )}
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="loading">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="error_not_found">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="py-16 items-center">
           <Feather name="alert-circle" size={48} color="#C0392B" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Объявление не найдено</Text>
           <Text className="text-text-muted text-sm mt-1">Возможно, оно было удалено</Text>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="phone_revealed">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View className="bg-surface rounded-lg p-4 items-center">
           <Feather name="phone" size={24} color="#00AA6C" />
           <Text className="text-text-primary text-lg font-bold mt-2">+995 555 12 34 56</Text>
           <Text className="text-text-muted text-sm mt-1">{seller.name}</Text>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="report_modal_open">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {}} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Пожаловаться</Text>
           {['Мошенничество', 'Спам', 'Неприемлемый контент', 'Другое'].map((reason) => (
@@ -245,10 +213,7 @@ export default function ListingDetailStates() {
             <Text className="text-white font-semibold">Отправить жалобу</Text>
           </TouchableOpacity>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
     </View>
   );
 }
