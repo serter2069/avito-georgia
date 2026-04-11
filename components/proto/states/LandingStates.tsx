@@ -144,6 +144,39 @@ function ListingCard({ title, price, currency, city, seed }: {
   );
 }
 
+// ─── Testimonial Card ───────────────────────────────────────────────────────
+function TestimonialCard({ name, city, text, avatar, rating }: {
+  name: string; city: string; text: string; avatar: string; rating: number;
+}) {
+  return (
+    <View style={{
+      backgroundColor: C.white, borderRadius: 10, borderWidth: 1,
+      borderColor: C.border, padding: 16, flex: 1, minWidth: 200,
+    }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <Image
+          source={{ uri: avatar }}
+          style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.page }}
+          resizeMode="cover"
+        />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{name}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Feather name="map-pin" size={11} color={C.muted} />
+            <Text style={{ fontSize: 12, color: C.muted }}>{city}</Text>
+          </View>
+        </View>
+      </View>
+      <Text style={{ fontSize: 13, color: C.text, lineHeight: 19, marginBottom: 8 }}>"{text}"</Text>
+      <View style={{ flexDirection: 'row', gap: 2 }}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Feather key={i} name="star" size={14} color={i < rating ? '#f59e0b' : C.border} />
+        ))}
+      </View>
+    </View>
+  );
+}
+
 // ─── Feature Card ───────────────────────────────────────────────────────────
 function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
@@ -352,6 +385,36 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
               icon="map-pin"
               title="Локально"
               description="Находите предложения рядом с вами — от Тбилиси до Зугдиди."
+            />
+          </View>
+        </View>
+
+        {/* Testimonials Section */}
+        <View style={{ paddingHorizontal: 20, paddingBottom: 28 }}>
+          <Text style={{ fontSize: 20, fontWeight: '700', color: C.text, marginBottom: 16 }}>
+            Отзывы пользователей
+          </Text>
+          <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 12 }}>
+            <TestimonialCard
+              name="Ираклий Гоциридзе"
+              city="Тбилиси"
+              text="Продал машину за 3 дня! Удобный интерфейс, быстро нашёл покупателя. Рекомендую."
+              avatar="https://picsum.photos/seed/review-irakli/80/80"
+              rating={5}
+            />
+            <TestimonialCard
+              name="Нино Кварацхелия"
+              city="Батуми"
+              text="Нашла квартиру в Батуми через avito.ge. Отличный сервис, всё прозрачно и понятно."
+              avatar="https://picsum.photos/seed/review-nino/80/80"
+              rating={5}
+            />
+            <TestimonialCard
+              name="Георгий Берианидзе"
+              city="Кутаиси"
+              text="Размещаю объявления бесплатно — это круто. Премиум подписка окупается за одну сделку."
+              avatar="https://picsum.photos/seed/review-giorgi/80/80"
+              rating={4}
             />
           </View>
         </View>
