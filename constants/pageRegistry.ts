@@ -1,4 +1,4 @@
-export type PageGroup = 'Overview' | 'Auth' | 'Onboarding' | 'Public' | 'My Listings' | 'Dashboard' | 'Promotions' | 'Admin' | 'Static';
+export type PageGroup = 'Brand' | 'Auth' | 'Onboarding' | 'Public' | 'My Listings' | 'Dashboard' | 'Promotions' | 'Admin' | 'Static';
 export type NavVariant = 'none' | 'public' | 'auth' | 'client' | 'admin';
 
 export interface PageNote {
@@ -20,22 +20,10 @@ export interface PageEntry {
 }
 
 export const pageRegistry: PageEntry[] = [
-  // Overview
-  {
-    id: 'overview',
-    title: 'Project Overview',
-    group: 'Overview',
-    route: '/proto/overview',
-    stateCount: 1,
-    nav: 'none',
-    qaCycles: 0,
-    qaScore: undefined,
-    notes: [{ date: '2026-04-09', text: 'Карта проекта: роли, сценарии, прогресс прототипирования. Не экран приложения — документ.' }],
-  },
   {
     id: 'brand',
     title: 'Brand & Styles',
-    group: 'Overview',
+    group: 'Brand',
     route: '/proto/brand',
     stateCount: 1,
     nav: 'none',
