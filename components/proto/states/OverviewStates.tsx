@@ -66,7 +66,15 @@ function ScenarioCard({ id, title, role, steps, screens }: {
       borderColor: C.border, padding: 16,
     }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{title}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{
+            backgroundColor: C.primaryBg, width: 28, height: 28, borderRadius: 6,
+            alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: C.primary }}>{id.replace('browse', 'S1').replace('search', 'S2').replace('auth', 'S3').replace('create-listing', 'S4').replace('messaging', 'S5').replace('promote', 'S6').replace('subscribe', 'S7').replace('moderation', 'S8')}</Text>
+          </View>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{title}</Text>
+        </View>
         <View style={{
           backgroundColor: C.primaryBg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4,
         }}>
@@ -75,24 +83,46 @@ function ScenarioCard({ id, title, role, steps, screens }: {
       </View>
 
       {/* Steps flow */}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
-        {screens.map((screen, idx) => (
-          <React.Fragment key={idx}>
-            <Pressable
-              style={{
-                backgroundColor: C.page, borderRadius: 6,
-                paddingHorizontal: 10, paddingVertical: 6,
-                borderWidth: 1, borderColor: C.border,
-              }}
-              onPress={() => navTo(screen)}
-            >
-              <Text style={{ fontSize: 12, fontWeight: '500', color: C.primary }}>{screen}</Text>
-            </Pressable>
-            {idx < screens.length - 1 && (
-              <Feather name="chevron-right" size={14} color={C.muted} />
-            )}
-          </React.Fragment>
-        ))}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        {screens.map((screen, idx) => {
+          // Parse steps like "homepage -> listings-feed -> listing-detail"
+          const screenNames = steps[0]?.split(' → ') || steps[0]?.split(' -> ') || [screen];
+          const currentScreen = screenNames[idx] || screen;
+          return (
+            <React.Fragment key={idx}>
+              <Pressable
+                style={{
+                  backgroundColor: C.page, borderRadius: 6,
+                  paddingHorizontal: 10, paddingVertical: 6,
+                  borderWidth: 1, borderColor: C.border,
+                }}
+                onPress={() => navTo(screen)}
+              >
+                <Text style={{ fontSize: 12, fontWeight: '500', color: C.primary }}>{currentScreen.trim()}</Text>
+              </Pressable>
+              {idx < screens.length - 1 && (
+                <Feather name="chevron-right" size={14} color={C.muted} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </View>
+
+      {/* Expected outcome */}
+      <View style={{
+        backgroundColor: C.page, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6,
+        borderLeftWidth: 3, borderLeftColor: C.primary,
+      }}>
+        <Text style={{ fontSize: 11, color: C.muted }}>
+          {title === 'Просмотр объявлений' && 'Главная → лента объявлений → детали → контакт с продавцом'}
+          {title === 'Поиск' && 'Ввод запроса → результаты/карта → выбор объявления'}
+          {title === 'Авторизация' && 'Email → OTP-код → онбординг (первый вход) → главная'}
+          {title === 'Размещение объявления' && 'Форма создания → модерация → публикация'}
+          {title === 'Переписка' && 'Объявление → чат с продавцом → история сообщений'}
+          {title === 'Продвижение объявления' && 'Мои объявления → выбор пакета → оплата → подтверждение'}
+          {title === 'Premium подписка' && 'Профиль → тарифы → Stripe → активация'}
+          {title === 'Модерация (Admin)' && 'Дашборд → очередь → одобрить/отклонить'}
+        </Text>
       </View>
     </View>
   );
@@ -134,9 +164,33 @@ function ProgressSection() {
       <View style={{ height: 8, backgroundColor: C.page, borderRadius: 4, overflow: 'hidden' }}>
         <View style={{ height: '100%', width: `${barWidth}%`, backgroundColor: C.primary, borderRadius: 4 }} />
       </View>
-      <Text style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
+      <Text style={{ fontSize: 11, color: C.muted, marginTop: 4, marginBottom: 12 }}>
         {reviewPages}/{totalProto} страниц готовы к ревью ({Math.round(barWidth)}%)
       </Text>
+
+      {/* Page status list */}
+      <Text style={{ fontSize: 12, fontWeight: '700', color: C.text, marginBottom: 8 }}>Страницы по статусам:</Text>
+      <View style={{ gap: 4 }}>
+        {pageRegistry.map((page) => {
+          const cycles = page.qaCycles ?? 0;
+          const statusColor = cycles >= 5 ? '#2E7D30' : cycles > 0 ? '#f59e0b' : '#94A3B8';
+          const statusLabel = cycles >= 5 ? 'READY' : cycles > 0 ? 'PROTO' : 'TODO';
+          return (
+            <View key={page.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Pressable onPress={() => navTo(page.id)} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Feather name="file" size={12} color={C.primary} />
+                <Text style={{ fontSize: 12, color: C.text, fontWeight: '500' }}>{page.title}</Text>
+              </Pressable>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={{ fontSize: 10, color: C.muted }}>{cycles}/5</Text>
+                <View style={{ backgroundColor: statusColor, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                  <Text style={{ fontSize: 9, fontWeight: '700', color: '#fff' }}>{statusLabel}</Text>
+                </View>
+              </View>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }

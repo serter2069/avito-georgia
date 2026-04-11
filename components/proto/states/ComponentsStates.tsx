@@ -780,6 +780,117 @@ function AlertsSection() {
 }
 
 // ---------------------------------------------------------------------------
+// 11. Price Range Slider
+// ---------------------------------------------------------------------------
+function PriceRangeSection() {
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [selectedCurrency, setSelectedCurrency] = useState<'GEL' | 'USD'>('GEL');
+
+  const presets = [
+    { label: '0 - 500', min: 0, max: 500 },
+    { label: '500 - 1000', min: 500, max: 1000 },
+    { label: '1000 - 5000', min: 1000, max: 5000 },
+    { label: '5000+', min: 5000, max: 0 },
+  ];
+
+  const [activePreset, setActivePreset] = useState<number | null>(null);
+
+  return (
+    <Section title="11. Price Range Filter">
+      <Label text="Currency toggle" />
+      <View style={{ flexDirection: 'row', gap: 0, backgroundColor: C.bgPrimary, borderRadius: 8, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
+        {(['GEL', 'USD'] as const).map((cur) => (
+          <Pressable
+            key={cur}
+            style={{
+              flex: 1, paddingVertical: 10, alignItems: 'center',
+              backgroundColor: selectedCurrency === cur ? C.primary : 'transparent',
+            }}
+            onPress={() => setSelectedCurrency(cur)}
+          >
+            <Text style={{ fontSize: 14, fontWeight: '600', color: selectedCurrency === cur ? C.white : C.textSecondary }}>{cur}</Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Label text="Price range inputs" />
+      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 11, color: C.textMuted, marginBottom: 4 }}>Min</Text>
+          <TextInput
+            style={{
+              height: 44, borderWidth: 1, borderColor: C.border, borderRadius: 8,
+              paddingHorizontal: 12, fontSize: 14, color: C.textPrimary, backgroundColor: C.bgPrimary,
+            } as any}
+            placeholder="0"
+            placeholderTextColor={C.textMuted}
+            value={minPrice}
+            onChangeText={setMinPrice}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={{ width: 20, alignItems: 'center', paddingTop: 20 }}>
+          <Feather name="minus" size={16} color={C.textMuted} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 11, color: C.textMuted, marginBottom: 4 }}>Max</Text>
+          <TextInput
+            style={{
+              height: 44, borderWidth: 1, borderColor: C.border, borderRadius: 8,
+              paddingHorizontal: 12, fontSize: 14, color: C.textPrimary, backgroundColor: C.bgPrimary,
+            } as any}
+            placeholder="10000+"
+            placeholderTextColor={C.textMuted}
+            value={maxPrice}
+            onChangeText={setMaxPrice}
+            keyboardType="numeric"
+          />
+        </View>
+      </View>
+
+      <Label text="Quick presets" />
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        {presets.map((preset, idx) => (
+          <Pressable
+            key={preset.label}
+            style={{
+              paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8,
+              backgroundColor: activePreset === idx ? C.primary : C.bgPrimary,
+              borderWidth: 1, borderColor: activePreset === idx ? C.primary : C.border,
+            }}
+            onPress={() => {
+              setActivePreset(activePreset === idx ? null : idx);
+              setMinPrice(preset.min.toString());
+              setMaxPrice(preset.max > 0 ? preset.max.toString() : '');
+            }}
+          >
+            <Text style={{
+              fontSize: 13, fontWeight: '500',
+              color: activePreset === idx ? C.white : C.textSecondary,
+            }}>
+              {preset.label} {selectedCurrency}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      {minPrice || maxPrice ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.surface, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 }}>
+          <Feather name="filter" size={14} color={C.primary} />
+          <Text style={{ fontSize: 13, color: C.primary, fontWeight: '500' }}>
+            {minPrice || '0'} - {maxPrice || 'any'} {selectedCurrency}
+          </Text>
+          <Pressable onPress={() => { setMinPrice(''); setMaxPrice(''); setActivePreset(null); }} style={{ marginLeft: 'auto' }}>
+            <Feather name="x" size={14} color={C.textMuted} />
+          </Pressable>
+        </View>
+      ) : null}
+    </Section>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main export
 // ---------------------------------------------------------------------------
 export default function ComponentsStates() {
@@ -806,6 +917,7 @@ export default function ComponentsStates() {
           <CardsSection />
           <BadgesSection />
           <AlertsSection />
+          <PriceRangeSection />
           <View style={{ height: 40 }} />
         </ScrollView>
       </View>
