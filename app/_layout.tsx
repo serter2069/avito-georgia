@@ -1,7 +1,7 @@
 import '../global.css';
 import '../lib/i18n';
 import { initI18n } from '../lib/i18n';
-import { useCallback, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Stack, useRouter, useSegments, usePathname } from 'expo-router';
 import { View, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -93,18 +93,7 @@ export default function RootLayout() {
   const isProtoSync = Platform.OS === 'web' && typeof window !== 'undefined' && window.location.pathname.startsWith('/proto');
   const isProto = isProtoSync || segments[0] === 'proto' || pathname.startsWith('/proto');
   const containerStyle = isProto ? { maxWidth: 9999 } : { maxWidth: rawMaxWidth };
-  // RN Web bug: fiber gets correct style but DOM element is not updated.
-  // useCallback ref fires synchronously on mount — avoids null-ref issue when
-  // the View renders after the loading spinner is dismissed.
-  const rootViewRef = useCallback((el: View | null) => {
-    if (!el || Platform.OS !== 'web') return;
-    const htmlEl = el as unknown as HTMLElement;
-    if (isProto) {
-      htmlEl.style.maxWidth = '';
-    } else {
-      htmlEl.style.maxWidth = rawMaxWidth + 'px';
-    }
-  }, [isProto, rawMaxWidth]);
+  const rootViewRef = useRef<View>(null);
   const router = useRouter();
 
   const [fontsLoaded] = useFonts({
@@ -125,6 +114,21 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
+
+  // RN Web bug: fiber gets correct style but DOM element is not updated.
+  // Include fontsLoaded + isReady so this runs after the main View mounts
+  // (the loading spinner View has no ref, so rootViewRef.current is null until then).
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    if (!fontsLoaded || !isReady) return;
+    const el = rootViewRef.current as unknown as HTMLElement | null;
+    if (!el) return;
+    if (isProto) {
+      el.style.maxWidth = '';
+    } else {
+      el.style.maxWidth = rawMaxWidth + 'px';
+    }
+  }, [fontsLoaded, isReady, isProto, rawMaxWidth]);
 
   // On admin subdomain (admin.*): redirect to /admin equivalent if not already there.
   // Both fontsLoaded and isReady must be true before navigating — ensures Root Layout is
