@@ -91,7 +91,8 @@ export default function RootLayout() {
   const segments = useSegments();
   const pathname = usePathname();
   const isProto = segments[0] === 'proto' || pathname.startsWith('/proto');
-  const containerStyle = isProto ? {} : { maxWidth: rawMaxWidth };
+  // For proto: explicitly override to a large value — passing {} doesn't clear RN Web inline styles
+  const containerStyle = isProto ? { maxWidth: 9999 } : { maxWidth: rawMaxWidth };
   const router = useRouter();
 
   const [fontsLoaded] = useFonts({
