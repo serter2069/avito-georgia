@@ -27,6 +27,7 @@ export const pageRegistry: PageEntry[] = [
     route: '/',
     stateCount: 1,
     nav: 'none',
+    notes: [{ date: '2026-04-11', text: 'ПЛАТФОРМА: Mobile-first. Целевые платформы — iOS и Android (React Native) + мобильный веб. Десктопная версия не предусмотрена. Все экраны проектируются под ширину 375–430px.' }],
   },
   {
     id: 'brand',
