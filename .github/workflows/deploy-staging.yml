@@ -36,7 +36,7 @@ jobs:
       - name: Deploy frontend
         run: |
           rsync -av --delete dist/ /var/www/avito-georgia/web/
-          sudo chown -R github-runner:www-data /var/www/avito-georgia/web/
+          sudo chown -R root:www-data /var/www/avito-georgia/web/
           sudo chmod -R g+rw /var/www/avito-georgia/web/
 
       - name: Apply nginx config
@@ -68,7 +68,7 @@ jobs:
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_STG }}
         run: |
-          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/ || true
+          sudo chown -R root:www-data /var/www/avito-georgia/api/ || true
           rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
             api/ /var/www/avito-georgia/api/
           cd /var/www/avito-georgia/api && npm ci && npx prisma generate && doppler run -- npm run build
