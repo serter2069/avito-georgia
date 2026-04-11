@@ -7,13 +7,13 @@ import { protoMeta } from '../../../constants/protoMeta';
 
 // Brand colors — synced with BrandStates.tsx
 const C = {
-  green: '#00AA6C',
-  greenBg: '#E8F9F2',
+  primary: '#0A7B8A',
+  primaryBg: '#E8F4F8',
   white: '#FFFFFF',
-  page: '#F4F4F4',
-  text: '#1A1A1A',
-  muted: '#737373',
-  border: '#E0E0E0',
+  page: '#F2F8FA',
+  text: '#0A2840',
+  muted: '#6A8898',
+  border: '#C8E0E8',
   error: '#D32F2F',
 };
 
@@ -26,10 +26,10 @@ function RoleCard({ id, title, description, screenCount }: { id: string; title: 
     }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
         <View style={{
-          width: 36, height: 36, borderRadius: 8, backgroundColor: C.greenBg,
+          width: 36, height: 36, borderRadius: 8, backgroundColor: C.primaryBg,
           alignItems: 'center', justifyContent: 'center',
         }}>
-          <Feather name="user" size={18} color={C.green} />
+          <Feather name="user" size={18} color={C.primary} />
         </View>
         <View>
           <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{title}</Text>
@@ -39,11 +39,11 @@ function RoleCard({ id, title, description, screenCount }: { id: string; title: 
       <Text style={{ fontSize: 13, color: C.muted, lineHeight: 18, marginBottom: 8 }}>{description}</Text>
       <View style={{
         flexDirection: 'row', alignItems: 'center', gap: 4,
-        backgroundColor: C.greenBg, alignSelf: 'flex-start',
+        backgroundColor: C.primaryBg, alignSelf: 'flex-start',
         paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4,
       }}>
-        <Feather name="monitor" size={11} color={C.green} />
-        <Text style={{ fontSize: 11, fontWeight: '600', color: C.green }}>{screenCount} экранов</Text>
+        <Feather name="monitor" size={11} color={C.primary} />
+        <Text style={{ fontSize: 11, fontWeight: '600', color: C.primary }}>{screenCount} экранов</Text>
       </View>
     </View>
   );
@@ -61,9 +61,9 @@ function ScenarioCard({ id, title, role, steps, screens }: {
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{title}</Text>
         <View style={{
-          backgroundColor: C.greenBg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4,
+          backgroundColor: C.primaryBg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4,
         }}>
-          <Text style={{ fontSize: 11, fontWeight: '600', color: C.green }}>{role}</Text>
+          <Text style={{ fontSize: 11, fontWeight: '600', color: C.primary }}>{role}</Text>
         </View>
       </View>
 
@@ -117,14 +117,14 @@ function ProgressSection() {
           <Text style={{ fontSize: 11, color: C.muted }}>В работе</Text>
         </View>
         <View style={{ alignItems: 'center' }}>
-          <Text style={{ fontSize: 22, fontWeight: '800', color: C.green }}>{reviewPages}</Text>
+          <Text style={{ fontSize: 22, fontWeight: '800', color: C.primary }}>{reviewPages}</Text>
           <Text style={{ fontSize: 11, color: C.muted }}>Готово</Text>
         </View>
       </View>
 
       {/* Progress bar */}
       <View style={{ height: 8, backgroundColor: C.page, borderRadius: 4, overflow: 'hidden' }}>
-        <View style={{ height: '100%', width: `${barWidth}%`, backgroundColor: C.green, borderRadius: 4 }} />
+        <View style={{ height: '100%', width: `${barWidth}%`, backgroundColor: C.primary, borderRadius: 4 }} />
       </View>
       <Text style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
         {reviewPages}/{totalProto} страниц готовы к ревью ({Math.round(barWidth)}%)
@@ -150,7 +150,7 @@ function DefaultState() {
       <ScrollView contentContainerStyle={{ padding: isDesktop ? 32 : 16, gap: 24 }}>
         {/* Project Header */}
         <View style={{
-          backgroundColor: C.green, borderRadius: 12, padding: 24,
+          backgroundColor: C.primary, borderRadius: 12, padding: 24,
           flexDirection: isDesktop ? 'row' : 'column', alignItems: 'center', gap: 16,
         }}>
           <View style={{
@@ -175,7 +175,7 @@ function DefaultState() {
         {/* Roles */}
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <Feather name="users" size={18} color={C.green} />
+            <Feather name="users" size={18} color={C.primary} />
             <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Роли</Text>
           </View>
           <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 12, flexWrap: 'wrap' }}>
@@ -199,7 +199,7 @@ function DefaultState() {
         {/* Scenarios */}
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <Feather name="git-branch" size={18} color={C.green} />
+            <Feather name="git-branch" size={18} color={C.primary} />
             <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Сценарии</Text>
           </View>
           <View style={{ gap: 10 }}>
@@ -210,7 +210,7 @@ function DefaultState() {
                 title={scenario.title}
                 role={scenario.roles.join(', ')}
                 steps={scenario.steps}
-                screens={scenario.steps[0]?.split(' → ')[0]?.split(' → ') || []}
+                screens={scenario.steps}
               />
             ))}
           </View>
@@ -219,7 +219,7 @@ function DefaultState() {
         {/* Pages by Group */}
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <Feather name="layers" size={18} color={C.green} />
+            <Feather name="layers" size={18} color={C.primary} />
             <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Страницы по группам</Text>
           </View>
           <View style={{ gap: 8 }}>
@@ -230,13 +230,13 @@ function DefaultState() {
                 borderColor: C.border, paddingHorizontal: 14, paddingVertical: 10,
               }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <Feather name="folder" size={16} color={C.green} />
+                  <Feather name="folder" size={16} color={C.primary} />
                   <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>{group}</Text>
                 </View>
                 <View style={{
-                  backgroundColor: C.greenBg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4,
+                  backgroundColor: C.primaryBg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4,
                 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: C.green }}>{count}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: C.primary }}>{count}</Text>
                 </View>
               </View>
             ))}
@@ -246,7 +246,7 @@ function DefaultState() {
         {/* Tech Stack */}
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <Feather name="code" size={18} color={C.green} />
+            <Feather name="code" size={18} color={C.primary} />
             <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Стек и конфигурация</Text>
           </View>
           <View style={{
