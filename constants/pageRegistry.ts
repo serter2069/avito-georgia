@@ -1,4 +1,4 @@
-export type PageGroup = 'Brand' | 'Auth' | 'Onboarding' | 'Public' | 'My Listings' | 'Dashboard' | 'Promotions' | 'Admin' | 'Static';
+export type PageGroup = 'Overview' | 'Brand' | 'Auth' | 'Onboarding' | 'Public' | 'My Listings' | 'Dashboard' | 'Promotions' | 'Admin' | 'Static';
 export type NavVariant = 'none' | 'public' | 'auth' | 'client' | 'admin';
 
 export interface PageNote {
@@ -20,6 +20,14 @@ export interface PageEntry {
 }
 
 export const pageRegistry: PageEntry[] = [
+  {
+    id: 'overview',
+    title: 'Project Overview',
+    group: 'Overview',
+    route: '/',
+    stateCount: 1,
+    nav: 'none',
+  },
   {
     id: 'brand',
     title: 'Brand & Styles',
