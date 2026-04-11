@@ -27,7 +27,7 @@ export const pageRegistry: PageEntry[] = [
     route: '/',
     stateCount: 1,
     nav: 'none',
-    qaCycles: 3,
+    qaCycles: 4,
     qaScore: 9,
     notes: [{ date: '2026-04-11', text: 'ПЛАТФОРМА: Mobile-first. Целевые платформы — iOS и Android (React Native) + мобильный веб. Десктопная версия не предусмотрена. Все экраны проектируются под ширину 375–430px.' }],
     testScenarios: [
@@ -53,7 +53,7 @@ export const pageRegistry: PageEntry[] = [
     route: '/proto/states/components',
     stateCount: 1,
     nav: 'none',
-    qaCycles: 3,
+    qaCycles: 4,
     qaScore: 9,
     testScenarios: [
       { name: 'View component showcase', steps: ['open /proto/states/components', 'verify header variants visible', 'verify tab bar visible', 'verify input variants visible'] },
@@ -107,7 +107,7 @@ export const pageRegistry: PageEntry[] = [
     route: '/proto/landing',
     stateCount: 2,
     nav: 'none',
-    qaCycles: 3,
+    qaCycles: 4,
     qaScore: 9,
     testScenarios: [
       { name: 'Guest views landing page', steps: ['open /', 'verify hero section visible', 'verify search bar works', 'verify categories displayed', 'verify listings grid shown', 'scroll down to features'] },
