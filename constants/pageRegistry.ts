@@ -39,6 +39,14 @@ export const pageRegistry: PageEntry[] = [
     qaScore: 100,
     notes: [{ date: '2026-04-09', text: 'Визуальный гайдлайн бренда. Основан на стилях lun.ua. Цвета, шрифты, компоненты.' }],
   },
+  {
+    id: 'components',
+    title: 'UI Components',
+    group: 'Brand',
+    route: '/proto/states/components',
+    stateCount: 10,
+    nav: 'none',
+  },
 
   // Auth
   {

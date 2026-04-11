@@ -41,10 +41,12 @@ import AboutStates from '../../../components/proto/states/AboutStates';
 import HelpStates from '../../../components/proto/states/HelpStates';
 import PrivacyStates from '../../../components/proto/states/PrivacyStates';
 import TermsStates from '../../../components/proto/states/TermsStates';
+import ComponentsStates from '../../../components/proto/states/ComponentsStates';
 
 const stateComponents: Record<string, React.ComponentType> = {
   'overview': OverviewStates,
   'brand': BrandStates,
+  'components': ComponentsStates,
   'auth-email': AuthEmailStates,
   'auth-otp': AuthOtpStates,
   'onboarding': OnboardingStates,
