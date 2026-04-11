@@ -90,8 +90,10 @@ export default function RootLayout() {
   const rawMaxWidth = useResponsiveMaxWidth();
   const segments = useSegments();
   const pathname = usePathname();
-  const isProto = segments[0] === 'proto' || pathname.startsWith('/proto');
-  // For proto: explicitly override to a large value — passing {} doesn't clear RN Web inline styles
+  // Synchronous check — works on first render before hooks resolve
+  const isProtoSync = Platform.OS === 'web' && typeof window !== 'undefined' && window.location.pathname.startsWith('/proto');
+  const isProto = isProtoSync || segments[0] === 'proto' || pathname.startsWith('/proto');
+  // Use large maxWidth for proto (not undefined/empty — RN Web doesn't clear previously set inline styles)
   const containerStyle = isProto ? { maxWidth: 9999 } : { maxWidth: rawMaxWidth };
   const router = useRouter();
 
