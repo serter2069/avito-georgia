@@ -87,7 +87,10 @@ function useResponsiveMaxWidth() {
 export default function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate);
   const isReady = useAuthStore((s) => s.isReady);
-  const maxWidth = useResponsiveMaxWidth();
+  const rawMaxWidth = useResponsiveMaxWidth();
+  const segments = useSegments();
+  const isProto = segments[0] === 'proto';
+  const maxWidth = isProto ? undefined : rawMaxWidth;
   const router = useRouter();
 
   const [fontsLoaded] = useFonts({
