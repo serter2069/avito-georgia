@@ -2,7 +2,7 @@ import '../global.css';
 import '../lib/i18n';
 import { initI18n } from '../lib/i18n';
 import { useEffect, useRef } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, usePathname } from 'expo-router';
 import { View, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -89,8 +89,9 @@ export default function RootLayout() {
   const isReady = useAuthStore((s) => s.isReady);
   const rawMaxWidth = useResponsiveMaxWidth();
   const segments = useSegments();
-  const isProto = segments[0] === 'proto';
-  const maxWidth = isProto ? undefined : rawMaxWidth;
+  const pathname = usePathname();
+  const isProto = segments[0] === 'proto' || pathname.startsWith('/proto');
+  const containerStyle = isProto ? {} : { maxWidth: rawMaxWidth };
   const router = useRouter();
 
   const [fontsLoaded] = useFonts({
@@ -142,7 +143,7 @@ export default function RootLayout() {
   if (!fontsLoaded || !isReady) {
     return (
       <SafeAreaProvider>
-        <View className="flex-1 bg-dark items-center justify-center" style={{ maxWidth }}>
+        <View className="flex-1 bg-dark items-center justify-center" style={containerStyle}>
           <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </SafeAreaProvider>
@@ -151,7 +152,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <View className="flex-1 bg-dark w-full self-center" style={{ maxWidth }}>
+      <View className="flex-1 bg-dark w-full self-center" style={containerStyle}>
         <StatusBar style="light" />
         <Stack
           screenOptions={{
