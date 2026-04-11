@@ -24,6 +24,7 @@ export function StateSection({ title, children }: StateSectionProps) {
       borderColor: '#E0E0E0',
       borderRadius: 12,
       overflow: 'hidden',
+      marginBottom: 80,
     }}>
       {/* Badge header */}
       <View style={{

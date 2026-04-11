@@ -27,7 +27,13 @@ export const pageRegistry: PageEntry[] = [
     route: '/',
     stateCount: 1,
     nav: 'none',
+    qaCycles: 1,
+    qaScore: 8,
     notes: [{ date: '2026-04-11', text: 'ПЛАТФОРМА: Mobile-first. Целевые платформы — iOS и Android (React Native) + мобильный веб. Десктопная версия не предусмотрена. Все экраны проектируются под ширину 375–430px.' }],
+    testScenarios: [
+      { name: 'View project overview', steps: ['open /proto/states/overview', 'verify project name visible', 'verify roles displayed', 'verify scenarios listed'] },
+      { name: 'Click scenario link', steps: ['open /proto/states/overview', 'tap scenario screen link', 'verify navigation to page state'] },
+    ],
   },
   {
     id: 'brand',
@@ -47,6 +53,13 @@ export const pageRegistry: PageEntry[] = [
     route: '/proto/states/components',
     stateCount: 10,
     nav: 'none',
+    qaCycles: 1,
+    qaScore: 9,
+    testScenarios: [
+      { name: 'View component showcase', steps: ['open /proto/states/components', 'verify header variants visible', 'verify tab bar visible', 'verify input variants visible'] },
+      { name: 'Interact with tab bar', steps: ['open /proto/states/components', 'tap different tabs', 'verify active state changes'] },
+      { name: 'Test search autocomplete', steps: ['open /proto/states/components', 'type in city search', 'verify autocomplete results appear', 'select a city'] },
+    ],
   },
 
   // Auth
@@ -92,8 +105,16 @@ export const pageRegistry: PageEntry[] = [
     title: 'Landing',
     group: 'Public',
     route: '/proto/landing',
-    stateCount: 1,
+    stateCount: 2,
     nav: 'none',
+    qaCycles: 1,
+    qaScore: 9,
+    testScenarios: [
+      { name: 'Guest views landing page', steps: ['open /', 'verify hero section visible', 'verify search bar works', 'verify categories displayed', 'verify listings grid shown', 'scroll down to features'] },
+      { name: 'Guest clicks Login', steps: ['open /', 'tap Login button', 'verify navigation to auth-email'] },
+      { name: 'Guest searches for listing', steps: ['open /', 'type query in search bar', 'tap Find button', 'verify navigation to search'] },
+      { name: 'Guest selects city', steps: ['open /', 'tap city pill', 'verify city selected state', 'verify listings filter by city'] },
+    ],
   },
   {
     id: 'homepage',
