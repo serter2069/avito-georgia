@@ -2,7 +2,6 @@ import React from 'react';
 import {
   View,
   Text,
-  ScrollView,
   useWindowDimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -127,11 +126,7 @@ export default function BrandStates() {
 
   return (
     <StateSection title="BRAND_GUIDE">
-      <ScrollView
-        style={{ minHeight: 844 }}
-        contentContainerStyle={{ padding: isDesktop ? 32 : 16, gap: 48, backgroundColor: C.page }}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={{ gap: 48 }}>
 
         {/* ── Hero Block ──────────────────────────────────────────────────── */}
         <View style={{
@@ -508,8 +503,7 @@ export default function BrandStates() {
           </Card>
         </View>
 
-        <View style={{ height: 40 }} />
-      </ScrollView>
+      </View>
     </StateSection>
   );
 }
