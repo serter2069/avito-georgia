@@ -21,21 +21,21 @@ export function StateSection({ title, children }: StateSectionProps) {
     <View ref={ref} style={{
       backgroundColor: '#fff',
       borderWidth: 1,
-      borderColor: '#E0E0E0',
+      borderColor: '#C8E0E8',
       borderRadius: 12,
       overflow: 'hidden',
       marginBottom: 80,
     }}>
       {/* Badge header */}
       <View style={{
-        backgroundColor: '#F4F4F4',
+        backgroundColor: '#F2F8FA',
         borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
+        borderBottomColor: '#C8E0E8',
         paddingHorizontal: 12,
         paddingVertical: 6,
       }}>
         <Text style={{
-          color: '#00AA6C',
+          color: '#0A7B8A',
           fontSize: 12,
           fontWeight: '600',
         }}>

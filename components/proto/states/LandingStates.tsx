@@ -13,15 +13,22 @@ import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockCategories, mockCategoryIcons, mockCities, mockListings } from '../../../constants/protoMockData';
 
+// Navigation helper for proto links
+function navTo(pageId: string) {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    window.open(`/proto/states/${pageId}`, '_self');
+  }
+}
+
 // Brand colors — synced with BrandStates.tsx
 const C = {
-  green: '#00AA6C',
-  greenBg: '#E8F9F2',
+  primary: '#0A7B8A',
+  primaryBg: '#E8F4F8',
   white: '#FFFFFF',
-  page: '#F4F4F4',
-  text: '#1A1A1A',
-  muted: '#737373',
-  border: '#E0E0E0',
+  page: '#F2F8FA',
+  text: '#0A2840',
+  muted: '#6A8898',
+  border: '#C8E0E8',
   error: '#D32F2F',
 };
 
@@ -30,7 +37,7 @@ function AvitoLogo() {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
       <View style={{
-        width: 40, height: 40, backgroundColor: C.green,
+        width: 40, height: 40, backgroundColor: C.primary,
         borderRadius: 10, alignItems: 'center', justifyContent: 'center',
       }}>
         <Text style={{ color: '#fff', fontSize: 20, fontWeight: '800', letterSpacing: -0.5 }}>A</Text>
@@ -38,7 +45,7 @@ function AvitoLogo() {
       <View>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 1 }}>
           <Text style={{ fontSize: 22, fontWeight: '700', color: C.text, letterSpacing: -0.3 }}>avito</Text>
-          <Text style={{ fontSize: 16, fontWeight: '600', color: C.green }}>.ge</Text>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: C.primary }}>.ge</Text>
         </View>
         <Text style={{ fontSize: 11, color: C.muted, fontWeight: '400', letterSpacing: 0.2 }}>
           Georgia classifieds
@@ -60,14 +67,14 @@ function LandingHeader({ onLogin }: { onLogin: () => void }) {
       <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
         <Pressable style={{
           paddingHorizontal: 16, paddingVertical: 8, borderRadius: 6,
-          borderWidth: 1.5, borderColor: C.green, backgroundColor: C.white,
-        }} onPress={onLogin}>
-          <Text style={{ color: C.green, fontWeight: '600', fontSize: 14 }}>Войти</Text>
+          borderWidth: 1.5, borderColor: C.primary, backgroundColor: C.white,
+        }} onPress={() => { onLogin(); navTo('auth-email'); }}>
+          <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>Войти</Text>
         </Pressable>
         <Pressable style={{
           paddingHorizontal: 16, paddingVertical: 8, borderRadius: 6,
-          backgroundColor: C.green,
-        }}>
+          backgroundColor: C.primary,
+        }} onPress={() => navTo('create-listing')}>
           <Text style={{ color: C.white, fontWeight: '600', fontSize: 14 }}>Подать объявление</Text>
         </Pressable>
       </View>
@@ -82,10 +89,10 @@ function CategoryChip({ name, icon }: { name: string; icon: string }) {
       alignItems: 'center', width: 80, marginBottom: 12,
     }}>
       <View style={{
-        width: 56, height: 56, borderRadius: 12, backgroundColor: C.greenBg,
+        width: 56, height: 56, borderRadius: 12, backgroundColor: C.primaryBg,
         alignItems: 'center', justifyContent: 'center', marginBottom: 6,
       }}>
-        <Feather name={icon as any} size={24} color={C.green} />
+        <Feather name={icon as any} size={24} color={C.primary} />
       </View>
       <Text style={{ fontSize: 12, fontWeight: '500', color: C.text, textAlign: 'center' }} numberOfLines={2}>
         {name}
@@ -145,10 +152,10 @@ function FeatureCard({ icon, title, description }: { icon: string; title: string
       borderColor: C.border, padding: 20, flex: 1, minWidth: 200,
     }}>
       <View style={{
-        width: 44, height: 44, borderRadius: 10, backgroundColor: C.greenBg,
+        width: 44, height: 44, borderRadius: 10, backgroundColor: C.primaryBg,
         alignItems: 'center', justifyContent: 'center', marginBottom: 12,
       }}>
-        <Feather name={icon as any} size={22} color={C.green} />
+        <Feather name={icon as any} size={22} color={C.primary} />
       </View>
       <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, marginBottom: 6 }}>{title}</Text>
       <Text style={{ fontSize: 13, color: C.muted, lineHeight: 18 }}>{description}</Text>
@@ -164,27 +171,27 @@ function LandingFooter() {
     }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20 }}>
         <View style={{
-          width: 32, height: 32, backgroundColor: C.green, borderRadius: 8,
+          width: 32, height: 32, backgroundColor: C.primary, borderRadius: 8,
           alignItems: 'center', justifyContent: 'center',
         }}>
           <Text style={{ color: '#fff', fontSize: 16, fontWeight: '800' }}>A</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 1 }}>
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#fff' }}>avito</Text>
-          <Text style={{ fontSize: 13, fontWeight: '600', color: C.green }}>.ge</Text>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: C.primary }}>.ge</Text>
         </View>
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20, marginBottom: 20 }}>
         <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff', marginBottom: 4 }}>Компания</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>О нас</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Помощь</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Контакты</Text>
+          <Pressable onPress={() => navTo('about')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>О нас</Text></Pressable>
+          <Pressable onPress={() => navTo('help')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Помощь</Text></Pressable>
+          <Pressable onPress={() => navTo('homepage')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Контакты</Text></Pressable>
         </View>
         <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff', marginBottom: 4 }}>Правовая информация</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Политика конфиденциальности</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Пользовательское соглашение</Text>
+          <Pressable onPress={() => navTo('privacy')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Политика конфиденциальности</Text></Pressable>
+          <Pressable onPress={() => navTo('terms')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Пользовательское соглашение</Text></Pressable>
         </View>
         <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff', marginBottom: 4 }}>Города</Text>
@@ -219,7 +226,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={{
-          backgroundColor: C.green, paddingVertical: 40, paddingHorizontal: 20,
+          backgroundColor: C.primary, paddingVertical: 40, paddingHorizontal: 20,
           alignItems: 'center',
         }}>
           <Text style={{
@@ -256,7 +263,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
               />
             </View>
             <Pressable style={{
-              backgroundColor: C.green, paddingHorizontal: 24,
+              backgroundColor: C.primary, paddingHorizontal: 24,
               alignItems: 'center', justifyContent: 'center',
             }}>
               <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Найти</Text>
@@ -278,7 +285,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
               >
                 <Text style={{
                   fontSize: 13, fontWeight: '600',
-                  color: selectedCity === city ? C.green : '#fff',
+                  color: selectedCity === city ? C.primary : '#fff',
                 }}>
                   {city}
                 </Text>
@@ -305,9 +312,9 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
             <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>
               Свежие объявления
             </Text>
-            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: C.green }}>Все</Text>
-              <Feather name="chevron-right" size={16} color={C.green} />
+            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }} onPress={() => navTo('listings-feed')}>
+              <Text style={{ fontSize: 14, fontWeight: '600', color: C.primary }}>Все</Text>
+              <Feather name="chevron-right" size={16} color={C.primary} />
             </Pressable>
           </View>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
@@ -351,7 +358,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
 
         {/* CTA Section */}
         <View style={{
-          backgroundColor: C.greenBg, paddingVertical: 36, paddingHorizontal: 20,
+          backgroundColor: C.primaryBg, paddingVertical: 36, paddingHorizontal: 20,
           alignItems: 'center',
         }}>
           <Text style={{
@@ -367,11 +374,11 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
             Бесплатное размещение до 10 объявлений. Премиум подписка для профессиональных продавцов.
           </Text>
           <Pressable style={{
-            backgroundColor: C.green, borderRadius: 8,
+            backgroundColor: C.primary, borderRadius: 8,
             paddingHorizontal: 32, paddingVertical: 14,
             shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.15, shadowRadius: 6, elevation: 3,
-          }}>
+          }} onPress={() => navTo('create-listing')}>
             <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>Подать объявление бесплатно</Text>
           </Pressable>
         </View>
@@ -398,7 +405,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
 function StatItem({ value, label }: { value: string; label: string }) {
   return (
     <View style={{ alignItems: 'center', flex: 1, minWidth: 120 }}>
-      <Text style={{ fontSize: 28, fontWeight: '800', color: C.green, marginBottom: 4 }}>{value}</Text>
+      <Text style={{ fontSize: 28, fontWeight: '800', color: C.primary, marginBottom: 4 }}>{value}</Text>
       <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center' }}>{label}</Text>
     </View>
   );
@@ -420,7 +427,7 @@ function MobileHeaderState() {
         </Pressable>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <View style={{
-            width: 28, height: 28, backgroundColor: C.green, borderRadius: 6,
+            width: 28, height: 28, backgroundColor: C.primary, borderRadius: 6,
             alignItems: 'center', justifyContent: 'center',
           }}>
             <Text style={{ color: '#fff', fontSize: 14, fontWeight: '800' }}>A</Text>
@@ -429,7 +436,7 @@ function MobileHeaderState() {
         </View>
         <Pressable style={{
           paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6,
-          backgroundColor: C.green,
+          backgroundColor: C.primary,
         }}>
           <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>Войти</Text>
         </Pressable>
@@ -452,7 +459,7 @@ function MobileHeaderState() {
               flexDirection: 'row', alignItems: 'center', gap: 12,
               paddingHorizontal: 16, paddingVertical: 12,
             }}>
-              <Feather name={item.icon as any} size={18} color={C.green} />
+              <Feather name={item.icon as any} size={18} color={C.primary} />
               <Text style={{ fontSize: 15, color: C.text, fontWeight: '500' }}>{item.label}</Text>
             </Pressable>
           ))}
@@ -469,7 +476,7 @@ function MobileHeaderState() {
             Тысячи объявлений по всей Грузии
           </Text>
           <Pressable style={{
-            backgroundColor: C.green, borderRadius: 8,
+            backgroundColor: C.primary, borderRadius: 8,
             paddingHorizontal: 28, paddingVertical: 14, width: '100%',
           }}>
             <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16, textAlign: 'center' }}>
@@ -487,10 +494,10 @@ function MobileHeaderState() {
                 width: 72, alignItems: 'center', marginRight: 12,
               }}>
                 <View style={{
-                  width: 52, height: 52, borderRadius: 10, backgroundColor: C.greenBg,
+                  width: 52, height: 52, borderRadius: 10, backgroundColor: C.primaryBg,
                   alignItems: 'center', justifyContent: 'center', marginBottom: 4,
                 }}>
-                  <Feather name={(mockCategoryIcons[cat] || 'grid') as any} size={22} color={C.green} />
+                  <Feather name={(mockCategoryIcons[cat] || 'grid') as any} size={22} color={C.primary} />
                 </View>
                 <Text style={{ fontSize: 11, color: C.text, textAlign: 'center' }} numberOfLines={2}>{cat}</Text>
               </View>
