@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
@@ -41,10 +41,6 @@ export default function HomepageStates() {
   return (
     <View>
       <StateSection title="default">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput
@@ -91,16 +87,9 @@ export default function HomepageStates() {
             <Text className="text-text-muted text-xs text-center">Avito Georgia 2026</Text>
           </View>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="loading_listings">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
@@ -113,16 +102,9 @@ export default function HomepageStates() {
             <Text className="text-text-muted text-sm mt-3">Загрузка объявлений...</Text>
           </View>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="empty_listings">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={containerStyle}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
@@ -136,16 +118,9 @@ export default function HomepageStates() {
             <Text className="text-text-muted text-sm mt-1">Будьте первым, кто разместит!</Text>
           </View>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="guest_cta">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={containerStyle} className="bg-surface rounded-lg p-4 items-center">
           <Text className="text-text-primary text-lg font-bold mb-2">Присоединяйтесь!</Text>
           <Text className="text-text-muted text-sm text-center mb-4">Войдите, чтобы размещать объявления и сохранять избранное</Text>
@@ -153,16 +128,9 @@ export default function HomepageStates() {
             <Text className="text-white font-semibold">Войти</Text>
           </TouchableOpacity>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
 
       <StateSection title="user_cta">
-        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
-          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
-          <View style={{ flex: 1 }}>
-
         <View style={containerStyle} className="bg-surface rounded-lg p-4 items-center">
           <Text className="text-text-primary text-lg font-bold mb-2">Продайте быстрее!</Text>
           <Text className="text-text-muted text-sm text-center mb-4">Продвиньте ваше объявление и получите больше просмотров</Text>
@@ -170,10 +138,7 @@ export default function HomepageStates() {
             <Text className="text-white font-semibold">Продвинуть</Text>
           </TouchableOpacity>
         </View>
-                </View>
-          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
-        </View>
-</StateSection>
+      </StateSection>
     </View>
   );
 }
