@@ -13,6 +13,13 @@ import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockCategories, mockCategoryIcons, mockCities, mockListings } from '../../../constants/protoMockData';
 
+// Navigation helper for proto links
+function navTo(pageId: string) {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    window.open(`/proto/states/${pageId}`, '_self');
+  }
+}
+
 // Brand colors — synced with BrandStates.tsx
 const C = {
   primary: '#0A7B8A',
@@ -61,13 +68,13 @@ function LandingHeader({ onLogin }: { onLogin: () => void }) {
         <Pressable style={{
           paddingHorizontal: 16, paddingVertical: 8, borderRadius: 6,
           borderWidth: 1.5, borderColor: C.primary, backgroundColor: C.white,
-        }} onPress={onLogin}>
+        }} onPress={() => { onLogin(); navTo('auth-email'); }}>
           <Text style={{ color: C.primary, fontWeight: '600', fontSize: 14 }}>Войти</Text>
         </Pressable>
         <Pressable style={{
           paddingHorizontal: 16, paddingVertical: 8, borderRadius: 6,
           backgroundColor: C.primary,
-        }}>
+        }} onPress={() => navTo('create-listing')}>
           <Text style={{ color: C.white, fontWeight: '600', fontSize: 14 }}>Подать объявление</Text>
         </Pressable>
       </View>
@@ -177,14 +184,14 @@ function LandingFooter() {
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20, marginBottom: 20 }}>
         <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff', marginBottom: 4 }}>Компания</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>О нас</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Помощь</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Контакты</Text>
+          <Pressable onPress={() => navTo('about')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>О нас</Text></Pressable>
+          <Pressable onPress={() => navTo('help')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Помощь</Text></Pressable>
+          <Pressable onPress={() => navTo('homepage')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Контакты</Text></Pressable>
         </View>
         <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff', marginBottom: 4 }}>Правовая информация</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Политика конфиденциальности</Text>
-          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Пользовательское соглашение</Text>
+          <Pressable onPress={() => navTo('privacy')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Политика конфиденциальности</Text></Pressable>
+          <Pressable onPress={() => navTo('terms')}><Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Пользовательское соглашение</Text></Pressable>
         </View>
         <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff', marginBottom: 4 }}>Города</Text>
@@ -305,7 +312,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
             <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>
               Свежие объявления
             </Text>
-            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }} onPress={() => navTo('listings-feed')}>
               <Text style={{ fontSize: 14, fontWeight: '600', color: C.primary }}>Все</Text>
               <Feather name="chevron-right" size={16} color={C.primary} />
             </Pressable>
@@ -371,7 +378,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
             paddingHorizontal: 32, paddingVertical: 14,
             shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.15, shadowRadius: 6, elevation: 3,
-          }}>
+          }} onPress={() => navTo('create-listing')}>
             <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>Подать объявление бесплатно</Text>
           </Pressable>
         </View>

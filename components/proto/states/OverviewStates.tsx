@@ -5,6 +5,13 @@ import { StateSection } from '../StateSection';
 import { pageRegistry } from '../../../constants/pageRegistry';
 import { protoMeta } from '../../../constants/protoMeta';
 
+// Navigation helper for proto links
+function navTo(pageId: string) {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    window.open(`/proto/states/${pageId}`, '_self');
+  }
+}
+
 // Brand colors — synced with BrandStates.tsx
 const C = {
   primary: '#0A7B8A',
@@ -70,15 +77,16 @@ function ScenarioCard({ id, title, role, steps, screens }: {
       {/* Steps flow */}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
         {screens.map((screen, idx) => (
-          <React.Fragment key={screen}>
+          <React.Fragment key={idx}>
             <Pressable
               style={{
                 backgroundColor: C.page, borderRadius: 6,
                 paddingHorizontal: 10, paddingVertical: 6,
                 borderWidth: 1, borderColor: C.border,
               }}
+              onPress={() => navTo(screen)}
             >
-              <Text style={{ fontSize: 12, fontWeight: '500', color: C.text }}>{screen}</Text>
+              <Text style={{ fontSize: 12, fontWeight: '500', color: C.primary }}>{screen}</Text>
             </Pressable>
             {idx < screens.length - 1 && (
               <Feather name="chevron-right" size={14} color={C.muted} />
