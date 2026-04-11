@@ -23,11 +23,13 @@ export default function AuthOtpStates() {
   const isDesktop = width >= 768;
 
   const formStyle = isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -51,7 +53,7 @@ export default function AuthOtpStates() {
       </StateSection>
 
       <StateSection title="error">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -65,7 +67,7 @@ export default function AuthOtpStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -78,7 +80,7 @@ export default function AuthOtpStates() {
       </StateSection>
 
       <StateSection title="blocked">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Слишком много попыток</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -95,7 +97,7 @@ export default function AuthOtpStates() {
       </StateSection>
 
       <StateSection title="resend_available">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -111,7 +113,7 @@ export default function AuthOtpStates() {
       </StateSection>
 
       <StateSection title="captcha_required">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <View style={[{ width: '100%' }, formStyle]}>

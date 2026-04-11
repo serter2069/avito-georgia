@@ -21,11 +21,13 @@ export default function SettingsStates() {
     const idx = order.indexOf(language);
     setLanguage(order[(idx + 1) % order.length]);
   };
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View style={isDesktop ? { maxWidth: 560, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-4">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Язык</Text>
             <TouchableOpacity
@@ -62,7 +64,7 @@ export default function SettingsStates() {
       </StateSection>
 
       <StateSection title="delete_confirm_alert">
-        <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="alert-triangle" size={48} color="#C0392B" />
             <Text className="text-text-primary text-lg font-bold mt-2">Удалить аккаунт?</Text>
@@ -80,7 +82,7 @@ export default function SettingsStates() {
       </StateSection>
 
       <StateSection title="logout_confirm">
-        <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="log-out" size={48} color="#00AA6C" />
             <Text className="text-text-primary text-lg font-bold mt-2">Выйти из аккаунта?</Text>

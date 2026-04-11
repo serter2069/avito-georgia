@@ -278,7 +278,7 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
           {/* Search Bar */}
           <View style={{
             flexDirection: 'row', backgroundColor: C.white,
-            borderRadius: 8, overflow: 'hidden', width: '100%', maxWidth: 600,
+            borderRadius: 8, overflow: 'hidden', width: '100%', maxWidth: 960,
             shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.15, shadowRadius: 12, elevation: 6,
           }}>
@@ -593,6 +593,12 @@ function MobileHeaderState() {
 // ─── MAIN EXPORT ────────────────────────────────────────────────────────────
 export default function LandingStates() {
   const [loginPressed, setLoginPressed] = useState(false);
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>

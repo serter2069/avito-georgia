@@ -36,12 +36,12 @@ export default function HomepageStates() {
   const isWide = width >= 1280;
 
   const colWidth = isWide ? '32%' : isDesktop ? '32%' : '48%';
-  const containerStyle = isDesktop ? { maxWidth: 1200, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
 
   return (
     <View>
       <StateSection title="default">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput
               className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
@@ -90,7 +90,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="loading_listings">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
@@ -105,7 +105,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="empty_listings">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row items-center gap-2 mb-4">
             <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
             <TouchableOpacity className="bg-primary p-3 rounded-lg">
@@ -121,7 +121,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="guest_cta">
-        <View style={containerStyle} className="bg-surface rounded-lg p-4 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-surface rounded-lg p-4 items-center">
           <Text className="text-text-primary text-lg font-bold mb-2">Присоединяйтесь!</Text>
           <Text className="text-text-muted text-sm text-center mb-4">Войдите, чтобы размещать объявления и сохранять избранное</Text>
           <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg">
@@ -131,7 +131,7 @@ export default function HomepageStates() {
       </StateSection>
 
       <StateSection title="user_cta">
-        <View style={containerStyle} className="bg-surface rounded-lg p-4 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-surface rounded-lg p-4 items-center">
           <Text className="text-text-primary text-lg font-bold mb-2">Продайте быстрее!</Text>
           <Text className="text-text-muted text-sm text-center mb-4">Продвиньте ваше объявление и получите больше просмотров</Text>
           <TouchableOpacity className="bg-secondary py-3 px-6 rounded-lg">

@@ -9,13 +9,13 @@ export default function SellerProfileStates() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
-  const containerStyle = isDesktop ? { maxWidth: 1200, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
   const colWidth = isDesktop ? '32%' : '48%';
 
   return (
     <View>
       <StateSection title="default">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           {isDesktop ? (
             // Desktop: 2-column layout (profile left, listings right)
             <View className="flex-row gap-6">
@@ -89,13 +89,13 @@ export default function SellerProfileStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty_listings">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="items-center mb-4">
             <Image source={{ uri: 'https://picsum.photos/seed/seller-empty/96/96' }} style={{ width: 96, height: 96, borderRadius: 48, marginBottom: 12 }} />
             <Text className="text-text-primary text-xl font-bold">{mockUsers[2].name}</Text>

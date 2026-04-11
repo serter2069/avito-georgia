@@ -8,11 +8,13 @@ export default function FavoritesStates() {
   const isDesktop = width >= 768;
 
   const listings = mockListings.filter(l => l.status === 'active').slice(0, 6);
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View className="flex-row flex-wrap gap-3">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="flex-row flex-wrap gap-3">
           {listings.map((l) => (
             <View
               key={l.id}
@@ -36,13 +38,13 @@ export default function FavoritesStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="heart" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет избранных</Text>
           <Text className="text-text-muted text-sm mt-1 text-center">Добавляйте объявления в избранное, чтобы не потерять</Text>

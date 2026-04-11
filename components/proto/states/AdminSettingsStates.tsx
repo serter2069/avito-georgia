@@ -1,15 +1,22 @@
-import { View, Text, TextInput, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Switch, ActivityIndicator,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
 
 export default function AdminSettingsStates() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View className="py-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Настройки сайта</Text>
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Название сайта</Text>
@@ -56,13 +63,13 @@ export default function AdminSettingsStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="saving">
-        <View className="py-4 opacity-50">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4 opacity-50">
           <Text className="text-text-primary text-lg font-bold mb-4">Настройки сайта</Text>
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Название сайта</Text>
@@ -83,7 +90,7 @@ export default function AdminSettingsStates() {
       </StateSection>
 
       <StateSection title="saved">
-        <View className="py-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4">
             <Feather name="check-circle" size={24} color="#2E7D30" />
             <Text className="text-success text-sm font-medium">Настройки сохранены</Text>

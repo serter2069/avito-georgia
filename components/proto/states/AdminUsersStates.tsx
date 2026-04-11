@@ -1,4 +1,5 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -34,11 +35,17 @@ function UserRow({ user }: { user: typeof mockUsers[0] }) {
 
 export default function AdminUsersStates() {
   const [searchQuery, setSearchQuery] = useState('');
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput
             className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-4"
             placeholder="Поиск пользователей..."
@@ -53,13 +60,13 @@ export default function AdminUsersStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="search_results">
-        <View>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border-focus rounded-lg px-4 py-3 text-base mb-4 text-text-primary" value="Нино" editable={false} />
           <Text className="text-text-muted text-sm mb-3">Найден 1 пользователь</Text>
           <UserRow user={mockUsers[1]} />
@@ -67,7 +74,7 @@ export default function AdminUsersStates() {
       </StateSection>
 
       <StateSection title="empty_search">
-        <View>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border-focus rounded-lg px-4 py-3 text-base mb-4 text-text-primary" value="qwerty123" editable={false} />
           <View className="py-12 items-center">
             <Feather name="user-x" size={48} color="#737373" />

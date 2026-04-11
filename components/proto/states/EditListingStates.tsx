@@ -9,18 +9,20 @@ export default function EditListingStates() {
   const [price, setPrice] = useState('28500');
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="loading_data">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Загрузка данных...</Text>
         </View>
       </StateSection>
 
       <StateSection title="default">
-        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-4">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} onChangeText={setTitle} />
@@ -51,7 +53,7 @@ export default function EditListingStates() {
       </StateSection>
 
       <StateSection title="saving">
-        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4 opacity-50">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-4 opacity-50">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Заголовок</Text>
             <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-text-primary" value={title} editable={false} />
@@ -63,7 +65,7 @@ export default function EditListingStates() {
       </StateSection>
 
       <StateSection title="success">
-        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-4">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4">
             <Feather name="check-circle" size={24} color="#2E7D30" />
             <Text className="text-success text-sm font-medium">Объявление успешно сохранено</Text>

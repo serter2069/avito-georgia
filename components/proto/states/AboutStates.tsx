@@ -5,12 +5,14 @@ export default function AboutStates() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
-  const contentStyle = isDesktop ? { maxWidth: 800, alignSelf: 'center' as const, width: '100%' } : {};
+  const contentStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View style={contentStyle} className="py-4">
+        <View style={[{ minHeight: 844 }, contentStyle]} className="py-4">
           <Text className="text-primary text-2xl font-bold mb-4">О нас</Text>
           <Text className="text-text-primary text-base leading-6 mb-4">
             Avito Georgia — это современная доска объявлений для жителей Грузии. Мы помогаем людям покупать и продавать товары и услуги быстро и безопасно.

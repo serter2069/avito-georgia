@@ -52,11 +52,13 @@ export default function MyListingsStates() {
   const half = Math.ceil(listings.length / 2);
   const leftCol = listings.slice(0, half);
   const rightCol = listings.slice(half);
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View style={isDesktop ? { maxWidth: 900, alignSelf: 'center', width: '100%' } : undefined}>
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           <View className="flex-row gap-2 mb-4 flex-wrap">
             {['Активные', 'На модерации', 'Черновики', 'Проданные', 'Удалённые'].map((tab, i) => (
               <TouchableOpacity key={tab} onPress={() => setActiveTab(i)} className={`px-3 py-2 rounded-lg ${i === activeTab ? 'bg-primary' : 'bg-surface border border-border'}`}>
@@ -83,7 +85,7 @@ export default function MyListingsStates() {
       </StateSection>
 
       <StateSection title="empty">
-        <View className="py-12 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
           <Feather name="file-text" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">У вас пока нет объявлений</Text>
           <Text className="text-text-muted text-sm mt-1">Создайте первое объявление!</Text>
@@ -94,13 +96,13 @@ export default function MyListingsStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-12 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="confirm_delete_modal">
-        <View className="bg-white border border-border rounded-lg p-4" style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined}>
+        <View className="bg-white border border-border rounded-lg p-4" style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]}>
           <Text className="text-text-primary text-lg font-bold mb-2">Удалить объявление?</Text>
           <Text className="text-text-muted text-sm mb-4">Объявление "Toyota Camry 2020" будет удалено. Это действие нельзя отменить.</Text>
           <View className="flex-row gap-3">

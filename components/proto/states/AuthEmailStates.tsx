@@ -8,11 +8,13 @@ export default function AuthEmailStates() {
   const isDesktop = width >= 768;
 
   const formStyle = isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -36,7 +38,7 @@ export default function AuthEmailStates() {
       </StateSection>
 
       <StateSection title="validation_error">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -57,7 +59,7 @@ export default function AuthEmailStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>
           <View style={[{ width: '100%' }, formStyle]}>
@@ -77,7 +79,7 @@ export default function AuthEmailStates() {
       </StateSection>
 
       <StateSection title="network_error">
-        <View className="items-center py-8">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>
           <View style={[{ width: '100%' }, formStyle]}>

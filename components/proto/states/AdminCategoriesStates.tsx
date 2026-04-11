@@ -1,4 +1,5 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -65,11 +66,14 @@ function CategoryRow({ cat }: { cat: typeof categoryTree[0] }) {
   );
 }
 
-export default function AdminCategoriesStates() {
+export default function AdminCategoriesStates() {  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-text-primary text-lg font-bold">Категории ({categoryTree.length})</Text>
             <TouchableOpacity className="bg-primary px-3 py-2 rounded-lg">
@@ -83,13 +87,13 @@ export default function AdminCategoriesStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="add_modal">
-        <View className="bg-white border border-border rounded-lg p-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Новая категория</Text>
           <View className="mb-3">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Название (RU)</Text>
@@ -115,7 +119,7 @@ export default function AdminCategoriesStates() {
       </StateSection>
 
       <StateSection title="edit_modal">
-        <View className="bg-white border border-border rounded-lg p-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-1">Редактировать категорию</Text>
           <Text className="text-text-muted text-sm mb-4">Транспорт</Text>
           <View className="mb-3">

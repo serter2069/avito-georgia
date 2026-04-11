@@ -12,17 +12,20 @@ interface ProtoLayoutProps {
   children: ReactNode;
 }
 
+/** Shared constraint: max content width for PC layout */
+export const PC_MAX_WIDTH = 960;
+
 export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutProps) {
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
+  const isDesktop = width >= 768;
 
-  const padding = isWeb ? 32 : 16;
+  const padding = isWeb ? (isDesktop ? 48 : 16) : 16;
   const gap = 16;
-  const cols = isWeb
-    ? width > 1280 ? 3 : width > 768 ? 2 : 1
-    : 1;
-  const contentWidth = width - padding * 2;
-  const itemWidth = cols > 1 ? (contentWidth - (cols - 1) * gap) / cols : contentWidth;
+
+  // Single column — each StateSection is already full-width inside the max-width container
+  const contentWidth = Math.min(width, PC_MAX_WIDTH + padding * 2) - padding * 2;
+  const itemWidth = contentWidth;
 
   // Flatten children to extract StateSection elements for grid layout
   const childArray = flattenChildren(children);
@@ -34,14 +37,16 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
   const statesGrid = (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={{ paddingBottom: 48, paddingHorizontal: padding, paddingTop: 20 }}
+      contentContainerStyle={{ paddingBottom: 48, paddingTop: 20, alignItems: 'center' }}
     >
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }}>
-        {childArray.map((child, i) => (
-          <View key={i} style={{ width: itemWidth }}>
-            {child}
-          </View>
-        ))}
+      <View style={{ width: '100%', maxWidth: PC_MAX_WIDTH + padding * 2, paddingHorizontal: padding }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }}>
+          {childArray.map((child, i) => (
+            <View key={i} style={{ width: itemWidth }}>
+              {child}
+            </View>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );

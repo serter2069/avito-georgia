@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
@@ -35,11 +36,17 @@ function PackageCard({
 
 export default function PromoteListingStates() {
   const [selected, setSelected] = useState<string | null>(null);
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View className="py-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Продвижение объявления</Text>
           <PackageCard name="1 день" price="2.99 GEL" description="Поднятие в топ на 1 день" icon="trending-up" color="#00AA6C"
             selected={selected === 'day1'} onSelect={() => setSelected(selected === 'day1' ? null : 'day1')} />
@@ -51,20 +58,20 @@ export default function PromoteListingStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="purchasing">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Обработка платежа...</Text>
         </View>
       </StateSection>
 
       <StateSection title="error">
-        <View className="py-12 items-center px-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center px-4">
           <View className="w-16 h-16 rounded-full bg-error/10 items-center justify-center mb-2">
             <Feather name="alert-circle" size={40} color="#ef4444" />
           </View>

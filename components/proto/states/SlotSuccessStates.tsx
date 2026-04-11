@@ -1,29 +1,36 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
 export default function SlotSuccessStates() {
   const [navigated, setNavigated] = useState(false);
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="restoring">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Восстановление объявления...</Text>
         </View>
       </StateSection>
 
       <StateSection title="submitting">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Обработка слота...</Text>
         </View>
       </StateSection>
 
       <StateSection title="done">
-        <View className="py-12 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
           <View className="w-16 h-16 rounded-full bg-primary/20 items-center justify-center mb-2">
             <Feather name="check-circle" size={40} color="#00AA6C" />
           </View>
@@ -39,7 +46,7 @@ export default function SlotSuccessStates() {
       </StateSection>
 
       <StateSection title="error">
-        <View className="py-12 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
           <View className="w-16 h-16 rounded-full bg-error/10 items-center justify-center mb-2">
             <Feather name="alert-circle" size={40} color="#ef4444" />
           </View>

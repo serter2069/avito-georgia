@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, Platform, Image } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, Platform, Image,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
@@ -893,13 +894,16 @@ function PriceRangeSection() {
 // ---------------------------------------------------------------------------
 // Main export
 // ---------------------------------------------------------------------------
-export default function ComponentsStates() {
+export default function ComponentsStates() {  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
   return (
     <StateSection title="SHOWCASE">
-      <View style={{ minHeight: Platform.OS === 'web' ? '100vh' as any : 844 }}>
+      <View style={[{ minHeight: Platform.OS === 'web' ? '100vh' as any : 844 }, containerStyle]}>
         <ScrollView
           style={{ flex: 1, backgroundColor: C.bgPrimary }}
-          contentContainerStyle={{ padding: 16, gap: 24 }}
+          contentContainerStyle={{ padding: 16, gap: 24, maxWidth: 960, alignSelf: 'center', width: '100%' }}
         >
           <Text style={{ fontSize: 22, fontWeight: '700', color: C.textPrimary }}>
             UI Components

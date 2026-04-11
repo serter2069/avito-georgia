@@ -26,11 +26,13 @@ export default function CreateListingStates() {
   const [formPrice, setFormPrice] = useState('28500');
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="step_flow">
-        <View style={isDesktop ? { maxWidth: 640, alignSelf: 'center', width: '100%' } : undefined} className="py-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-4">
           <Stepper current={currentStep} />
 
           {currentStep === 1 && (
@@ -136,14 +138,14 @@ export default function CreateListingStates() {
       </StateSection>
 
       <StateSection title="submitting">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Публикация объявления...</Text>
         </View>
       </StateSection>
 
       <StateSection title="error">
-        <View className="py-8 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-8 items-center">
           <Feather name="alert-circle" size={48} color="#C0392B" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Ошибка публикации</Text>
           <Text className="text-text-muted text-sm mt-1 text-center">Не удалось опубликовать объявление. Проверьте соединение и попробуйте снова.</Text>

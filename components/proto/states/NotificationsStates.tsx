@@ -36,11 +36,13 @@ function NotificationRow({ n }: { n: typeof mockNotifications[0] }) {
 export default function NotificationsStates() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View style={isDesktop ? { maxWidth: 600, alignSelf: 'center', width: '100%' } : undefined}>
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           {mockNotifications.map((n) => (
             <NotificationRow key={n.id} n={n} />
           ))}
@@ -48,13 +50,13 @@ export default function NotificationsStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="bell" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет уведомлений</Text>
           <Text className="text-text-muted text-sm mt-1">Здесь будут ваши уведомления</Text>

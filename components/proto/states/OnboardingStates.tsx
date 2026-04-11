@@ -14,11 +14,13 @@ export default function OnboardingStates() {
   const isDesktop = width >= 768;
 
   const formStyle = isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View style={formStyle} className="py-6">
+        <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4">
@@ -72,7 +74,7 @@ export default function OnboardingStates() {
       </StateSection>
 
       <StateSection title="validation_error">
-        <View style={formStyle} className="py-6">
+        <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4">
@@ -99,7 +101,7 @@ export default function OnboardingStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View style={formStyle} className="py-6">
+        <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4 opacity-50">
@@ -123,7 +125,7 @@ export default function OnboardingStates() {
       </StateSection>
 
       <StateSection title="city_picker_open">
-        <View style={formStyle} className="py-6">
+        <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
           <View className="mb-4">

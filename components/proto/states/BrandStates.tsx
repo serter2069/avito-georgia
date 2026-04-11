@@ -272,10 +272,12 @@ export default function BrandStates() {
     'phone', 'mail', 'clock', 'tag', 'layers', 'maximize', 'lock',
     'log-out', 'chevron-right', 'x', 'check', 'arrow-left', 'info',
   ];
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <StateSection title="BRAND_GUIDE">
-      <ScrollView
+      <ScrollView style={[{ minHeight: 844 }, containerStyle]}
         contentContainerStyle={{ padding: isDesktop ? 32 : 16, gap: 40, backgroundColor: C.white }}
         showsVerticalScrollIndicator={false}
       >

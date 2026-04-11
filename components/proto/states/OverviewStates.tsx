@@ -341,7 +341,10 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 // ─── MAIN EXPORT ────────────────────────────────────────────────────────────
-export default function OverviewStates() {
+export default function OverviewStates() {  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
   return (
     <View>
       <StateSection title="DEFAULT">

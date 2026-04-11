@@ -24,11 +24,13 @@ function PlanCard({ name, price, features, isPrimary, isDesktop }: { name: strin
 export default function SubscriptionStates() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="no_subscription">
-        <View className="py-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Premium подписка</Text>
           {isDesktop ? (
             <View className="flex-row gap-4">
@@ -53,7 +55,7 @@ export default function SubscriptionStates() {
       </StateSection>
 
       <StateSection title="active_subscription">
-        <View className="py-4" style={isDesktop ? { maxWidth: 560, alignSelf: 'center', width: '100%' } : undefined}>
+        <View className="py-4" style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           <View className="bg-primary/10 border border-primary rounded-lg p-4 mb-4">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-primary text-lg font-bold">Premium</Text>
@@ -71,20 +73,20 @@ export default function SubscriptionStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="purchasing">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
           <Text className="text-text-muted text-sm mt-3">Оформляем подписку...</Text>
         </View>
       </StateSection>
 
       <StateSection title="cancel_confirm">
-        <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined} className="bg-white border border-border rounded-lg p-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="alert-triangle" size={48} color="#C0392B" />
             <Text className="text-text-primary text-lg font-bold mt-2">Отменить подписку?</Text>

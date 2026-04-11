@@ -28,12 +28,12 @@ export default function ListingDetailStates() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
-  const containerStyle = isDesktop ? { maxWidth: 1200, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
 
   return (
     <View>
       <StateSection title="default">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           {isDesktop ? (
             // Desktop: 2-column layout (photo left, details right)
             <View className="flex-row gap-6">
@@ -178,13 +178,13 @@ export default function ListingDetailStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="error_not_found">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="alert-circle" size={48} color="#C0392B" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Объявление не найдено</Text>
           <Text className="text-text-muted text-sm mt-1">Возможно, оно было удалено</Text>
@@ -192,7 +192,7 @@ export default function ListingDetailStates() {
       </StateSection>
 
       <StateSection title="phone_revealed">
-        <View className="bg-surface rounded-lg p-4 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-surface rounded-lg p-4 items-center">
           <Feather name="phone" size={24} color="#00AA6C" />
           <Text className="text-text-primary text-lg font-bold mt-2">+995 555 12 34 56</Text>
           <Text className="text-text-muted text-sm mt-1">{seller.name}</Text>
@@ -200,7 +200,7 @@ export default function ListingDetailStates() {
       </StateSection>
 
       <StateSection title="report_modal_open">
-        <View style={isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {}} className="bg-white border border-border rounded-lg p-4">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {}]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Пожаловаться</Text>
           {['Мошенничество', 'Спам', 'Неприемлемый контент', 'Другое'].map((reason) => (
             <TouchableOpacity key={reason} className="flex-row items-center gap-3 py-3 border-b border-border">

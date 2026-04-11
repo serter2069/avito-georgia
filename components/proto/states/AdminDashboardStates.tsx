@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -62,11 +63,17 @@ function MiniBarChart({ data, labels, color }: { data: number[]; labels: string[
 
 export default function AdminDashboardStates() {
   const [period, setPeriod] = useState<'7' | '30'>('7');
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <Text className="text-text-primary text-lg font-bold mb-4">Admin Dashboard</Text>
           <View className="flex-row flex-wrap gap-3 mb-4">
             <StatCard label="Пользователи" value={mockAdminStats.totalUsers.toLocaleString()} icon="users" color="#00AA6C" />
@@ -110,7 +117,7 @@ export default function AdminDashboardStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>

@@ -20,12 +20,15 @@ export default function ProfileStates() {
       </TouchableOpacity>
     </View>
   );
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
         {isDesktop ? (
-          <View style={{ maxWidth: 720, alignSelf: 'center', width: '100%' }} className="py-4">
+          <View style={{ width: '100%' }} className="py-4">
             <View className="flex-row gap-8">
               <View className="items-center" style={{ width: 120 }}>
                 <AvatarSection />
@@ -153,10 +156,11 @@ export default function ProfileStates() {
             )}
           </View>
         )}
+        </View>
       </StateSection>
 
       <StateSection title="saving">
-        <View className="py-4 items-center opacity-50">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4 items-center opacity-50">
           <Image source={{ uri: 'https://picsum.photos/seed/profile1/96/96' }} style={{ width: 96, height: 96, borderRadius: 48 }} />
           <View className="w-full mb-4 mt-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Имя</Text>
@@ -169,7 +173,7 @@ export default function ProfileStates() {
       </StateSection>
 
       <StateSection title="saved">
-        <View className="py-4 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4 items-center">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4 w-full">
             <Feather name="check-circle" size={24} color="#2E7D30" />
             <Text className="text-success text-sm font-medium">Профиль сохранён</Text>
@@ -186,7 +190,7 @@ export default function ProfileStates() {
       </StateSection>
 
       <StateSection title="error">
-        <View className="py-4 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-4 items-center">
           <View className="bg-error/10 border border-error/30 rounded-lg p-4 flex-row items-center gap-3 mb-4 w-full">
             <Feather name="alert-circle" size={24} color="#C0392B" />
             <Text className="text-error text-sm font-medium">Ошибка сохранения</Text>

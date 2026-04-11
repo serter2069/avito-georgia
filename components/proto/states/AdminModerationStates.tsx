@@ -1,4 +1,5 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -29,11 +30,17 @@ function ModerationCard({ listing, onReject }: { listing: typeof mockListings[0]
 export default function AdminModerationStates() {
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <Text className="text-text-primary text-lg font-bold mb-4">Очередь модерации ({pendingListings.length})</Text>
           {pendingListings.map((l) => (
             <ModerationCard key={l.id} listing={l} onReject={() => setShowRejectModal(true)} />
@@ -63,13 +70,13 @@ export default function AdminModerationStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty_queue">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="check-circle" size={48} color="#2E7D30" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Очередь пуста</Text>
           <Text className="text-text-muted text-sm mt-1">Все объявления проверены</Text>
@@ -77,7 +84,7 @@ export default function AdminModerationStates() {
       </StateSection>
 
       <StateSection title="reject_reason_modal">
-        <View className="bg-white border border-border rounded-lg p-4">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-2">Причина отклонения</Text>
           <Text className="text-text-muted text-sm mb-3">Объявление: "Диван угловой IKEA"</Text>
           <TextInput

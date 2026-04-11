@@ -77,12 +77,12 @@ export default function ListingsFeedStates() {
   const isWide = width >= 1280;
 
   const colWidth = isWide ? '32%' : isDesktop ? '48%' : '100%';
-  const containerStyle = isDesktop ? { maxWidth: 1200, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
 
   return (
     <View>
       <StateSection title="default">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <FilterBar sort={sort} onSort={setSort} />
           {isDesktop ? (
             <View className="flex-row flex-wrap gap-3">
@@ -101,7 +101,7 @@ export default function ListingsFeedStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
             <ActivityIndicator size="large" color="#00AA6C" />
@@ -110,7 +110,7 @@ export default function ListingsFeedStates() {
       </StateSection>
 
       <StateSection title="empty">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
             <Feather name="inbox" size={48} color="#737373" />
@@ -121,7 +121,7 @@ export default function ListingsFeedStates() {
       </StateSection>
 
       <StateSection title="filtered_empty">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row gap-2 mb-4 flex-wrap">
             <View className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">
               <Text className="text-primary text-sm">Электроника</Text>

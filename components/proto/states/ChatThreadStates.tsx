@@ -19,11 +19,13 @@ export default function ChatThreadStates() {
   const [message, setMessage] = useState('');
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined}>
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           <View className="bg-surface rounded-lg p-3 mb-4 flex-row items-center gap-2">
             <Feather name="tag" size={16} color="#00AA6C" />
             <Text className="text-text-secondary text-sm font-medium">Toyota Camry 2020</Text>
@@ -50,13 +52,13 @@ export default function ChatThreadStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty">
-        <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined} className="py-12 items-center">
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-12 items-center">
           <Feather name="message-circle" size={48} color="#737373" />
           <Text className="text-text-muted text-sm mt-3">Начните диалог</Text>
           <View className="flex-row items-center gap-2 mt-6 w-full">
@@ -78,7 +80,7 @@ export default function ChatThreadStates() {
       </StateSection>
 
       <StateSection title="sending">
-        <View style={isDesktop ? { maxWidth: 720, alignSelf: 'center', width: '100%' } : undefined}>
+        <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           {mockChatMessages.map((msg) => (
             <ChatBubble key={msg.id} text={msg.text} isOwn={msg.isOwn} time={new Date(msg.createdAt).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })} />
           ))}

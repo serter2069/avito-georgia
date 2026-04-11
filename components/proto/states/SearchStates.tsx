@@ -10,13 +10,13 @@ export default function SearchStates() {
   const isDesktop = width >= 768;
   const isWide = width >= 1280;
 
-  const containerStyle = isDesktop ? { maxWidth: 1200, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
   const colWidth = isWide ? '32%' : isDesktop ? '48%' : '100%';
 
   return (
     <View>
       <StateSection title="default">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row gap-2 mb-3">
             <TextInput
               className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
@@ -86,7 +86,7 @@ export default function SearchStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Toyota" editable={false} />
           <View className="py-12 items-center">
             <ActivityIndicator size="large" color="#00AA6C" />
@@ -95,7 +95,7 @@ export default function SearchStates() {
       </StateSection>
 
       <StateSection title="empty">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" placeholder="Что ищете?" placeholderTextColor="#737373" editable={false} />
           <View className="py-12 items-center">
             <Feather name="search" size={48} color="#737373" />
@@ -106,7 +106,7 @@ export default function SearchStates() {
       </StateSection>
 
       <StateSection title="filtered_empty">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Ламборгини Кутаиси" editable={false} />
           <View className="py-12 items-center">
             <Feather name="frown" size={48} color="#737373" />
@@ -117,7 +117,7 @@ export default function SearchStates() {
       </StateSection>
 
       <StateSection title="map_view">
-        <View style={containerStyle}>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Квартира Тбилиси" editable={false} />
           <View className="flex-row items-center justify-between mb-3">
             <Text className="text-text-muted text-sm">2 на карте</Text>

@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator,
+  useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -47,11 +48,17 @@ function ReportRow({ r, reviewed, onReview, onDeletePress }: { r: typeof mockRep
 export default function AdminReportsStates() {
   const [reviewed, setReviewed] = useState<Record<string, boolean>>({ r3: true });
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const { width } = useWindowDimensions();
+
+  const isDesktop = width >= 768;
+
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View>
+        <View style={[{ minHeight: 844 }, containerStyle]}>
           <Text className="text-text-primary text-lg font-bold mb-4">Жалобы ({mockReports.length})</Text>
           {mockReports.map((r) => (
             <ReportRow
@@ -80,13 +87,13 @@ export default function AdminReportsStates() {
       </StateSection>
 
       <StateSection title="loading">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
       </StateSection>
 
       <StateSection title="empty">
-        <View className="py-16 items-center">
+        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="flag" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет жалоб</Text>
           <Text className="text-text-muted text-sm mt-1">Новые жалобы появятся здесь</Text>

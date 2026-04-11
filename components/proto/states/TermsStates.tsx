@@ -5,12 +5,14 @@ export default function TermsStates() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
-  const contentStyle = isDesktop ? { maxWidth: 800, alignSelf: 'center' as const, width: '100%' } : {};
+  const contentStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+  const containerStyle = isDesktop ? { maxWidth: 960, alignSelf: 'center' as const, width: '100%' } : {};
+
 
   return (
     <View>
       <StateSection title="default">
-        <View style={contentStyle} className="py-4">
+        <View style={[{ minHeight: 844 }, contentStyle]} className="py-4">
           <Text className="text-primary text-2xl font-bold mb-4">Условия использования</Text>
           <Text className="text-text-muted text-sm mb-4">Последнее обновление: 1 апреля 2026</Text>
 
