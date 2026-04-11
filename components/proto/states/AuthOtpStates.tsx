@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions, Platform } from 'react-native';
 import { StateSection } from '../StateSection';
+import { Feather } from '@expo/vector-icons';
 
 function OtpInputRow({ values, hasError }: { values: string[]; hasError?: boolean }) {
   return (
@@ -27,6 +28,10 @@ export default function AuthOtpStates() {
   return (
     <View>
       <StateSection title="default">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -48,9 +53,16 @@ export default function AuthOtpStates() {
             <Text className="text-text-muted text-sm text-center">Отправить снова через <Text className="text-primary font-semibold">0:59</Text></Text>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="error">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -62,9 +74,16 @@ export default function AuthOtpStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="loading">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -75,9 +94,16 @@ export default function AuthOtpStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="blocked">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Слишком много попыток</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -92,9 +118,16 @@ export default function AuthOtpStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="resend_available">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -108,9 +141,16 @@ export default function AuthOtpStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="captcha_required">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -127,7 +167,10 @@ export default function AuthOtpStates() {
             </TouchableOpacity>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
     </View>
   );
 }

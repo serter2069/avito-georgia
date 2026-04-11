@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
@@ -16,6 +16,10 @@ export default function SearchStates() {
   return (
     <View>
       <StateSection title="default">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View style={containerStyle}>
           <View className="flex-row gap-2 mb-3">
             <TextInput
@@ -83,18 +87,32 @@ export default function SearchStates() {
             ))
           )}
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="loading">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View style={containerStyle}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Toyota" editable={false} />
           <View className="py-12 items-center">
             <ActivityIndicator size="large" color="#00AA6C" />
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="empty">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View style={containerStyle}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" placeholder="Что ищете?" placeholderTextColor="#737373" editable={false} />
           <View className="py-12 items-center">
@@ -103,9 +121,16 @@ export default function SearchStates() {
             <Text className="text-text-muted text-sm mt-1">Введите запрос или выберите категорию</Text>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="filtered_empty">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View style={containerStyle}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Ламборгини Кутаиси" editable={false} />
           <View className="py-12 items-center">
@@ -114,9 +139,16 @@ export default function SearchStates() {
             <Text className="text-text-muted text-sm mt-1 text-center">Попробуйте изменить запрос</Text>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="map_view">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View style={containerStyle}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Квартира Тбилиси" editable={false} />
           <View className="flex-row items-center justify-between mb-3">
@@ -135,7 +167,10 @@ export default function SearchStates() {
             <Text className="text-text-muted text-sm mt-2">Map placeholder</Text>
           </View>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
     </View>
   );
 }

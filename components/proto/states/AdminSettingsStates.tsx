@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Switch, ActivityIndicator, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
@@ -9,6 +9,10 @@ export default function AdminSettingsStates() {
   return (
     <View>
       <StateSection title="default">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Настройки сайта</Text>
           <View className="mb-4">
@@ -53,15 +57,29 @@ export default function AdminSettingsStates() {
             <Text className="text-white font-semibold">Сохранить</Text>
           </TouchableOpacity>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="loading">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="py-16 items-center">
           <ActivityIndicator size="large" color="#00AA6C" />
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="saving">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="py-4 opacity-50">
           <Text className="text-text-primary text-lg font-bold mb-4">Настройки сайта</Text>
           <View className="mb-4">
@@ -80,9 +98,16 @@ export default function AdminSettingsStates() {
             <ActivityIndicator color="#ffffff" />
           </TouchableOpacity>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
 
       <StateSection title="saved">
+        <View style={{ minHeight: Platform.OS === 'web' ? '100vh' : 844 }}>
+          <View className="flex-row items-center justify-between h-14 px-4 bg-white border-b border-border"><Text className="text-primary text-lg font-bold">Avito Georgia</Text><View className="flex-row items-center gap-3"><Feather name="search" size={20} color="#737373" /><Feather name="bell" size={20} color="#737373" /></View></View>
+          <View style={{ flex: 1 }}>
+
         <View className="py-4">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4">
             <Feather name="check-circle" size={24} color="#2E7D30" />
@@ -104,7 +129,10 @@ export default function AdminSettingsStates() {
             <Text className="text-white font-semibold">Сохранить</Text>
           </TouchableOpacity>
         </View>
-      </StateSection>
+                </View>
+          <View className="flex-row h-14 bg-white border-t border-border items-center">{[{i:"home",l:"Home"},{i:"plus-circle",l:"Post"},{i:"message-circle",l:"Chat"},{i:"user",l:"Profile"}].map(t=>(<View key={t.l} className="flex-1 items-center justify-center"><Feather name={t.i as any} size={20} color="#737373" /><Text className="text-[10px] text-text-muted">{t.l}</Text></View>))}</View>
+        </View>
+</StateSection>
     </View>
   );
 }
