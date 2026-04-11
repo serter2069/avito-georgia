@@ -90,12 +90,24 @@ export default function RootLayout() {
   const rawMaxWidth = useResponsiveMaxWidth();
   const segments = useSegments();
   const pathname = usePathname();
-  // Synchronous check — works on first render before hooks resolve
   const isProtoSync = Platform.OS === 'web' && typeof window !== 'undefined' && window.location.pathname.startsWith('/proto');
   const isProto = isProtoSync || segments[0] === 'proto' || pathname.startsWith('/proto');
-  // Use large maxWidth for proto (not undefined/empty — RN Web doesn't clear previously set inline styles)
   const containerStyle = isProto ? { maxWidth: 9999 } : { maxWidth: rawMaxWidth };
+  const rootViewRef = useRef<View>(null);
   const router = useRouter();
+
+  // RN Web bug: fiber gets correct style but DOM element is not updated.
+  // Force-clear maxWidth directly on DOM element for proto pages.
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const el = rootViewRef.current as unknown as HTMLElement | null;
+    if (!el) return;
+    if (isProto) {
+      el.style.maxWidth = '';
+    } else {
+      el.style.maxWidth = rawMaxWidth + 'px';
+    }
+  }, [isProto, rawMaxWidth]);
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -155,7 +167,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <View className="flex-1 bg-dark w-full self-center" style={containerStyle}>
+      <View ref={rootViewRef} className="flex-1 bg-dark w-full self-center" style={containerStyle}>
         <StatusBar style="light" />
         <Stack
           screenOptions={{
