@@ -127,9 +127,8 @@ export default function BrandStates() {
 
   return (
     <StateSection title="BRAND_GUIDE">
-      <View style={[{ flex: 1, width: '100%' }, isDesktop && { alignItems: 'center' as const }]}>
       <ScrollView
-        style={[{ minHeight: 844, width: '100%' }, isDesktop && { maxWidth: 960 }]}
+        style={{ minHeight: 844 }}
         contentContainerStyle={{ padding: isDesktop ? 32 : 16, gap: 48, backgroundColor: C.page }}
         showsVerticalScrollIndicator={false}
       >
@@ -511,7 +510,6 @@ export default function BrandStates() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-      </View>
     </StateSection>
   );
 }
