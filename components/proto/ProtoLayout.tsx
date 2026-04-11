@@ -1,6 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Platform, useWindowDimensions } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { View, ScrollView, Platform, useWindowDimensions } from 'react-native';
 import React, { Children, isValidElement } from 'react';
 import type { ReactNode } from 'react';
 import type { NavVariant } from '../../constants/pageRegistry';
@@ -15,7 +13,6 @@ interface ProtoLayoutProps {
 }
 
 export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutProps) {
-  const router = useRouter();
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
 
@@ -33,29 +30,6 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
   const showNav = nav && nav !== 'none';
   const isBottomNav = nav === 'client';
   const isAdminNav = nav === 'admin';
-
-  const backBar = (
-    <View style={{
-      backgroundColor: '#fff',
-      borderBottomWidth: 1,
-      borderBottomColor: '#E0E0E0',
-      paddingHorizontal: padding,
-      paddingVertical: 12,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    }}>
-      <TouchableOpacity onPress={() => router.push('/proto' as any)} activeOpacity={0.7}>
-        <Ionicons name="arrow-back" size={22} color="#1A1A1A" />
-      </TouchableOpacity>
-      <View style={{ flex: 1 }}>
-        <Text style={{ color: '#1A1A1A', fontSize: 16, fontWeight: '600' }}>
-          {pagId} — {title}
-        </Text>
-        <Text style={{ color: '#737373', fontSize: 12, marginTop: 2 }}>{route}</Text>
-      </View>
-    </View>
-  );
 
   const statesGrid = (
     <ScrollView
@@ -77,7 +51,6 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         {showNav && <ProtoNav variant={nav!} />}
-        {backBar}
         <View style={{ flex: 1, flexDirection: 'row' }}>
           {statesGrid}
         </View>
@@ -88,7 +61,6 @@ export function ProtoLayout({ pagId, title, route, nav, children }: ProtoLayoutP
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       {showNav && !isBottomNav && <ProtoNav variant={nav!} />}
-      {backBar}
       {statesGrid}
       {showNav && isBottomNav && <ProtoNav variant={nav!} />}
     </View>
