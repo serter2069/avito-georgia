@@ -165,11 +165,16 @@ export const pageRegistry: PageEntry[] = [
     title: 'Map View',
     group: 'Public',
     route: '/search?view=map',
-    stateCount: 1,
+    stateCount: 3,
     nav: 'public',
     qaCycles: 5,
-    qaScore: 85,
+    qaScore: 90,
     notes: [{ date: '2026-04-10', text: 'Карта объявлений — Leaflet + OpenStreetMap. Кластеризация маркеров. Клик по маркеру — превью объявления. Фильтры работают с картой' }],
+    testScenarios: [
+      { name: 'View map with listings', steps: ['open /search?view=map', 'verify map visible', 'verify markers on map', 'tap marker', 'verify listing preview card appears'] },
+      { name: 'Filter by city', steps: ['open /search?view=map', 'tap city pill', 'verify city selected', 'verify filters applied'] },
+      { name: 'Switch to list view', steps: ['open /search?view=map', 'tap list button', 'verify navigation to listings feed'] },
+    ],
   },
   {
     id: 'seller-profile',
