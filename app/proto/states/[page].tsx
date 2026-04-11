@@ -6,6 +6,7 @@ import { ProtoLayout } from '../../../components/proto/ProtoLayout';
 
 import OverviewStates from '../../../components/proto/states/OverviewStates';
 import BrandStates from '../../../components/proto/states/BrandStates';
+import LandingStates from '../../../components/proto/states/LandingStates';
 import AuthEmailStates from '../../../components/proto/states/AuthEmailStates';
 import AuthOtpStates from '../../../components/proto/states/AuthOtpStates';
 import OnboardingStates from '../../../components/proto/states/OnboardingStates';
@@ -46,6 +47,7 @@ import ComponentsStates from '../../../components/proto/states/ComponentsStates'
 const stateComponents: Record<string, React.ComponentType> = {
   'overview': OverviewStates,
   'brand': BrandStates,
+  'landing': LandingStates,
   'components': ComponentsStates,
   'auth-email': AuthEmailStates,
   'auth-otp': AuthOtpStates,

@@ -87,6 +87,14 @@ export const pageRegistry: PageEntry[] = [
 
   // Public
   {
+    id: 'landing',
+    title: 'Landing',
+    group: 'Public',
+    route: '/proto/landing',
+    stateCount: 1,
+    nav: 'none',
+  },
+  {
     id: 'homepage',
     title: 'Homepage',
     group: 'Public',
