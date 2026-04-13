@@ -245,7 +245,7 @@ function LandingFooter() {
 // ─── DEFAULT STATE — Full Landing Page ──────────────────────────────────────
 function DefaultState({ onLogin }: { onLogin: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState(null as string | null);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
