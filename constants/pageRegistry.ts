@@ -177,6 +177,23 @@ export const pageRegistry: PageEntry[] = [
     ],
   },
   {
+    id: 'cities',
+    title: 'Cities & Regions',
+    group: 'Public',
+    route: '/cities',
+    stateCount: 4,
+    nav: 'public',
+    qaCycles: 1,
+    qaScore: 8,
+    notes: [{ date: '2026-04-13', text: 'Обзор городов Грузии — выбор города для фильтрации объявлений. Карта регионов, популярные города, количество объявлений по городам.' }],
+    testScenarios: [
+      { name: 'Guest browses cities', steps: ['open /cities', 'verify city grid visible', 'verify listing counts shown', 'tap city card', 'verify city selected state'] },
+      { name: 'Guest searches city', steps: ['open /cities', 'type city name in search', 'verify filtered results', 'tap result', 'verify navigation to listings'] },
+      { name: 'Guest views map', steps: ['open /cities', 'tap map toggle', 'verify Georgia map visible', 'tap city marker', 'verify city popup'] },
+      { name: 'Empty city listings', steps: ['open /cities', 'select city with no listings', 'verify empty state message', 'verify back navigation'] },
+    ],
+  },
+  {
     id: 'seller-profile',
     title: 'Seller Profile',
     group: 'Public',
