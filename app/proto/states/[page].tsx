@@ -43,6 +43,7 @@ import HelpStates from '../../../components/proto/states/HelpStates';
 import PrivacyStates from '../../../components/proto/states/PrivacyStates';
 import TermsStates from '../../../components/proto/states/TermsStates';
 import ComponentsStates from '../../../components/proto/states/ComponentsStates';
+import CitiesStates from '../../../components/proto/states/CitiesStates';
 
 const stateComponents: Record<string, React.ComponentType> = {
   'overview': OverviewStates,
@@ -57,6 +58,7 @@ const stateComponents: Record<string, React.ComponentType> = {
   'listing-detail': ListingDetailStates,
   'search': SearchStates,
   'map-view': MapViewStates,
+  'cities': CitiesStates,
   'seller-profile': SellerProfileStates,
   'my-listings': MyListingsStates,
   'create-listing': CreateListingStates,
