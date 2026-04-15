@@ -198,7 +198,7 @@ function DefaultState() {
   if (isDesktop) {
     return (
       <StateSection title="SETTINGS__DEFAULT">
-        <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+        <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
           <View style={{ flexDirection: 'row', padding: 20, gap: 16, alignItems: 'flex-start' }}>
             {/* Left nav */}
             <View style={{ width: 200, backgroundColor: C.white, borderRadius: 12, padding: 8, gap: 2 }}>
@@ -228,7 +228,7 @@ function DefaultState() {
 
   return (
     <StateSection title="SETTINGS__DEFAULT">
-      <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ padding: 12, gap: 4 }}>
             {/* Header */}

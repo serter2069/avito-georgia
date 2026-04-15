@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
 // ─── Responsive wrapper ─────────────────────────────────────────────────────
 function ResponsiveFrame({ children }: { children: React.ReactNode }) {
   const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
   return (
-    <View style={isDesktop ? { width: 390, alignSelf: 'center', backgroundColor: C.page, borderRadius: 8, overflow: 'hidden' } : { backgroundColor: C.page }}>
+    <View style={{ backgroundColor: C.white, width: '100%' }}>
       {children}
     </View>
   );
@@ -136,11 +136,21 @@ function MapPreview() {
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN EXPORT
 // ═══════════════════════════════════════════════════════════════════════════════
+function WithBottomNav({ children }: { children: React.ReactNode }) {
+  const { width } = useWindowDimensions();
+  return (
+    <View>
+      {children}
+      {width < 640 && <BottomNav active="browse" />}
+    </View>
+  );
+}
+
 export default function MapViewStates() {
   return (
     <View style={{ gap: 32 }}>
-      <MapComingSoon />
-      <MapPreview />
+      <WithBottomNav><MapComingSoon /></WithBottomNav>
+      <WithBottomNav><MapPreview /></WithBottomNav>
     </View>
   );
 }

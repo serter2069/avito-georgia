@@ -9,7 +9,6 @@ import OnboardingStates from '../../../components/proto/states/OnboardingStates'
 import HomepageStates from '../../../components/proto/states/HomepageStates';
 import ListingsFeedStates from '../../../components/proto/states/ListingsFeedStates';
 import ListingDetailStates from '../../../components/proto/states/ListingDetailStates';
-import SearchStates from '../../../components/proto/states/SearchStates';
 import MapViewStates from '../../../components/proto/states/MapViewStates';
 import SellerProfileStates from '../../../components/proto/states/SellerProfileStates';
 import ReviewsStates from '../../../components/proto/states/ReviewsStates';
@@ -39,7 +38,6 @@ const stateComponents: Record<string, React.ComponentType> = {
   'homepage':        HomepageStates,
   'listings-feed':   ListingsFeedStates,
   'listing-detail':  ListingDetailStates,
-  'search':          SearchStates,
   'map-view':        MapViewStates,
   'seller-profile':  SellerProfileStates,
   'reviews':         ReviewsStates,

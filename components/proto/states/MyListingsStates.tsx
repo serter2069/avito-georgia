@@ -120,7 +120,7 @@ function ListingCard({
           <View
             style={{
               alignSelf: 'flex-start',
-              backgroundColor: '#F5F5F5',
+              backgroundColor: '#FFFFFF',
               borderRadius: 4,
               paddingHorizontal: 6,
               paddingVertical: 2,

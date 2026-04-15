@@ -112,7 +112,7 @@ function DefaultView() {
   const horizontalPadding = isDesktop ? 32 : 16;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       {/* Back button */}
       <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
         <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -165,7 +165,7 @@ function ContactLoadingView() {
   const horizontalPadding = isDesktop ? 32 : 16;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
         <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <Text style={{ fontSize: 20, color: C.text, lineHeight: 24 }}>←</Text>

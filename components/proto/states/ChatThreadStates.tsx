@@ -115,7 +115,7 @@ function InteractiveChat() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.page }}>
+    <View style={{ flex: 1, backgroundColor: C.white }}>
       <ScrollView
         contentContainerStyle={{ paddingTop: 12, paddingBottom: 8 }}
         showsVerticalScrollIndicator={false}

@@ -148,7 +148,7 @@ function SearchBar({ value, onChangeText }: { value: string; onChangeText: (t: s
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: C.page,
+      backgroundColor: C.white,
       borderRadius: 10,
       paddingHorizontal: 12,
       marginHorizontal: 16,
@@ -222,7 +222,7 @@ function DefaultState() {
   );
 
   const chatPlaceholder = (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: C.page }}>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: C.white }}>
       {selectedConv ? (
         <View style={{ alignItems: 'center', gap: 8 }}>
           <AvatarCircle initials={selectedConv.initials} colorIdx={selectedConv.colorIdx} size={56} />
