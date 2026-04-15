@@ -425,9 +425,8 @@ function InputsSection() {
           <SubLabel text="Default input" />
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">City</Text>
           <View className="border border-[#E0E0E0] rounded-sm bg-white flex-row items-center px-3">
-            <Feather name="map-pin" size={15} color={C.muted} />
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-2.5 pl-2"
+              className="flex-1 text-base text-[#1A1A1A] py-2.5"
               placeholder="e.g. Batumi"
               placeholderTextColor={C.muted}
               value={city}
@@ -440,9 +439,8 @@ function InputsSection() {
           <SubLabel text="Filled (focused)" />
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">Price</Text>
           <View className="border-2 border-[#00AA6C] rounded-sm bg-white flex-row items-center px-3">
-            <Feather name="tag" size={15} color={C.green} />
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-2.5 pl-2"
+              className="flex-1 text-base text-[#1A1A1A] py-2.5"
               value="85 000"
               editable={false}
             />
@@ -454,9 +452,8 @@ function InputsSection() {
           <SubLabel text="Error state" />
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">Phone</Text>
           <View className="border-[1.5px] border-[#D32F2F] rounded-sm bg-[#FFEBEE] flex-row items-center px-3">
-            <Feather name="phone" size={15} color={C.error} />
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-2.5 pl-2"
+              className="flex-1 text-base text-[#1A1A1A] py-2.5"
               value={phone}
               onChangeText={setPhone}
             />
