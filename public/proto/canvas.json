@@ -1,13 +1,37 @@
 {
   "pages": [
-    {
-      "id": "design-system",
-      "title": "Design System",
-      "group": "Design",
-      "x": 0,
-      "y": 0,
-      "w": 390,
-      "h": 844
-    }
+    { "id": "design-system",       "title": "Design System",          "group": "Design",   "x": 0,    "y": 0, "w": 390, "h": 844 },
+    { "id": "auth-email",          "title": "Email Login",            "group": "Auth",     "x": 0,    "y": 0, "w": 390, "h": 844 },
+    { "id": "auth-otp",            "title": "OTP Verification",       "group": "Auth",     "x": 510,  "y": 0, "w": 390, "h": 844 },
+    { "id": "onboarding",          "title": "Onboarding",             "group": "Auth",     "x": 1020, "y": 0, "w": 390, "h": 844 },
+    { "id": "homepage",            "title": "Homepage",               "group": "Browse",   "x": 0,    "y": 1000, "w": 390, "h": 844 },
+    { "id": "listings-feed",       "title": "Listings Feed",          "group": "Browse",   "x": 510,  "y": 1000, "w": 390, "h": 844 },
+    { "id": "listing-detail",      "title": "Listing Detail",         "group": "Browse",   "x": 1020, "y": 1000, "w": 390, "h": 844 },
+    { "id": "search",              "title": "Search",                 "group": "Browse",   "x": 1530, "y": 1000, "w": 390, "h": 844 },
+    { "id": "map-view",            "title": "Map View",               "group": "Browse",   "x": 2040, "y": 1000, "w": 390, "h": 844 },
+    { "id": "seller-profile",      "title": "Seller Profile",         "group": "Browse",   "x": 2550, "y": 1000, "w": 390, "h": 844 },
+    { "id": "my-listings",         "title": "My Listings",            "group": "Listings", "x": 0,    "y": 2000, "w": 390, "h": 844 },
+    { "id": "create-listing",      "title": "Create Listing",         "group": "Listings", "x": 510,  "y": 2000, "w": 390, "h": 844 },
+    { "id": "edit-listing",        "title": "Edit Listing",           "group": "Listings", "x": 1020, "y": 2000, "w": 390, "h": 844 },
+    { "id": "chat-thread",         "title": "Chat Thread",            "group": "Messages", "x": 0,    "y": 3000, "w": 390, "h": 844 },
+    { "id": "messages-list",       "title": "Messages List",          "group": "Messages", "x": 510,  "y": 3000, "w": 390, "h": 844 },
+    { "id": "favorites",           "title": "Favorites",              "group": "Messages", "x": 1020, "y": 3000, "w": 390, "h": 844 },
+    { "id": "notifications",       "title": "Notifications",          "group": "Messages", "x": 1530, "y": 3000, "w": 390, "h": 844 },
+    { "id": "profile",             "title": "Profile",                "group": "Account",  "x": 0,    "y": 4000, "w": 390, "h": 844 },
+    { "id": "settings",            "title": "Settings",               "group": "Account",  "x": 510,  "y": 4000, "w": 390, "h": 844 },
+    { "id": "subscription",        "title": "Subscription",           "group": "Account",  "x": 1020, "y": 4000, "w": 390, "h": 844 },
+    { "id": "payment-history",     "title": "Payment History",        "group": "Account",  "x": 1530, "y": 4000, "w": 390, "h": 844 },
+    { "id": "promote-listing",     "title": "Promote Listing",        "group": "Account",  "x": 2040, "y": 4000, "w": 390, "h": 844 },
+    { "id": "promotion-success",   "title": "Promotion Success",      "group": "Account",  "x": 2550, "y": 4000, "w": 390, "h": 844 },
+    { "id": "promotion-cancelled", "title": "Promotion Cancelled",    "group": "Account",  "x": 3060, "y": 4000, "w": 390, "h": 844 },
+    { "id": "slot-success",        "title": "Slot Success",           "group": "Account",  "x": 3570, "y": 4000, "w": 390, "h": 844 },
+    { "id": "admin-dashboard",     "title": "Admin Dashboard",        "group": "Admin",    "x": 0,    "y": 5000, "w": 390, "h": 844 },
+    { "id": "admin-moderation",    "title": "Admin Moderation",       "group": "Admin",    "x": 510,  "y": 5000, "w": 390, "h": 844 },
+    { "id": "admin-users",         "title": "Admin Users",            "group": "Admin",    "x": 1020, "y": 5000, "w": 390, "h": 844 },
+    { "id": "admin-categories",    "title": "Admin Categories",       "group": "Admin",    "x": 1530, "y": 5000, "w": 390, "h": 844 },
+    { "id": "about",               "title": "About",                  "group": "Legal",    "x": 0,    "y": 6000, "w": 390, "h": 844 },
+    { "id": "help",                "title": "Help",                   "group": "Legal",    "x": 510,  "y": 6000, "w": 390, "h": 844 },
+    { "id": "privacy",             "title": "Privacy Policy",         "group": "Legal",    "x": 1020, "y": 6000, "w": 390, "h": 844 },
+    { "id": "terms",               "title": "Terms of Service",       "group": "Legal",    "x": 1530, "y": 6000, "w": 390, "h": 844 }
   ]
 }
