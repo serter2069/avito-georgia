@@ -378,7 +378,7 @@ function Header() {
 }
 
 // ─── Main state ───────────────────────────────────────────────────────────────
-function ChatThreadDefault() {
+export function ChatThreadDefault() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 

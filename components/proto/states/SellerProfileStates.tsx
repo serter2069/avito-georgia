@@ -220,7 +220,7 @@ function ListingsGrid({ listings }: { listings: SellerListing[] }) {
   );
 }
 
-function SellerProfileMain() {
+export function SellerProfileMain() {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
   const isDesktop = width >= 1024;

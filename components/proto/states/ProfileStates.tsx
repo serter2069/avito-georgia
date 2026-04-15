@@ -349,7 +349,7 @@ function EditProfileForm() {
 
 // ---- State 1: Own Profile ----
 
-function OwnProfileState({ showBottomNav = true }: { showBottomNav?: boolean }) {
+export function OwnProfileState({ showBottomNav = true }: { showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 

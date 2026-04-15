@@ -1,10 +1,5 @@
-import CreateListingStates from '../../components/proto/states/CreateListingStates';
-import { AppShell } from '../../components/layout/AppShell';
+import { CreateListingInteractive } from '../../components/proto/states/CreateListingStates';
 
 export default function CreateListingPage() {
-  return (
-    <AppShell showBottomNav={false} showBack scrollable={true}>
-      <CreateListingStates />
-    </AppShell>
-  );
+  return <CreateListingInteractive />;
 }

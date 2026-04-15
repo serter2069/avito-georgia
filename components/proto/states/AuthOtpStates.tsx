@@ -77,7 +77,7 @@ function ConfirmButton({ disabled }: { disabled?: boolean }) {
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-function DefaultState() {
+export function AuthOtpDefault() {
   return (
     <ResponsiveWrapper>
       <View className="bg-white">
@@ -207,7 +207,7 @@ export default function AuthOtpStates() {
   return (
     <View style={{ gap: 40 }}>
       <StateSection title="AUTH_OTP — Default">
-        <DefaultState />
+        <AuthOtpDefault />
       </StateSection>
 
       <StateSection title="AUTH_OTP — Filling">

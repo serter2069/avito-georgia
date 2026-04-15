@@ -95,7 +95,7 @@ const LISTINGS = [
 ];
 
 // ─── Interactive Feed ─────────────────────────────────────────────────────────
-function InteractiveFeed({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
+export function InteractiveFeed({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [sortOrder, setSortOrder] = useState<'date' | 'price'>('date');
   const columns = useColumns();

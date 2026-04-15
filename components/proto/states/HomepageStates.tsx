@@ -110,7 +110,7 @@ function LangSelect({ value, onChange }: { value: string; onChange: (v: string) 
 
 // ─── Main content ─────────────────────────────────────────────────────────────
 
-function HomepageContent({ loggedIn, showHeader = true, showBottomNav = true }: { loggedIn?: boolean; showHeader?: boolean; showBottomNav?: boolean }) {
+export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = true }: { loggedIn?: boolean; showHeader?: boolean; showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
   const isTablet = width >= 640;

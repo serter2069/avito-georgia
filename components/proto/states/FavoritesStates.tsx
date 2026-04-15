@@ -161,7 +161,7 @@ function FavoritesGrid({ items, onRemove }: { items: FavItem[]; onRemove: (id: n
   );
 }
 
-function FavoritesInteractive({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
+export function FavoritesInteractive({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
   const [items, setItems] = useState<FavItem[]>(INITIAL_FAVORITES);

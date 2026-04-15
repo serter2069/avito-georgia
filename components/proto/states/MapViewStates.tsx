@@ -200,7 +200,7 @@ function ListingRow({ pin, onPress }: { pin: ML; onPress(): void }) {
 }
 
 // ─── Mobile ───────────────────────────────────────────────────────────────────
-function MapMobile() {
+export function MapMobile() {
   const { width } = useWindowDimensions();
   const [activeId, setActiveId] = useState<string|null>(null);
 
@@ -288,7 +288,7 @@ function MapMobile() {
 }
 
 // ─── Desktop ──────────────────────────────────────────────────────────────────
-function MapDesktop() {
+export function MapDesktop() {
   const [activeId, setActiveId] = useState<string|null>(null);
 
   const clusters      = buildClusters(PINS);

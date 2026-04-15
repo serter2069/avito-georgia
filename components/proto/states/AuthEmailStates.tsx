@@ -88,7 +88,7 @@ function PrimaryButton({ label, disabled, loading }: { label: string; disabled?:
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-function DefaultState() {
+export function AuthEmailDefault() {
   return (
     <ResponsiveWrapper>
       <View className="bg-white" style={{ paddingHorizontal: 24, paddingTop: 80, paddingBottom: 40, gap: 32 }}>
@@ -184,7 +184,7 @@ export default function AuthEmailStates() {
   return (
     <View style={{ gap: 40 }}>
       <StateSection title="AUTH_EMAIL — Default">
-        <DefaultState />
+        <AuthEmailDefault />
       </StateSection>
 
       <StateSection title="AUTH_EMAIL — Filled">
