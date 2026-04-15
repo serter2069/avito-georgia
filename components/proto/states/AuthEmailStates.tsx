@@ -36,22 +36,27 @@ function ResponsiveWrapper({ children }: { children: React.ReactNode }) {
 function EmailInput({ value, error, disabled }: { value?: string; error?: boolean; disabled?: boolean }) {
   return (
     <View>
+      <View style={{
+        borderWidth: error ? 1.5 : 1,
+        borderColor: error ? C.error : C.border,
+        borderRadius: 8,
+        backgroundColor: disabled ? C.bg : C.white,
+      }}>
       <TextInput
         style={{
-          borderWidth: error ? 1.5 : 1,
-          borderColor: error ? C.error : C.border,
-          borderRadius: 8,
-          backgroundColor: disabled ? C.bg : C.white,
+          borderWidth: 0,
+          backgroundColor: 'transparent',
           paddingHorizontal: 16,
           color: C.text,
           fontSize: 16,
           paddingVertical: 12,
           outlineWidth: 0,
-        }}
+        } as any}
         placeholder="ваш@email.com"
         placeholderTextColor={C.muted}
         value={value}
       />
+      </View>
       {error && (
         <Text className="text-sm mt-1.5" style={{ color: C.error }}>
           Введите корректный email

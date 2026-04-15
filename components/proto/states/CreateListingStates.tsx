@@ -161,26 +161,30 @@ function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
     <View style={{ padding: 16, gap: 14 }}>
       <View>
         <FieldLabel text="Заголовок" />
-        <TextInput
-          value={title}
-          onChangeText={setTitle}
-          placeholder="Что продаёте?"
-          placeholderTextColor={C.muted}
-          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-        />
+        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
+          <TextInput
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Что продаёте?"
+            placeholderTextColor={C.muted}
+            style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
+          />
+        </View>
       </View>
       <SelectRow label="Категория" value="Авто" />
       <View>
         <FieldLabel text="Описание" />
-        <TextInput
-          value={desc}
-          onChangeText={setDesc}
-          placeholder="Опишите товар подробнее..."
-          placeholderTextColor={C.muted}
-          multiline
-          numberOfLines={4}
-          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0, minHeight: 100, textAlignVertical: 'top' } as any}
-        />
+        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
+          <TextInput
+            value={desc}
+            onChangeText={setDesc}
+            placeholder="Опишите товар подробнее..."
+            placeholderTextColor={C.muted}
+            multiline
+            numberOfLines={4}
+            style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0, minHeight: 100, textAlignVertical: 'top' } as any}
+          />
+        </View>
       </View>
       <SelectRow label="Город" value="Тбилиси" />
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
@@ -233,14 +237,16 @@ function Step3({ onBack }: { onBack: () => void }) {
       </View>
       <View>
         <FieldLabel text="Контактный телефон" />
-        <TextInput
-          value={phone}
-          onChangeText={setPhone}
-          placeholder="+995 5XX XXX XXX"
-          placeholderTextColor={C.muted}
-          keyboardType="phone-pad"
-          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-        />
+        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
+          <TextInput
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="+995 5XX XXX XXX"
+            placeholderTextColor={C.muted}
+            keyboardType="phone-pad"
+            style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
+          />
+        </View>
       </View>
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
         <Pressable onPress={onBack} style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>

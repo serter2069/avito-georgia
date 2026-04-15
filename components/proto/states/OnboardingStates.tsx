@@ -26,22 +26,22 @@ function InputField({ label, placeholder, value, required }: { label: string; pl
         <Text className="text-sm font-medium" style={{ color: C.text }}>{label}</Text>
         {required && <Text style={{ color: C.error, fontSize: 14 }}>*</Text>}
       </View>
-      <TextInput
-        style={{
-          borderWidth: 1,
-          borderColor: C.border,
-          borderRadius: 8,
-          backgroundColor: C.white,
-          paddingHorizontal: 16,
-          color: value ? C.text : C.muted,
-          fontSize: 16,
-          paddingVertical: 12,
-          outlineWidth: 0,
-        }}
-        placeholder={placeholder}
-        placeholderTextColor={C.muted}
-        value={value}
-      />
+      <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, backgroundColor: C.white }}>
+        <TextInput
+          style={{
+            borderWidth: 0,
+            backgroundColor: 'transparent',
+            paddingHorizontal: 16,
+            color: value ? C.text : C.muted,
+            fontSize: 16,
+            paddingVertical: 12,
+            outlineWidth: 0,
+          } as any}
+          placeholder={placeholder}
+          placeholderTextColor={C.muted}
+          value={value}
+        />
+      </View>
     </View>
   );
 }

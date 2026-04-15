@@ -160,7 +160,7 @@ function SearchBar({ value, onChangeText }: { value: string; onChangeText: (t: s
         onChangeText={onChangeText}
         placeholder="Поиск по чатам"
         placeholderTextColor={C.muted}
-        style={{ flex: 1, fontSize: 15, color: C.text, paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 }}
+        style={{ flex: 1, fontSize: 15, color: C.text, paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
       />
       {value.length > 0 && (
         <Pressable onPress={() => onChangeText('')} style={{ padding: 4 }}>

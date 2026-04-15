@@ -242,7 +242,7 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
             <Text style={{ fontSize: 13, color: C.muted, flexShrink: 0 }}>Цена ₾</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 5, minWidth: 70 }}>
               <TextInput
-                style={{ fontSize: 13, color: C.text, width: 55, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent', paddingVertical: 0 }}
+                style={{ fontSize: 13, color: C.text, width: 55, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
                 placeholder="от"
                 placeholderTextColor={C.muted}
                 value={priceFrom}
@@ -253,7 +253,7 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
             <Text style={{ color: C.muted, fontSize: 13 }}>—</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 5, minWidth: 70 }}>
               <TextInput
-                style={{ fontSize: 13, color: C.text, width: 55, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent', paddingVertical: 0 }}
+                style={{ fontSize: 13, color: C.text, width: 55, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
                 placeholder="до"
                 placeholderTextColor={C.muted}
                 value={priceTo}

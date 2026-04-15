@@ -401,7 +401,7 @@ function InputsSection() {
               placeholderTextColor={C.muted}
               value={search}
               onChangeText={setSearch}
-              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, paddingHorizontal: 10, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, paddingHorizontal: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
             />
             <View className="bg-[#00AA6C] px-4 py-3">
               <Text className="text-white font-semibold text-sm">Search</Text>
@@ -412,13 +412,15 @@ function InputsSection() {
         <View>
           <SubLabel text="Default input" />
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">City</Text>
-          <TextInput
-            placeholder="e.g. Batumi"
-            placeholderTextColor={C.muted}
-            value={city}
-            onChangeText={setCity}
-            style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, paddingHorizontal: 12, borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 2, backgroundColor: '#FFFFFF', outlineWidth: 0 }}
-          />
+          <View style={{ borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 2, backgroundColor: '#FFFFFF' }}>
+            <TextInput
+              placeholder="e.g. Batumi"
+              placeholderTextColor={C.muted}
+              value={city}
+              onChangeText={setCity}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, paddingHorizontal: 12, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
+            />
+          </View>
         </View>
 
         <View>
@@ -427,7 +429,7 @@ function InputsSection() {
           <View style={{ borderWidth: 2, borderColor: '#00AA6C', borderRadius: 2, backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}>
             <TextInput
               value="85 000"
-              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
             />
             <Text className="text-sm text-[#737373]">$</Text>
           </View>
@@ -436,11 +438,13 @@ function InputsSection() {
         <View>
           <SubLabel text="Error state" />
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">Phone</Text>
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, paddingHorizontal: 12, borderWidth: 1.5, borderColor: '#D32F2F', borderRadius: 2, backgroundColor: '#FFEBEE', outlineWidth: 0 }}
-          />
+          <View style={{ borderWidth: 1.5, borderColor: '#D32F2F', borderRadius: 2, backgroundColor: '#FFEBEE' }}>
+            <TextInput
+              value={phone}
+              onChangeText={setPhone}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, paddingHorizontal: 12, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
+            />
+          </View>
           <View className="flex-row items-center mt-1" style={{ gap: 4 }}>
             <Text className="text-xs text-[#D32F2F]">× Invalid phone number</Text>
           </View>

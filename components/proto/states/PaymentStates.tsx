@@ -55,35 +55,41 @@ function CheckoutContent() {
       {/* Card fields */}
       <View style={{ gap: 10 }}>
         <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Данные карты</Text>
-        <TextInput
-          value={cardNum}
-          onChangeText={setCardNum}
-          placeholder="Номер карты"
-          placeholderTextColor={C.muted}
-          keyboardType="numeric"
-          maxLength={19}
-          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-        />
+        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
+          <TextInput
+            value={cardNum}
+            onChangeText={setCardNum}
+            placeholder="Номер карты"
+            placeholderTextColor={C.muted}
+            keyboardType="numeric"
+            maxLength={19}
+            style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
+          />
+        </View>
         <View style={{ flexDirection: 'row', gap: 10 }}>
-          <TextInput
-            value={expiry}
-            onChangeText={setExpiry}
-            placeholder="MM / ГГ"
-            placeholderTextColor={C.muted}
-            keyboardType="numeric"
-            maxLength={5}
-            style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-          />
-          <TextInput
-            value={cvv}
-            onChangeText={setCvv}
-            placeholder="CVV"
-            placeholderTextColor={C.muted}
-            keyboardType="numeric"
-            maxLength={4}
-            secureTextEntry
-            style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-          />
+          <View style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
+            <TextInput
+              value={expiry}
+              onChangeText={setExpiry}
+              placeholder="MM / ГГ"
+              placeholderTextColor={C.muted}
+              keyboardType="numeric"
+              maxLength={5}
+              style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
+            />
+          </View>
+          <View style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
+            <TextInput
+              value={cvv}
+              onChangeText={setCvv}
+              placeholder="CVV"
+              placeholderTextColor={C.muted}
+              keyboardType="numeric"
+              maxLength={4}
+              secureTextEntry
+              style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
+            />
+          </View>
         </View>
       </View>
 

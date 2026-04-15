@@ -118,7 +118,7 @@ export function HelpStates() {
               placeholderTextColor={C.muted}
               value={query}
               onChangeText={setQuery}
-              style={{ flex: 1, fontSize: 14, color: C.text, paddingVertical: 11, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 }}
+              style={{ flex: 1, fontSize: 14, color: C.text, paddingVertical: 11, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
             />
           </View>
           {/* FAQ list */}

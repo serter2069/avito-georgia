@@ -307,23 +307,24 @@ function EditProfileForm() {
       {fields.map((f) => (
         <View key={f.label} className="gap-1.5">
           <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>{f.label}</Text>
-          <TextInput
-            value={f.value}
-            onChangeText={f.setter}
-            keyboardType={f.keyboard}
-            placeholder={f.placeholder}
-            placeholderTextColor={C.muted}
-            style={{
-              borderWidth: 1,
-              borderColor: C.border,
-              borderRadius: 10,
-              paddingHorizontal: 12,
-              paddingVertical: 11,
-              fontSize: 15,
-              color: C.text,
-              outlineWidth: 0,
-            }}
-          />
+          <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 10 }}>
+            <TextInput
+              value={f.value}
+              onChangeText={f.setter}
+              keyboardType={f.keyboard}
+              placeholder={f.placeholder}
+              placeholderTextColor={C.muted}
+              style={{
+                borderWidth: 0,
+                backgroundColor: 'transparent',
+                paddingHorizontal: 12,
+                paddingVertical: 11,
+                fontSize: 15,
+                color: C.text,
+                outlineWidth: 0,
+              } as any}
+            />
+          </View>
         </View>
       ))}
 
