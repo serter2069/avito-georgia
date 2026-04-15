@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator,
+import { View, Text, TouchableOpacity,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 
 export default function SlotSuccessStates() {
   const [navigated, setNavigated] = useState(false);
@@ -15,21 +16,27 @@ export default function SlotSuccessStates() {
 
   return (
     <View>
-      <StateSection title="restoring">
+      <StateSection title="RESTORING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
-          <Text className="text-text-muted text-sm mt-3">Восстановление объявления...</Text>
+          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,170,108,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+            <Feather name="refresh-cw" size={28} color="#00AA6C" />
+          </View>
+          <Text style={{ color: '#1A1A1A', fontSize: 16, fontWeight: '600' }}>Восстановление...</Text>
+          <Text style={{ color: '#737373', fontSize: 14, marginTop: 4 }}>Активируем ваше объявление</Text>
         </View>
       </StateSection>
 
-      <StateSection title="submitting">
+      <StateSection title="SUBMITTING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
-          <Text className="text-text-muted text-sm mt-3">Обработка слота...</Text>
+          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,170,108,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+            <Feather name="zap" size={28} color="#00AA6C" />
+          </View>
+          <Text style={{ color: '#1A1A1A', fontSize: 16, fontWeight: '600' }}>Обработка слота...</Text>
+          <Text style={{ color: '#737373', fontSize: 14, marginTop: 4 }}>Пожалуйста, подождите</Text>
         </View>
       </StateSection>
 
-      <StateSection title="done">
+      <StateSection title="DONE">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
           <View className="w-16 h-16 rounded-full bg-primary/20 items-center justify-center mb-2">
             <Feather name="check-circle" size={40} color="#00AA6C" />
@@ -45,7 +52,7 @@ export default function SlotSuccessStates() {
         </View>
       </StateSection>
 
-      <StateSection title="error">
+      <StateSection title="ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
           <View className="w-16 h-16 rounded-full bg-error/10 items-center justify-center mb-2">
             <Feather name="alert-circle" size={40} color="#ef4444" />

@@ -29,7 +29,7 @@ export default function HelpStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, contentStyle]} className="py-4">
           <Text className="text-primary text-2xl font-bold mb-2">Помощь</Text>
           <Text className="text-text-muted text-sm mb-6">Часто задаваемые вопросы</Text>
@@ -39,7 +39,7 @@ export default function HelpStates() {
         </View>
       </StateSection>
 
-      <StateSection title="faq_expanded">
+      <StateSection title="FAQ_EXPANDED">
         <View style={[{ minHeight: 844 }, contentStyle]} className="py-4">
           <Text className="text-primary text-2xl font-bold mb-2">Помощь</Text>
           <Text className="text-text-muted text-sm mb-6">Часто задаваемые вопросы</Text>

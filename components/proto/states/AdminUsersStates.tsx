@@ -1,8 +1,9 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image,
+import { View, Text, TextInput, TouchableOpacity, Image,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockUsers } from '../../../constants/protoMockData';
 
 function UserRow({ user }: { user: typeof mockUsers[0] }) {
@@ -44,7 +45,7 @@ export default function AdminUsersStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput
             className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-4"
@@ -59,13 +60,18 @@ export default function AdminUsersStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <SkeletonBlock height={44} radius={8} style={{ marginBottom: 16 }} />
+          {[1, 2, 3, 4, 5].map(i => (
+            <View key={i} style={{ borderBottomWidth: 1, borderBottomColor: '#E8EDF0' }}>
+              <SkeletonRow />
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="search_results">
+      <StateSection title="SEARCH_RESULTS">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border-focus rounded-lg px-4 py-3 text-base mb-4 text-text-primary" value="Нино" editable={false} />
           <Text className="text-text-muted text-sm mb-3">Найден 1 пользователь</Text>
@@ -73,7 +79,7 @@ export default function AdminUsersStates() {
         </View>
       </StateSection>
 
-      <StateSection title="empty_search">
+      <StateSection title="EMPTY_SEARCH">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border-focus rounded-lg px-4 py-3 text-base mb-4 text-text-primary" value="qwerty123" editable={false} />
           <View className="py-12 items-center">

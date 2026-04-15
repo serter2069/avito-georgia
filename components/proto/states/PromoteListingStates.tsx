@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator,
+import { View, Text, TouchableOpacity,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 
 function PackageCard({
   name, price, description, icon, color, selected, onSelect,
@@ -45,7 +46,7 @@ export default function PromoteListingStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Продвижение объявления</Text>
           <PackageCard name="1 день" price="2.99 GEL" description="Поднятие в топ на 1 день" icon="trending-up" color="#00AA6C"
@@ -57,20 +58,39 @@ export default function PromoteListingStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]} style={{ paddingVertical: 16 }}>
+          <SkeletonBlock width={200} height={20} style={{ marginBottom: 16 }} />
+          {[1, 2, 3].map(i => (
+            <View key={i} style={{ borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', padding: 16, marginBottom: 12, gap: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <SkeletonBlock width={40} height={40} radius={8} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <SkeletonBlock width="40%" height={16} />
+                  <SkeletonBlock width="60%" height={10} />
+                </View>
+                <SkeletonBlock width={70} height={20} />
+              </View>
+              <SkeletonBlock height={36} radius={8} />
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="purchasing">
+      <StateSection title="PURCHASING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
-          <Text className="text-text-muted text-sm mt-3">Обработка платежа...</Text>
+          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,170,108,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            <Feather name="credit-card" size={28} color="#00AA6C" />
+          </View>
+          <Text style={{ color: '#1A1A1A', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Обработка платежа...</Text>
+          <Text style={{ color: '#737373', fontSize: 14 }}>Пожалуйста, подождите</Text>
+          <View style={{ width: '50%', height: 4, backgroundColor: '#E8EDF0', borderRadius: 2, marginTop: 24, overflow: 'hidden' }}>
+            <View style={{ width: '60%', height: 4, backgroundColor: '#00AA6C', borderRadius: 2 }} />
+          </View>
         </View>
       </StateSection>
 
-      <StateSection title="error">
+      <StateSection title="ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center px-4">
           <View className="w-16 h-16 rounded-full bg-error/10 items-center justify-center mb-2">
             <Feather name="alert-circle" size={40} color="#ef4444" />

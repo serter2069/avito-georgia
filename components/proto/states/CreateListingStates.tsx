@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockCategories, mockCategoryIcons, mockCities } from '../../../constants/protoMockData';
 
 function Stepper({ current }: { current: number }) {
@@ -31,7 +32,7 @@ export default function CreateListingStates() {
 
   return (
     <View>
-      <StateSection title="step_flow">
+      <StateSection title="STEP_FLOW">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-4">
           <Stepper current={currentStep} />
 
@@ -137,14 +138,20 @@ export default function CreateListingStates() {
         </View>
       </StateSection>
 
-      <StateSection title="submitting">
+      <StateSection title="SUBMITTING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
-          <Text className="text-text-muted text-sm mt-3">Публикация объявления...</Text>
+          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,170,108,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            <Feather name="upload" size={28} color="#00AA6C" />
+          </View>
+          <Text style={{ color: '#1A1A1A', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Публикация...</Text>
+          <Text style={{ color: '#737373', fontSize: 14 }}>Загружаем фотографии и данные</Text>
+          <View style={{ width: '60%', height: 4, backgroundColor: '#E8EDF0', borderRadius: 2, marginTop: 24, overflow: 'hidden' }}>
+            <View style={{ width: '65%', height: 4, backgroundColor: '#00AA6C', borderRadius: 2 }} />
+          </View>
         </View>
       </StateSection>
 
-      <StateSection title="error">
+      <StateSection title="ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-8 items-center">
           <Feather name="alert-circle" size={48} color="#C0392B" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Ошибка публикации</Text>

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, Pressable, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Pressable, useWindowDimensions, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockUsers, mockCities } from '../../../constants/protoMockData';
 
 const C = {
@@ -211,7 +212,7 @@ export default function ProfileStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           {isDesktop ? (
             <View style={{ paddingVertical: 16 }}>
@@ -249,22 +250,25 @@ export default function ProfileStates() {
         </View>
       </StateSection>
 
-      <StateSection title="saving">
+      <StateSection title="SAVING">
         <View style={[{ minHeight: 844 }, containerStyle]} style={{ minHeight: 844, opacity: 0.6 }}>
           <View style={{ paddingVertical: 16, alignItems: 'center' }}>
             <AvatarSection />
             <View style={{ width: '100%', marginTop: 12 }}>
               <FormField label="Имя" value={name} />
               <FormField label="Email" value={user.email} locked />
-              <TouchableOpacity style={{ backgroundColor: C.primary, paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}>
-                <ActivityIndicator color="#ffffff" size="small" />
+              <TouchableOpacity style={{ backgroundColor: C.primary, paddingVertical: 12, borderRadius: 8, alignItems: 'center', opacity: 0.7 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.4)' }} />
+                  <Text style={{ color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>Сохранение...</Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="saved">
+      <StateSection title="SAVED">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View style={{
             backgroundColor: 'rgba(46,125,48,0.08)', borderWidth: 1, borderColor: 'rgba(46,125,48,0.25)',
@@ -284,7 +288,7 @@ export default function ProfileStates() {
         </View>
       </StateSection>
 
-      <StateSection title="error">
+      <StateSection title="ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View style={{
             backgroundColor: 'rgba(192,57,43,0.08)', borderWidth: 1, borderColor: 'rgba(192,57,43,0.25)',

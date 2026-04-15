@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockChatMessages } from '../../../constants/protoMockData';
 
 function ChatBubble({ text, isOwn, time }: { text: string; isOwn: boolean; time: string }) {
@@ -24,7 +25,7 @@ export default function ChatThreadStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           <View className="bg-surface rounded-lg p-3 mb-4 flex-row items-center gap-2">
             <Feather name="tag" size={16} color="#00AA6C" />
@@ -51,13 +52,19 @@ export default function ChatThreadStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <SkeletonBlock height={44} radius={8} style={{ marginBottom: 16 }} />
+          {[1, 2, 3, 4].map(i => (
+            <View key={i} style={{ alignItems: i % 2 === 0 ? 'flex-end' : 'flex-start', marginBottom: 12 }}>
+              <SkeletonBlock width={i % 2 === 0 ? '60%' : '70%'} height={40} radius={16} />
+              <SkeletonBlock width={40} height={8} style={{ marginTop: 4 }} />
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-12 items-center">
           <Feather name="message-circle" size={48} color="#737373" />
           <Text className="text-text-muted text-sm mt-3">Начните диалог</Text>
@@ -79,7 +86,7 @@ export default function ChatThreadStates() {
         </View>
       </StateSection>
 
-      <StateSection title="sending">
+      <StateSection title="SENDING">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           {mockChatMessages.map((msg) => (
             <ChatBubble key={msg.id} text={msg.text} isOwn={msg.isOwn} time={new Date(msg.createdAt).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })} />
@@ -88,7 +95,7 @@ export default function ChatThreadStates() {
             <View className="max-w-[80%] px-4 py-3 rounded-2xl bg-primary rounded-br-sm opacity-50">
               <Text className="text-white text-sm">Отлично, договорились!</Text>
             </View>
-            <ActivityIndicator size="small" color="#00AA6C" className="mt-1" />
+            <Text style={{ fontSize: 11, color: "#737373", marginTop: 2 }}>Отправка...</Text>
           </View>
         </View>
       </StateSection>

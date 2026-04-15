@@ -1,8 +1,9 @@
-import { View, Text, TextInput, TouchableOpacity, Switch, ActivityIndicator,
+import { View, Text, TextInput, TouchableOpacity, Switch,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 
 export default function AdminSettingsStates() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -15,7 +16,7 @@ export default function AdminSettingsStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Настройки сайта</Text>
           <View className="mb-4">
@@ -62,13 +63,20 @@ export default function AdminSettingsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]} style={{ paddingVertical: 16 }}>
+          <SkeletonBlock width={160} height={20} style={{ marginBottom: 24 }} />
+          {[1, 2, 3, 4, 5].map(i => (
+            <View key={i} style={{ marginBottom: 16 }}>
+              <SkeletonBlock width={120} height={12} style={{ marginBottom: 6 }} />
+              <SkeletonBlock height={44} radius={8} />
+            </View>
+          ))}
+          <SkeletonBlock height={44} radius={8} style={{ marginTop: 8 }} />
         </View>
       </StateSection>
 
-      <StateSection title="saving">
+      <StateSection title="SAVING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-4 opacity-50">
           <Text className="text-text-primary text-lg font-bold mb-4">Настройки сайта</Text>
           <View className="mb-4">
@@ -83,13 +91,16 @@ export default function AdminSettingsStates() {
             <Text className="text-text-primary text-sm font-medium">Режим обслуживания</Text>
             <Switch value={false} trackColor={{ false: '#D1D5DB', true: '#00AA6C' }} thumbColor="#ffffff" />
           </View>
-          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center">
-            <ActivityIndicator color="#ffffff" />
+          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center opacity-60">
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.4)' }} />
+              <Text style={{ color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>Сохранение...</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </StateSection>
 
-      <StateSection title="saved">
+      <StateSection title="SAVED">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <View className="bg-success/10 border border-success/30 rounded-lg p-4 flex-row items-center gap-3 mb-4">
             <Feather name="check-circle" size={24} color="#2E7D30" />

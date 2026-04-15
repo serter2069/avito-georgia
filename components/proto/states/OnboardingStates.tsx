@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 
 const CITIES = ['Тбилиси', 'Батуми', 'Кутаиси', 'Рустави', 'Гори', 'Зугдиди'];
 
@@ -19,7 +20,7 @@ export default function OnboardingStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
@@ -73,7 +74,7 @@ export default function OnboardingStates() {
         </View>
       </StateSection>
 
-      <StateSection title="validation_error">
+      <StateSection title="VALIDATION_ERROR">
         <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
@@ -100,7 +101,7 @@ export default function OnboardingStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
+      <StateSection title="LOADING">
         <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>
@@ -119,12 +120,15 @@ export default function OnboardingStates() {
             </View>
           </View>
           <TouchableOpacity className="bg-primary py-3 rounded-lg items-center opacity-50">
-            <ActivityIndicator color="#ffffff" />
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: "rgba(255,255,255,0.4)" }} />
+              <Text style={{ color: "rgba(255,255,255,0.6)", fontWeight: "600", fontSize: 14 }}>Сохранение...</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </StateSection>
 
-      <StateSection title="city_picker_open">
+      <StateSection title="CITY_PICKER_OPEN">
         <View style={[{ minHeight: 844 }, formStyle]} className="py-6">
           <Text className="text-text-primary text-xl font-bold mb-1">Заполните профиль</Text>
           <Text className="text-text-muted text-sm mb-6">Расскажите немного о себе</Text>

@@ -1,28 +1,35 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonCard } from '../SkeletonBlock';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
 
 function CategoryChip({ name, icon, selected, onPress }: { name: string; icon: string; selected?: boolean; onPress?: () => void }) {
   return (
-    <TouchableOpacity className="items-center mr-4 mb-3" onPress={onPress}>
-      <View className={`w-14 h-14 rounded-xl items-center justify-center mb-1 ${selected ? 'bg-primary/20' : 'bg-surface'}`}>
+    <TouchableOpacity style={{ alignItems: 'center', marginRight: 16, marginBottom: 12 }} onPress={onPress}>
+      <View style={{
+        width: 56, height: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 6,
+        backgroundColor: selected ? 'rgba(0,170,108,0.12)' : '#F5F7F8',
+      }}>
         <Feather name={icon as any} size={24} color="#00AA6C" />
       </View>
-      <Text className="text-text-muted text-[10px] text-center">{name}</Text>
+      <Text style={{ color: '#737373', fontSize: 11, textAlign: 'center', fontWeight: '500' }}>{name}</Text>
     </TouchableOpacity>
   );
 }
 
 function ListingCardMini({ title, price, currency, city, seed }: { title: string; price: number | null; currency: string; city: string; seed: string }) {
   return (
-    <View className="bg-white border border-border rounded-lg overflow-hidden mb-3">
+    <View style={{ backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#E8EDF0', overflow: 'hidden', marginBottom: 12 }}>
       <Image source={{ uri: `https://picsum.photos/seed/${seed}/400/300` }} style={{ width: '100%', height: 128 }} />
-      <View className="p-3">
-        <Text className="text-text-primary text-sm font-semibold mb-1" numberOfLines={1}>{title}</Text>
-        <Text className="text-primary font-bold text-base">{price ? `${price.toLocaleString()} ${currency}` : 'Договорная'}</Text>
-        <Text className="text-text-muted text-xs mt-1">{city}</Text>
+      <View style={{ padding: 12 }}>
+        <Text style={{ color: '#1A1A1A', fontSize: 14, fontWeight: '600', marginBottom: 4 }} numberOfLines={1}>{title}</Text>
+        <Text style={{ color: '#00AA6C', fontWeight: '700', fontSize: 16 }}>{price ? `${price.toLocaleString()} ${currency}` : 'Договорная'}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
+          <Feather name="map-pin" size={12} color="#737373" />
+          <Text style={{ color: '#737373', fontSize: 12 }}>{city}</Text>
+        </View>
       </View>
     </View>
   );
@@ -40,103 +47,119 @@ export default function HomepageStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
-          <View className="flex-row items-center gap-2 mb-4">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
             <TextInput
-              className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base"
+              style={{ flex: 1, backgroundColor: '#F5F7F8', borderWidth: 1, borderColor: '#E8EDF0', borderRadius: 10, paddingHorizontal: 16, paddingVertical: 12, fontSize: 15, color: '#1A1A1A' }}
               placeholder="Поиск по объявлениям..."
               placeholderTextColor="#737373"
               editable={false}
             />
-            <TouchableOpacity className="bg-primary p-3 rounded-lg">
+            <TouchableOpacity style={{ backgroundColor: '#00AA6C', padding: 12, borderRadius: 10 }}>
               <Feather name="search" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            className="flex-row items-center gap-2 mb-4 bg-surface px-3 py-2 rounded-lg self-start"
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, backgroundColor: '#F5F7F8', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, alignSelf: 'flex-start' }}
             onPress={() => setSelectedCity(selectedCity ? null : 'Тбилиси')}
           >
             <Feather name="map-pin" size={16} color="#00AA6C" />
-            <Text className="text-primary text-sm font-medium">{selectedCity || 'Тбилиси'}</Text>
+            <Text style={{ color: '#00AA6C', fontSize: 14, fontWeight: '600' }}>{selectedCity || 'Тбилиси'}</Text>
             <Feather name="chevron-down" size={14} color="#00AA6C" />
           </TouchableOpacity>
-          <View className="flex-row flex-wrap mb-4">
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 16 }}>
             {mockCategories.map((cat) => (
-              <CategoryChip
-                key={cat}
-                name={cat}
-                icon={mockCategoryIcons[cat] || 'grid'}
-                selected={selectedCategory === cat}
-                onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-              />
+              <CategoryChip key={cat} name={cat} icon={mockCategoryIcons[cat] || 'grid'} selected={selectedCategory === cat} onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)} />
             ))}
           </View>
-          <Text className="text-text-primary text-lg font-bold mb-3">Последние объявления</Text>
-          <View className="flex-row flex-wrap gap-3">
-            {mockListings.filter(l => l.status === 'active').slice(0, isDesktop ? 6 : 6).map((l, idx) => (
-              <View key={l.id} style={{ width: colWidth }}>
+          <Text style={{ color: '#1A1A1A', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>Последние объявления</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            {mockListings.filter(l => l.status === 'active').slice(0, 6).map((l, idx) => (
+              <View key={l.id} style={{ width: colWidth as any }}>
                 <ListingCardMini title={l.title} price={l.price} currency={l.currency} city={l.city} seed={`listing${idx + 1}`} />
               </View>
             ))}
           </View>
-          <TouchableOpacity className="bg-primary py-3 rounded-lg items-center mt-4">
-            <Text className="text-white font-semibold">Разместить объявление</Text>
+          <TouchableOpacity style={{ backgroundColor: '#00AA6C', paddingVertical: 14, borderRadius: 10, alignItems: 'center', marginTop: 16 }}>
+            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 15 }}>Разместить объявление</Text>
           </TouchableOpacity>
-          <View className="mt-6 pt-4 border-t border-border">
-            <Text className="text-text-muted text-xs text-center">Avito Georgia 2026</Text>
+          <View style={{ marginTop: 24, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#E8EDF0' }}>
+            <Text style={{ color: '#737373', fontSize: 12, textAlign: 'center' }}>Avito Georgia 2026</Text>
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="loading_listings">
+      <StateSection title="LOADING">
         <View style={[{ minHeight: 844 }, containerStyle]}>
-          <View className="flex-row items-center gap-2 mb-4">
-            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
-            <TouchableOpacity className="bg-primary p-3 rounded-lg">
-              <Feather name="search" size={20} color="#fff" />
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+            <SkeletonBlock height={46} radius={10} style={{ flex: 1 }} />
+            <SkeletonBlock width={46} height={46} radius={10} />
+          </View>
+          <SkeletonBlock width={120} height={36} radius={8} style={{ marginBottom: 16 }} />
+          <View style={{ flexDirection: 'row', gap: 16, marginBottom: 24 }}>
+            {[1, 2, 3, 4, 5].map(i => (
+              <View key={i} style={{ alignItems: 'center', gap: 6 }}>
+                <SkeletonBlock width={56} height={56} radius={14} />
+                <SkeletonBlock width={48} height={10} />
+              </View>
+            ))}
+          </View>
+          <SkeletonBlock width={180} height={18} style={{ marginBottom: 12 }} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            {[1, 2, 3, 4].map(i => (
+              <View key={i} style={{ width: isDesktop ? '48%' as any : '48%' as any }}>
+                <SkeletonCard />
+              </View>
+            ))}
+          </View>
+        </View>
+      </StateSection>
+
+      <StateSection title="EMPTY">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <View style={{ paddingVertical: 64, alignItems: 'center' }}>
+            <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: '#F5F7F8', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+              <Feather name="inbox" size={32} color="#737373" />
+            </View>
+            <Text style={{ color: '#1A1A1A', fontSize: 18, fontWeight: '700', marginBottom: 6 }}>Пока нет объявлений</Text>
+            <Text style={{ color: '#737373', fontSize: 14, textAlign: 'center', maxWidth: 280 }}>Будьте первым, кто разместит объявление!</Text>
+            <TouchableOpacity style={{ backgroundColor: '#00AA6C', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10, marginTop: 20 }}>
+              <Text style={{ color: '#fff', fontWeight: '600' }}>Разместить</Text>
             </TouchableOpacity>
           </View>
-          <View className="py-12 items-center">
-            <ActivityIndicator size="large" color="#00AA6C" />
-            <Text className="text-text-muted text-sm mt-3">Загрузка объявлений...</Text>
-          </View>
         </View>
       </StateSection>
 
-      <StateSection title="empty_listings">
+      <StateSection title="ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]}>
-          <View className="flex-row items-center gap-2 mb-4">
-            <TextInput className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-base" placeholder="Поиск по объявлениям..." placeholderTextColor="#737373" editable={false} />
-            <TouchableOpacity className="bg-primary p-3 rounded-lg">
-              <Feather name="search" size={20} color="#fff" />
+          <View style={{ paddingVertical: 64, alignItems: 'center' }}>
+            <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: '#FFEBEE', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+              <Feather name="wifi-off" size={32} color="#D32F2F" />
+            </View>
+            <Text style={{ color: '#1A1A1A', fontSize: 18, fontWeight: '700', marginBottom: 6 }}>Ошибка загрузки</Text>
+            <Text style={{ color: '#737373', fontSize: 14, textAlign: 'center', maxWidth: 280, marginBottom: 20 }}>
+              Не удалось загрузить объявления. Проверьте интернет-соединение.
+            </Text>
+            <TouchableOpacity style={{ backgroundColor: '#00AA6C', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10 }}>
+              <Text style={{ color: '#fff', fontWeight: '600' }}>Повторить</Text>
             </TouchableOpacity>
           </View>
-          <View className="py-12 items-center">
-            <Feather name="inbox" size={48} color="#737373" />
-            <Text className="text-text-primary text-lg font-semibold mt-3">Пока нет объявлений</Text>
-            <Text className="text-text-muted text-sm mt-1">Будьте первым, кто разместит!</Text>
+        </View>
+      </StateSection>
+
+      <StateSection title="GUEST_CTA">
+        <View style={[{ minHeight: 400 }, containerStyle]}>
+          <View style={{ backgroundColor: '#F5F7F8', borderRadius: 12, padding: 24, alignItems: 'center' }}>
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(0,170,108,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Feather name="user-plus" size={24} color="#00AA6C" />
+            </View>
+            <Text style={{ color: '#1A1A1A', fontSize: 18, fontWeight: '700', marginBottom: 6 }}>Присоединяйтесь!</Text>
+            <Text style={{ color: '#737373', fontSize: 14, textAlign: 'center', marginBottom: 16 }}>Войдите, чтобы размещать объявления и сохранять избранное</Text>
+            <TouchableOpacity style={{ backgroundColor: '#00AA6C', paddingVertical: 12, paddingHorizontal: 32, borderRadius: 10 }}>
+              <Text style={{ color: '#fff', fontWeight: '600' }}>Войти</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      </StateSection>
-
-      <StateSection title="guest_cta">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-surface rounded-lg p-4 items-center">
-          <Text className="text-text-primary text-lg font-bold mb-2">Присоединяйтесь!</Text>
-          <Text className="text-text-muted text-sm text-center mb-4">Войдите, чтобы размещать объявления и сохранять избранное</Text>
-          <TouchableOpacity className="bg-primary py-3 px-6 rounded-lg">
-            <Text className="text-white font-semibold">Войти</Text>
-          </TouchableOpacity>
-        </View>
-      </StateSection>
-
-      <StateSection title="user_cta">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="bg-surface rounded-lg p-4 items-center">
-          <Text className="text-text-primary text-lg font-bold mb-2">Продайте быстрее!</Text>
-          <Text className="text-text-muted text-sm text-center mb-4">Продвиньте ваше объявление и получите больше просмотров</Text>
-          <TouchableOpacity className="bg-secondary py-3 px-6 rounded-lg">
-            <Text className="text-white font-semibold">Продвинуть</Text>
-          </TouchableOpacity>
         </View>
       </StateSection>
     </View>

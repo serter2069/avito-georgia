@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockListings, mockCategories, mockCategoryIcons } from '../../../constants/protoMockData';
 
 export default function SearchStates() {
@@ -15,7 +16,7 @@ export default function SearchStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row gap-2 mb-3">
             <TextInput
@@ -85,16 +86,25 @@ export default function SearchStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
+      <StateSection title="LOADING">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Toyota" editable={false} />
-          <View className="py-12 items-center">
-            <ActivityIndicator size="large" color="#00AA6C" />
+          <View style={{ gap: 12, paddingTop: 8 }}>
+            {[1, 2, 3].map(i => (
+              <View key={i} style={{ flexDirection: 'row', borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', overflow: 'hidden' }}>
+                <SkeletonBlock width={96} height={96} radius={0} />
+                <View style={{ flex: 1, padding: 12, gap: 8 }}>
+                  <SkeletonBlock width="70%" height={14} />
+                  <SkeletonBlock width="40%" height={16} />
+                  <SkeletonBlock width="30%" height={10} />
+                </View>
+              </View>
+            ))}
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" placeholder="Что ищете?" placeholderTextColor="#737373" editable={false} />
           <View className="py-12 items-center">
@@ -105,7 +115,7 @@ export default function SearchStates() {
         </View>
       </StateSection>
 
-      <StateSection title="filtered_empty">
+      <StateSection title="FILTERED_EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Ламборгини Кутаиси" editable={false} />
           <View className="py-12 items-center">
@@ -116,7 +126,7 @@ export default function SearchStates() {
         </View>
       </StateSection>
 
-      <StateSection title="map_view">
+      <StateSection title="MAP_VIEW">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <TextInput className="bg-surface border border-border rounded-lg px-4 py-3 text-base mb-3" value="Квартира Тбилиси" editable={false} />
           <View className="flex-row items-center justify-between mb-3">
