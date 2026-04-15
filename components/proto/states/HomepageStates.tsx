@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../ProtoPlaceholderImage';
@@ -10,117 +11,17 @@ const C = {
   text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8',
 };
 
-// ─── View-drawn category icons (no SVG, no Image, guaranteed cross-platform) ──
-function IconAll({ color }: { color: string }) {
-  const s = 7;
-  return (
-    <View style={{ width: 20, height: 20, flexWrap: 'wrap', flexDirection: 'row', gap: 2 }}>
-      {[0,1,2,3].map(i => <View key={i} style={{ width: s, height: s, borderRadius: 2, backgroundColor: color }} />)}
-    </View>
-  );
-}
-function IconAuto({ color }: { color: string }) {
-  return (
-    <View style={{ width: 22, height: 16, position: 'relative' }}>
-      <View style={{ position: 'absolute', bottom: 4, left: 0, right: 0, height: 7, borderRadius: 3, backgroundColor: color }} />
-      <View style={{ position: 'absolute', top: 0, left: 4, right: 4, height: 8, borderRadius: 3, backgroundColor: color }} />
-      <View style={{ position: 'absolute', bottom: 0, left: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
-      <View style={{ position: 'absolute', bottom: 0, right: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
-    </View>
-  );
-}
-function IconRealty({ color }: { color: string }) {
-  return (
-    <View style={{ width: 20, height: 20, alignItems: 'center' }}>
-      {/* roof triangle */}
-      <View style={{ width: 0, height: 0, borderLeftWidth: 10, borderRightWidth: 10, borderBottomWidth: 8, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: color }} />
-      {/* body */}
-      <View style={{ width: 14, height: 11, backgroundColor: color, borderRadius: 1 }}>
-        {/* door */}
-        <View style={{ position: 'absolute', bottom: 0, left: 5, width: 4, height: 5, backgroundColor: C.white, borderRadius: 1 }} />
-      </View>
-    </View>
-  );
-}
-function IconTech({ color }: { color: string }) {
-  return (
-    <View style={{ width: 13, height: 20, borderRadius: 3, borderWidth: 2, borderColor: color, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 2 }}>
-      <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: color }} />
-    </View>
-  );
-}
-function IconClothes({ color }: { color: string }) {
-  return (
-    <View style={{ width: 20, height: 18, position: 'relative' }}>
-      {/* sleeves */}
-      <View style={{ position: 'absolute', top: 0, left: 0, width: 7, height: 7, borderRadius: 2, backgroundColor: color, transform: [{ rotate: '-20deg' }] }} />
-      <View style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: 2, backgroundColor: color, transform: [{ rotate: '20deg' }] }} />
-      {/* body */}
-      <View style={{ position: 'absolute', bottom: 0, left: 3, right: 3, top: 5, backgroundColor: color, borderRadius: 2 }} />
-    </View>
-  );
-}
-function IconHome({ color }: { color: string }) {
-  return (
-    <View style={{ width: 22, height: 16, position: 'relative' }}>
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 10, borderRadius: 2, backgroundColor: color }} />
-      <View style={{ position: 'absolute', top: 2, left: 3, right: 3, height: 6, borderRadius: 2, backgroundColor: color, opacity: 0.6 }} />
-      {/* legs */}
-      <View style={{ position: 'absolute', bottom: -2, left: 2, width: 3, height: 3, backgroundColor: color }} />
-      <View style={{ position: 'absolute', bottom: -2, right: 2, width: 3, height: 3, backgroundColor: color }} />
-    </View>
-  );
-}
-function IconJobs({ color }: { color: string }) {
-  return (
-    <View style={{ width: 22, height: 18, alignItems: 'center' }}>
-      {/* handle */}
-      <View style={{ width: 10, height: 4, borderTopLeftRadius: 3, borderTopRightRadius: 3, borderWidth: 2, borderColor: color, borderBottomWidth: 0, marginBottom: -1 }} />
-      {/* case */}
-      <View style={{ width: 22, height: 13, borderRadius: 3, borderWidth: 2, borderColor: color }}>
-        <View style={{ position: 'absolute', top: 4, left: 0, right: 0, height: 1.5, backgroundColor: color }} />
-      </View>
-    </View>
-  );
-}
-function IconServices({ color }: { color: string }) {
-  return (
-    <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ width: 8, height: 8, borderRadius: 4, borderWidth: 2, borderColor: color }} />
-      {[[0,0],[0,9],[9,0],[9,9],[4.5,0],[4.5,9],[0,4.5],[9,4.5]].map(([l,t], i) => (
-        <View key={i} style={{ position: 'absolute', width: 3, height: 3, borderRadius: 1.5, backgroundColor: color, top: t + 4, left: l + 4 }} />
-      ))}
-    </View>
-  );
-}
-function IconAnimals({ color }: { color: string }) {
-  return (
-    <View style={{ width: 20, height: 20, position: 'relative' }}>
-      <View style={{ position: 'absolute', top: 0, left: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
-      <View style={{ position: 'absolute', top: 0, right: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
-      <View style={{ position: 'absolute', top: 4, left: 0, width: 4, height: 4, borderRadius: 2, backgroundColor: color }} />
-      <View style={{ position: 'absolute', top: 4, right: 0, width: 4, height: 4, borderRadius: 2, backgroundColor: color }} />
-      <View style={{ position: 'absolute', bottom: 0, left: 3, right: 3, height: 9, borderRadius: 4, backgroundColor: color }} />
-    </View>
-  );
-}
-
-const CAT_ICONS: Record<string, React.ComponentType<{ color: string }>> = {
-  all: IconAll, auto: IconAuto, realty: IconRealty, tech: IconTech,
-  clothes: IconClothes, home: IconHome, jobs: IconJobs, services: IconServices, animals: IconAnimals,
-};
-
 // ─── Category definitions ────────────────────────────────────────────────────
-const CATEGORIES = [
-  { id: 'all',      label: 'Все',      bg: '#E8F9F2', color: '#00AA6C' },
-  { id: 'auto',     label: 'Авто',     bg: '#E3F2FD', color: '#1976D2' },
-  { id: 'realty',   label: 'Жильё',    bg: '#E8F5E9', color: '#388E3C' },
-  { id: 'tech',     label: 'Техника',  bg: '#EDE7F6', color: '#7B1FA2' },
-  { id: 'clothes',  label: 'Одежда',   bg: '#FCE4EC', color: '#C2185B' },
-  { id: 'home',     label: 'Дом',      bg: '#FFF3E0', color: '#E65100' },
-  { id: 'jobs',     label: 'Работа',   bg: '#F3E5F5', color: '#6A1B9A' },
-  { id: 'services', label: 'Услуги',   bg: '#E0F2F1', color: '#00695C' },
-  { id: 'animals',  label: 'Животные', bg: '#FFF8E1', color: '#F57F17' },
+const CATEGORIES: { id: string; label: string; bg: string; color: string; icon: string }[] = [
+  { id: 'all',      label: 'Все',      bg: '#E8F9F2', color: '#00AA6C', icon: 'grid-outline' },
+  { id: 'auto',     label: 'Авто',     bg: '#E3F2FD', color: '#1976D2', icon: 'car-outline' },
+  { id: 'realty',   label: 'Жильё',    bg: '#E8F5E9', color: '#388E3C', icon: 'home-outline' },
+  { id: 'tech',     label: 'Техника',  bg: '#EDE7F6', color: '#7B1FA2', icon: 'phone-portrait-outline' },
+  { id: 'clothes',  label: 'Одежда',   bg: '#FCE4EC', color: '#C2185B', icon: 'shirt-outline' },
+  { id: 'home',     label: 'Дом',      bg: '#FFF3E0', color: '#E65100', icon: 'bed-outline' },
+  { id: 'jobs',     label: 'Работа',   bg: '#F3E5F5', color: '#6A1B9A', icon: 'briefcase-outline' },
+  { id: 'services', label: 'Услуги',   bg: '#E0F2F1', color: '#00695C', icon: 'construct-outline' },
+  { id: 'animals',  label: 'Животные', bg: '#FFF8E1', color: '#F57F17', icon: 'paw-outline' },
 ];
 
 const CITIES = ['Все города', 'Тбилиси', 'Батуми', 'Кутаиси', 'Рустави', 'Гори', 'Зугдиди'];
@@ -284,11 +185,10 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: hPad, paddingVertical: 10, gap: 10 }}>
           {CATEGORIES.map((cat) => {
             const active = category === cat.id;
-            const IconComp = CAT_ICONS[cat.id];
             return (
               <Pressable key={cat.id} onPress={() => setCategory(cat.id)} style={{ alignItems: 'center', gap: 5, minWidth: 52 }}>
                 <View style={{ width: 48, height: 48, borderRadius: 13, backgroundColor: active ? cat.color : cat.bg, alignItems: 'center', justifyContent: 'center', borderWidth: active ? 0 : 1, borderColor: C.border }}>
-                  {IconComp && <IconComp color={active ? '#fff' : cat.color} />}
+                  <Ionicons name={cat.icon as any} size={22} color={active ? '#fff' : cat.color} />
                 </View>
                 <Text style={{ fontSize: 10, color: active ? cat.color : C.muted, fontWeight: active ? '700' : '400', textAlign: 'center' }} numberOfLines={1}>
                   {cat.label}

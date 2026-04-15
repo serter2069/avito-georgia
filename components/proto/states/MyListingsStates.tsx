@@ -9,13 +9,15 @@ const C = {
   greenBg: '#E8F9F2',
   white: '#FFFFFF',
   text: '#1A1A1A',
-  muted: '#9E9E9E',
-  border: '#E8E8E8',
+  sub: '#6B6B6B',
+  muted: '#B0B0B0',
+  border: '#EFEFEF',
   error: '#D32F2F',
-  warn: '#F59E0B',
-  page: '#F5F5F5',
+  errorBg: '#FEE2E2',
+  warnBg: '#FEF3C7',
+  warnTxt: '#92400E',
+  page: '#F7F7F7',
 };
-const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7', '#FFF9C4', '#FFCCBC'];
 
 type Tab = 'active' | 'inactive' | 'draft';
 
@@ -26,8 +28,8 @@ interface Listing {
   views: string;
   photos: number;
   colorIdx: number;
-  expiresDate?: string;   // 'DD.MM.YYYY' — only for active
-  daysLeft?: number;      // computed for display
+  expiresDate?: string;
+  daysLeft?: number;
 }
 
 const LISTINGS: Record<Tab, Listing[]> = {
@@ -46,13 +48,13 @@ const LISTINGS: Record<Tab, Listing[]> = {
   ],
 };
 
-const TAB_DEFS: { key: Tab; label: string; count: number }[] = [
-  { key: 'active', label: 'Активные', count: 3 },
-  { key: 'inactive', label: 'Неактивные', count: 2 },
-  { key: 'draft', label: 'Черновики', count: 2 },
+const TAB_DEFS: { key: Tab; label: string }[] = [
+  { key: 'active',   label: 'Активные'   },
+  { key: 'inactive', label: 'Неактивные' },
+  { key: 'draft',    label: 'Черновики'  },
 ];
 
-function ListingCard({
+function ListingRow({
   listing,
   tab,
   onDelete,
@@ -61,131 +63,72 @@ function ListingCard({
   tab: Tab;
   onDelete: (id: number) => void;
 }) {
-  const [liked, setLiked] = useState(false);
+  const urgent = tab === 'active' && (listing.daysLeft ?? 99) <= 3;
+  const soon   = tab === 'active' && !urgent && (listing.daysLeft ?? 99) <= 7;
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderBottomColor: C.border,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        gap: 12,
-        backgroundColor: C.white,
-      }}
-    >
-      {/* Image */}
-      <View style={{ position: 'relative', width: 88, height: 88, borderRadius: 8, overflow: 'hidden' }}>
-        <ProtoImage seed={listing.colorIdx + 50} width={88} height={88} style={{ borderRadius: 6 }} />
-        {/* Heart */}
-        <Pressable
-          onPress={() => setLiked(!liked)}
-          style={{
-            position: 'absolute',
-            top: 4,
-            right: 4,
-            width: 26,
-            height: 26,
-            borderRadius: 13,
-            backgroundColor: 'rgba(255,255,255,0.85)',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ fontSize: 14, color: liked ? '#E53935' : C.muted }}>{liked ? '\u2665' : '\u2661'}</Text>
-        </Pressable>
-        {/* Photo count */}
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 4,
-            right: 4,
-            backgroundColor: 'rgba(0,0,0,0.55)',
-            borderRadius: 4,
-            paddingHorizontal: 5,
-            paddingVertical: 2,
-          }}
-        >
-          <Text style={{ color: C.white, fontSize: 10, fontWeight: '600' }}>{listing.photos} фото</Text>
-        </View>
+    <View style={{ flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 14, gap: 12, backgroundColor: C.white }}>
+      {/* Thumbnail */}
+      <View style={{ borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
+        <ProtoImage seed={listing.colorIdx + 50} width={72} height={72} />
       </View>
 
       {/* Info */}
-      <View style={{ flex: 1, gap: 4 }}>
-        <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }} numberOfLines={2}>
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text style={{ fontSize: 14, fontWeight: '500', color: C.text, lineHeight: 19 }} numberOfLines={2}>
           {listing.title}
         </Text>
-        <Text style={{ fontSize: 15, fontWeight: '700', color: C.green }}>{listing.price}</Text>
-        {listing.views ? (
-          <Text style={{ fontSize: 12, color: C.muted }}>{listing.views}</Text>
-        ) : (
-          <View style={{ alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
-            <Text style={{ fontSize: 11, fontWeight: '600', color: C.muted }}>Черновик</Text>
-          </View>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: C.text }}>{listing.price}</Text>
+          {listing.views ? (
+            <Text style={{ fontSize: 12, color: C.muted }}>{listing.views}</Text>
+          ) : (
+            <Text style={{ fontSize: 11, color: C.muted }}>черновик</Text>
+          )}
+        </View>
+
+        {/* Expiry line */}
+        {tab === 'active' && listing.expiresDate && (
+          <Text style={{
+            fontSize: 11,
+            color: urgent ? C.error : soon ? C.warnTxt : C.muted,
+            fontWeight: (urgent || soon) ? '600' : '400',
+          }}>
+            {urgent
+              ? `Истекает ${listing.daysLeft === 1 ? 'завтра' : `через ${listing.daysLeft} дн.`} · ${listing.expiresDate}`
+              : soon
+              ? `Ещё ${listing.daysLeft} дн. · до ${listing.expiresDate}`
+              : `До ${listing.expiresDate}`}
+          </Text>
         )}
 
-        {/* Expiry badge for active listings */}
-        {tab === 'active' && listing.expiresDate && (() => {
-          const urgent = (listing.daysLeft ?? 99) <= 3;
-          const soon   = !urgent && (listing.daysLeft ?? 99) <= 7;
-          const bgColor  = urgent ? '#FEE2E2' : soon ? '#FEF3C7' : C.greenBg;
-          const txtColor = urgent ? C.error   : soon ? '#92400E' : C.green;
-          const label = urgent
-            ? `Истекает ${listing.daysLeft === 1 ? 'завтра' : `через ${listing.daysLeft} дн.`} · ${listing.expiresDate}`
-            : soon
-            ? `Ещё ${listing.daysLeft} дн. · до ${listing.expiresDate}`
-            : `Активно до ${listing.expiresDate}`;
-          return (
-            <View style={{ alignSelf: 'flex-start', backgroundColor: bgColor, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3, marginTop: 2 }}>
-              <Text style={{ fontSize: 11, fontWeight: '600', color: txtColor }}>{label}</Text>
-            </View>
-          );
-        })()}
-
         {/* Actions */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
+        <View style={{ flexDirection: 'row', gap: 14, marginTop: 4 }}>
           {tab === 'active' && (
             <>
               <Pressable>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: C.green }}>Редактировать</Text>
+                <Text style={{ fontSize: 12, color: C.green, fontWeight: '500' }}>Редактировать</Text>
               </Pressable>
               {(listing.daysLeft ?? 99) <= 7 && (
                 <Pressable>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: (listing.daysLeft ?? 99) <= 3 ? C.error : '#92400E' }}>Продлить — 3 ₾</Text>
+                  <Text style={{ fontSize: 12, color: urgent ? C.error : C.warnTxt, fontWeight: '600' }}>Продлить — 3 ₾</Text>
                 </Pressable>
               )}
             </>
           )}
           {tab === 'inactive' && (
-            <Pressable
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: C.greenBg,
-                borderRadius: 6,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-                gap: 4,
-              }}
-            >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: C.green }}>Возобновить — 3 GEL</Text>
+            <Pressable>
+              <Text style={{ fontSize: 12, color: C.green, fontWeight: '600' }}>Возобновить — 3 ₾</Text>
             </Pressable>
           )}
           {tab === 'draft' && (
             <>
-              <Pressable
-                style={{
-                  backgroundColor: C.green,
-                  borderRadius: 6,
-                  paddingHorizontal: 10,
-                  paddingVertical: 4,
-                }}
-              >
-                <Text style={{ fontSize: 13, fontWeight: '700', color: C.white }}>Опубликовать</Text>
+              <Pressable>
+                <Text style={{ fontSize: 12, color: C.green, fontWeight: '600' }}>Опубликовать</Text>
               </Pressable>
               <Pressable onPress={() => onDelete(listing.id)}>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: C.error }}>Удалить</Text>
+                <Text style={{ fontSize: 12, color: C.muted }}>Удалить</Text>
               </Pressable>
             </>
           )}
@@ -204,32 +147,36 @@ function MyListingsInteractive() {
   const [items, setItems] = useState<Record<Tab, Listing[]>>(LISTINGS);
 
   const handleDelete = (id: number) => {
-    setItems((prev) => ({
-      ...prev,
-      draft: prev.draft.filter((l) => l.id !== id),
-    }));
+    setItems((prev) => ({ ...prev, draft: prev.draft.filter((l) => l.id !== id) }));
   };
 
-  const currentList = items[tab];
+  const counts: Record<Tab, number> = {
+    active:   items.active.length,
+    inactive: items.inactive.length,
+    draft:    items.draft.length,
+  };
 
   const tabBar = (
-    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: C.border }}>
-      {TAB_DEFS.map(({ key, label, count }) => {
+    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: C.border, paddingHorizontal: 4 }}>
+      {TAB_DEFS.map(({ key, label }) => {
         const active = tab === key;
         return (
           <Pressable
             key={key}
             onPress={() => setTab(key)}
             style={{
-              flex: 1,
-              alignItems: 'center',
-              paddingVertical: 12,
-              borderBottomWidth: active ? 2 : 0,
-              borderBottomColor: C.green,
+              paddingHorizontal: 12,
+              paddingVertical: 11,
+              borderBottomWidth: 2,
+              borderBottomColor: active ? C.green : 'transparent',
+              marginBottom: -1,
             }}
           >
-            <Text style={{ fontSize: 13, fontWeight: '600', color: active ? C.green : C.muted }}>
-              {label} ({key === 'draft' ? items.draft.length : count})
+            <Text style={{ fontSize: 13, color: active ? C.green : C.sub, fontWeight: active ? '600' : '400' }}>
+              {label}
+              {counts[key] > 0 && (
+                <Text style={{ fontSize: 12, color: active ? C.green : C.muted }}> {counts[key]}</Text>
+              )}
             </Text>
           </Pressable>
         );
@@ -237,17 +184,20 @@ function MyListingsInteractive() {
     </View>
   );
 
+  const currentList = items[tab];
+
   const listContent = (
-    <View>
+    <View style={{ backgroundColor: C.page }}>
       {currentList.length === 0 ? (
-        <View style={{ alignItems: 'center', paddingVertical: 48, paddingHorizontal: 24 }}>
-          <Text style={{ fontSize: 15, fontWeight: '600', color: C.muted, textAlign: 'center' }}>
-            Нет объявлений
-          </Text>
+        <View style={{ alignItems: 'center', paddingVertical: 48 }}>
+          <Text style={{ fontSize: 14, color: C.muted }}>Нет объявлений</Text>
         </View>
       ) : (
-        currentList.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} tab={tab} onDelete={handleDelete} />
+        currentList.map((listing, i) => (
+          <View key={listing.id}>
+            {i > 0 && <View style={{ height: 1, backgroundColor: C.border, marginLeft: 100 }} />}
+            <ListingRow listing={listing} tab={tab} onDelete={handleDelete} />
+          </View>
         ))
       )}
     </View>
@@ -255,17 +205,10 @@ function MyListingsInteractive() {
 
   if (isDesktop) {
     return (
-      <View style={{ flexDirection: 'row', gap: 0 }}>
-        {/* Sidebar tabs */}
-        <View
-          style={{
-            width: 200,
-            borderRightWidth: 1,
-            borderRightColor: C.border,
-            paddingTop: 8,
-          }}
-        >
-          {TAB_DEFS.map(({ key, label, count }) => {
+      <View style={{ flexDirection: 'row' }}>
+        {/* Sidebar */}
+        <View style={{ width: 180, borderRightWidth: 1, borderRightColor: C.border }}>
+          {TAB_DEFS.map(({ key, label }) => {
             const active = tab === key;
             return (
               <Pressable
@@ -273,23 +216,20 @@ function MyListingsInteractive() {
                 onPress={() => setTab(key)}
                 style={{
                   paddingHorizontal: 16,
-                  paddingVertical: 14,
+                  paddingVertical: 12,
+                  borderLeftWidth: 2,
+                  borderLeftColor: active ? C.green : 'transparent',
                   backgroundColor: active ? C.greenBg : C.white,
-                  borderLeftWidth: active ? 3 : 0,
-                  borderLeftColor: C.green,
                 }}
               >
-                <Text style={{ fontSize: 14, fontWeight: active ? '700' : '500', color: active ? C.green : C.text }}>
+                <Text style={{ fontSize: 13, color: active ? C.green : C.text, fontWeight: active ? '600' : '400' }}>
                   {label}
                 </Text>
-                <Text style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
-                  {key === 'draft' ? items.draft.length : count} объявлений
-                </Text>
+                <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>{counts[key]} объявлений</Text>
               </Pressable>
             );
           })}
         </View>
-        {/* Listings */}
         <View style={{ flex: 1 }}>{listContent}</View>
       </View>
     );
@@ -310,20 +250,16 @@ function MyListingsEmpty() {
 
   return (
     <View>
-      <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Мои объявления</Text>
+      <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border }}>
+        <Text style={{ fontSize: 17, fontWeight: '600', color: C.text }}>Мои объявления</Text>
       </View>
-      <View style={{ alignItems: 'center', paddingVertical: 64, paddingHorizontal: 24 }}>
-        <Text style={{ fontSize: 16, fontWeight: '600', color: C.text, textAlign: 'center', marginBottom: 8 }}>
-          Нет объявлений
-        </Text>
-        <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', marginBottom: 20 }}>
+      <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 32 }}>
+        <Text style={{ fontSize: 15, fontWeight: '500', color: C.text, marginBottom: 6 }}>Нет объявлений</Text>
+        <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', marginBottom: 24, lineHeight: 18 }}>
           3 бесплатных объявления в каждой категории
         </Text>
-        <Pressable
-          style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 12 }}
-        >
-          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Подать объявление</Text>
+        <Pressable style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 22, paddingVertical: 11 }}>
+          <Text style={{ color: C.white, fontWeight: '600', fontSize: 14 }}>Подать объявление</Text>
         </Pressable>
       </View>
       {isMobile && <BottomNav active="browse" />}
@@ -338,33 +274,11 @@ export default function MyListingsStates() {
   return (
     <View style={{ gap: 0 }}>
       <StateSection title="MY_LISTINGS / Interactive Tabs (active/inactive/draft)">
-        <View
-          style={
-            isDesktop
-              ? {
-                  borderWidth: 1,
-                  borderColor: C.border,
-                  borderRadius: 12,
-                  overflow: 'hidden',
-                  backgroundColor: C.white,
-                }
-              : { backgroundColor: C.white }
-          }
-        >
-          <View
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 12,
-              borderBottomWidth: 1,
-              borderBottomColor: C.border,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Мои объявления</Text>
-            <Pressable>
-              <Text style={{ fontSize: 22, color: C.green, fontWeight: '300' }}>+</Text>
+        <View style={isDesktop ? { borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', backgroundColor: C.white } : { backgroundColor: C.white }}>
+          <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={{ fontSize: 17, fontWeight: '600', color: C.text }}>Мои объявления</Text>
+            <Pressable style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: C.border }}>
+              <Text style={{ fontSize: 13, color: C.green, fontWeight: '500' }}>+ Подать</Text>
             </Pressable>
           </View>
           <MyListingsInteractive />
@@ -372,13 +286,7 @@ export default function MyListingsStates() {
       </StateSection>
 
       <StateSection title="MY_LISTINGS / Empty State">
-        <View
-          style={
-            isDesktop
-              ? { borderWidth: 1, borderColor: C.border, borderRadius: 12, overflow: 'hidden', backgroundColor: C.white }
-              : { backgroundColor: C.white }
-          }
-        >
+        <View style={isDesktop ? { borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', backgroundColor: C.white } : { backgroundColor: C.white }}>
           <MyListingsEmpty />
         </View>
       </StateSection>
