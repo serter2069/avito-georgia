@@ -33,7 +33,7 @@ function InputField({ label, value, suffix }: {
         <TextInput
           value={value}
           
-          style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent' }}
+          style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
         />
         {suffix && <Text className="text-sm text-[#737373] ml-2">{suffix}</Text>}
       </View>

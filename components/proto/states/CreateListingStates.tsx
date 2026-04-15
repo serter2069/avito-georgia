@@ -55,7 +55,7 @@ function InputField({ label, placeholder, value, suffix, multiline }: {
           value={value}
           
           multiline={multiline}
-          style={multiline ? { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, height: 80, textAlignVertical: 'top', borderWidth: 0, backgroundColor: 'transparent' } : { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent' }}
+          style={multiline ? { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, height: 80, textAlignVertical: 'top', borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' } : { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
         />
         {suffix && <Text className="text-sm text-[#737373] ml-2">{suffix}</Text>}
       </View>

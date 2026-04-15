@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+
+// ─── Image Placeholder ───────────────────────────────────────────────────────
+function ImgPlaceholder({ height = 260, color = '#BBDEFB' }: { height?: number; color?: string }) {
+  return <View style={{ height, backgroundColor: color, width: '100%' }} />;
+}
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
@@ -26,20 +31,22 @@ function Header() {
   );
 }
 
+const GALLERY_COLORS = ['#BBDEFB', '#C8E6C9', '#F8BBD0', '#E1BEE7'];
+
 function PhotoGallery() {
+  const [activePhoto, setActivePhoto] = useState(0);
   return (
-    <View className="bg-[#E8E8E8] relative" style={{ height: 220, width: '100%' }}>
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-[#B0B0B0] text-base">Фото объявления</Text>
+    <View style={{ height: 260, width: '100%', position: 'relative' }}>
+      <ImgPlaceholder height={260} color={GALLERY_COLORS[activePhoto]} />
+      <View style={{ position: 'absolute', bottom: 12, right: 12, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 }}>
+        <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{activePhoto + 1} / {GALLERY_COLORS.length}</Text>
       </View>
-      <View className="absolute bottom-3 right-3 bg-black/60 rounded-full px-3 py-1">
-        <Text className="text-white text-xs font-semibold">1 / 4</Text>
-      </View>
-      <View className="absolute bottom-3 left-0 right-0 flex-row justify-center" style={{ gap: 6 }}>
-        <View className="w-2 h-2 rounded-full bg-white" />
-        <View className="w-2 h-2 rounded-full bg-white/40" />
-        <View className="w-2 h-2 rounded-full bg-white/40" />
-        <View className="w-2 h-2 rounded-full bg-white/40" />
+      <View style={{ position: 'absolute', bottom: 12, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
+        {GALLERY_COLORS.map((_, i) => (
+          <Pressable key={i} onPress={() => setActivePhoto(i)}>
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: i === activePhoto ? '#fff' : 'rgba(255,255,255,0.4)' }} />
+          </Pressable>
+        ))}
       </View>
     </View>
   );

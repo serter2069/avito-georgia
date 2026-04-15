@@ -56,7 +56,7 @@ function DefaultState() {
   return (
     <StateSection title="PROFILE__DEFAULT">
       <PhoneFrame>
-        <View style={{ backgroundColor: C.page }}>
+        <View style={{ backgroundColor: C.white }}>
           {/* Top section */}
           <View className="bg-white p-5 items-center" style={{ gap: 8 }}>
             <Avatar initials={'\u0413\u041A'} />
@@ -102,7 +102,7 @@ function EditModeState() {
   return (
     <StateSection title="PROFILE__EDIT">
       <PhoneFrame>
-        <View style={{ backgroundColor: C.page }}>
+        <View style={{ backgroundColor: C.white }}>
           <View className="bg-white p-5" style={{ gap: 16 }}>
             <Text className="text-lg font-bold" style={{ color: C.text }}>{'\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043F\u0440\u043E\u0444\u0438\u043B\u044C'}</Text>
 

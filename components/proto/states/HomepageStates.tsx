@@ -5,25 +5,31 @@ import { StateSection } from '../StateSection';
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
+// ─── Image Placeholder ───────────────────────────────────────────────────────
+function ImgPlaceholder({ height = 180, color = '#C8E6C9' }: { height?: number; color?: string }) {
+  return <View style={{ height, backgroundColor: color, width: '100%' }} />;
+}
+const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7'];
+
 // ─── Responsive wrapper ─────────────────────────────────────────────────────
 function ResponsiveFrame({ children }: { children: React.ReactNode }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   return (
-    <View style={isDesktop ? { width: 390, alignSelf: 'center', backgroundColor: C.page, borderRadius: 8, overflow: 'hidden' } : { backgroundColor: C.page }}>
+    <View style={isDesktop ? { width: 390, alignSelf: 'center', backgroundColor: C.white, borderRadius: 8, overflow: 'hidden' } : { backgroundColor: C.white }}>
       {children}
     </View>
   );
 }
 
 // ─── Reusable ListingCard ────────────────────────────────────────────────────
-function ListingCard({ title, price, location, time, badge }: { title: string; price: string; location: string; time: string; badge?: string }) {
+function ListingCard({ title, price, location, time, badge, colorIndex = 0 }: { title: string; price: string; location: string; time: string; badge?: string; colorIndex?: number }) {
   return (
     <View
       className="bg-white rounded-lg overflow-hidden border border-[#E0E0E0]"
       style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 }}
     >
-      <View style={{ height: 120, backgroundColor: '#F0F0F0', borderRadius: 4 }} />
+      <ImgPlaceholder height={120} color={IMG_COLORS[colorIndex % IMG_COLORS.length]} />
       {badge && (
         <View className="absolute top-2 left-2 rounded-sm px-2 py-0.5 bg-[#E8F9F2]">
           <Text className="text-[11px] font-bold text-[#00AA6C]">{badge}</Text>
@@ -132,7 +138,7 @@ function FreshListings() {
       <View className="flex-row flex-wrap" style={{ gap: 10 }}>
         {listings.map((l, i) => (
           <View key={i} style={{ width: '48%' as any }}>
-            <ListingCard {...l} />
+            <ListingCard {...l} colorIndex={i} />
           </View>
         ))}
       </View>

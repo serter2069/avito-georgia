@@ -4,6 +4,12 @@ import { StateSection } from '../StateSection';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
+// ─── Image Placeholder ───────────────────────────────────────────────────────
+function ImgPlaceholder({ height = 180, color = '#C8E6C9' }: { height?: number; color?: string }) {
+  return <View style={{ height, backgroundColor: color, width: '100%' }} />;
+}
+const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7'];
+
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
@@ -70,10 +76,10 @@ function Tabs({ activeTab }: { activeTab: 'listings' | 'reviews' }) {
   );
 }
 
-function MiniListingCard({ title, price }: { title: string; price: string }) {
+function MiniListingCard({ title, price, colorIndex = 0 }: { title: string; price: string; colorIndex?: number }) {
   return (
     <View className="border border-[#E0E0E0] rounded-lg overflow-hidden" style={{ width: '48%' as any }}>
-      <View className="h-[90px] bg-[#E0E0E0]" />
+      <ImgPlaceholder height={90} color={IMG_COLORS[colorIndex % IMG_COLORS.length]} />
       <View className="p-2">
         <Text className="text-[13px] font-bold text-[#1A1A1A] mb-0.5">{price}</Text>
         <Text className="text-[11px] text-[#737373]" numberOfLines={2}>{title}</Text>
@@ -121,7 +127,7 @@ function SellerDefault() {
         <Tabs activeTab="listings" />
         <View className="flex-row flex-wrap p-3 justify-between" style={{ gap: 10 }}>
           {listings.map((item, idx) => (
-            <MiniListingCard key={idx} {...item} />
+            <MiniListingCard key={idx} {...item} colorIndex={idx} />
           ))}
         </View>
       </PhoneFrame>

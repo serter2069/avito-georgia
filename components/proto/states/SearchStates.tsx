@@ -19,11 +19,13 @@ function ResponsiveFrame({ children }: { children: React.ReactNode }) {
 // ─── Category chips (text only) ──────────────────────────────────────────────
 const CATEGORIES = ['Авто', 'Недвижимость', 'Электроника', 'Одежда', 'Дом и сад', 'Работа', 'Услуги', 'Животные'];
 
+const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8'];
+
 // ─── ListingCard (full-width) ────────────────────────────────────────────────
-function ListingCard({ title, price, city, time }: { title: string; price: string; city: string; time: string }) {
+function ListingCard({ title, price, city, time, idx }: { title: string; price: string; city: string; time: string; idx: number }) {
   return (
     <View className="flex-row border-b border-[#E0E0E0] p-3" style={{ gap: 12 }}>
-      <View style={{ width: 100, height: 80, borderRadius: 6, backgroundColor: '#F0F0F0' }} />
+      <View style={{ width: 100, height: 120, borderRadius: 6, backgroundColor: IMG_COLORS[idx % 4] }} />
       <View className="flex-1 justify-center">
         <Text className="text-[15px] font-bold text-[#1A1A1A] mb-1">{price}</Text>
         <Text className="text-[13px] text-[#1A1A1A] mb-1.5" numberOfLines={2}>{title}</Text>
@@ -48,8 +50,7 @@ function SearchDefault() {
             <TextInput
               placeholder="Поиск объявлений..."
               placeholderTextColor={C.muted}
-              
-              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent' }}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
             />
           </View>
         </View>
@@ -120,7 +121,7 @@ function SearchResults() {
 
         {/* Listing cards */}
         {listings.map((item, idx) => (
-          <ListingCard key={idx} {...item} />
+          <ListingCard key={idx} {...item} idx={idx} />
         ))}
         <View style={{ height: 8 }} />
       </ResponsiveFrame>

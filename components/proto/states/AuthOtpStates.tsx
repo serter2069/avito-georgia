@@ -11,7 +11,7 @@ function ResponsiveWrapper({ children }: { children: React.ReactNode }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   return (
-    <View style={isDesktop ? { backgroundColor: C.bg, padding: 24, alignItems: 'center' } : undefined}>
+    <View style={isDesktop ? { alignItems: 'center', padding: 24 } : undefined}>
       <View style={{ width: isDesktop ? 390 : '100%', alignSelf: 'center' }}>
         {children}
       </View>

@@ -76,7 +76,7 @@ function InputBar({ disabled = false }: { disabled?: boolean }) {
           placeholder={'\u041D\u0430\u043F\u0438\u0441\u0430\u0442\u044C...'}
           placeholderTextColor={C.muted}
           editable={!disabled}
-          style={{ color: C.text, fontSize: 14 }}
+          style={{ color: C.text, fontSize: 14, outlineWidth: 0 }}
         />
       </View>
       <Text className="text-base font-bold" style={{ color: C.green }}>{'\u2192'}</Text>

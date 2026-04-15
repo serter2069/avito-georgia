@@ -150,7 +150,7 @@ export function HelpStates() {
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
                 
-                style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent' }}
+                style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
               />
             </View>
 
@@ -183,7 +183,7 @@ export function HelpStates() {
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
                 
-                style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent' }}
+                style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
               />
             </View>
 

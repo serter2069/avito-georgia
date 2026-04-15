@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+
+const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8'];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -19,7 +21,7 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
       }
     >
       {isDesktop && (
-        <View style={{ position: 'absolute', top: -20, left: 0, right: 0, bottom: -20, zIndex: -1, backgroundColor: C.page }} />
+        <View style={{ position: 'absolute', top: -20, left: 0, right: 0, bottom: -20, zIndex: -1, backgroundColor: C.white }} />
       )}
       {children}
     </View>
@@ -59,12 +61,12 @@ function StatusTabs({ tabs, activeIdx }: { tabs: string[]; activeIdx: number }) 
   );
 }
 
-function ListingRow({ title, price, views, actions }: {
-  title: string; price: string; views?: string; actions?: { label: string; color?: string }[];
+function ListingRow({ title, price, views, actions, idx = 0 }: {
+  title: string; price: string; views?: string; actions?: { label: string; color?: string }[]; idx?: number;
 }) {
   return (
     <View className="flex-row px-4 py-3 border-b border-[#E0E0E0]" style={{ gap: 12 }}>
-      <View style={{ width: 60, height: 60, borderRadius: 6, backgroundColor: '#E0E0E0' }} />
+      <View style={{ width: 72, height: 72, borderRadius: 6, backgroundColor: IMG_COLORS[idx % 4] }} />
       <View className="flex-1" style={{ gap: 4 }}>
         <Text className="text-[15px] font-semibold text-[#1A1A1A]" numberOfLines={1}>{title}</Text>
         <Text className="text-[15px] font-bold" style={{ color: C.green }}>{price}</Text>
@@ -87,13 +89,29 @@ function ListingRow({ title, price, views, actions }: {
 // STATES
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ActiveTabState() {
-  const tabs = ['Активные (3)', 'Ожидают (1)', 'Черновики (2)', 'Архив'];
-  const listings = [
+const TAB_LISTINGS: Record<string, { title: string; price: string; views: string }[]> = {
+  active: [
     { title: 'Toyota Camry 2019, 45 000 км', price: '12 500 ₾', views: '24 просмотра' },
-    { title: 'Квартира 3-комн., Батуми центр', price: '85 000 ₾', views: '24 просмотра' },
-    { title: 'iPhone 14 Pro Max 256GB', price: '2 400 ₾', views: '24 просмотра' },
+    { title: 'Квартира 3-комн., Батуми центр', price: '85 000 ₾', views: '12 просмотров' },
+    { title: 'iPhone 14 Pro Max 256GB', price: '2 400 ₾', views: '8 просмотров' },
+  ],
+  inactive: [
+    { title: 'Велосипед горный, алюминий', price: '450 ₾', views: '3 просмотра' },
+  ],
+  draft: [
+    { title: 'Диван угловой, бежевый', price: '350 ₾', views: '' },
+    { title: 'Ноутбук Dell Inspiron 15', price: '1 800 ₾', views: '' },
+  ],
+};
+
+function ActiveTabState() {
+  const [tab, setTab] = useState<'active' | 'inactive' | 'draft'>('active');
+  const tabDefs = [
+    { key: 'active' as const, label: 'Активные (3)' },
+    { key: 'inactive' as const, label: 'Неактивные (1)' },
+    { key: 'draft' as const, label: 'Черновики (2)' },
   ];
+  const listings = TAB_LISTINGS[tab];
   const actions = [
     { label: 'Редактировать' },
     { label: 'Удалить', color: C.error },
@@ -101,13 +119,38 @@ function ActiveTabState() {
   ];
 
   return (
-    <StateSection title="MY_LISTINGS / Active">
+    <StateSection title="MY_LISTINGS / Interactive Tabs">
       <PhoneFrame>
         <Header title="Мои объявления" />
-        <StatusTabs tabs={tabs} activeIdx={0} />
-        {listings.map((l) => (
-          <ListingRow key={l.title} title={l.title} price={l.price} views={l.views} actions={actions} />
-        ))}
+        <View className="flex-row border-b border-[#E0E0E0]">
+          {tabDefs.map(({ key, label }) => {
+            const active = tab === key;
+            return (
+              <Pressable
+                key={key}
+                className="flex-1 items-center py-3"
+                style={active ? { borderBottomWidth: 2, borderBottomColor: C.green } : {}}
+                onPress={() => setTab(key)}
+              >
+                <Text
+                  className="text-[13px] font-semibold"
+                  style={{ color: active ? C.green : C.muted }}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        {listings.length === 0 ? (
+          <View className="items-center py-12 px-6">
+            <Text className="text-base font-semibold text-[#1A1A1A] text-center">Нет объявлений</Text>
+          </View>
+        ) : (
+          listings.map((l, idx) => (
+            <ListingRow key={l.title} title={l.title} price={l.price} views={l.views} actions={actions} idx={idx} />
+          ))
+        )}
       </PhoneFrame>
     </StateSection>
   );
@@ -122,7 +165,7 @@ function PendingTabState() {
         <Header title="Мои объявления" />
         <StatusTabs tabs={tabs} activeIdx={1} />
         <View className="flex-row px-4 py-3 border-b border-[#E0E0E0]" style={{ gap: 12 }}>
-          <View style={{ width: 60, height: 60, borderRadius: 6, backgroundColor: '#E0E0E0' }} />
+          <View style={{ width: 72, height: 72, borderRadius: 6, backgroundColor: IMG_COLORS[1] }} />
           <View className="flex-1" style={{ gap: 4 }}>
             <View className="flex-row items-center" style={{ gap: 8 }}>
               <Text className="text-[15px] font-semibold text-[#1A1A1A]" numberOfLines={1}>Диван угловой, бежевый</Text>
@@ -168,6 +211,7 @@ function DeleteConfirmState() {
           title="Toyota Camry 2019, 45 000 км"
           price="12 500 ₾"
           views="24 просмотра"
+          idx={0}
         />
 
         {/* Modal overlay */}
