@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+
+function useResponsiveWidth() {
+  const { width } = useWindowDimensions();
+  return width >= 640 ? 390 : ('100%' as any);
+}
 
 // ─── Brand Tokens ────────────────────────────────────────────────────────────
 const C = {
@@ -61,9 +66,10 @@ function DocSection({ heading, body }: { heading: string; body: string }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function AboutStates() {
+  const w = useResponsiveWidth();
   return (
     <StateSection title="ABOUT — Default">
-      <View className="bg-[#F5F5F5]" style={{ width: 390 }}>
+      <View className="bg-[#F5F5F5]" style={{ width: w }}>
         <PageHeader title="О нас" />
 
         <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }}>
@@ -127,18 +133,19 @@ const faqItems = [
 
 export function HelpStates() {
   const [expanded, setExpanded] = useState<number | null>(null);
+  const w = useResponsiveWidth();
 
   return (
     <View style={{ gap: 80 }}>
       {/* State 1: Default */}
       <StateSection title="HELP — Default">
-        <View className="bg-[#F5F5F5]" style={{ width: 390 }}>
+        <View className="bg-[#F5F5F5]" style={{ width: w }}>
           <PageHeader title="Помощь" />
 
           <View style={{ padding: 16, gap: 16 }}>
             {/* Search */}
             <View style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 8 }}>
-              <Text className="text-base text-[#737373]">&#x1F50D;</Text>
+              <Text style={{ fontSize: 14, color: C.muted }}>Q</Text>
               <TextInput
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
@@ -165,13 +172,13 @@ export function HelpStates() {
 
       {/* State 2: FAQ item expanded */}
       <StateSection title="HELP — FAQ item expanded">
-        <View className="bg-[#F5F5F5]" style={{ width: 390 }}>
+        <View className="bg-[#F5F5F5]" style={{ width: w }}>
           <PageHeader title="Помощь" />
 
           <View style={{ padding: 16, gap: 16 }}>
             {/* Search */}
             <View style={{ backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 8 }}>
-              <Text className="text-base text-[#737373]">&#x1F50D;</Text>
+              <Text style={{ fontSize: 14, color: C.muted }}>Q</Text>
               <TextInput
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
@@ -214,9 +221,10 @@ export function HelpStates() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function PrivacyStates() {
+  const w = useResponsiveWidth();
   return (
     <StateSection title="PRIVACY — Default">
-      <View className="bg-[#F5F5F5]" style={{ width: 390 }}>
+      <View className="bg-[#F5F5F5]" style={{ width: w }}>
         <PageHeader title="Политика конфиденциальности" />
 
         <ScrollView contentContainerStyle={{ padding: 16, gap: 4 }}>
@@ -247,9 +255,10 @@ export function PrivacyStates() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function TermsStates() {
+  const w = useResponsiveWidth();
   return (
     <StateSection title="TERMS — Default">
-      <View className="bg-[#F5F5F5]" style={{ width: 390 }}>
+      <View className="bg-[#F5F5F5]" style={{ width: w }}>
         <PageHeader title="Условия использования" />
 
         <ScrollView contentContainerStyle={{ padding: 16, gap: 4 }}>
