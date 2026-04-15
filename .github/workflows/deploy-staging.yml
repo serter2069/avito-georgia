@@ -45,3 +45,38 @@ jobs:
           sudo ln -sf /etc/nginx/sites-available/avito-georgia /etc/nginx/sites-enabled/avito-georgia
           sudo nginx -t && sudo systemctl reload nginx
 
+      - name: Sync canvas.json to proto-canvas
+        env:
+          PROTO_CANVAS_API_KEY: ${{ secrets.PROTO_CANVAS_API_KEY }}
+          PROTO_CANVAS_PROJECT_ID: 1bea57a8-c011-4583-8257-02d41fe8a100
+          PROTO_CANVAS_CANVAS_ID: 6e272bbe-3cb0-4698-8167-f4663202083a
+          STAGING_DOMAIN: avito-georgia.smartlaunchhub.com
+        run: |
+          node -e "
+          const fs = require('fs');
+          const https = require('https');
+          const pages = JSON.parse(fs.readFileSync('public/proto/canvas.json')).pages;
+          const screens = pages.map((p, i) => ({
+            id: p.id,
+            html: true,
+            name: p.title,
+            size: { width: p.w, height: p.h },
+            children: [],
+            position: { x: i * (p.w + 120), y: 60 }
+          }));
+          const schemaJson = {
+            meta: { name: 'avito-georgia', stagingDomain: process.env.STAGING_DOMAIN },
+            tokens: {},
+            screens
+          };
+          const body = JSON.stringify({ schemaJson });
+          const req = https.request({
+            hostname: 'proto.smartlaunchhub.com',
+            path: '/api/projects/' + process.env.PROTO_CANVAS_PROJECT_ID + '/canvases/' + process.env.PROTO_CANVAS_CANVAS_ID,
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.PROTO_CANVAS_API_KEY, 'Content-Length': Buffer.byteLength(body) }
+          }, res => { let d=''; res.on('data', c => d+=c); res.on('end', () => console.log('proto-canvas sync:', res.statusCode, d.slice(0,100))); });
+          req.on('error', e => { console.error('proto-canvas sync failed:', e.message); process.exit(1); });
+          req.write(body); req.end();
+          "
+
