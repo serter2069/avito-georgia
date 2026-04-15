@@ -1,13 +1,71 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
 function PhoneFrame({ children }: { children: React.ReactNode }) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
   return (
-    <View className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden" style={{ width: 390 }}>
+    <View
+      className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
+      style={isDesktop ? { width: 390, alignSelf: 'center' } : { width: '100%' }}
+    >
       {children}
+    </View>
+  );
+}
+
+function Header() {
+  return (
+    <View className="flex-row items-center px-4 py-3 bg-white border-b border-[#E0E0E0]">
+      <Text className="text-base font-semibold text-[#1A1A1A]">← Назад</Text>
+    </View>
+  );
+}
+
+function ProfileHeader() {
+  return (
+    <View className="px-4 pt-4 pb-3">
+      <View className="flex-row items-center" style={{ gap: 14 }}>
+        <View className="w-16 h-16 rounded-full bg-[#737373] items-center justify-center">
+          <Text className="text-2xl font-bold text-white">M</Text>
+        </View>
+        <View className="flex-1">
+          <Text className="text-lg font-bold text-[#1A1A1A]">Михаил Т.</Text>
+          <Text className="text-[13px] text-[#737373] mt-0.5">На платформе с марта 2023</Text>
+          <Text className="text-[13px] text-[#737373] mt-0.5">42 объявления</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function Tabs({ activeTab }: { activeTab: 'listings' | 'reviews' }) {
+  const tabs = [
+    { key: 'listings', label: 'Объявления (42)' },
+    { key: 'reviews', label: 'Отзывы (8)' },
+  ];
+  return (
+    <View className="flex-row border-b border-[#E0E0E0]">
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.key;
+        return (
+          <Pressable
+            key={tab.key}
+            className="flex-1 items-center py-3"
+            style={isActive ? { borderBottomWidth: 2, borderBottomColor: C.green } : {}}
+          >
+            <Text
+              className="text-[14px]"
+              style={{ fontWeight: isActive ? '700' : '500', color: isActive ? C.green : C.muted }}
+            >
+              {tab.label}
+            </Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -24,82 +82,43 @@ function MiniListingCard({ title, price }: { title: string; price: string }) {
   );
 }
 
-function ProfileHeader({ name, since, count, premium }: { name: string; since: string; count: number; premium?: boolean }) {
+function ReviewCard({ name, stars, date, text }: { name: string; stars: number; date: string; text: string }) {
+  const filled = Array(stars).fill(null);
+  const empty = Array(5 - stars).fill(null);
   return (
-    <View className="px-4 pt-4 pb-3">
-      <Text className="text-lg font-bold text-[#1A1A1A] mb-4">Профиль продавца</Text>
-      <View className="flex-row items-center" style={{ gap: 14 }}>
-        {/* Avatar */}
-        <View className="w-16 h-16 rounded-full bg-[#00AA6C] items-center justify-center">
-          <Text className="text-2xl font-bold text-white">М</Text>
+    <View className="border border-[#E0E0E0] rounded-lg p-3" style={{ gap: 6 }}>
+      <View className="flex-row items-center" style={{ gap: 10 }}>
+        <View className="w-9 h-9 rounded-full bg-[#E0E0E0] items-center justify-center">
+          <Text className="text-xs font-bold text-[#737373]">{name.charAt(0)}</Text>
         </View>
         <View className="flex-1">
-          <View className="flex-row items-center" style={{ gap: 8 }}>
-            <Text className="text-[17px] font-bold text-[#1A1A1A]">{name}</Text>
-            {premium && (
-              <View className="bg-[#FFF3E0] rounded-full px-2.5 py-0.5">
-                <Text className="text-[11px] font-bold text-[#E65100]">Premium &#x2605;</Text>
-              </View>
-            )}
-          </View>
-          <Text className="text-[13px] text-[#737373] mt-0.5">{since}</Text>
-          <Text className="text-[13px] text-[#737373] mt-0.5">{count} объявлений</Text>
-          {premium && (
-            <View className="flex-row items-center mt-1" style={{ gap: 4 }}>
-              <Text className="text-[12px] text-[#00AA6C] font-semibold">&#x2713; Проверенный продавец</Text>
-            </View>
-          )}
+          <Text className="text-[13px] font-semibold text-[#1A1A1A]">{name}</Text>
+          <Text className="text-[11px] text-[#737373]">{date}</Text>
         </View>
       </View>
+      <Text className="text-sm" style={{ color: '#F59E0B' }}>
+        {filled.map(() => '\u2605').join('')}{empty.map(() => '\u2606').join('')}
+      </Text>
+      <Text className="text-[13px] text-[#1A1A1A] leading-5">{text}</Text>
     </View>
   );
 }
 
-function Tabs({ activeTab, listingsCount, reviewsCount, onPress }: { activeTab: string; listingsCount: number; reviewsCount: number; onPress: (tab: string) => void }) {
-  const tabs = [
-    { key: 'listings', label: `Объявления (${listingsCount})` },
-    { key: 'reviews', label: `Отзывы (${reviewsCount})` },
-  ];
-
-  return (
-    <View className="flex-row border-b border-[#E0E0E0]">
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.key;
-        return (
-          <Pressable
-            key={tab.key}
-            className="flex-1 items-center py-3"
-            style={isActive ? { borderBottomWidth: 2, borderBottomColor: C.green } : {}}
-            onPress={() => onPress(tab.key)}
-          >
-            <Text
-              className="text-[14px]"
-              style={{ fontWeight: isActive ? '700' : '500', color: isActive ? C.green : C.muted }}
-            >
-              {tab.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
-// ─── State 1: Default Profile ───────────────────────────────────────────────────
-
+// State 1: Default
 function SellerDefault() {
   const listings = [
-    { title: '3-комн. квартира, центр', price: '$85,000' },
-    { title: 'Toyota Camry 2019', price: '$12,500' },
-    { title: 'Угловой диван, бежевый', price: '350 GEL' },
-    { title: 'MacBook Pro 14" M3', price: '$1,800' },
+    { title: '3-комн. квартира, центр', price: '₾85 000' },
+    { title: 'Toyota Camry 2019', price: '₾25 000' },
+    { title: 'Угловой диван, бежевый', price: '₾700' },
+    { title: 'MacBook Pro 14" M3', price: '₾3 600' },
   ];
 
   return (
     <StateSection title="SELLER_DEFAULT">
       <PhoneFrame>
-        <ProfileHeader name="Михаил Т." since="На платформе с марта 2023" count={42} />
-        <Tabs activeTab="listings" listingsCount={42} reviewsCount={8} onPress={() => {}} />
+        <Header />
+        <ProfileHeader />
+        <Tabs activeTab="listings" />
         <View className="flex-row flex-wrap p-3 justify-between" style={{ gap: 10 }}>
           {listings.map((item, idx) => (
             <MiniListingCard key={idx} {...item} />
@@ -110,24 +129,30 @@ function SellerDefault() {
   );
 }
 
-// ─── State 2: Premium Seller ────────────────────────────────────────────────────
-
-function SellerPremium() {
-  const listings = [
-    { title: 'Пентхаус 120 м\u00B2, вид на море', price: '$180,000' },
-    { title: 'BMW X5 2022, 15k км', price: '$48,000' },
-    { title: 'iPhone 15 Pro Max 256GB', price: '3,200 GEL' },
-    { title: 'Дизайнерская мебель, комплект', price: '4,500 GEL' },
+// State 2: Reviews Tab
+function SellerReviews() {
+  const reviews = [
+    { name: 'Анна К.', stars: 5, date: '12 марта 2026', text: 'Отличный продавец, быстрая сделка. Рекомендую!' },
+    { name: 'Давид М.', stars: 4, date: '28 февраля 2026', text: 'Хорошее качество товара, но немного задержал доставку.' },
+    { name: 'Нино Б.', stars: 5, date: '15 января 2026', text: 'Всё как в описании, очень приятное общение.' },
   ];
 
   return (
-    <StateSection title="SELLER_PREMIUM">
+    <StateSection title="SELLER_REVIEWS_TAB">
       <PhoneFrame>
-        <ProfileHeader name="Михаил Т." since="На платформе с марта 2023" count={42} premium />
-        <Tabs activeTab="listings" listingsCount={42} reviewsCount={8} onPress={() => {}} />
-        <View className="flex-row flex-wrap p-3 justify-between" style={{ gap: 10 }}>
-          {listings.map((item, idx) => (
-            <MiniListingCard key={idx} {...item} />
+        <Header />
+        <ProfileHeader />
+        <Tabs activeTab="reviews" />
+        <View className="p-3" style={{ gap: 12 }}>
+          {/* Rating summary */}
+          <View className="flex-row items-center" style={{ gap: 8 }}>
+            <Text className="text-lg font-bold text-[#1A1A1A]">4.7</Text>
+            <Text style={{ color: '#F59E0B', fontSize: 14 }}>{'\u2605\u2605\u2605\u2605\u2606'}</Text>
+            <Text className="text-[13px] text-[#737373]">8 отзывов</Text>
+          </View>
+          {/* Review list */}
+          {reviews.map((r, idx) => (
+            <ReviewCard key={idx} {...r} />
           ))}
         </View>
       </PhoneFrame>
@@ -135,23 +160,17 @@ function SellerPremium() {
   );
 }
 
-// ─── State 3: Empty Listings ────────────────────────────────────────────────────
-
+// State 3: Empty Listings
 function SellerEmpty() {
   return (
     <StateSection title="SELLER_EMPTY_LISTINGS">
       <PhoneFrame>
-        <ProfileHeader name="Михаил Т." since="На платформе с марта 2023" count={0} />
-        <Tabs activeTab="listings" listingsCount={0} reviewsCount={8} onPress={() => {}} />
+        <Header />
+        <ProfileHeader />
+        <Tabs activeTab="listings" />
         <View className="items-center py-14 px-4">
-          <View className="w-16 h-16 rounded-full bg-[#F5F5F5] items-center justify-center mb-4">
-            <Text className="text-2xl">&#x1F4E6;</Text>
-          </View>
-          <Text className="text-[15px] font-semibold text-[#1A1A1A] mb-1">
+          <Text className="text-[15px] font-semibold text-[#737373] text-center">
             Нет активных объявлений
-          </Text>
-          <Text className="text-[13px] text-[#737373] text-center">
-            У этого продавца пока нет объявлений
           </Text>
         </View>
       </PhoneFrame>
@@ -159,19 +178,21 @@ function SellerEmpty() {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// MAIN EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
-
 export default function SellerProfileStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 24, backgroundColor: C.page }}>
-      <View>
-        <Text className="text-2xl font-bold text-[#1A1A1A] mb-1">Seller Profile</Text>
-        <Text className="text-sm text-[#737373]">Seller profile states -- Avito Georgia</Text>
-      </View>
+    <ScrollView
+      contentContainerStyle={{
+        padding: 16,
+        gap: 24,
+        backgroundColor: isDesktop ? '#F0F0F0' : C.white,
+        alignItems: isDesktop ? 'center' : undefined,
+      }}
+    >
       <SellerDefault />
-      <SellerPremium />
+      <SellerReviews />
       <SellerEmpty />
       <View className="h-10" />
     </ScrollView>

@@ -12,27 +12,18 @@ import ListingDetailStates from '../../../components/proto/states/ListingDetailS
 import SearchStates from '../../../components/proto/states/SearchStates';
 import MapViewStates from '../../../components/proto/states/MapViewStates';
 import SellerProfileStates from '../../../components/proto/states/SellerProfileStates';
+import ReviewsStates from '../../../components/proto/states/ReviewsStates';
 import MyListingsStates from '../../../components/proto/states/MyListingsStates';
 import CreateListingStates from '../../../components/proto/states/CreateListingStates';
 import EditListingStates from '../../../components/proto/states/EditListingStates';
+import ListingExpiredStates from '../../../components/proto/states/ListingExpiredStates';
 import ChatThreadStates from '../../../components/proto/states/ChatThreadStates';
 import MessagesListStates from '../../../components/proto/states/MessagesListStates';
 import FavoritesStates from '../../../components/proto/states/FavoritesStates';
-import NotificationsStates from '../../../components/proto/states/NotificationsStates';
+import PaymentStates from '../../../components/proto/states/PaymentStates';
+import PaymentHistoryStates from '../../../components/proto/states/PaymentHistoryStates';
 import ProfileStates from '../../../components/proto/states/ProfileStates';
 import SettingsStates from '../../../components/proto/states/SettingsStates';
-import SubscriptionStates from '../../../components/proto/states/SubscriptionStates';
-import PaymentHistoryStates from '../../../components/proto/states/PaymentHistoryStates';
-import PromoteListingStates from '../../../components/proto/states/PromoteListingStates';
-import PromotionSuccessStates, {
-  PromotionCancelledStates,
-  SlotSuccessStates,
-} from '../../../components/proto/states/PromotionResultStates';
-import AdminDashboardStates from '../../../components/proto/states/AdminDashboardStates';
-import AdminModerationStates from '../../../components/proto/states/AdminModerationStates';
-import AdminUsersStates, {
-  AdminCategoriesStates,
-} from '../../../components/proto/states/AdminUsersStates';
 import {
   AboutStates,
   HelpStates,
@@ -41,39 +32,32 @@ import {
 } from '../../../components/proto/states/LegalStates';
 
 const stateComponents: Record<string, React.ComponentType> = {
-  'design-system':       DesignSystemStates,
-  'auth-email':          AuthEmailStates,
-  'auth-otp':            AuthOtpStates,
-  'onboarding':          OnboardingStates,
-  'homepage':            HomepageStates,
-  'listings-feed':       ListingsFeedStates,
-  'listing-detail':      ListingDetailStates,
-  'search':              SearchStates,
-  'map-view':            MapViewStates,
-  'seller-profile':      SellerProfileStates,
-  'my-listings':         MyListingsStates,
-  'create-listing':      CreateListingStates,
-  'edit-listing':        EditListingStates,
-  'chat-thread':         ChatThreadStates,
-  'messages-list':       MessagesListStates,
-  'favorites':           FavoritesStates,
-  'notifications':       NotificationsStates,
-  'profile':             ProfileStates,
-  'settings':            SettingsStates,
-  'subscription':        SubscriptionStates,
-  'payment-history':     PaymentHistoryStates,
-  'promote-listing':     PromoteListingStates,
-  'promotion-success':   PromotionSuccessStates,
-  'promotion-cancelled': PromotionCancelledStates,
-  'slot-success':        SlotSuccessStates,
-  'admin-dashboard':     AdminDashboardStates,
-  'admin-moderation':    AdminModerationStates,
-  'admin-users':         AdminUsersStates,
-  'admin-categories':    AdminCategoriesStates,
-  'about':               AboutStates,
-  'help':                HelpStates,
-  'privacy':             PrivacyStates,
-  'terms':               TermsStates,
+  'design-system':   DesignSystemStates,
+  'auth-email':      AuthEmailStates,
+  'auth-otp':        AuthOtpStates,
+  'onboarding':      OnboardingStates,
+  'homepage':        HomepageStates,
+  'listings-feed':   ListingsFeedStates,
+  'listing-detail':  ListingDetailStates,
+  'search':          SearchStates,
+  'map-view':        MapViewStates,
+  'seller-profile':  SellerProfileStates,
+  'reviews':         ReviewsStates,
+  'my-listings':     MyListingsStates,
+  'create-listing':  CreateListingStates,
+  'edit-listing':    EditListingStates,
+  'listing-expired': ListingExpiredStates,
+  'chat-thread':     ChatThreadStates,
+  'messages-list':   MessagesListStates,
+  'favorites':       FavoritesStates,
+  'payment':         PaymentStates,
+  'payment-history': PaymentHistoryStates,
+  'profile':         ProfileStates,
+  'settings':        SettingsStates,
+  'about':           AboutStates,
+  'help':            HelpStates,
+  'privacy':         PrivacyStates,
+  'terms':           TermsStates,
 };
 
 export default function ProtoStatesPage() {

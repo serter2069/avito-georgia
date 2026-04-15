@@ -1,40 +1,20 @@
 import React from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 
 // ─── Core Design Tokens ───────────────────────────────────────────────────────
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
-const R = { xs:2, sm:4, md:8, lg:12, xl:16, full:9999 };
+const C = { green:'#00AA6C', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F', bg:'#F5F5F5' };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
-function PhoneFrame({ children }: { children: React.ReactNode }) {
+function ResponsiveWrapper({ children }: { children: React.ReactNode }) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
   return (
-    <View
-      className="bg-white rounded-2xl border border-[#E0E0E0] overflow-hidden"
-      style={{
-        width: 390,
-        minHeight: 540,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 16,
-        elevation: 4,
-      }}
-    >
-      {children}
-    </View>
-  );
-}
-
-function ProgressIndicator() {
-  return (
-    <View className="items-center" style={{ gap: 6 }}>
-      <View className="flex-row" style={{ gap: 4 }}>
-        <View className="rounded-full" style={{ width: 24, height: 4, backgroundColor: C.green }} />
-        <View className="rounded-full" style={{ width: 24, height: 4, backgroundColor: C.border }} />
+    <View style={isDesktop ? { backgroundColor: C.bg, padding: 24, alignItems: 'center' } : undefined}>
+      <View style={{ width: isDesktop ? 390 : '100%', alignSelf: 'center' }}>
+        {children}
       </View>
-      <Text className="text-xs" style={{ color: C.muted }}>Шаг 1 из 1</Text>
     </View>
   );
 }
@@ -47,11 +27,12 @@ function InputField({ label, placeholder, value, required }: { label: string; pl
         {required && <Text style={{ color: C.error, fontSize: 14 }}>*</Text>}
       </View>
       <View
-        className="rounded-lg bg-white px-4"
         style={{
           borderWidth: 1,
-          borderColor: value ? C.green : C.border,
-          borderRadius: R.md,
+          borderColor: C.border,
+          borderRadius: 8,
+          backgroundColor: C.white,
+          paddingHorizontal: 16,
         }}
       >
         <TextInput
@@ -67,23 +48,24 @@ function InputField({ label, placeholder, value, required }: { label: string; pl
   );
 }
 
-function SelectField({ label, placeholder, value, active }: { label: string; placeholder: string; value?: string; active?: boolean }) {
+function SelectField({ label, value }: { label: string; value?: string }) {
   return (
     <View>
       <Text className="text-sm font-medium mb-1.5" style={{ color: C.text }}>{label}</Text>
       <View
-        className="rounded-lg bg-white px-4 flex-row items-center justify-between"
+        className="flex-row items-center justify-between"
         style={{
           borderWidth: 1,
-          borderColor: value ? C.green : C.border,
-          borderRadius: R.md,
+          borderColor: C.border,
+          borderRadius: 8,
+          backgroundColor: C.white,
+          paddingHorizontal: 16,
           paddingVertical: 13,
         }}
       >
-        <Text style={{ fontSize: 16, color: value ? C.text : C.muted }}>
-          {value || placeholder}
+        <Text style={{ fontSize: 16, color: value ? C.green : C.muted }}>
+          {value || 'Выберите город ›'}
         </Text>
-        <Text style={{ fontSize: 14, color: C.muted }}>{active ? '▲' : '▼'}</Text>
       </View>
     </View>
   );
@@ -94,10 +76,10 @@ function PrimaryButton({ label, disabled }: { label: string; disabled?: boolean 
     <View
       className="rounded-lg items-center justify-center"
       style={{
-        backgroundColor: disabled ? '#B0DFC9' : C.green,
+        backgroundColor: C.green,
         paddingVertical: 14,
-        borderRadius: R.md,
-        opacity: disabled ? 0.7 : 1,
+        borderRadius: 8,
+        opacity: disabled ? 0.5 : 1,
       }}
     >
       <Text className="text-white font-bold" style={{ fontSize: 16 }}>{label}</Text>
@@ -109,53 +91,51 @@ function PrimaryButton({ label, disabled }: { label: string; disabled?: boolean 
 
 function DefaultState() {
   return (
-    <PhoneFrame>
-      <View className="flex-1 px-6" style={{ paddingTop: 48, gap: 28 }}>
-        <View className="items-center" style={{ gap: 8 }}>
-          <Text className="text-2xl font-bold text-[#1A1A1A]" style={{ letterSpacing: -0.3 }}>
+    <ResponsiveWrapper>
+      <View className="bg-white" style={{ paddingHorizontal: 24, paddingTop: 48, paddingBottom: 40, gap: 28 }}>
+        <View style={{ gap: 8 }}>
+          <Text className="text-xl font-bold" style={{ color: C.text }}>
             Расскажите о себе
           </Text>
-          <Text className="text-sm text-center" style={{ color: C.muted }}>
-            Заполните профиль, чтобы начать пользоваться avito.ge
+          <Text className="text-sm" style={{ color: C.muted }}>
+            Шаг 1 из 1
           </Text>
         </View>
 
         <View style={{ gap: 16 }}>
-          <InputField label="Имя" placeholder="Введите ваше имя" required />
-          <InputField label="Телефон" placeholder="+995 ___ __-__-__" />
-          <SelectField label="Город" placeholder="Выберите город" />
+          <InputField label="Имя *" placeholder="Введите ваше имя" />
+          <InputField label="Телефон" placeholder="+995 XXX XX-XX-XX" />
+          <SelectField label="Город" />
         </View>
 
         <PrimaryButton label="Продолжить" disabled />
-        <ProgressIndicator />
       </View>
-    </PhoneFrame>
+    </ResponsiveWrapper>
   );
 }
 
 function FilledState() {
   return (
-    <PhoneFrame>
-      <View className="flex-1 px-6" style={{ paddingTop: 48, gap: 28 }}>
-        <View className="items-center" style={{ gap: 8 }}>
-          <Text className="text-2xl font-bold text-[#1A1A1A]" style={{ letterSpacing: -0.3 }}>
+    <ResponsiveWrapper>
+      <View className="bg-white" style={{ paddingHorizontal: 24, paddingTop: 48, paddingBottom: 40, gap: 28 }}>
+        <View style={{ gap: 8 }}>
+          <Text className="text-xl font-bold" style={{ color: C.text }}>
             Расскажите о себе
           </Text>
-          <Text className="text-sm text-center" style={{ color: C.muted }}>
-            Заполните профиль, чтобы начать пользоваться avito.ge
+          <Text className="text-sm" style={{ color: C.muted }}>
+            Шаг 1 из 1
           </Text>
         </View>
 
         <View style={{ gap: 16 }}>
-          <InputField label="Имя" placeholder="Введите ваше имя" value="Георгий" required />
-          <InputField label="Телефон" placeholder="+995 ___ __-__-__" value="+995 555 12-34-56" />
-          <SelectField label="Город" placeholder="Выберите город" value="Тбилиси" />
+          <InputField label="Имя *" placeholder="Введите ваше имя" value="Георгий" />
+          <InputField label="Телефон" placeholder="+995 XXX XX-XX-XX" value="+995 555 12-34-56" />
+          <SelectField label="Город" value="Тбилиси" />
         </View>
 
         <PrimaryButton label="Продолжить" />
-        <ProgressIndicator />
       </View>
-    </PhoneFrame>
+    </ResponsiveWrapper>
   );
 }
 
@@ -170,55 +150,55 @@ function CityPickerState() {
   ];
 
   return (
-    <PhoneFrame>
-      <View className="flex-1 px-6" style={{ paddingTop: 48, gap: 28 }}>
-        <View className="items-center" style={{ gap: 8 }}>
-          <Text className="text-2xl font-bold text-[#1A1A1A]" style={{ letterSpacing: -0.3 }}>
+    <ResponsiveWrapper>
+      <View className="bg-white" style={{ paddingHorizontal: 24, paddingTop: 48, paddingBottom: 40, gap: 28 }}>
+        <View style={{ gap: 8 }}>
+          <Text className="text-xl font-bold" style={{ color: C.text }}>
             Расскажите о себе
           </Text>
-          <Text className="text-sm text-center" style={{ color: C.muted }}>
-            Заполните профиль, чтобы начать пользоваться avito.ge
+          <Text className="text-sm" style={{ color: C.muted }}>
+            Шаг 1 из 1
           </Text>
         </View>
 
         <View style={{ gap: 16 }}>
-          <InputField label="Имя" placeholder="Введите ваше имя" value="Георгий" required />
-          <InputField label="Телефон" placeholder="+995 ___ __-__-__" value="+995 555 12-34-56" />
+          <InputField label="Имя *" placeholder="Введите ваше имя" value="Георгий" />
+          <InputField label="Телефон" placeholder="+995 XXX XX-XX-XX" value="+995 555 12-34-56" />
 
           <View>
-            <SelectField label="Город" placeholder="Выберите город" value="Тбилиси" active />
+            <SelectField label="Город" value="Тбилиси" />
 
-            {/* Dropdown overlay */}
+            {/* City picker dropdown */}
             <View
-              className="rounded-lg border border-[#E0E0E0] bg-white mt-1 overflow-hidden"
+              className="mt-1 overflow-hidden"
               style={{
+                borderWidth: 1,
+                borderColor: C.border,
+                borderRadius: 8,
+                backgroundColor: C.white,
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.12,
                 shadowRadius: 24,
                 elevation: 8,
-                borderRadius: R.md,
               }}
             >
               {cities.map((city, idx) => (
                 <View key={city.name}>
-                  <View
-                    className="flex-row items-center justify-between px-4 py-3"
-                    style={{ backgroundColor: city.selected ? C.greenBg : C.white }}
+                  <Pressable
+                    className="flex-row items-center justify-between"
+                    style={{ paddingHorizontal: 16, paddingVertical: 12 }}
                   >
                     <Text
-                      className="text-base"
                       style={{
+                        fontSize: 16,
                         color: city.selected ? C.green : C.text,
                         fontWeight: city.selected ? '600' : '400',
                       }}
                     >
-                      {city.name}
+                      {city.name}{city.selected ? '  ✓' : ''}
                     </Text>
-                    {city.selected && (
-                      <Text style={{ fontSize: 16, color: C.green }}>✓</Text>
-                    )}
-                  </View>
+                  </Pressable>
                   {idx < cities.length - 1 && (
                     <View style={{ height: 1, backgroundColor: C.border, marginLeft: 16 }} />
                   )}
@@ -228,7 +208,7 @@ function CityPickerState() {
           </View>
         </View>
       </View>
-    </PhoneFrame>
+    </ResponsiveWrapper>
   );
 }
 

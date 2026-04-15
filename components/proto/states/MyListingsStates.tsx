@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
@@ -7,8 +7,20 @@ const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5',
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
 function PhoneFrame({ children }: { children: React.ReactNode }) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
   return (
-    <View className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden" style={{ width: 390 }}>
+    <View
+      className="bg-white overflow-hidden"
+      style={isDesktop
+        ? { width: 390, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: C.border, backgroundColor: C.white }
+        : { width: '100%' as any, backgroundColor: C.white }
+      }
+    >
+      {isDesktop && (
+        <View style={{ position: 'absolute', top: -20, left: 0, right: 0, bottom: -20, zIndex: -1, backgroundColor: C.page }} />
+      )}
       {children}
     </View>
   );
@@ -18,19 +30,19 @@ function Header({ title }: { title: string }) {
   return (
     <View className="flex-row items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
       <Text className="text-lg font-bold text-[#1A1A1A]">{title}</Text>
-      <Text className="text-xl text-[#737373]">+</Text>
+      <Text className="text-xl text-[#00AA6C]">+</Text>
     </View>
   );
 }
 
-function StatusTabs({ tabs, activeIdx }: { tabs: { label: string; count: number }[]; activeIdx: number }) {
+function StatusTabs({ tabs, activeIdx }: { tabs: string[]; activeIdx: number }) {
   return (
     <View className="flex-row border-b border-[#E0E0E0]">
       {tabs.map((tab, idx) => {
         const active = idx === activeIdx;
         return (
           <View
-            key={tab.label}
+            key={tab}
             className="flex-1 items-center py-3"
             style={active ? { borderBottomWidth: 2, borderBottomColor: C.green } : {}}
           >
@@ -38,7 +50,7 @@ function StatusTabs({ tabs, activeIdx }: { tabs: { label: string; count: number 
               className="text-[13px] font-semibold"
               style={{ color: active ? C.green : C.muted }}
             >
-              {tab.label} ({tab.count})
+              {tab}
             </Text>
           </View>
         );
@@ -48,43 +60,24 @@ function StatusTabs({ tabs, activeIdx }: { tabs: { label: string; count: number 
 }
 
 function ListingRow({ title, price, views, actions }: {
-  title: string; price: string; views?: string; actions: { label: string; color?: string }[];
+  title: string; price: string; views?: string; actions?: { label: string; color?: string }[];
 }) {
   return (
     <View className="flex-row px-4 py-3 border-b border-[#E0E0E0]" style={{ gap: 12 }}>
-      {/* Image placeholder */}
-      <View className="w-16 h-16 rounded-md bg-[#E0E0E0]" />
+      <View style={{ width: 60, height: 60, borderRadius: 6, backgroundColor: '#E0E0E0' }} />
       <View className="flex-1" style={{ gap: 4 }}>
         <Text className="text-[15px] font-semibold text-[#1A1A1A]" numberOfLines={1}>{title}</Text>
-        <Text className="text-[15px] font-bold text-[#00AA6C]">{price}</Text>
+        <Text className="text-[15px] font-bold" style={{ color: C.green }}>{price}</Text>
         {views && <Text className="text-xs text-[#737373]">{views}</Text>}
-        <View className="flex-row mt-1" style={{ gap: 12 }}>
-          {actions.map((a) => (
-            <Text key={a.label} className="text-[13px] font-semibold" style={{ color: a.color || C.green }}>
-              {a.label}
-            </Text>
-          ))}
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function BadgeRow({ title, price, badge }: {
-  title: string; price: string; badge: { label: string; bg: string; color: string };
-}) {
-  return (
-    <View className="flex-row px-4 py-3 border-b border-[#E0E0E0]" style={{ gap: 12 }}>
-      <View className="w-16 h-16 rounded-md bg-[#E0E0E0]" />
-      <View className="flex-1" style={{ gap: 4 }}>
-        <View className="flex-row items-center" style={{ gap: 8 }}>
-          <Text className="text-[15px] font-semibold text-[#1A1A1A]" numberOfLines={1}>{title}</Text>
-          <View className="rounded-full px-2.5 py-0.5" style={{ backgroundColor: badge.bg }}>
-            <Text className="text-[11px] font-bold" style={{ color: badge.color }}>{badge.label}</Text>
+        {actions && actions.length > 0 && (
+          <View className="flex-row mt-1" style={{ gap: 12 }}>
+            {actions.map((a) => (
+              <Text key={a.label} className="text-[13px] font-semibold" style={{ color: a.color || C.green }}>
+                {a.label}
+              </Text>
+            ))}
           </View>
-        </View>
-        <Text className="text-[15px] font-bold text-[#00AA6C]">{price}</Text>
-        <Text className="text-[13px] font-semibold text-[#D32F2F] mt-1">Отменить</Text>
+        )}
       </View>
     </View>
   );
@@ -95,25 +88,20 @@ function BadgeRow({ title, price, badge }: {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ActiveTabState() {
-  const tabs = [
-    { label: 'Активные', count: 3 },
-    { label: 'Ожидают', count: 1 },
-    { label: 'Черновики', count: 2 },
-    { label: 'Проданные', count: 5 },
-  ];
+  const tabs = ['Активные (3)', 'Ожидают (1)', 'Черновики (2)', 'Архив'];
   const listings = [
-    { title: 'Toyota Camry 2019, 45 000 км', price: '12 500 GEL', views: '2 просмотра сегодня' },
-    { title: 'Квартира 3-комн., Батуми центр', price: '85 000 $', views: '2 просмотра сегодня' },
-    { title: 'iPhone 14 Pro Max 256GB', price: '2 400 GEL', views: '2 просмотра сегодня' },
+    { title: 'Toyota Camry 2019, 45 000 км', price: '12 500 ₾', views: '24 просмотра' },
+    { title: 'Квартира 3-комн., Батуми центр', price: '85 000 ₾', views: '24 просмотра' },
+    { title: 'iPhone 14 Pro Max 256GB', price: '2 400 ₾', views: '24 просмотра' },
   ];
   const actions = [
     { label: 'Редактировать' },
-    { label: 'Продвинуть' },
-    { label: '\u00B7\u00B7\u00B7', color: C.muted },
+    { label: 'Удалить', color: C.error },
+    { label: 'Продлить' },
   ];
 
   return (
-    <StateSection title="MY_LISTINGS / Active tab">
+    <StateSection title="MY_LISTINGS / Active">
       <PhoneFrame>
         <Header title="Мои объявления" />
         <StatusTabs tabs={tabs} activeIdx={0} />
@@ -126,23 +114,25 @@ function ActiveTabState() {
 }
 
 function PendingTabState() {
-  const tabs = [
-    { label: 'Активные', count: 3 },
-    { label: 'Ожидают', count: 1 },
-    { label: 'Черновики', count: 2 },
-    { label: 'Проданные', count: 5 },
-  ];
+  const tabs = ['Активные (3)', 'Ожидают (1)', 'Черновики (2)', 'Архив'];
 
   return (
-    <StateSection title="MY_LISTINGS / Pending moderation tab">
+    <StateSection title="MY_LISTINGS / Pending">
       <PhoneFrame>
         <Header title="Мои объявления" />
         <StatusTabs tabs={tabs} activeIdx={1} />
-        <BadgeRow
-          title="Диван угловой, бежевый"
-          price="350 GEL"
-          badge={{ label: 'На проверке', bg: '#FFF3E0', color: '#E65100' }}
-        />
+        <View className="flex-row px-4 py-3 border-b border-[#E0E0E0]" style={{ gap: 12 }}>
+          <View style={{ width: 60, height: 60, borderRadius: 6, backgroundColor: '#E0E0E0' }} />
+          <View className="flex-1" style={{ gap: 4 }}>
+            <View className="flex-row items-center" style={{ gap: 8 }}>
+              <Text className="text-[15px] font-semibold text-[#1A1A1A]" numberOfLines={1}>Диван угловой, бежевый</Text>
+            </View>
+            <Text className="text-[15px] font-bold" style={{ color: C.green }}>350 ₾</Text>
+            <View className="rounded px-2 py-0.5 self-start mt-1" style={{ backgroundColor: '#F5F5F5' }}>
+              <Text className="text-[11px] font-bold" style={{ color: C.muted }}>На проверке</Text>
+            </View>
+          </View>
+        </View>
       </PhoneFrame>
     </StateSection>
   );
@@ -150,35 +140,36 @@ function PendingTabState() {
 
 function EmptyState() {
   return (
-    <StateSection title="MY_LISTINGS / Empty — no listings">
+    <StateSection title="MY_LISTINGS / Empty">
       <PhoneFrame>
         <Header title="Мои объявления" />
         <View className="items-center py-16 px-6">
-          <View className="w-16 h-16 rounded-full bg-[#E8F9F2] items-center justify-center mb-4">
-            <Text style={{ fontSize: 28 }}>📋</Text>
-          </View>
           <Text className="text-base font-semibold text-[#1A1A1A] mb-2 text-center">
-            Здесь будут ваши объявления
+            Нет объявлений
           </Text>
-          <Pressable className="bg-[#00AA6C] rounded-md px-6 py-3 mt-4">
+          <Pressable className="rounded-md px-6 py-3 mt-4" style={{ backgroundColor: C.green }}>
             <Text className="text-white font-bold text-[15px]">Подать объявление</Text>
           </Pressable>
+          <Text className="text-xs text-[#737373] mt-3 text-center">
+            3 бесплатных объявления в каждой категории
+          </Text>
         </View>
       </PhoneFrame>
     </StateSection>
   );
 }
 
-function DeleteConfirmationState() {
+function DeleteConfirmState() {
   return (
-    <StateSection title="MY_LISTINGS / Delete confirmation modal">
+    <StateSection title="MY_LISTINGS / Delete confirm">
       <PhoneFrame>
         <Header title="Мои объявления" />
         <ListingRow
           title="Toyota Camry 2019, 45 000 км"
-          price="12 500 GEL"
-          actions={[{ label: 'Редактировать' }]}
+          price="12 500 ₾"
+          views="24 просмотра"
         />
+
         {/* Modal overlay */}
         <View
           className="absolute inset-0 items-center justify-center"
@@ -201,9 +192,9 @@ function DeleteConfirmationState() {
             </Text>
             <View className="flex-row justify-end" style={{ gap: 12 }}>
               <Pressable className="rounded-md px-5 py-2.5 border border-[#E0E0E0]">
-                <Text className="text-[15px] font-semibold text-[#1A1A1A]">Отменить</Text>
+                <Text className="text-[15px] font-semibold text-[#1A1A1A]">Отмена</Text>
               </Pressable>
-              <Pressable className="rounded-md px-5 py-2.5 bg-[#D32F2F]">
+              <Pressable className="rounded-md px-5 py-2.5" style={{ backgroundColor: C.error }}>
                 <Text className="text-[15px] font-bold text-white">Удалить</Text>
               </Pressable>
             </View>
@@ -224,7 +215,7 @@ export default function MyListingsStates() {
       <ActiveTabState />
       <PendingTabState />
       <EmptyState />
-      <DeleteConfirmationState />
+      <DeleteConfirmState />
     </View>
   );
 }

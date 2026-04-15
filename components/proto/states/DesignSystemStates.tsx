@@ -9,10 +9,9 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 
-// ─── Core Design Tokens ───────────────────────────────────────────────────────
+// Core Design Tokens
 const C = {
   green:   '#00AA6C',
   greenBg: '#E8F9F2',
@@ -26,7 +25,7 @@ const C = {
 
 const R = { xs: 2, sm: 4, md: 8, lg: 12, xl: 16, full: 9999 };
 
-// ─── Helpers ────────────────────────────────────────────────────────────────────
+// Helpers
 
 function AvitoLogo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' | 'xl' }) {
   const scale = size === 'sm' ? 0.6 : size === 'lg' ? 1.5 : size === 'xl' ? 2.2 : 1;
@@ -100,9 +99,7 @@ function SubLabel({ text }: { text: string }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // BRAND SECTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
 
 function HeroSection({ isDesktop }: { isDesktop: boolean }) {
   return (
@@ -126,9 +123,8 @@ function HeroSection({ isDesktop }: { isDesktop: boolean }) {
           Georgia's #1 Classifieds
         </Text>
         <View className="flex-row items-center bg-[#E8F9F2] rounded-full px-4 py-2" style={{ gap: 8 }}>
-          <Feather name="check-circle" size={14} color={C.green} />
           <Text className="text-[13px] font-semibold text-[#00AA6C]">
-            Design System v1.0
+            ✓ Design System v1.0
           </Text>
         </View>
       </View>
@@ -214,19 +210,15 @@ function UIPrimitivesSection() {
         <SubLabel text="Buttons" />
         <View className="flex-row flex-wrap items-center" style={{ gap: 12 }}>
           <View className="bg-[#00AA6C] rounded-md px-6 py-3 flex-row items-center" style={{ gap: 8 }}>
-            <Feather name="plus" size={16} color="#fff" />
-            <Text className="text-white font-bold text-[15px]">Primary</Text>
+            <Text className="text-white font-bold text-[15px]">+ Primary</Text>
           </View>
           <View className="bg-white rounded-md px-6 py-3 border-[1.5px] border-[#00AA6C] flex-row items-center" style={{ gap: 8 }}>
-            <Feather name="message-circle" size={16} color={C.green} />
             <Text className="text-[#00AA6C] font-bold text-[15px]">Secondary</Text>
           </View>
           <View className="rounded-md px-6 py-3 flex-row items-center" style={{ gap: 8 }}>
-            <Feather name="share-2" size={16} color={C.muted} />
             <Text className="text-[#737373] font-semibold text-[15px]">Ghost</Text>
           </View>
           <View className="bg-[#FFEBEE] rounded-md px-6 py-3 flex-row items-center" style={{ gap: 8 }}>
-            <Feather name="trash-2" size={16} color={C.error} />
             <Text className="text-[#D32F2F] font-bold text-[15px]">Destructive</Text>
           </View>
         </View>
@@ -256,17 +248,17 @@ function UIPrimitivesSection() {
         <SubLabel text="Status Chips" />
         <View className="flex-row flex-wrap" style={{ gap: 10 }}>
           {[
-            { label: 'Active',   icon: 'check-circle' as const, bg: C.greenBg, color: C.green },
-            { label: 'Pending',  icon: 'clock' as const,        bg: '#FFF3E0', color: '#E65100' },
-            { label: 'Rejected', icon: 'x-circle' as const,     bg: '#FFEBEE', color: C.error },
-            { label: 'Archived', icon: 'archive' as const,      bg: '#F4F4F4', color: C.muted },
+            { label: 'Active',   symbol: '\u2713', bg: C.greenBg, color: C.green },
+            { label: 'Pending',  symbol: '\u25CB', bg: '#FFF3E0', color: '#E65100' },
+            { label: 'Rejected', symbol: '\u00D7', bg: '#FFEBEE', color: C.error },
+            { label: 'Archived', symbol: '\u2014', bg: '#F4F4F4', color: C.muted },
           ].map((chip) => (
             <View
               key={chip.label}
               className="rounded-md px-3.5 py-2 flex-row items-center"
               style={{ backgroundColor: chip.bg, gap: 6 }}
             >
-              <Feather name={chip.icon} size={14} color={chip.color} />
+              <Text className="text-[13px] font-bold" style={{ color: chip.color }}>{chip.symbol}</Text>
               <Text className="text-[13px] font-semibold" style={{ color: chip.color }}>{chip.label}</Text>
             </View>
           ))}
@@ -329,17 +321,15 @@ function SpacingRadiusSection() {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // COMPONENT SECTIONS
-// ═══════════════════════════════════════════════════════════════════════════════
 
 function NavigationSection() {
   const [activeTab, setActiveTab] = useState('home');
   const tabs = [
-    { key: 'home', icon: 'home' as const, label: 'Home' },
-    { key: 'listings', icon: 'grid' as const, label: 'Listings' },
-    { key: 'chat', icon: 'message-circle' as const, label: 'Chat' },
-    { key: 'profile', icon: 'user' as const, label: 'Profile' },
+    { key: 'home', label: 'Home' },
+    { key: 'listings', label: 'Listings' },
+    { key: 'chat', label: 'Chat' },
+    { key: 'profile', label: 'Profile' },
   ];
 
   return (
@@ -358,8 +348,8 @@ function NavigationSection() {
             </View>
           </View>
           <View className="flex-row items-center" style={{ gap: 16 }}>
-            <Feather name="search" size={20} color={C.text} />
-            <Feather name="bell" size={20} color={C.text} />
+            <Text className="text-base text-[#1A1A1A]">Search</Text>
+            <Text className="text-base text-[#1A1A1A]">Bell</Text>
             <View className="bg-[#00AA6C] rounded-sm px-3.5 py-1.5">
               <Text className="text-white font-bold text-[13px]">Post ad</Text>
             </View>
@@ -379,7 +369,6 @@ function NavigationSection() {
                 style={{ gap: 3 }}
                 onPress={() => setActiveTab(tab.key)}
               >
-                <Feather name={tab.icon} size={22} color={isActive ? C.green : C.muted} />
                 <Text
                   className="text-[10px]"
                   style={{ fontWeight: isActive ? '700' : '500', color: isActive ? C.green : C.muted }}
@@ -407,7 +396,6 @@ function InputsSection() {
         <View>
           <SubLabel text="Search bar" />
           <View className="flex-row items-center bg-white border-[1.5px] border-[#00AA6C] rounded-md pl-3 overflow-hidden">
-            <Feather name="search" size={18} color={C.muted} />
             <TextInput
               className="flex-1 text-base text-[#1A1A1A] py-3 px-2.5"
               placeholder="Search listings..."
@@ -459,8 +447,7 @@ function InputsSection() {
             />
           </View>
           <View className="flex-row items-center mt-1" style={{ gap: 4 }}>
-            <Feather name="alert-circle" size={12} color={C.error} />
-            <Text className="text-xs text-[#D32F2F]">Invalid phone number</Text>
+            <Text className="text-xs text-[#D32F2F]">× Invalid phone number</Text>
           </View>
         </View>
       </Card>
@@ -489,7 +476,7 @@ function ButtonsSection() {
           >
             {loading === 'primary'
               ? <ActivityIndicator size="small" color="#fff" />
-              : <Feather name="plus" size={16} color="#fff" />}
+              : <Text className="text-white font-bold text-[15px]">+</Text>}
             <Text className="text-white font-bold text-[15px]">
               {loading === 'primary' ? 'Loading...' : 'Primary'}
             </Text>
@@ -502,7 +489,7 @@ function ButtonsSection() {
           >
             {loading === 'secondary'
               ? <ActivityIndicator size="small" color={C.green} />
-              : <Feather name="message-circle" size={16} color={C.green} />}
+              : null}
             <Text className="text-[#00AA6C] font-bold text-[15px]">
               {loading === 'secondary' ? 'Loading...' : 'Secondary'}
             </Text>
@@ -513,7 +500,6 @@ function ButtonsSection() {
             className="rounded-md px-6 py-3 flex-row items-center"
             style={{ gap: 8 }}
           >
-            <Feather name="share-2" size={16} color={C.muted} />
             <Text className="text-[#737373] font-semibold text-[15px]">Ghost</Text>
           </Pressable>
 
@@ -524,7 +510,7 @@ function ButtonsSection() {
           >
             {loading === 'destructive'
               ? <ActivityIndicator size="small" color={C.error} />
-              : <Feather name="trash-2" size={16} color={C.error} />}
+              : null}
             <Text className="text-[#D32F2F] font-bold text-[15px]">
               {loading === 'destructive' ? 'Deleting...' : 'Destructive'}
             </Text>
@@ -569,17 +555,16 @@ function CardsSection({ isDesktop }: { isDesktop: boolean }) {
                 className="absolute top-2 right-2 w-8 h-8 rounded-full items-center justify-center"
                 style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}
               >
-                <Feather name="heart" size={15} color={saved[item.id] ? C.error : C.muted} />
+                <Text style={{ fontSize: 15, color: saved[item.id] ? C.error : C.muted }}>
+                  {saved[item.id] ? '\u2665' : '\u2661'}
+                </Text>
               </Pressable>
             </View>
             <View className="p-3">
               <Text className="text-xl font-bold text-[#1A1A1A] mb-0.5">{item.price}</Text>
               <Text className="text-sm text-[#1A1A1A] mb-2 leading-5" numberOfLines={2}>{item.title}</Text>
               <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center" style={{ gap: 4 }}>
-                  <Feather name="map-pin" size={12} color={C.muted} />
-                  <Text className="text-xs text-[#737373]">{item.location}</Text>
-                </View>
+                <Text className="text-xs text-[#737373]">{item.location}</Text>
                 <Text className="text-xs text-[#737373]">{item.time}</Text>
               </View>
             </View>
@@ -613,10 +598,10 @@ function ListsSection() {
                 <Text className="text-[13px] text-[#737373] mt-0.5">{item.detail}</Text>
               </View>
               <View className="flex-row items-center" style={{ gap: 4 }}>
-                <Feather name="star" size={13} color="#F59E0B" />
+                <Text style={{ fontSize: 13, color: '#F59E0B' }}>{'\u2605'}</Text>
                 <Text className="text-[13px] font-bold text-[#1A1A1A]">{item.rating}</Text>
               </View>
-              <Feather name="chevron-right" size={18} color={C.muted} />
+              <Text className="text-[#737373] text-base">›</Text>
             </Pressable>
             {idx < items.length - 1 && <View className="h-px bg-[#E0E0E0] ml-[72px]" />}
           </View>
@@ -632,15 +617,14 @@ function EmptyStateSection() {
       <SectionHeading number="10" title="EMPTY STATES" />
       <Card className="items-center py-10">
         <View className="w-[72px] h-[72px] rounded-full bg-[#E8F9F2] items-center justify-center mb-5">
-          <Feather name="inbox" size={32} color={C.green} />
+          <Text className="text-2xl text-[#00AA6C] font-bold">--</Text>
         </View>
         <Text className="text-lg font-bold text-[#1A1A1A] mb-1.5">No listings yet</Text>
         <Text className="text-sm text-[#737373] text-center leading-5 mb-5" style={{ maxWidth: 280 }}>
           You have not posted any listings. Start selling by creating your first ad.
         </Text>
         <Pressable className="bg-[#00AA6C] rounded-md px-6 py-3 flex-row items-center" style={{ gap: 8 }}>
-          <Feather name="plus" size={16} color="#fff" />
-          <Text className="text-white font-bold text-[15px]">Create listing</Text>
+          <Text className="text-white font-bold text-[15px]">+ Create listing</Text>
         </Pressable>
       </Card>
     </View>
@@ -649,10 +633,10 @@ function EmptyStateSection() {
 
 function AlertsSection() {
   const alerts = [
-    { type: 'success', icon: 'check-circle' as const, bg: C.greenBg, color: C.green, text: 'Listing published successfully! It is now visible to buyers.' },
-    { type: 'error', icon: 'alert-circle' as const, bg: '#FFEBEE', color: C.error, text: 'Failed to upload photos. Please check file size (max 5MB) and try again.' },
-    { type: 'warning', icon: 'alert-triangle' as const, bg: '#FFF3E0', color: '#E65100', text: 'Your listing expires in 3 days. Renew to keep it active.' },
-    { type: 'info', icon: 'info' as const, bg: '#E3F2FD', color: '#1565C0', text: 'Your listing is under review. It will be published within 24 hours.' },
+    { type: 'success', symbol: '\u2713', bg: C.greenBg, color: C.green, text: 'Listing published successfully! It is now visible to buyers.' },
+    { type: 'error', symbol: '\u00D7', bg: '#FFEBEE', color: C.error, text: 'Failed to upload photos. Please check file size (max 5MB) and try again.' },
+    { type: 'warning', symbol: '!', bg: '#FFF3E0', color: '#E65100', text: 'Your listing expires in 3 days. Renew to keep it active.' },
+    { type: 'info', symbol: 'i', bg: '#E3F2FD', color: '#1565C0', text: 'Your listing is under review. It will be published within 24 hours.' },
   ];
 
   return (
@@ -671,7 +655,7 @@ function AlertsSection() {
               backgroundColor: alert.bg,
             }}
           >
-            <Feather name={alert.icon} size={18} color={alert.color} />
+            <Text className="text-lg font-bold" style={{ color: alert.color }}>{alert.symbol}</Text>
             <Text className="flex-1 text-sm font-medium leading-5" style={{ color: alert.color }}>
               {alert.text}
             </Text>
@@ -682,9 +666,7 @@ function AlertsSection() {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
 
 export default function DesignSystemStates() {
   const { width } = useWindowDimensions();

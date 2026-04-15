@@ -1,9 +1,20 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+
+// ─── Responsive wrapper ─────────────────────────────────────────────────────
+function ResponsiveFrame({ children }: { children: React.ReactNode }) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+  return (
+    <View style={isDesktop ? { width: 390, alignSelf: 'center', backgroundColor: C.page, borderRadius: 8, overflow: 'hidden' } : { backgroundColor: C.page }}>
+      {children}
+    </View>
+  );
+}
 
 // ─── Reusable ListingCard ────────────────────────────────────────────────────
 function ListingCard({ title, price, location, time, badge }: { title: string; price: string; location: string; time: string; badge?: string }) {
@@ -12,7 +23,7 @@ function ListingCard({ title, price, location, time, badge }: { title: string; p
       className="bg-white rounded-lg overflow-hidden border border-[#E0E0E0]"
       style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 }}
     >
-      <View className="bg-[#F0F0F0]" style={{ height: 120 }} />
+      <View style={{ height: 120, backgroundColor: '#F0F0F0', borderRadius: 4 }} />
       {badge && (
         <View className="absolute top-2 left-2 rounded-sm px-2 py-0.5 bg-[#E8F9F2]">
           <Text className="text-[11px] font-bold text-[#00AA6C]">{badge}</Text>
@@ -41,11 +52,8 @@ function TopBar({ loggedIn }: { loggedIn?: boolean }) {
         </View>
       </View>
       {loggedIn ? (
-        <View className="flex-row items-center" style={{ gap: 14 }}>
-          <Text className="text-lg">🔔</Text>
-          <View className="w-8 h-8 bg-[#00AA6C] rounded-full items-center justify-center">
-            <Text className="text-white font-bold text-sm">Г</Text>
-          </View>
+        <View className="w-8 h-8 bg-[#00AA6C] rounded-full items-center justify-center">
+          <Text className="text-white font-bold text-sm">Г</Text>
         </View>
       ) : (
         <View className="bg-[#00AA6C] rounded-md px-4 py-2">
@@ -56,12 +64,16 @@ function TopBar({ loggedIn }: { loggedIn?: boolean }) {
   );
 }
 
-// ─── Search Bar ──────────────────────────────────────────────────────────────
-function SearchBar() {
+// ─── Search Row ──────────────────────────────────────────────────────────────
+function SearchRow() {
   return (
-    <View className="flex-row items-center bg-white border border-[#E0E0E0] rounded-lg px-3 py-3 mx-4 mt-3">
-      <Text className="text-base mr-2">🔍</Text>
-      <Text className="text-base text-[#737373]">Найти в Тбилиси...</Text>
+    <View className="flex-row items-center px-4 mt-3" style={{ gap: 8 }}>
+      <View className="flex-1 bg-white border border-[#E0E0E0] rounded-lg px-3 py-3">
+        <Text className="text-base text-[#737373]">Поиск объявлений...</Text>
+      </View>
+      <Pressable className="bg-[#00AA6C] rounded-lg px-4 py-3">
+        <Text className="text-white font-bold text-sm">Найти</Text>
+      </Pressable>
     </View>
   );
 }
@@ -75,7 +87,7 @@ function CityPills() {
     { name: 'Рустави', active: false },
   ];
   return (
-    <View className="flex-row flex-wrap px-4 mt-3" style={{ gap: 8 }}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, gap: 8 }}>
       {cities.map((c) => (
         <View
           key={c.name}
@@ -84,32 +96,22 @@ function CityPills() {
           <Text className={`text-sm font-semibold ${c.active ? 'text-white' : 'text-[#1A1A1A]'}`}>{c.name}</Text>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
-// ─── Categories Grid ─────────────────────────────────────────────────────────
+// ─── Categories Grid (text chips, no icons) ─────────────────────────────────
 function CategoriesGrid() {
-  const cats = [
-    { emoji: '🏠', label: 'Недвижимость' },
-    { emoji: '🚗', label: 'Авто' },
-    { emoji: '💻', label: 'Электроника' },
-    { emoji: '👕', label: 'Одежда' },
-    { emoji: '🛋️', label: 'Дом и сад' },
-    { emoji: '💼', label: 'Работа' },
-    { emoji: '🐾', label: 'Животные' },
-    { emoji: '🔧', label: 'Услуги' },
-  ];
+  const cats = ['Авто', 'Недвижимость', 'Электроника', 'Одежда', 'Дом и сад', 'Работа', 'Услуги', 'Животные'];
   return (
     <View className="flex-row flex-wrap px-4 mt-4" style={{ gap: 10 }}>
-      {cats.map((c) => (
+      {cats.map((label) => (
         <View
-          key={c.label}
-          className="bg-white rounded-lg border border-[#E0E0E0] items-center justify-center py-3"
-          style={{ width: '47%' as any, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3, elevation: 1 }}
+          key={label}
+          className="bg-[#F0F0F0] rounded-full px-4 py-2.5"
+          style={{ width: '47%' as any, alignItems: 'center' }}
         >
-          <Text style={{ fontSize: 28 }}>{c.emoji}</Text>
-          <Text className="text-sm font-medium text-[#1A1A1A] mt-1.5">{c.label}</Text>
+          <Text className="text-sm font-medium text-[#1A1A1A]">{label}</Text>
         </View>
       ))}
     </View>
@@ -138,52 +140,94 @@ function FreshListings() {
   );
 }
 
-// ─── CTA Banner ──────────────────────────────────────────────────────────────
-function CtaBanner() {
-  return (
-    <View className="mx-4 mt-5 bg-[#00AA6C] rounded-lg px-5 py-4 items-center">
-      <Text className="text-white font-bold text-base mb-1">Подайте объявление</Text>
-      <Text className="text-white text-sm opacity-80">Быстро, просто и бесплатно</Text>
-    </View>
-  );
+// ─── Skeleton placeholder ────────────────────────────────────────────────────
+function SkeletonBlock({ height, width, mt }: { height: number; width?: string | number; mt?: number }) {
+  return <View style={{ height, width: width || '100%', backgroundColor: '#E0E0E0', borderRadius: 6, marginTop: mt || 0 }} />;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// STATE 1: Guest Default
+// STATE 1: Guest
 // ═══════════════════════════════════════════════════════════════════════════════
-function GuestDefault() {
+function GuestState() {
   return (
-    <StateSection title="HOMEPAGE_GUEST_DEFAULT">
-      <View className="bg-[#F5F5F5] rounded-lg overflow-hidden" style={{ width: 390 }}>
+    <StateSection title="HOMEPAGE_GUEST">
+      <ResponsiveFrame>
         <TopBar />
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-          <SearchBar />
-          <CityPills />
-          <CategoriesGrid />
-          <FreshListings />
-          <CtaBanner />
-        </ScrollView>
-      </View>
+        <SearchRow />
+        <CityPills />
+        <CategoriesGrid />
+        <FreshListings />
+        <View style={{ height: 16 }} />
+      </ResponsiveFrame>
     </StateSection>
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// STATE 2: User Logged In
+// STATE 2: User
 // ═══════════════════════════════════════════════════════════════════════════════
-function UserLoggedIn() {
+function UserState() {
   return (
-    <StateSection title="HOMEPAGE_USER_LOGGED_IN">
-      <View className="bg-[#F5F5F5] rounded-lg overflow-hidden" style={{ width: 390 }}>
+    <StateSection title="HOMEPAGE_USER">
+      <ResponsiveFrame>
         <TopBar loggedIn />
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-          <SearchBar />
-          <CityPills />
-          <CategoriesGrid />
-          <FreshListings />
-          <CtaBanner />
-        </ScrollView>
-      </View>
+        <SearchRow />
+        <CityPills />
+        <CategoriesGrid />
+        <FreshListings />
+        <View style={{ height: 16 }} />
+      </ResponsiveFrame>
+    </StateSection>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STATE 3: Loading
+// ═══════════════════════════════════════════════════════════════════════════════
+function LoadingState() {
+  return (
+    <StateSection title="HOMEPAGE_LOADING">
+      <ResponsiveFrame>
+        {/* TopBar skeleton */}
+        <View className="flex-row items-center justify-between bg-white px-4 py-3 border-b border-[#E0E0E0]">
+          <SkeletonBlock height={32} width={120} />
+          <SkeletonBlock height={32} width={64} />
+        </View>
+        {/* Search skeleton */}
+        <View className="px-4 mt-3">
+          <SkeletonBlock height={44} />
+        </View>
+        {/* City pills skeleton */}
+        <View className="flex-row px-4 mt-3" style={{ gap: 8 }}>
+          <SkeletonBlock height={32} width={80} />
+          <SkeletonBlock height={32} width={70} />
+          <SkeletonBlock height={32} width={70} />
+          <SkeletonBlock height={32} width={70} />
+        </View>
+        {/* Category chips skeleton */}
+        <View className="flex-row flex-wrap px-4 mt-4" style={{ gap: 10 }}>
+          {[1,2,3,4,5,6,7,8].map((i) => (
+            <View key={i} style={{ width: '47%' as any }}>
+              <SkeletonBlock height={40} />
+            </View>
+          ))}
+        </View>
+        {/* Listing skeletons */}
+        <View className="px-4 mt-5">
+          <SkeletonBlock height={20} width={180} />
+          <View className="flex-row flex-wrap mt-3" style={{ gap: 10 }}>
+            {[1,2,3,4].map((i) => (
+              <View key={i} style={{ width: '48%' as any }}>
+                <SkeletonBlock height={120} />
+                <SkeletonBlock height={14} width={'80%'} mt={8} />
+                <SkeletonBlock height={16} width={'50%'} mt={4} />
+                <SkeletonBlock height={10} width={'60%'} mt={4} />
+              </View>
+            ))}
+          </View>
+        </View>
+        <View style={{ height: 16 }} />
+      </ResponsiveFrame>
     </StateSection>
   );
 }
@@ -194,8 +238,9 @@ function UserLoggedIn() {
 export default function HomepageStates() {
   return (
     <View style={{ gap: 32 }}>
-      <GuestDefault />
-      <UserLoggedIn />
+      <GuestState />
+      <UserState />
+      <LoadingState />
     </View>
   );
 }
