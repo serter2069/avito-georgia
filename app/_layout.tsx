@@ -55,10 +55,7 @@ function useProtectedRoute() {
       segments[0] === 'proto';
     const inDashboard = segments[0] === 'dashboard' || segments[0] === 'my';
 
-    if (!user && inDashboard) {
-      isRedirectingRef.current = true;
-      router.replace('/(auth)');
-    } else if (!user && inOnboarding) {
+    if (!user && inOnboarding) {
       // Unauthenticated users cannot access onboarding
       isRedirectingRef.current = true;
       router.replace('/(auth)');
@@ -160,7 +157,7 @@ export default function RootLayout() {
   if (!fontsLoaded || !isReady) {
     return (
       <SafeAreaProvider>
-        <View className="flex-1 bg-dark items-center justify-center" style={containerStyle}>
+        <View className="flex-1 bg-white items-center justify-center">
           <ActivityIndicator size="large" color={colors.brandPrimary} />
         </View>
       </SafeAreaProvider>
@@ -169,12 +166,12 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <View ref={rootViewRef} className="flex-1 bg-dark w-full self-center" style={containerStyle}>
-        <StatusBar style="light" />
+      <View ref={rootViewRef} className="flex-1 bg-white w-full self-center">
+        <StatusBar style="dark" />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: colors.bgPrimary },
+            contentStyle: { backgroundColor: colors.bgCard },
           }}
         />
       </View>
