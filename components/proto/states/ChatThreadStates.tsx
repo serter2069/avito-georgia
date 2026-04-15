@@ -73,11 +73,10 @@ function InputBar({ disabled = false }: { disabled?: boolean }) {
     <View className="flex-row items-center px-3 py-2 border-t border-[#E0E0E0]" style={{ gap: 8 }}>
       <View className="flex-1 bg-[#F5F5F5] rounded-full px-4 py-2">
         <TextInput
-          className="text-sm"
           placeholder={'\u041D\u0430\u043F\u0438\u0441\u0430\u0442\u044C...'}
           placeholderTextColor={C.muted}
           editable={!disabled}
-          style={{ color: C.text }}
+          style={{ color: C.text, fontSize: 14 }}
         />
       </View>
       <Text className="text-base font-bold" style={{ color: C.green }}>{'\u2192'}</Text>

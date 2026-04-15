@@ -36,8 +36,7 @@ function InputField({ label, placeholder, value, required }: { label: string; pl
         }}
       >
         <TextInput
-          className="text-base py-3"
-          style={{ color: value ? C.text : C.muted }}
+          style={{ color: value ? C.text : C.muted, fontSize: 16, paddingVertical: 12 }}
           placeholder={placeholder}
           placeholderTextColor={C.muted}
           value={value}

@@ -46,10 +46,10 @@ function SearchDefault() {
         <View className="px-4 pt-4 pb-3">
           <View className="flex-row items-center border-2 border-[#00AA6C] rounded-lg bg-white px-3" style={{ gap: 8 }}>
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-3"
               placeholder="Поиск объявлений..."
               placeholderTextColor={C.muted}
               editable={false}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12 }}
             />
           </View>
         </View>

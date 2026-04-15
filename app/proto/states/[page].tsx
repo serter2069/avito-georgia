@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 
 import DesignSystemStates from '../../../components/proto/states/DesignSystemStates';
@@ -72,5 +72,9 @@ export default function ProtoStatesPage() {
     );
   }
 
-  return <Component />;
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16 }}>
+      <Component />
+    </ScrollView>
+  );
 }

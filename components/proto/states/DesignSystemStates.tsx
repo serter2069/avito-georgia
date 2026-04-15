@@ -397,11 +397,11 @@ function InputsSection() {
           <SubLabel text="Search bar" />
           <View className="flex-row items-center bg-white border-[1.5px] border-[#00AA6C] rounded-md pl-3 overflow-hidden">
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-3 px-2.5"
               placeholder="Search listings..."
               placeholderTextColor={C.muted}
               value={search}
               onChangeText={setSearch}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, paddingHorizontal: 10 }}
             />
             <View className="bg-[#00AA6C] px-4 py-3">
               <Text className="text-white font-semibold text-sm">Search</Text>
@@ -414,11 +414,11 @@ function InputsSection() {
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">City</Text>
           <View className="border border-[#E0E0E0] rounded-sm bg-white flex-row items-center px-3">
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-2.5"
               placeholder="e.g. Batumi"
               placeholderTextColor={C.muted}
               value={city}
               onChangeText={setCity}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10 }}
             />
           </View>
         </View>
@@ -428,9 +428,9 @@ function InputsSection() {
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">Price</Text>
           <View className="border-2 border-[#00AA6C] rounded-sm bg-white flex-row items-center px-3">
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-2.5"
               value="85 000"
               editable={false}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10 }}
             />
             <Text className="text-sm text-[#737373]">$</Text>
           </View>
@@ -441,9 +441,9 @@ function InputsSection() {
           <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">Phone</Text>
           <View className="border-[1.5px] border-[#D32F2F] rounded-sm bg-[#FFEBEE] flex-row items-center px-3">
             <TextInput
-              className="flex-1 text-base text-[#1A1A1A] py-2.5"
               value={phone}
               onChangeText={setPhone}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10 }}
             />
           </View>
           <View className="flex-row items-center mt-1" style={{ gap: 4 }}>

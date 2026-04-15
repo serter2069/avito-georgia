@@ -46,8 +46,7 @@ function EmailInput({ value, error, disabled }: { value?: string; error?: boolea
         }}
       >
         <TextInput
-          className="text-base py-3"
-          style={{ color: C.text }}
+          style={{ color: C.text, fontSize: 16, paddingVertical: 12 }}
           placeholder="ваш@email.com"
           placeholderTextColor={C.muted}
           value={value}

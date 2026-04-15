@@ -140,10 +140,10 @@ export function HelpStates() {
             <View className="bg-white border border-[#E0E0E0] rounded-lg flex-row items-center px-3" style={{ gap: 8 }}>
               <Text className="text-base text-[#737373]">&#x1F50D;</Text>
               <TextInput
-                className="flex-1 text-sm text-[#1A1A1A] py-3"
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
                 editable={false}
+                style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12 }}
               />
             </View>
 
@@ -173,10 +173,10 @@ export function HelpStates() {
             <View className="bg-white border border-[#E0E0E0] rounded-lg flex-row items-center px-3" style={{ gap: 8 }}>
               <Text className="text-base text-[#737373]">&#x1F50D;</Text>
               <TextInput
-                className="flex-1 text-sm text-[#1A1A1A] py-3"
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
                 editable={false}
+                style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12 }}
               />
             </View>
 
