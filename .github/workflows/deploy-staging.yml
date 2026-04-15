@@ -67,7 +67,7 @@ jobs:
         run: |
           cd ${{ env.DEPLOY_DIR }}
           export DOPPLER_TOKEN=$(cat ${{ env.DOPPLER_TOKEN_FILE }})
-          doppler run -- npx expo export --platform web --output-dir web
+          doppler run -- npx expo export --platform web
 
       - name: Install API dependencies
         run: |
@@ -91,7 +91,7 @@ jobs:
       - name: Generate version.json
         run: |
           cd ${{ env.DEPLOY_DIR }}
-          cat > web/version.json << EOF
+          cat > dist/version.json << EOF
           {
             "version": "$(git rev-parse --short HEAD)",
             "commit": "$(git rev-parse HEAD)",
@@ -139,7 +139,7 @@ jobs:
           git reset --hard ${{ env.ROLLBACK_COMMIT }}
           npm ci
           export DOPPLER_TOKEN=$(cat ${{ env.DOPPLER_TOKEN_FILE }})
-          doppler run -- npx expo export --platform web --output-dir web
+          doppler run -- npx expo export --platform web
           cd api && npm ci
           doppler run -- npx prisma generate
           npx tsc
