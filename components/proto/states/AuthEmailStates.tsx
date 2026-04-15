@@ -50,7 +50,7 @@ function EmailInput({ value, error, disabled }: { value?: string; error?: boolea
         placeholder="ваш@email.com"
         placeholderTextColor={C.muted}
         value={value}
-        editable={false}
+        
       />
       {error && (
         <Text className="text-sm mt-1.5" style={{ color: C.error }}>

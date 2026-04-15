@@ -40,7 +40,7 @@ function InputField({ label, placeholder, value, required }: { label: string; pl
         placeholder={placeholder}
         placeholderTextColor={C.muted}
         value={value}
-        editable={false}
+        
       />
     </View>
   );

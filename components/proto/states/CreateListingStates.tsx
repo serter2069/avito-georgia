@@ -53,7 +53,7 @@ function InputField({ label, placeholder, value, suffix, multiline }: {
           placeholder={placeholder}
           placeholderTextColor={C.muted}
           value={value}
-          editable={false}
+          
           multiline={multiline}
           style={multiline ? { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, height: 80, textAlignVertical: 'top', borderWidth: 0, backgroundColor: 'transparent' } : { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent' }}
         />

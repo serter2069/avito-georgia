@@ -427,7 +427,7 @@ function InputsSection() {
           <View style={{ borderWidth: 2, borderColor: '#00AA6C', borderRadius: 2, backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}>
             <TextInput
               value="85 000"
-              editable={false}
+              
               style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent' }}
             />
             <Text className="text-sm text-[#737373]">$</Text>

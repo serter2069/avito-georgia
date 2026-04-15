@@ -149,7 +149,7 @@ export function HelpStates() {
               <TextInput
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
-                editable={false}
+                
                 style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent' }}
               />
             </View>
@@ -182,7 +182,7 @@ export function HelpStates() {
               <TextInput
                 placeholder="Поиск по FAQ"
                 placeholderTextColor={C.muted}
-                editable={false}
+                
                 style={{ flex: 1, fontSize: 14, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent' }}
               />
             </View>

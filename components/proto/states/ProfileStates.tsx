@@ -119,7 +119,7 @@ function EditModeState() {
                   paddingVertical: 10,
                 }}
                 value={'\u0413\u0435\u043E\u0440\u0433\u0438\u0439'}
-                editable={false}
+                
               />
             </View>
 
@@ -137,7 +137,7 @@ function EditModeState() {
                 }}
                 placeholder="+995 5XX XXX XXX"
                 placeholderTextColor={C.muted}
-                editable={false}
+                
               />
             </View>
 
