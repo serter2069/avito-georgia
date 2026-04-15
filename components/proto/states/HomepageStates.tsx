@@ -194,7 +194,7 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
   const [query, setQuery] = useState('');
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
-  const [sort, setSort] = useState<'date' | 'price'>('date');
+  const [sort, setSort] = useState<'date' | 'price_asc' | 'price_desc'>('date');
 
   const filtered = LISTINGS.filter(l => {
     const matchCat = category === 'all' || l.cat === category;
@@ -332,21 +332,27 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
           {/* Spacer */}
           {isTablet && <View style={{ flex: 1 }} />}
 
-          {/* Count + sort */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Text style={{ fontSize: 13, color: C.muted, marginRight: 4 }}>{filtered.length} объявлений</Text>
-            <Pressable
-              onPress={() => setSort('date')}
-              style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: sort === 'date' ? C.green : C.border, backgroundColor: sort === 'date' ? C.greenBg : C.white }}
-            >
-              <Text style={{ fontSize: 12, fontWeight: sort === 'date' ? '600' : '400', color: sort === 'date' ? C.green : C.text }}>По дате</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setSort('price')}
-              style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: sort === 'price' ? C.green : C.border, backgroundColor: sort === 'price' ? C.greenBg : C.white }}
-            >
-              <Text style={{ fontSize: 12, fontWeight: sort === 'price' ? '600' : '400', color: sort === 'price' ? C.green : C.text }}>По цене</Text>
-            </Pressable>
+          {/* Count + sort select */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Text style={{ fontSize: 13, color: C.muted }}>{filtered.length} объявлений</Text>
+            {/* Native select — works in Expo web */}
+            <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 0, backgroundColor: C.white, flexDirection: 'row', alignItems: 'center' }}>
+              {/* @ts-ignore — select is valid HTML element in RN web */}
+              <select
+                value={sort}
+                onChange={(e: any) => setSort(e.target.value)}
+                style={{
+                  fontSize: 13, color: '#1A1A1A', backgroundColor: 'transparent',
+                  border: 'none', outline: 'none', paddingTop: 5, paddingBottom: 5,
+                  cursor: 'pointer', appearance: 'none', paddingRight: 18,
+                }}
+              >
+                <option value="date">По дате</option>
+                <option value="price_asc">Дешевле</option>
+                <option value="price_desc">Дороже</option>
+              </select>
+              <Text style={{ fontSize: 10, color: C.muted, marginLeft: -16, pointerEvents: 'none' as any }}>▾</Text>
+            </View>
           </View>
         </View>
       </View>
