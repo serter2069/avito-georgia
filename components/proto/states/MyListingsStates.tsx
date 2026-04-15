@@ -1,265 +1,372 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = {
+  green: '#00AA6C',
+  greenBg: '#E8F9F2',
+  white: '#FFFFFF',
+  text: '#1A1A1A',
+  muted: '#9E9E9E',
+  border: '#E8E8E8',
+  error: '#D32F2F',
+  warn: '#F59E0B',
+  page: '#F5F5F5',
+};
+const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7', '#FFF9C4', '#FFCCBC'];
 
-const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8'];
+type Tab = 'active' | 'inactive' | 'draft';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────────
+interface Listing {
+  id: number;
+  title: string;
+  price: string;
+  views: string;
+  photos: number;
+  colorIdx: number;
+}
 
-function PhoneFrame({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
+const LISTINGS: Record<Tab, Listing[]> = {
+  active: [
+    { id: 1, title: 'Toyota Camry 2019, 45 000 км', price: '12 500 ₾', views: '24 просмотра', photos: 8, colorIdx: 0 },
+    { id: 2, title: 'Квартира 3-комн., Батуми центр', price: '85 000 ₾', views: '12 просмотров', photos: 12, colorIdx: 1 },
+    { id: 3, title: 'iPhone 14 Pro Max 256GB', price: '2 400 ₾', views: '8 просмотров', photos: 5, colorIdx: 2 },
+  ],
+  inactive: [
+    { id: 4, title: 'Велосипед горный, алюминий', price: '450 ₾', views: '3 просмотра', photos: 3, colorIdx: 3 },
+    { id: 5, title: 'Диван угловой, бежевый', price: '350 ₾', views: '1 просмотр', photos: 4, colorIdx: 4 },
+  ],
+  draft: [
+    { id: 6, title: 'Ноутбук Dell Inspiron 15', price: '1 800 ₾', views: '', photos: 2, colorIdx: 5 },
+    { id: 7, title: 'Холодильник Samsung NoFrost', price: '900 ₾', views: '', photos: 1, colorIdx: 6 },
+  ],
+};
+
+const TAB_DEFS: { key: Tab; label: string; count: number }[] = [
+  { key: 'active', label: 'Активные', count: 3 },
+  { key: 'inactive', label: 'Неактивные', count: 2 },
+  { key: 'draft', label: 'Черновики', count: 2 },
+];
+
+function ListingCard({
+  listing,
+  tab,
+  onDelete,
+}: {
+  listing: Listing;
+  tab: Tab;
+  onDelete: (id: number) => void;
+}) {
+  const [liked, setLiked] = useState(false);
 
   return (
     <View
-      className="bg-white overflow-hidden"
-      style={isDesktop
-        ? { width: 390, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: C.border, backgroundColor: C.white }
-        : { width: '100%' as any, backgroundColor: C.white }
-      }
+      style={{
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: C.border,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        gap: 12,
+        backgroundColor: C.white,
+      }}
     >
-      {isDesktop && (
-        <View style={{ position: 'absolute', top: -20, left: 0, right: 0, bottom: -20, zIndex: -1, backgroundColor: C.white }} />
-      )}
-      {children}
-    </View>
-  );
-}
+      {/* Image */}
+      <View style={{ position: 'relative', width: 88, height: 88, borderRadius: 8, overflow: 'hidden' }}>
+        <View style={{ width: 88, height: 88, backgroundColor: IMG_COLORS[listing.colorIdx % IMG_COLORS.length] }} />
+        {/* Heart */}
+        <Pressable
+          onPress={() => setLiked(!liked)}
+          style={{
+            position: 'absolute',
+            top: 4,
+            right: 4,
+            width: 26,
+            height: 26,
+            borderRadius: 13,
+            backgroundColor: 'rgba(255,255,255,0.85)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 14, color: liked ? '#E53935' : C.muted }}>{liked ? '\u2665' : '\u2661'}</Text>
+        </Pressable>
+        {/* Photo count */}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 4,
+            right: 4,
+            backgroundColor: 'rgba(0,0,0,0.55)',
+            borderRadius: 4,
+            paddingHorizontal: 5,
+            paddingVertical: 2,
+          }}
+        >
+          <Text style={{ color: C.white, fontSize: 10, fontWeight: '600' }}>{listing.photos} фото</Text>
+        </View>
+      </View>
 
-function Header({ title }: { title: string }) {
-  return (
-    <View className="flex-row items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
-      <Text className="text-lg font-bold text-[#1A1A1A]">{title}</Text>
-      <Text className="text-xl text-[#00AA6C]">+</Text>
-    </View>
-  );
-}
-
-function StatusTabs({ tabs, activeIdx }: { tabs: string[]; activeIdx: number }) {
-  return (
-    <View className="flex-row border-b border-[#E0E0E0]">
-      {tabs.map((tab, idx) => {
-        const active = idx === activeIdx;
-        return (
+      {/* Info */}
+      <View style={{ flex: 1, gap: 4 }}>
+        <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }} numberOfLines={2}>
+          {listing.title}
+        </Text>
+        <Text style={{ fontSize: 15, fontWeight: '700', color: C.green }}>{listing.price}</Text>
+        {listing.views ? (
+          <Text style={{ fontSize: 12, color: C.muted }}>{listing.views}</Text>
+        ) : (
           <View
-            key={tab}
-            className="flex-1 items-center py-3"
-            style={active ? { borderBottomWidth: 2, borderBottomColor: C.green } : {}}
+            style={{
+              alignSelf: 'flex-start',
+              backgroundColor: '#F5F5F5',
+              borderRadius: 4,
+              paddingHorizontal: 6,
+              paddingVertical: 2,
+            }}
           >
-            <Text
-              className="text-[13px] font-semibold"
-              style={{ color: active ? C.green : C.muted }}
-            >
-              {tab}
-            </Text>
-          </View>
-        );
-      })}
-    </View>
-  );
-}
-
-function ListingRow({ title, price, views, actions, idx = 0 }: {
-  title: string; price: string; views?: string; actions?: { label: string; color?: string }[]; idx?: number;
-}) {
-  return (
-    <View className="flex-row px-4 py-3 border-b border-[#E0E0E0]" style={{ gap: 12 }}>
-      <View style={{ width: 72, height: 72, borderRadius: 6, backgroundColor: IMG_COLORS[idx % 4] }} />
-      <View className="flex-1" style={{ gap: 4 }}>
-        <Text className="text-[15px] font-semibold text-[#1A1A1A]" numberOfLines={1}>{title}</Text>
-        <Text className="text-[15px] font-bold" style={{ color: C.green }}>{price}</Text>
-        {views && <Text className="text-xs text-[#737373]">{views}</Text>}
-        {actions && actions.length > 0 && (
-          <View className="flex-row mt-1" style={{ gap: 12 }}>
-            {actions.map((a) => (
-              <Text key={a.label} className="text-[13px] font-semibold" style={{ color: a.color || C.green }}>
-                {a.label}
-              </Text>
-            ))}
+            <Text style={{ fontSize: 11, fontWeight: '600', color: C.muted }}>Черновик</Text>
           </View>
         )}
+
+        {/* Actions */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 2 }}>
+          {tab === 'active' && (
+            <>
+              <Pressable>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: C.green }}>Редактировать</Text>
+              </Pressable>
+              <Pressable>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: C.green }}>Продлить</Text>
+              </Pressable>
+            </>
+          )}
+          {tab === 'inactive' && (
+            <Pressable
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: C.greenBg,
+                borderRadius: 6,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                gap: 4,
+              }}
+            >
+              <Text style={{ fontSize: 13, fontWeight: '700', color: C.green }}>Возобновить — 3 GEL</Text>
+            </Pressable>
+          )}
+          {tab === 'draft' && (
+            <>
+              <Pressable
+                style={{
+                  backgroundColor: C.green,
+                  borderRadius: 6,
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                }}
+              >
+                <Text style={{ fontSize: 13, fontWeight: '700', color: C.white }}>Опубликовать</Text>
+              </Pressable>
+              <Pressable onPress={() => onDelete(listing.id)}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: C.error }}>Удалить</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
       </View>
     </View>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// STATES
-// ═══════════════════════════════════════════════════════════════════════════════
+function MyListingsInteractive() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
+  const isDesktop = width >= 1024;
 
-const TAB_LISTINGS: Record<string, { title: string; price: string; views: string }[]> = {
-  active: [
-    { title: 'Toyota Camry 2019, 45 000 км', price: '12 500 ₾', views: '24 просмотра' },
-    { title: 'Квартира 3-комн., Батуми центр', price: '85 000 ₾', views: '12 просмотров' },
-    { title: 'iPhone 14 Pro Max 256GB', price: '2 400 ₾', views: '8 просмотров' },
-  ],
-  inactive: [
-    { title: 'Велосипед горный, алюминий', price: '450 ₾', views: '3 просмотра' },
-  ],
-  draft: [
-    { title: 'Диван угловой, бежевый', price: '350 ₾', views: '' },
-    { title: 'Ноутбук Dell Inspiron 15', price: '1 800 ₾', views: '' },
-  ],
-};
+  const [tab, setTab] = useState<Tab>('active');
+  const [items, setItems] = useState<Record<Tab, Listing[]>>(LISTINGS);
 
-function ActiveTabState() {
-  const [tab, setTab] = useState<'active' | 'inactive' | 'draft'>('active');
-  const tabDefs = [
-    { key: 'active' as const, label: 'Активные (3)' },
-    { key: 'inactive' as const, label: 'Неактивные (1)' },
-    { key: 'draft' as const, label: 'Черновики (2)' },
-  ];
-  const listings = TAB_LISTINGS[tab];
-  const actions = [
-    { label: 'Редактировать' },
-    { label: 'Удалить', color: C.error },
-    { label: 'Продлить' },
-  ];
+  const handleDelete = (id: number) => {
+    setItems((prev) => ({
+      ...prev,
+      draft: prev.draft.filter((l) => l.id !== id),
+    }));
+  };
 
-  return (
-    <StateSection title="MY_LISTINGS / Interactive Tabs">
-      <PhoneFrame>
-        <Header title="Мои объявления" />
-        <View className="flex-row border-b border-[#E0E0E0]">
-          {tabDefs.map(({ key, label }) => {
+  const currentList = items[tab];
+
+  const tabBar = (
+    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: C.border }}>
+      {TAB_DEFS.map(({ key, label, count }) => {
+        const active = tab === key;
+        return (
+          <Pressable
+            key={key}
+            onPress={() => setTab(key)}
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              paddingVertical: 12,
+              borderBottomWidth: active ? 2 : 0,
+              borderBottomColor: C.green,
+            }}
+          >
+            <Text style={{ fontSize: 13, fontWeight: '600', color: active ? C.green : C.muted }}>
+              {label} ({key === 'draft' ? items.draft.length : count})
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+
+  const listContent = (
+    <View>
+      {currentList.length === 0 ? (
+        <View style={{ alignItems: 'center', paddingVertical: 48, paddingHorizontal: 24 }}>
+          <Text style={{ fontSize: 15, fontWeight: '600', color: C.muted, textAlign: 'center' }}>
+            Нет объявлений
+          </Text>
+        </View>
+      ) : (
+        currentList.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} tab={tab} onDelete={handleDelete} />
+        ))
+      )}
+    </View>
+  );
+
+  if (isDesktop) {
+    return (
+      <View style={{ flexDirection: 'row', gap: 0 }}>
+        {/* Sidebar tabs */}
+        <View
+          style={{
+            width: 200,
+            borderRightWidth: 1,
+            borderRightColor: C.border,
+            paddingTop: 8,
+          }}
+        >
+          {TAB_DEFS.map(({ key, label, count }) => {
             const active = tab === key;
             return (
               <Pressable
                 key={key}
-                className="flex-1 items-center py-3"
-                style={active ? { borderBottomWidth: 2, borderBottomColor: C.green } : {}}
                 onPress={() => setTab(key)}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
+                  backgroundColor: active ? C.greenBg : C.white,
+                  borderLeftWidth: active ? 3 : 0,
+                  borderLeftColor: C.green,
+                }}
               >
-                <Text
-                  className="text-[13px] font-semibold"
-                  style={{ color: active ? C.green : C.muted }}
-                >
+                <Text style={{ fontSize: 14, fontWeight: active ? '700' : '500', color: active ? C.green : C.text }}>
                   {label}
+                </Text>
+                <Text style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
+                  {key === 'draft' ? items.draft.length : count} объявлений
                 </Text>
               </Pressable>
             );
           })}
         </View>
-        {listings.length === 0 ? (
-          <View className="items-center py-12 px-6">
-            <Text className="text-base font-semibold text-[#1A1A1A] text-center">Нет объявлений</Text>
-          </View>
-        ) : (
-          listings.map((l, idx) => (
-            <ListingRow key={l.title} title={l.title} price={l.price} views={l.views} actions={actions} idx={idx} />
-          ))
-        )}
-      </PhoneFrame>
-    </StateSection>
+        {/* Listings */}
+        <View style={{ flex: 1 }}>{listContent}</View>
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      {tabBar}
+      {listContent}
+      {isMobile && <BottomNav active="browse" />}
+    </View>
   );
 }
 
-function PendingTabState() {
-  const tabs = ['Активные (3)', 'Ожидают (1)', 'Черновики (2)', 'Архив'];
+function MyListingsEmpty() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
 
   return (
-    <StateSection title="MY_LISTINGS / Pending">
-      <PhoneFrame>
-        <Header title="Мои объявления" />
-        <StatusTabs tabs={tabs} activeIdx={1} />
-        <View className="flex-row px-4 py-3 border-b border-[#E0E0E0]" style={{ gap: 12 }}>
-          <View style={{ width: 72, height: 72, borderRadius: 6, backgroundColor: IMG_COLORS[1] }} />
-          <View className="flex-1" style={{ gap: 4 }}>
-            <View className="flex-row items-center" style={{ gap: 8 }}>
-              <Text className="text-[15px] font-semibold text-[#1A1A1A]" numberOfLines={1}>Диван угловой, бежевый</Text>
-            </View>
-            <Text className="text-[15px] font-bold" style={{ color: C.green }}>350 ₾</Text>
-            <View className="rounded px-2 py-0.5 self-start mt-1" style={{ backgroundColor: '#F5F5F5' }}>
-              <Text className="text-[11px] font-bold" style={{ color: C.muted }}>На проверке</Text>
-            </View>
-          </View>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-function EmptyState() {
-  return (
-    <StateSection title="MY_LISTINGS / Empty">
-      <PhoneFrame>
-        <Header title="Мои объявления" />
-        <View className="items-center py-16 px-6">
-          <Text className="text-base font-semibold text-[#1A1A1A] mb-2 text-center">
-            Нет объявлений
-          </Text>
-          <Pressable className="rounded-md px-6 py-3 mt-4" style={{ backgroundColor: C.green }}>
-            <Text className="text-white font-bold text-[15px]">Подать объявление</Text>
-          </Pressable>
-          <Text className="text-xs text-[#737373] mt-3 text-center">
-            3 бесплатных объявления в каждой категории
-          </Text>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-function DeleteConfirmState() {
-  return (
-    <StateSection title="MY_LISTINGS / Delete confirm">
-      <PhoneFrame>
-        <Header title="Мои объявления" />
-        <ListingRow
-          title="Toyota Camry 2019, 45 000 км"
-          price="12 500 ₾"
-          views="24 просмотра"
-          idx={0}
-        />
-
-        {/* Modal overlay */}
-        <View
-          className="absolute inset-0 items-center justify-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+    <View>
+      <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Мои объявления</Text>
+      </View>
+      <View style={{ alignItems: 'center', paddingVertical: 64, paddingHorizontal: 24 }}>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: C.text, textAlign: 'center', marginBottom: 8 }}>
+          Нет объявлений
+        </Text>
+        <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', marginBottom: 20 }}>
+          3 бесплатных объявления в каждой категории
+        </Text>
+        <Pressable
+          style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 12 }}
         >
-          <View
-            className="bg-white rounded-xl mx-6 p-6"
-            style={{
-              width: 340,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.15,
-              shadowRadius: 24,
-              elevation: 8,
-            }}
-          >
-            <Text className="text-lg font-bold text-[#1A1A1A] mb-2">Удалить объявление?</Text>
-            <Text className="text-sm text-[#737373] mb-6 leading-5">
-              Это действие нельзя отменить.
-            </Text>
-            <View className="flex-row justify-end" style={{ gap: 12 }}>
-              <Pressable className="rounded-md px-5 py-2.5 border border-[#E0E0E0]">
-                <Text className="text-[15px] font-semibold text-[#1A1A1A]">Отмена</Text>
-              </Pressable>
-              <Pressable className="rounded-md px-5 py-2.5" style={{ backgroundColor: C.error }}>
-                <Text className="text-[15px] font-bold text-white">Удалить</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </PhoneFrame>
-    </StateSection>
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Подать объявление</Text>
+        </Pressable>
+      </View>
+      {isMobile && <BottomNav active="browse" />}
+    </View>
   );
 }
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MAIN EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
 
 export default function MyListingsStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+
   return (
     <View style={{ gap: 0 }}>
-      <ActiveTabState />
-      <PendingTabState />
-      <EmptyState />
-      <DeleteConfirmState />
+      <StateSection title="MY_LISTINGS / Interactive Tabs (active/inactive/draft)">
+        <View
+          style={
+            isDesktop
+              ? {
+                  borderWidth: 1,
+                  borderColor: C.border,
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  backgroundColor: C.white,
+                }
+              : { backgroundColor: C.white }
+          }
+        >
+          <View
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              borderBottomWidth: 1,
+              borderBottomColor: C.border,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Мои объявления</Text>
+            <Pressable>
+              <Text style={{ fontSize: 22, color: C.green, fontWeight: '300' }}>+</Text>
+            </Pressable>
+          </View>
+          <MyListingsInteractive />
+        </View>
+      </StateSection>
+
+      <StateSection title="MY_LISTINGS / Empty State">
+        <View
+          style={
+            isDesktop
+              ? { borderWidth: 1, borderColor: C.border, borderRadius: 12, overflow: 'hidden', backgroundColor: C.white }
+              : { backgroundColor: C.white }
+          }
+        >
+          <MyListingsEmpty />
+        </View>
+      </StateSection>
     </View>
   );
 }

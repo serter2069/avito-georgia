@@ -1,50 +1,48 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-// ─── Image Placeholder ───────────────────────────────────────────────────────
-function ImgPlaceholder({ height = 260, color = '#BBDEFB' }: { height?: number; color?: string }) {
-  return <View style={{ height, backgroundColor: color, width: '100%' }} />;
-}
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+const C = { green: '#00AA6C', greenBg: '#E8F9F2', white: '#FFFFFF', text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8' };
+const IMG_COLORS = ['#BBDEFB', '#C8E6C9', '#F8BBD0', '#E1BEE7', '#FFF9C4'];
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
-
-function PhoneFrame({ children }: { children: React.ReactNode }) {
+function useLayout() {
   const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-  return (
-    <View
-      className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
-      style={isDesktop ? { width: 390, alignSelf: 'center' } : { width: '100%' }}
-    >
-      {children}
-    </View>
-  );
+  return { width, isMobile: width < 640, isDesktop: width >= 1024 };
 }
 
-function Header() {
-  return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-[#E0E0E0]">
-      <Text className="text-base font-semibold text-[#1A1A1A]">← Назад</Text>
-      <Text className="text-sm text-[#737373]">Поделиться</Text>
-    </View>
-  );
-}
-
-const GALLERY_COLORS = ['#BBDEFB', '#C8E6C9', '#F8BBD0', '#E1BEE7'];
-
-function PhotoGallery() {
+// ─── Photo Gallery ────────────────────────────────────────────────────────────
+function PhotoGallery({ onFavPress, fav }: { onFavPress: () => void; fav: boolean }) {
   const [activePhoto, setActivePhoto] = useState(0);
+  const { isMobile, isDesktop } = useLayout();
+  const galleryHeight = isDesktop ? 400 : 280;
+
   return (
-    <View style={{ height: 260, width: '100%', position: 'relative' }}>
-      <ImgPlaceholder height={260} color={GALLERY_COLORS[activePhoto]} />
-      <View style={{ position: 'absolute', bottom: 12, right: 12, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 }}>
-        <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{activePhoto + 1} / {GALLERY_COLORS.length}</Text>
+    <View style={{ position: 'relative', height: galleryHeight, width: '100%' }}>
+      <View style={{ height: galleryHeight, backgroundColor: IMG_COLORS[activePhoto % IMG_COLORS.length], width: '100%' }} />
+
+      {/* Heart button top-right */}
+      <Pressable
+        onPress={onFavPress}
+        style={{ position: 'absolute', top: 12, right: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <Text style={{ fontSize: 18, color: fav ? '#E53935' : '#9E9E9E' }}>{fav ? '♥' : '♡'}</Text>
+      </Pressable>
+
+      {/* Photo count badge bottom-right */}
+      <View style={{ position: 'absolute', bottom: 6, right: 6, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2 }}>
+        <Text style={{ color: '#fff', fontSize: 10, fontWeight: '600' }}>5 фото</Text>
       </View>
-      <View style={{ position: 'absolute', bottom: 12, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
-        {GALLERY_COLORS.map((_, i) => (
-          <Pressable key={i} onPress={() => setActivePhoto(i)}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: i === activePhoto ? '#fff' : 'rgba(255,255,255,0.4)' }} />
+
+      {/* Dot navigation bottom-center */}
+      <View style={{ position: 'absolute', bottom: 16, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
+        {IMG_COLORS.map((_, i) => (
+          <Pressable key={i} onPress={() => setActivePhoto(i)} hitSlop={8}>
+            <View style={{
+              width: i === activePhoto ? 18 : 8, height: 8, borderRadius: 4,
+              backgroundColor: i === activePhoto ? C.white : 'rgba(255,255,255,0.45)',
+            }} />
           </Pressable>
         ))}
       </View>
@@ -52,213 +50,178 @@ function PhotoGallery() {
   );
 }
 
-function SellerRow({ phoneRevealed }: { phoneRevealed?: boolean }) {
+// ─── Seller Info Row ──────────────────────────────────────────────────────────
+function SellerRow() {
   return (
-    <View className="bg-white rounded-lg border border-[#E0E0E0] p-4 mx-4 mt-3">
-      <View className="flex-row items-center" style={{ gap: 12 }}>
-        <View className="w-11 h-11 bg-[#737373] rounded-full items-center justify-center">
-          <Text className="text-white font-bold text-lg">M</Text>
-        </View>
-        <View className="flex-1">
-          <Text className="text-[15px] font-semibold text-[#1A1A1A]">Михаил</Text>
-          <Text className="text-xs text-[#737373] mt-0.5">На сайте с 2023</Text>
-        </View>
+    <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 16, borderTopWidth: 1, borderTopColor: C.border, marginTop: 4 }}>
+      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#B2DFDB', alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: '#00695C' }}>МК</Text>
       </View>
-      <View className="flex-row mt-3" style={{ gap: 10 }}>
-        <Pressable className="flex-1 bg-[#00AA6C] rounded-md py-3 items-center">
-          <Text className="text-white font-bold text-sm">Написать</Text>
-        </Pressable>
-        {phoneRevealed ? (
-          <View className="flex-1 border border-[#00AA6C] rounded-md py-3 items-center">
-            <Text style={{ color: '#00AA6C', fontWeight: '600', fontSize: 14 }}>+995 555 XX-XX-XX</Text>
-          </View>
-        ) : (
-          <Pressable className="flex-1 border border-[#E0E0E0] rounded-md py-3 items-center">
-            <Text className="text-[#1A1A1A] font-semibold text-sm">Показать телефон</Text>
-          </Pressable>
-        )}
+      <View style={{ flex: 1, marginLeft: 12 }}>
+        <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>Михаил Кварацхелия</Text>
+        <Text style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>★ 4.8 · На сайте с 2022</Text>
       </View>
+      <Text style={{ fontSize: 12, color: C.green, fontWeight: '500' }}>Профиль</Text>
     </View>
   );
 }
 
-function ListingContent({ favorite, ownerView }: { favorite?: boolean; ownerView?: boolean }) {
+// ─── Detail Info ──────────────────────────────────────────────────────────────
+function ListingInfo() {
   return (
-    <View className="px-4 pt-4">
-      {/* Badge */}
-      <View className="rounded-full px-3 py-1 bg-[#E8F9F2] self-start mb-2">
-        <Text className="text-xs font-bold text-[#00AA6C]">Активно</Text>
-      </View>
-
-      {/* Title */}
-      <Text className="text-xl font-bold text-[#1A1A1A] leading-7">
+    <View>
+      <Text style={{ fontSize: 22, fontWeight: '700', color: C.text, lineHeight: 30 }}>
         3-комнатная квартира, Батуми, вид на море
       </Text>
-
-      {/* Price */}
-      <Text className="text-2xl font-bold text-[#1A1A1A] mt-2">₾125 000</Text>
-
-      {/* Location */}
-      <Text className="text-sm text-[#737373] mt-2">Батуми, Аджара</Text>
-
-      {/* Description */}
-      <Text className="text-base text-[#1A1A1A] leading-6 mt-4">
-        Просторная 3-комнатная квартира с панорамным видом на море. Современный ремонт, полностью меблирована. 5 минут пешком до пляжа, рядом вся инфраструктура.
-      </Text>
-
-      {/* Divider */}
-      <View className="h-px bg-[#E0E0E0] my-4" />
-
-      {/* Seller or Owner actions */}
-      {ownerView ? (
-        <View className="flex-row" style={{ gap: 8 }}>
-          <Pressable className="flex-1 bg-[#00AA6C] rounded-md py-3 items-center">
-            <Text className="text-white font-bold text-sm">Редактировать</Text>
-          </Pressable>
-          <Pressable className="flex-1 bg-[#FFEBEE] rounded-md py-3 items-center">
-            <Text className="text-[#D32F2F] font-bold text-sm">Удалить</Text>
-          </Pressable>
-          <Pressable className="flex-1 border border-[#00AA6C] rounded-md py-3 items-center">
-            <Text className="text-[#00AA6C] font-bold text-sm">Продлить</Text>
-          </Pressable>
-        </View>
-      ) : null}
-
-      {/* Favorite row */}
-      {!ownerView && (
-        <Pressable className="flex-row items-center py-2">
-          <Text style={{ fontSize: 18, color: favorite ? '#e03131' : C.text }}>
-            {favorite ? '\u2665' : '\u2661'}
-          </Text>
-          <Text className="text-sm text-[#1A1A1A] ml-2">В избранное</Text>
-        </Pressable>
-      )}
-
-      {/* Report */}
-      {!ownerView && (
-        <Pressable className="mt-2 mb-2">
-          <Text className="text-sm text-[#737373] underline">Пожаловаться</Text>
-        </Pressable>
-      )}
-    </View>
-  );
-}
-
-function ReportModal() {
-  const reasons = ['Спам', 'Мошенничество', 'Запрещённый контент', 'Другое'];
-  return (
-    <View className="bg-black/40 p-6 rounded-lg">
-      <View className="bg-white rounded-xl p-5" style={{ gap: 16 }}>
-        <Text className="text-lg font-bold text-[#1A1A1A]">Пожаловаться на объявление</Text>
-        <View style={{ gap: 12 }}>
-          {reasons.map((r, i) => (
-            <Pressable key={r} className="flex-row items-center" style={{ gap: 10 }}>
-              <View
-                className="w-5 h-5 rounded-full border-2 items-center justify-center"
-                style={{ borderColor: i === 0 ? C.green : C.border }}
-              >
-                {i === 0 && <View className="w-2.5 h-2.5 rounded-full bg-[#00AA6C]" />}
-              </View>
-              <Text className="text-base text-[#1A1A1A]">{r}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <View className="flex-row" style={{ gap: 10 }}>
-          <Pressable className="flex-1 bg-[#00AA6C] rounded-md py-3 items-center">
-            <Text className="text-white font-bold text-sm">Отправить</Text>
-          </Pressable>
-          <Pressable className="flex-1 border border-[#E0E0E0] rounded-md py-3 items-center">
-            <Text className="text-[#1A1A1A] font-semibold text-sm">Отмена</Text>
-          </Pressable>
-        </View>
+      <Text style={{ fontSize: 26, fontWeight: '800', color: C.text, marginTop: 10 }}>₾125 000</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 }}>
+        <Text style={{ fontSize: 13, color: C.muted }}>Батуми, Аджара</Text>
+        <Text style={{ fontSize: 13, color: C.border }}>·</Text>
+        <Text style={{ fontSize: 13, color: C.muted }}>3 часа назад</Text>
       </View>
+      <SellerRow />
+      <Text style={{ fontSize: 15, color: C.text, lineHeight: 24 }}>
+        Просторная 3-комнатная квартира с панорамным видом на море. Современный ремонт, полностью меблирована. 5 минут пешком до пляжа, рядом вся инфраструктура. Окна выходят на Черное море. Есть кондиционеры, встроенная кухня, джакузи.
+      </Text>
     </View>
   );
 }
 
-// State 1: Default (Guest)
-function DefaultGuest() {
+// ─── CTA Buttons ──────────────────────────────────────────────────────────────
+function CTAButtons({ loading }: { loading: boolean }) {
   return (
-    <StateSection title="LISTING_DETAIL_GUEST">
-      <PhoneFrame>
-        <Header />
-        <PhotoGallery />
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-          <ListingContent />
-          <SellerRow />
-        </ScrollView>
-      </PhoneFrame>
-    </StateSection>
+    <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+      <Pressable style={{ flex: 1, backgroundColor: C.green, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}>
+        {loading ? (
+          <ActivityIndicator color={C.white} size="small" />
+        ) : (
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Написать продавцу</Text>
+        )}
+      </Pressable>
+      <Pressable style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: C.green, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Позвонить</Text>
+      </Pressable>
+    </View>
   );
 }
 
-// State 2: Phone Revealed
-function PhoneRevealed() {
+// ─── Default View State ───────────────────────────────────────────────────────
+function DefaultView() {
+  const [fav, setFav] = useState(false);
+  const { isMobile, isDesktop, width } = useLayout();
+  const horizontalPadding = isDesktop ? 32 : 16;
+
   return (
-    <StateSection title="LISTING_DETAIL_PHONE_REVEALED">
-      <PhoneFrame>
-        <Header />
-        <PhotoGallery />
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-          <ListingContent />
-          <SellerRow phoneRevealed />
-        </ScrollView>
-      </PhoneFrame>
-    </StateSection>
+    <View style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+      {/* Back button */}
+      <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
+        <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={{ fontSize: 20, color: C.text, lineHeight: 24 }}>←</Text>
+          <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>Назад</Text>
+        </Pressable>
+        <View style={{ flex: 1 }} />
+        <Text style={{ fontSize: 13, color: C.muted }}>Поделиться</Text>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: isMobile ? 80 : 32 }}>
+        {isDesktop ? (
+          // Desktop: 2-column layout
+          <View style={{ maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: horizontalPadding, paddingTop: 24 }}>
+            <View style={{ flexDirection: 'row', gap: 32 }}>
+              {/* Left: gallery 55% */}
+              <View style={{ width: '55%' }}>
+                <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                  <PhotoGallery onFavPress={() => setFav(!fav)} fav={fav} />
+                </View>
+              </View>
+              {/* Right: info 45% */}
+              <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 24 }}>
+                <ListingInfo />
+                <CTAButtons loading={false} />
+              </View>
+            </View>
+          </View>
+        ) : (
+          // Mobile/tablet: stacked layout
+          <View>
+            <PhotoGallery onFavPress={() => setFav(!fav)} fav={fav} />
+            <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
+              <ListingInfo />
+              <CTAButtons loading={false} />
+            </View>
+          </View>
+        )}
+      </ScrollView>
+
+      {isMobile && <BottomNav />}
+    </View>
   );
 }
 
-// State 3: Favorite Added
-function FavoriteAdded() {
+// ─── Contact Loading State ────────────────────────────────────────────────────
+function ContactLoadingView() {
+  const [fav, setFav] = useState(false);
+  const { isMobile, isDesktop } = useLayout();
+  const horizontalPadding = isDesktop ? 32 : 16;
+
   return (
-    <StateSection title="LISTING_DETAIL_FAVORITE_ADDED">
-      <PhoneFrame>
-        <Header />
-        <PhotoGallery />
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-          <ListingContent favorite />
-          <SellerRow />
-        </ScrollView>
-      </PhoneFrame>
-    </StateSection>
+    <View style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+      <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
+        <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={{ fontSize: 20, color: C.text, lineHeight: 24 }}>←</Text>
+          <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>Назад</Text>
+        </Pressable>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: isMobile ? 80 : 32 }}>
+        {isDesktop ? (
+          <View style={{ maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: horizontalPadding, paddingTop: 24 }}>
+            <View style={{ flexDirection: 'row', gap: 32 }}>
+              <View style={{ width: '55%' }}>
+                <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                  <PhotoGallery onFavPress={() => setFav(!fav)} fav={fav} />
+                </View>
+              </View>
+              <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 24 }}>
+                <ListingInfo />
+                <CTAButtons loading={true} />
+                <View style={{ marginTop: 12, padding: 12, backgroundColor: C.greenBg, borderRadius: 8, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 13, color: C.green, fontWeight: '500' }}>Открываем чат с продавцом...</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View>
+            <PhotoGallery onFavPress={() => setFav(!fav)} fav={fav} />
+            <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
+              <ListingInfo />
+              <CTAButtons loading={true} />
+              <View style={{ marginTop: 12, padding: 12, backgroundColor: C.greenBg, borderRadius: 8, alignItems: 'center' }}>
+                <Text style={{ fontSize: 13, color: C.green, fontWeight: '500' }}>Открываем чат с продавцом...</Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </ScrollView>
+
+      {isMobile && <BottomNav />}
+    </View>
   );
 }
 
-// State 4: Owner View
-function OwnerView() {
-  return (
-    <StateSection title="LISTING_DETAIL_OWNER_VIEW">
-      <PhoneFrame>
-        <Header />
-        <PhotoGallery />
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-          <ListingContent ownerView />
-        </ScrollView>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-// State 5: Report Modal
-function ReportState() {
-  return (
-    <StateSection title="LISTING_DETAIL_REPORT_MODAL">
-      <PhoneFrame>
-        <Header />
-        <ReportModal />
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN EXPORT
+// ═══════════════════════════════════════════════════════════════════════════════
 export default function ListingDetailStates() {
   return (
     <View style={{ gap: 32 }}>
-      <DefaultGuest />
-      <PhoneRevealed />
-      <FavoriteAdded />
-      <OwnerView />
-      <ReportState />
+      <StateSection title="LISTING_DETAIL_DEFAULT">
+        <DefaultView />
+      </StateSection>
+      <StateSection title="LISTING_DETAIL_CONTACT_LOADING">
+        <ContactLoadingView />
+      </StateSection>
     </View>
   );
 }

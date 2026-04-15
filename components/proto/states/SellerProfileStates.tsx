@@ -1,206 +1,374 @@
-import React from 'react';
-import { View, Text, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = {
+  green: '#00AA6C',
+  greenBg: '#E8F9F2',
+  white: '#FFFFFF',
+  text: '#1A1A1A',
+  muted: '#9E9E9E',
+  border: '#E8E8E8',
+  error: '#D32F2F',
+  star: '#F59E0B',
+};
+const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7', '#FFF9C4', '#FFCCBC'];
 
-// ─── Image Placeholder ───────────────────────────────────────────────────────
-function ImgPlaceholder({ height = 180, color = '#C8E6C9' }: { height?: number; color?: string }) {
-  return <View style={{ height, backgroundColor: color, width: '100%' }} />;
+interface SellerListing {
+  id: number;
+  title: string;
+  price: string;
+  photos: number;
+  colorIdx: number;
 }
-const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7'];
 
-function PhoneFrame({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
+const SELLER_LISTINGS: SellerListing[] = [
+  { id: 1, title: '3-комн. квартира, центр Батуми', price: '85 000 ₾', photos: 14, colorIdx: 0 },
+  { id: 2, title: 'Toyota Camry 2019, 45 000 км', price: '25 000 ₾', photos: 8, colorIdx: 1 },
+  { id: 3, title: 'Угловой диван, бежевый', price: '700 ₾', photos: 4, colorIdx: 2 },
+  { id: 4, title: 'MacBook Pro 14" M3', price: '3 600 ₾', photos: 6, colorIdx: 3 },
+  { id: 5, title: 'Велосипед Trek Marlin', price: '1 200 ₾', photos: 5, colorIdx: 4 },
+  { id: 6, title: 'Samsung Galaxy S24 Ultra', price: '3 100 ₾', photos: 7, colorIdx: 5 },
+];
+
+function StarRating({ rating }: { rating: number }) {
+  const full = Math.floor(rating);
+  const half = rating - full >= 0.5;
+  const empty = 5 - full - (half ? 1 : 0);
+  return (
+    <Text style={{ fontSize: 16, color: C.star, letterSpacing: 1 }}>
+      {'\u2605'.repeat(full)}
+      {half ? '\u00BD' : ''}
+      {'\u2606'.repeat(empty)}
+    </Text>
+  );
+}
+
+function SellerHeader({ name, initials, joined, rating, listingCount }: {
+  name: string;
+  initials: string;
+  joined: string;
+  rating: number;
+  listingCount: number;
+}) {
+  return (
+    <View style={{ padding: 20, gap: 16 }}>
+      {/* Avatar + name + meta */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+        <View
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: 36,
+            backgroundColor: '#757575',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 26, fontWeight: '700', color: C.white }}>{initials}</Text>
+        </View>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>{name}</Text>
+          <Text style={{ fontSize: 13, color: C.muted }}>На платформе с {joined}</Text>
+          <Text style={{ fontSize: 13, color: C.muted }}>{listingCount} объявлений</Text>
+        </View>
+      </View>
+
+      {/* Rating row */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <StarRating rating={rating} />
+        <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{rating.toFixed(1)}</Text>
+        <Text style={{ fontSize: 13, color: C.muted }}>· 24 отзыва</Text>
+      </View>
+
+      {/* Action buttons */}
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <Pressable
+          style={{
+            flex: 1,
+            backgroundColor: C.green,
+            borderRadius: 8,
+            paddingVertical: 11,
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 14 }}>Написать</Text>
+        </Pressable>
+        <Pressable
+          style={{
+            paddingHorizontal: 16,
+            paddingVertical: 11,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: C.border,
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ color: C.muted, fontWeight: '600', fontSize: 13 }}>Пожаловаться</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function ListingCard({
+  listing,
+  cardWidth,
+}: {
+  listing: SellerListing;
+  cardWidth: number;
+}) {
+  const [liked, setLiked] = useState(false);
+
   return (
     <View
-      className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
-      style={isDesktop ? { width: 390, alignSelf: 'center' } : { width: '100%' }}
+      style={{
+        width: cardWidth,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: C.border,
+        overflow: 'hidden',
+        backgroundColor: C.white,
+      }}
     >
-      {children}
-    </View>
-  );
-}
-
-function Header() {
-  return (
-    <View className="flex-row items-center px-4 py-3 bg-white border-b border-[#E0E0E0]">
-      <Text className="text-base font-semibold text-[#1A1A1A]">← Назад</Text>
-    </View>
-  );
-}
-
-function ProfileHeader() {
-  return (
-    <View className="px-4 pt-4 pb-3">
-      <View className="flex-row items-center" style={{ gap: 14 }}>
-        <View className="w-16 h-16 rounded-full bg-[#737373] items-center justify-center">
-          <Text className="text-2xl font-bold text-white">M</Text>
+      <View style={{ position: 'relative' }}>
+        <View style={{ height: 100, backgroundColor: IMG_COLORS[listing.colorIdx % IMG_COLORS.length] }} />
+        {/* Heart */}
+        <Pressable
+          onPress={() => setLiked(!liked)}
+          style={{
+            position: 'absolute',
+            top: 6,
+            right: 6,
+            width: 26,
+            height: 26,
+            borderRadius: 13,
+            backgroundColor: 'rgba(255,255,255,0.88)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 14, color: liked ? '#E53935' : C.muted }}>{liked ? '\u2665' : '\u2661'}</Text>
+        </Pressable>
+        {/* Photo count */}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 6,
+            right: 6,
+            backgroundColor: 'rgba(0,0,0,0.55)',
+            borderRadius: 4,
+            paddingHorizontal: 5,
+            paddingVertical: 2,
+          }}
+        >
+          <Text style={{ color: C.white, fontSize: 10, fontWeight: '600' }}>{listing.photos} фото</Text>
         </View>
-        <View className="flex-1">
-          <Text className="text-lg font-bold text-[#1A1A1A]">Михаил Т.</Text>
-          <Text className="text-[13px] text-[#737373] mt-0.5">На платформе с марта 2023</Text>
-          <Text className="text-[13px] text-[#737373] mt-0.5">42 объявления</Text>
-        </View>
+      </View>
+      <View style={{ padding: 8, gap: 3 }}>
+        <Text style={{ fontSize: 13, fontWeight: '700', color: C.green }}>{listing.price}</Text>
+        <Text style={{ fontSize: 12, color: C.text }} numberOfLines={2}>
+          {listing.title}
+        </Text>
       </View>
     </View>
   );
 }
 
-function Tabs({ activeTab }: { activeTab: 'listings' | 'reviews' }) {
-  const tabs = [
-    { key: 'listings', label: 'Объявления (42)' },
-    { key: 'reviews', label: 'Отзывы (8)' },
-  ];
-  return (
-    <View className="flex-row border-b border-[#E0E0E0]">
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.key;
-        return (
-          <Pressable
-            key={tab.key}
-            className="flex-1 items-center py-3"
-            style={isActive ? { borderBottomWidth: 2, borderBottomColor: C.green } : {}}
-          >
-            <Text
-              className="text-[14px]"
-              style={{ fontWeight: isActive ? '700' : '500', color: isActive ? C.green : C.muted }}
-            >
-              {tab.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
+function ListingsGrid({ listings }: { listings: SellerListing[] }) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+  const isTablet = width >= 640;
 
-function MiniListingCard({ title, price, colorIndex = 0 }: { title: string; price: string; colorIndex?: number }) {
-  return (
-    <View className="border border-[#E0E0E0] rounded-lg overflow-hidden" style={{ width: '48%' as any }}>
-      <ImgPlaceholder height={90} color={IMG_COLORS[colorIndex % IMG_COLORS.length]} />
-      <View className="p-2">
-        <Text className="text-[13px] font-bold text-[#1A1A1A] mb-0.5">{price}</Text>
-        <Text className="text-[11px] text-[#737373]" numberOfLines={2}>{title}</Text>
+  // When desktop, the grid is inside the right column (approximately width - 280px sidebar)
+  // We compute columns relative to available space
+  const cols = isDesktop ? 3 : isTablet ? 3 : 2;
+  const hPad = isDesktop ? 0 : 16;
+  const availableWidth = isDesktop ? width - 280 - 32 : width - hPad * 2;
+  const gap = 10;
+  const cardWidth = (availableWidth - gap * (cols - 1)) / cols;
+
+  const rows: SellerListing[][] = [];
+  for (let i = 0; i < listings.length; i += cols) {
+    rows.push(listings.slice(i, i + cols));
+  }
+
+  if (listings.length === 0) {
+    return (
+      <View style={{ alignItems: 'center', paddingVertical: 48 }}>
+        <Text style={{ fontSize: 14, color: C.muted }}>Нет активных объявлений</Text>
       </View>
-    </View>
-  );
-}
-
-function ReviewCard({ name, stars, date, text }: { name: string; stars: number; date: string; text: string }) {
-  const filled = Array(stars).fill(null);
-  const empty = Array(5 - stars).fill(null);
-  return (
-    <View className="border border-[#E0E0E0] rounded-lg p-3" style={{ gap: 6 }}>
-      <View className="flex-row items-center" style={{ gap: 10 }}>
-        <View className="w-9 h-9 rounded-full bg-[#E0E0E0] items-center justify-center">
-          <Text className="text-xs font-bold text-[#737373]">{name.charAt(0)}</Text>
-        </View>
-        <View className="flex-1">
-          <Text className="text-[13px] font-semibold text-[#1A1A1A]">{name}</Text>
-          <Text className="text-[11px] text-[#737373]">{date}</Text>
-        </View>
-      </View>
-      <Text className="text-sm" style={{ color: '#F59E0B' }}>
-        {filled.map(() => '\u2605').join('')}{empty.map(() => '\u2606').join('')}
-      </Text>
-      <Text className="text-[13px] text-[#1A1A1A] leading-5">{text}</Text>
-    </View>
-  );
-}
-
-// State 1: Default
-function SellerDefault() {
-  const listings = [
-    { title: '3-комн. квартира, центр', price: '₾85 000' },
-    { title: 'Toyota Camry 2019', price: '₾25 000' },
-    { title: 'Угловой диван, бежевый', price: '₾700' },
-    { title: 'MacBook Pro 14" M3', price: '₾3 600' },
-  ];
+    );
+  }
 
   return (
-    <StateSection title="SELLER_DEFAULT">
-      <PhoneFrame>
-        <Header />
-        <ProfileHeader />
-        <Tabs activeTab="listings" />
-        <View className="flex-row flex-wrap p-3 justify-between" style={{ gap: 10 }}>
-          {listings.map((item, idx) => (
-            <MiniListingCard key={idx} {...item} colorIndex={idx} />
+    <View style={{ paddingHorizontal: isDesktop ? 16 : hPad, paddingTop: 12, paddingBottom: 16, gap }}>
+      {rows.map((row, ri) => (
+        <View key={ri} style={{ flexDirection: 'row', gap }}>
+          {row.map((item) => (
+            <ListingCard key={item.id} listing={item} cardWidth={cardWidth} />
           ))}
+          {row.length < cols &&
+            Array(cols - row.length)
+              .fill(null)
+              .map((_, i) => <View key={`empty-${i}`} style={{ width: cardWidth }} />)}
         </View>
-      </PhoneFrame>
-    </StateSection>
+      ))}
+    </View>
   );
 }
 
-// State 2: Reviews Tab
-function SellerReviews() {
-  const reviews = [
-    { name: 'Анна К.', stars: 5, date: '12 марта 2026', text: 'Отличный продавец, быстрая сделка. Рекомендую!' },
-    { name: 'Давид М.', stars: 4, date: '28 февраля 2026', text: 'Хорошее качество товара, но немного задержал доставку.' },
-    { name: 'Нино Б.', stars: 5, date: '15 января 2026', text: 'Всё как в описании, очень приятное общение.' },
-  ];
+function SellerProfileMain() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
+  const isDesktop = width >= 1024;
+
+  const headerContent = (
+    <SellerHeader
+      name="Михаил Т."
+      initials="МТ"
+      joined="марта 2023"
+      rating={4.5}
+      listingCount={42}
+    />
+  );
+
+  const sectionHeader = (
+    <View
+      style={{
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderTopWidth: 1,
+        borderTopColor: C.border,
+        borderBottomWidth: 1,
+        borderBottomColor: C.border,
+        backgroundColor: '#FAFAFA',
+      }}
+    >
+      <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>Объявления продавца (42)</Text>
+    </View>
+  );
+
+  if (isDesktop) {
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        {/* Sidebar */}
+        <View
+          style={{
+            width: 280,
+            borderRightWidth: 1,
+            borderRightColor: C.border,
+          }}
+        >
+          {headerContent}
+        </View>
+        {/* Listings */}
+        <View style={{ flex: 1 }}>
+          {sectionHeader}
+          <ListingsGrid listings={SELLER_LISTINGS} />
+        </View>
+      </View>
+    );
+  }
 
   return (
-    <StateSection title="SELLER_REVIEWS_TAB">
-      <PhoneFrame>
-        <Header />
-        <ProfileHeader />
-        <Tabs activeTab="reviews" />
-        <View className="p-3" style={{ gap: 12 }}>
-          {/* Rating summary */}
-          <View className="flex-row items-center" style={{ gap: 8 }}>
-            <Text className="text-lg font-bold text-[#1A1A1A]">4.7</Text>
-            <Text style={{ color: '#F59E0B', fontSize: 14 }}>{'\u2605\u2605\u2605\u2605\u2606'}</Text>
-            <Text className="text-[13px] text-[#737373]">8 отзывов</Text>
-          </View>
-          {/* Review list */}
-          {reviews.map((r, idx) => (
-            <ReviewCard key={idx} {...r} />
-          ))}
-        </View>
-      </PhoneFrame>
-    </StateSection>
+    <View>
+      {/* Back nav */}
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: C.border,
+        }}
+      >
+        <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>← Назад</Text>
+      </View>
+      {headerContent}
+      {sectionHeader}
+      <ListingsGrid listings={SELLER_LISTINGS} />
+      {isMobile && <BottomNav active="browse" />}
+    </View>
   );
 }
 
-// State 3: Empty Listings
-function SellerEmpty() {
-  return (
-    <StateSection title="SELLER_EMPTY_LISTINGS">
-      <PhoneFrame>
-        <Header />
-        <ProfileHeader />
-        <Tabs activeTab="listings" />
-        <View className="items-center py-14 px-4">
-          <Text className="text-[15px] font-semibold text-[#737373] text-center">
-            Нет активных объявлений
-          </Text>
+function SellerProfileEmpty() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
+  const isDesktop = width >= 1024;
+
+  const headerContent = (
+    <SellerHeader
+      name="Георгий К."
+      initials="ГК"
+      joined="января 2024"
+      rating={4.0}
+      listingCount={0}
+    />
+  );
+
+  if (isDesktop) {
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        <View style={{ width: 280, borderRightWidth: 1, borderRightColor: C.border }}>
+          {headerContent}
         </View>
-      </PhoneFrame>
-    </StateSection>
+        <View style={{ flex: 1, alignItems: 'center', paddingVertical: 48 }}>
+          <Text style={{ fontSize: 14, color: C.muted }}>Нет активных объявлений</Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border }}>
+        <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>← Назад</Text>
+      </View>
+      {headerContent}
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingVertical: 10,
+          borderTopWidth: 1,
+          borderTopColor: C.border,
+          borderBottomWidth: 1,
+          borderBottomColor: C.border,
+          backgroundColor: '#FAFAFA',
+        }}
+      >
+        <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>Объявления продавца</Text>
+      </View>
+      <View style={{ alignItems: 'center', paddingVertical: 48 }}>
+        <Text style={{ fontSize: 14, color: C.muted }}>Нет активных объявлений</Text>
+      </View>
+      {isMobile && <BottomNav active="browse" />}
+    </View>
   );
 }
 
 export default function SellerProfileStates() {
   const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
+  const isDesktop = width >= 1024;
+
+  const frameStyle = isDesktop
+    ? { borderWidth: 1, borderColor: C.border, borderRadius: 12, overflow: 'hidden' as const, backgroundColor: C.white }
+    : { backgroundColor: C.white };
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        padding: 16,
-        gap: 24,
-        backgroundColor: isDesktop ? '#F0F0F0' : C.white,
-        alignItems: isDesktop ? 'center' : undefined,
-      }}
-    >
-      <SellerDefault />
-      <SellerReviews />
-      <SellerEmpty />
-      <View className="h-10" />
-    </ScrollView>
+    <View style={{ gap: 0 }}>
+      <StateSection title="SELLER_PROFILE / Default (with listings grid)">
+        <View style={frameStyle}>
+          <SellerProfileMain />
+        </View>
+      </StateSection>
+
+      <StateSection title="SELLER_PROFILE / Empty listings">
+        <View style={frameStyle}>
+          <SellerProfileEmpty />
+        </View>
+      </StateSection>
+    </View>
   );
 }

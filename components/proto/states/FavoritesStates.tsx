@@ -1,136 +1,211 @@
-import React from 'react';
-import { View, Text, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = {
+  green: '#00AA6C',
+  greenBg: '#E8F9F2',
+  white: '#FFFFFF',
+  text: '#1A1A1A',
+  muted: '#9E9E9E',
+  border: '#E8E8E8',
+};
+const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7', '#FFF9C4', '#FFCCBC'];
 
-function PhoneFrame({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-  return (
-    <View
-      className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
-      style={isDesktop ? { width: 390, alignSelf: 'center' } : { width: '100%' }}
-    >
-      {children}
-    </View>
-  );
-}
-
-interface ListingCard {
+interface FavItem {
+  id: number;
   title: string;
   price: string;
   city: string;
-  bgColor: string;
+  photos: number;
+  colorIdx: number;
 }
 
-const FAVORITES: ListingCard[] = [
-  { title: 'Toyota Camry 2019', price: '\u20BE12 500', city: '\u0422\u0431\u0438\u043B\u0438\u0441\u0438', bgColor: '#D4E6F1' },
-  { title: '\u041A\u0432\u0430\u0440\u0442\u0438\u0440\u0430 3-\u043A\u043E\u043C\u043D', price: '\u20BE185 000', city: '\u0411\u0430\u0442\u0443\u043C\u0438', bgColor: '#D5F5E3' },
-  { title: 'iPhone 15 Pro 256GB', price: '\u20BE2 800', city: '\u0422\u0431\u0438\u043B\u0438\u0441\u0438', bgColor: '#FADBD8' },
-  { title: '\u0414\u0438\u0432\u0430\u043D \u0443\u0433\u043B\u043E\u0432\u043E\u0439', price: '\u20BE950', city: '\u041A\u0443\u0442\u0430\u0438\u0441\u0438', bgColor: '#FCF3CF' },
-  { title: '\u0412\u0435\u043B\u043E\u0441\u0438\u043F\u0435\u0434 Trek', price: '\u20BE1 200', city: '\u0422\u0431\u0438\u043B\u0438\u0441\u0438', bgColor: '#E8DAEF' },
-  { title: 'MacBook Air M2', price: '\u20BE3 400', city: '\u0411\u0430\u0442\u0443\u043C\u0438', bgColor: '#D6EAF8' },
+const INITIAL_FAVORITES: FavItem[] = [
+  { id: 1, title: 'Toyota Camry 2019', price: '12 500 ₾', city: 'Тбилиси', photos: 8, colorIdx: 0 },
+  { id: 2, title: 'Квартира 3-комн., центр Батуми', price: '185 000 ₾', city: 'Батуми', photos: 12, colorIdx: 1 },
+  { id: 3, title: 'iPhone 15 Pro 256GB', price: '2 800 ₾', city: 'Тбилиси', photos: 5, colorIdx: 2 },
+  { id: 4, title: 'Диван угловой, бежевый', price: '950 ₾', city: 'Кутаиси', photos: 4, colorIdx: 3 },
+  { id: 5, title: 'Велосипед Trek Marlin 5', price: '1 200 ₾', city: 'Тбилиси', photos: 3, colorIdx: 4 },
+  { id: 6, title: 'MacBook Air M2 256GB', price: '3 400 ₾', city: 'Батуми', photos: 6, colorIdx: 5 },
+  { id: 7, title: 'Холодильник Samsung NoFrost', price: '1 100 ₾', city: 'Тбилиси', photos: 4, colorIdx: 6 },
+  { id: 8, title: 'Ноутбук Dell XPS 15', price: '4 200 ₾', city: 'Тбилиси', photos: 7, colorIdx: 7 },
 ];
 
-function FavCard({ card }: { card: ListingCard }) {
+function FavCard({
+  item,
+  onRemove,
+}: {
+  item: FavItem;
+  onRemove: (id: number) => void;
+}) {
+  const [liked, setLiked] = useState(true);
+
+  const handleHeart = () => {
+    setLiked(false);
+    setTimeout(() => onRemove(item.id), 200);
+  };
+
   return (
     <View
-      className="rounded-lg border border-[#E0E0E0] overflow-hidden bg-white"
-      style={{ width: '48%' }}
+      style={{
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: C.border,
+        overflow: 'hidden',
+        backgroundColor: C.white,
+      }}
     >
-      <View className="relative">
-        <View style={{ height: 100, backgroundColor: card.bgColor }} />
-        <View className="absolute top-2 right-2">
-          <Text style={{ fontSize: 16, color: C.muted }}>{'\u2661'}</Text>
+      {/* Image area */}
+      <View style={{ position: 'relative' }}>
+        <View style={{ height: 110, backgroundColor: IMG_COLORS[item.colorIdx % IMG_COLORS.length] }} />
+        {/* Heart button — filled red since in favorites */}
+        <Pressable
+          onPress={handleHeart}
+          style={{
+            position: 'absolute',
+            top: 6,
+            right: 6,
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            backgroundColor: 'rgba(255,255,255,0.88)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 15, color: liked ? '#E53935' : C.muted }}>{liked ? '\u2665' : '\u2661'}</Text>
+        </Pressable>
+        {/* Photo count badge */}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 6,
+            right: 6,
+            backgroundColor: 'rgba(0,0,0,0.55)',
+            borderRadius: 4,
+            paddingHorizontal: 5,
+            paddingVertical: 2,
+          }}
+        >
+          <Text style={{ color: C.white, fontSize: 10, fontWeight: '600' }}>{item.photos} фото</Text>
         </View>
       </View>
-      <View className="p-2.5" style={{ gap: 2 }}>
-        <Text className="text-sm font-bold" style={{ color: C.text }} numberOfLines={1}>{card.title}</Text>
-        <Text className="text-sm font-bold" style={{ color: C.green }}>{card.price}</Text>
-        <Text className="text-xs" style={{ color: C.muted }}>{card.city}</Text>
+
+      {/* Info */}
+      <View style={{ padding: 10, gap: 3 }}>
+        <Text style={{ fontSize: 14, fontWeight: '700', color: C.green }}>{item.price}</Text>
+        <Text style={{ fontSize: 13, fontWeight: '500', color: C.text }} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <Text style={{ fontSize: 11, color: C.muted }}>{item.city}</Text>
       </View>
     </View>
   );
 }
 
-// -- State 1: Default --
+function FavoritesGrid({ items, onRemove }: { items: FavItem[]; onRemove: (id: number) => void }) {
+  const { width } = useWindowDimensions();
 
-function DefaultState() {
-  return (
-    <StateSection title="FAVORITES__DEFAULT">
-      <PhoneFrame>
-        <View className="px-4 pt-4 pb-3">
-          <Text className="text-xl font-bold" style={{ color: C.text }}>{'\u0418\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435 \u00B7 7'}</Text>
-        </View>
-        <View className="flex-row flex-wrap px-3 pb-4" style={{ gap: 10, justifyContent: 'space-between' }}>
-          {FAVORITES.map((card) => (
-            <FavCard key={card.title} card={card} />
-          ))}
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
+  let cols = 2;
+  if (width >= 1024) cols = 4;
+  else if (width >= 640) cols = 3;
 
-// -- State 2: Removed toast --
+  const gap = 12;
+  const hPad = 16;
+  const cardWidth = (width - hPad * 2 - gap * (cols - 1)) / cols;
 
-function RemovedToastState() {
-  return (
-    <StateSection title="FAVORITES__REMOVED_TOAST">
-      <PhoneFrame>
-        <View className="px-4 pt-4 pb-3">
-          <Text className="text-xl font-bold" style={{ color: C.text }}>{'\u0418\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435 \u00B7 6'}</Text>
-        </View>
-        <View className="flex-row flex-wrap px-3 pb-4" style={{ gap: 10, justifyContent: 'space-between' }}>
-          {FAVORITES.slice(1).map((card) => (
-            <FavCard key={card.title} card={card} />
-          ))}
-        </View>
-        <View
-          className="mx-3 mb-3 rounded-lg flex-row items-center justify-between px-4 py-3"
-          style={{ backgroundColor: '#333333' }}
+  if (items.length === 0) {
+    return (
+      <View style={{ alignItems: 'center', paddingVertical: 64, paddingHorizontal: 24 }}>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: C.text, textAlign: 'center', marginBottom: 8 }}>
+          Нет избранных объявлений
+        </Text>
+        <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', marginBottom: 20 }}>
+          Нажимайте на сердечко, чтобы сохранять объявления
+        </Text>
+        <Pressable
+          style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 12 }}
         >
-          <Text className="text-sm text-white">{'\u0423\u0434\u0430\u043B\u0435\u043D\u043E \u0438\u0437 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0433\u043E'}</Text>
-          <Pressable>
-            <Text className="text-sm font-bold text-white">{'\u041E\u0442\u043C\u0435\u043D\u0438\u0442\u044C'}</Text>
-          </Pressable>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Перейти к объявлениям</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
-// -- State 3: Empty --
+  // Build rows
+  const rows: FavItem[][] = [];
+  for (let i = 0; i < items.length; i += cols) {
+    rows.push(items.slice(i, i + cols));
+  }
 
-function EmptyState() {
   return (
-    <StateSection title="FAVORITES__EMPTY">
-      <PhoneFrame>
-        <View className="px-4 pt-4 pb-3">
-          <Text className="text-xl font-bold" style={{ color: C.text }}>{'\u0418\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435'}</Text>
+    <View style={{ paddingHorizontal: hPad, paddingVertical: 12, gap }}>
+      {rows.map((row, ri) => (
+        <View key={ri} style={{ flexDirection: 'row', gap }}>
+          {row.map((item) => (
+            <View key={item.id} style={{ width: cardWidth }}>
+              <FavCard item={item} onRemove={onRemove} />
+            </View>
+          ))}
+          {/* Fill empty slots in last row */}
+          {row.length < cols &&
+            Array(cols - row.length)
+              .fill(null)
+              .map((_, i) => <View key={`empty-${i}`} style={{ width: cardWidth }} />)}
         </View>
-        <View className="items-center py-16 px-6">
-          <Text className="text-base font-semibold text-center" style={{ color: C.text }}>
-            {'\u041D\u0435\u0442 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u044B\u0445 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0439'}
-          </Text>
-          <Pressable className="mt-4 rounded-md px-6 py-3" style={{ backgroundColor: C.green }}>
-            <Text className="text-white font-bold text-sm">{'\u041F\u0435\u0440\u0435\u0439\u0442\u0438 \u043A \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u044F\u043C'}</Text>
-          </Pressable>
-        </View>
-      </PhoneFrame>
-    </StateSection>
+      ))}
+    </View>
   );
 }
 
-// -- Main Export --
+function FavoritesInteractive() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
+  const [items, setItems] = useState<FavItem[]>(INITIAL_FAVORITES);
+
+  const handleRemove = (id: number) => {
+    setItems((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  return (
+    <View>
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: C.border,
+        }}
+      >
+        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>
+          Избранное{items.length > 0 ? ` · ${items.length}` : ''}
+        </Text>
+      </View>
+      <FavoritesGrid items={items} onRemove={handleRemove} />
+      {isMobile && <BottomNav active="profile" />}
+    </View>
+  );
+}
 
 export default function FavoritesStates() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <DefaultState />
-      <RemovedToastState />
-      <EmptyState />
-    </ScrollView>
+    <View style={{ gap: 0 }}>
+      <StateSection title="FAVORITES / Interactive (heart removes item, empty state when all removed)">
+        <View
+          style={
+            isDesktop
+              ? { borderWidth: 1, borderColor: C.border, borderRadius: 12, overflow: 'hidden', backgroundColor: C.white }
+              : { backgroundColor: C.white }
+          }
+        >
+          <FavoritesInteractive />
+        </View>
+      </StateSection>
+    </View>
   );
 }

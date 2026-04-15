@@ -1,281 +1,295 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = {
+  green: '#00AA6C',
+  greenBg: '#E8F9F2',
+  white: '#FFFFFF',
+  text: '#1A1A1A',
+  muted: '#9E9E9E',
+  border: '#E8E8E8',
+  page: '#F5F5F5',
+};
 
-// ─── Helpers ────────────────────────────────────────────────────────────────────
+const PHOTO_COLORS = ['#B0C4DE', '#D2B48C', '#A8D8A8'];
 
-function PhoneFrame({ children }: { children: React.ReactNode }) {
+function StepIndicator({ step }: { step: number }) {
+  const steps = ['Фото', 'Описание', 'Цена и контакты'];
+  return (
+    <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.white }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+        {steps.map((label, i) => {
+          const num = i + 1;
+          const active = num === step;
+          const done = num < step;
+          return (
+            <React.Fragment key={num}>
+              <View style={{ alignItems: 'center' }}>
+                <View style={{
+                  width: 26, height: 26, borderRadius: 13,
+                  backgroundColor: done || active ? C.green : C.border,
+                  alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Text style={{ color: done || active ? C.white : C.muted, fontSize: 12, fontWeight: '700' }}>
+                    {done ? '✓' : String(num)}
+                  </Text>
+                </View>
+                <Text style={{ fontSize: 10, color: active ? C.green : C.muted, marginTop: 3, fontWeight: active ? '600' : '400' }}>
+                  {label}
+                </Text>
+              </View>
+              {i < steps.length - 1 && (
+                <View style={{ flex: 1, height: 2, backgroundColor: done ? C.green : C.border, marginHorizontal: 4, marginBottom: 16 }} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+function FieldLabel({ text }: { text: string }) {
+  return <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 6 }}>{text}</Text>;
+}
+
+function SelectRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={{ marginBottom: 14 }}>
+      <FieldLabel text={label} />
+      <View style={{
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+        borderWidth: 1, borderColor: C.border, borderRadius: 8,
+        paddingHorizontal: 12, paddingVertical: 12,
+        backgroundColor: C.white,
+      }}>
+        <Text style={{ fontSize: 15, color: C.text }}>{value}</Text>
+        <Text style={{ fontSize: 16, color: C.muted }}>{'>'}</Text>
+      </View>
+    </View>
+  );
+}
+
+// Preview card shown on desktop right column
+function PreviewCard({ step }: { step: number }) {
+  return (
+    <View style={{
+      borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', backgroundColor: C.white,
+    }}>
+      <View style={{ height: 180, backgroundColor: step >= 1 ? PHOTO_COLORS[0] : C.border }} />
+      <View style={{ padding: 12 }}>
+        <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, marginBottom: 4 }}>
+          {step >= 3 ? '12 500 ₾' : '—'}
+        </Text>
+        <Text style={{ fontSize: 14, color: C.text, marginBottom: 4 }}>
+          {step >= 2 ? 'Toyota Camry 2019, 45 000 км' : 'Заголовок объявления'}
+        </Text>
+        <Text style={{ fontSize: 12, color: C.muted }}>Тбилиси</Text>
+      </View>
+    </View>
+  );
+}
+
+// --- STEP 1: Фото ---
+function Step1({ onNext }: { onNext: () => void }) {
+  const [uploaded, setUploaded] = useState(false);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
+  const photoArea = (
+    <View style={{ padding: 16 }}>
+      {!uploaded ? (
+        <Pressable
+          onPress={() => setUploaded(true)}
+          style={{
+            borderWidth: 2, borderStyle: 'dashed', borderColor: C.border, borderRadius: 10,
+            paddingVertical: 48, alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 32, color: C.muted, marginBottom: 8 }}>+</Text>
+          <Text style={{ fontSize: 15, fontWeight: '600', color: C.green }}>Добавить фото</Text>
+          <Text style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>до 10 фотографий</Text>
+        </Pressable>
+      ) : (
+        <View>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Фото</Text>
+          <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+            {PHOTO_COLORS.map((bg, i) => (
+              <View key={i} style={{ width: 90, height: 90, borderRadius: 8, backgroundColor: bg }} />
+            ))}
+            <Pressable style={{
+              width: 90, height: 90, borderRadius: 8, borderWidth: 2, borderStyle: 'dashed', borderColor: C.border,
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Text style={{ fontSize: 26, color: C.green }}>+</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+      <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'flex-end' }}>
+        <Pressable onPress={onNext} style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 32, paddingVertical: 12 }}>
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Далее</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+
+  if (isDesktop) {
+    return (
+      <View style={{ flexDirection: 'row', gap: 24 }}>
+        <View style={{ flex: 2 }}>{photoArea}</View>
+        <View style={{ flex: 1, padding: 16, paddingLeft: 0 }}>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Предпросмотр</Text>
+          <PreviewCard step={uploaded ? 1 : 0} />
+        </View>
+      </View>
+    );
+  }
+  return photoArea;
+}
+
+// --- STEP 2: Описание ---
+function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+  const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
+  const form = (
+    <View style={{ padding: 16, gap: 14 }}>
+      <View>
+        <FieldLabel text="Заголовок" />
+        <TextInput
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Что продаёте?"
+          placeholderTextColor={C.muted}
+          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
+        />
+      </View>
+      <SelectRow label="Категория" value="Авто" />
+      <View>
+        <FieldLabel text="Описание" />
+        <TextInput
+          value={desc}
+          onChangeText={setDesc}
+          placeholder="Опишите товар подробнее..."
+          placeholderTextColor={C.muted}
+          multiline
+          numberOfLines={4}
+          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0, minHeight: 100, textAlignVertical: 'top' } as any}
+        />
+      </View>
+      <SelectRow label="Город" value="Тбилиси" />
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
+        <Pressable onPress={onBack} style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
+          <Text style={{ fontSize: 15, fontWeight: '600', color: C.muted }}>Назад</Text>
+        </Pressable>
+        <Pressable onPress={onNext} style={{ flex: 2, backgroundColor: C.green, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Далее</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+
+  if (isDesktop) {
+    return (
+      <View style={{ flexDirection: 'row', gap: 24 }}>
+        <View style={{ flex: 2 }}>{form}</View>
+        <View style={{ flex: 1, padding: 16, paddingLeft: 0 }}>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Предпросмотр</Text>
+          <PreviewCard step={2} />
+        </View>
+      </View>
+    );
+  }
+  return form;
+}
+
+// --- STEP 3: Цена и контакты ---
+function Step3({ onBack }: { onBack: () => void }) {
+  const [price, setPrice] = useState('');
+  const [phone, setPhone] = useState('');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
+  const form = (
+    <View style={{ padding: 16, gap: 14 }}>
+      <View>
+        <FieldLabel text="Цена" />
+        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12 }}>
+          <TextInput
+            value={price}
+            onChangeText={setPrice}
+            placeholder="0"
+            placeholderTextColor={C.muted}
+            keyboardType="numeric"
+            style={{ flex: 1, fontSize: 15, color: C.text, paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
+          />
+          <Text style={{ fontSize: 16, fontWeight: '600', color: C.text }}>₾</Text>
+        </View>
+      </View>
+      <View>
+        <FieldLabel text="Контактный телефон" />
+        <TextInput
+          value={phone}
+          onChangeText={setPhone}
+          placeholder="+995 5XX XXX XXX"
+          placeholderTextColor={C.muted}
+          keyboardType="phone-pad"
+          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
+        />
+      </View>
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
+        <Pressable onPress={onBack} style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
+          <Text style={{ fontSize: 15, fontWeight: '600', color: C.muted }}>Назад</Text>
+        </Pressable>
+        <Pressable style={{ flex: 2, backgroundColor: C.green, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Опубликовать</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+
+  if (isDesktop) {
+    return (
+      <View style={{ flexDirection: 'row', gap: 24 }}>
+        <View style={{ flex: 2 }}>{form}</View>
+        <View style={{ flex: 1, padding: 16, paddingLeft: 0 }}>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Предпросмотр</Text>
+          <PreviewCard step={3} />
+        </View>
+      </View>
+    );
+  }
+  return form;
+}
+
+function CreateListingInteractive() {
+  const [step, setStep] = useState(1);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
   return (
-    <View
-      className="bg-white overflow-hidden"
-      style={isDesktop
-        ? { width: 390, alignSelf: 'center', borderRadius: 12, borderWidth: 1, borderColor: C.border, backgroundColor: C.white }
-        : { width: '100%' as any, backgroundColor: C.white }
-      }
-    >
-      {children}
+    <View style={{ backgroundColor: C.white }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border }}>
+        <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>Новое объявление</Text>
+      </View>
+      <StepIndicator step={step} />
+      {step === 1 && <Step1 onNext={() => setStep(2)} />}
+      {step === 2 && <Step2 onNext={() => setStep(3)} onBack={() => setStep(1)} />}
+      {step === 3 && <Step3 onBack={() => setStep(2)} />}
+      {!isDesktop && <BottomNav active="post" />}
     </View>
   );
 }
-
-function StepHeader({ title, step }: { title: string; step: number }) {
-  return (
-    <View className="px-4 py-3 border-b border-[#E0E0E0]">
-      <View className="flex-row items-center justify-between">
-        <Text className="text-lg font-bold text-[#1A1A1A]">{title}</Text>
-        <View className="rounded-full px-3 py-1" style={{ backgroundColor: C.greenBg }}>
-          <Text className="text-[13px] font-bold" style={{ color: C.green }}>{step}/3</Text>
-        </View>
-      </View>
-      <View className="h-1 bg-[#E0E0E0] rounded-full mt-3">
-        <View
-          className="h-1 rounded-full"
-          style={{ width: `${(step / 3) * 100}%`, backgroundColor: C.green }}
-        />
-      </View>
-    </View>
-  );
-}
-
-function InputField({ label, placeholder, value, suffix, multiline }: {
-  label: string; placeholder?: string; value?: string; suffix?: string; multiline?: boolean;
-}) {
-  return (
-    <View>
-      <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">{label}</Text>
-      <View style={{ borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 6, backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}>
-        <TextInput
-          placeholder={placeholder}
-          placeholderTextColor={C.muted}
-          value={value}
-          
-          multiline={multiline}
-          style={multiline ? { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, height: 80, textAlignVertical: 'top', borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' } : { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, outlineWidth: 0, backgroundColor: 'transparent' }}
-        />
-        {suffix && <Text className="text-sm text-[#737373] ml-2">{suffix}</Text>}
-      </View>
-    </View>
-  );
-}
-
-function SelectField({ label, value }: { label: string; value: string }) {
-  return (
-    <View>
-      <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">{label}</Text>
-      <View className="border border-[#E0E0E0] rounded-md bg-white flex-row items-center justify-between px-3 py-2.5">
-        <Text className="text-base text-[#1A1A1A]">{value}</Text>
-        <Text style={{ color: C.muted }}>›</Text>
-      </View>
-    </View>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// STATES
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function Step1CategoryState() {
-  const categories = ['Авто', 'Недвижимость', 'Электроника', 'Одежда', 'Дом и сад', 'Работа', 'Услуги', 'Животные'];
-
-  return (
-    <StateSection title="CREATE_LISTING / Step 1 — Category">
-      <PhoneFrame>
-        <StepHeader title="Новое объявление" step={1} />
-        <View className="p-4" style={{ gap: 12 }}>
-          <Text className="text-base font-semibold text-[#1A1A1A] mb-1">Выберите категорию</Text>
-          <View className="flex-row flex-wrap" style={{ gap: 10 }}>
-            {categories.map((cat) => (
-              <Pressable
-                key={cat}
-                className="border border-[#E0E0E0] rounded-lg items-center justify-center py-4"
-                style={{ width: '47.5%' as any }}
-              >
-                <Text className="text-[14px] font-semibold text-[#1A1A1A]">{cat}</Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-function Step2DetailsState() {
-  return (
-    <StateSection title="CREATE_LISTING / Step 2 — Details">
-      <PhoneFrame>
-        <StepHeader title="Новое объявление" step={2} />
-        <View className="p-4" style={{ gap: 16 }}>
-          <InputField label="Заголовок" placeholder="Что продаёте?" />
-          <InputField label="Описание" placeholder="Опишите товар подробнее..." multiline />
-          <InputField label="Цена" placeholder="0" suffix="₾" />
-          <SelectField label="Город" value="Тбилиси ›" />
-
-          {/* Photo upload area */}
-          <View>
-            <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">Фото</Text>
-            <View
-              className="rounded-lg items-center justify-center py-8"
-              style={{ borderWidth: 2, borderStyle: 'dashed', borderColor: C.border }}
-            >
-              <Text className="text-[15px] font-semibold" style={{ color: C.green }}>Добавить фото (обязательно)</Text>
-              <Text className="text-xs mt-1" style={{ color: C.muted }}>макс. 10</Text>
-            </View>
-          </View>
-
-          <Pressable className="rounded-md py-3 items-center mt-2" style={{ backgroundColor: C.green }}>
-            <Text className="text-white font-bold text-[15px]">Далее</Text>
-          </Pressable>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-function Step3ReviewFreeState() {
-  return (
-    <StateSection title="CREATE_LISTING / Step 3 — Review (free slot)">
-      <PhoneFrame>
-        <StepHeader title="Новое объявление" step={3} />
-        <View className="p-4" style={{ gap: 16 }}>
-          <Text className="text-base font-semibold text-[#1A1A1A]">Предпросмотр</Text>
-
-          {/* Preview card */}
-          <View
-            className="border border-[#E0E0E0] rounded-lg overflow-hidden"
-            style={{
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.06,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View style={{ height: 160, backgroundColor: '#E0E0E0' }} />
-            <View className="p-3" style={{ gap: 4 }}>
-              <Text className="text-xl font-bold text-[#1A1A1A]">12 500 ₾</Text>
-              <Text className="text-sm text-[#1A1A1A]">Toyota Camry 2019, 45 000 км</Text>
-              <Text className="text-xs mt-1" style={{ color: C.muted }}>Тбилиси</Text>
-            </View>
-          </View>
-
-          {/* Free slot note */}
-          <View className="rounded-md px-3 py-2" style={{ backgroundColor: C.greenBg }}>
-            <Text className="text-[13px] font-semibold" style={{ color: C.green }}>
-              Публикация бесплатна (2 из 3 использовано)
-            </Text>
-          </View>
-
-          <Pressable className="rounded-md py-3 items-center" style={{ backgroundColor: C.green }}>
-            <Text className="text-white font-bold text-[15px]">Опубликовать</Text>
-          </Pressable>
-          <Pressable className="border border-[#E0E0E0] rounded-md py-3 items-center">
-            <Text className="text-[15px] font-semibold" style={{ color: C.muted }}>Сохранить черновик</Text>
-          </Pressable>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-function Step3ReviewPaidState() {
-  return (
-    <StateSection title="CREATE_LISTING / Step 3 — Review (paid)">
-      <PhoneFrame>
-        <StepHeader title="Новое объявление" step={3} />
-        <View className="p-4" style={{ gap: 16 }}>
-          <Text className="text-base font-semibold text-[#1A1A1A]">Предпросмотр</Text>
-
-          {/* Preview card */}
-          <View
-            className="border border-[#E0E0E0] rounded-lg overflow-hidden"
-            style={{
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.06,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View style={{ height: 160, backgroundColor: '#E0E0E0' }} />
-            <View className="p-3" style={{ gap: 4 }}>
-              <Text className="text-xl font-bold text-[#1A1A1A]">12 500 ₾</Text>
-              <Text className="text-sm text-[#1A1A1A]">Toyota Camry 2019, 45 000 км</Text>
-              <Text className="text-xs mt-1" style={{ color: C.muted }}>Тбилиси</Text>
-            </View>
-          </View>
-
-          {/* Paid note */}
-          <View className="rounded-md px-3 py-2" style={{ backgroundColor: '#FFF8E1' }}>
-            <Text className="text-[13px] font-semibold" style={{ color: '#E65100' }}>
-              Публикация стоит ₾5
-            </Text>
-            <Text className="text-[11px] mt-0.5" style={{ color: C.muted }}>
-              Оплата через Stripe
-            </Text>
-          </View>
-
-          <Pressable className="rounded-md py-3 items-center" style={{ backgroundColor: C.green }}>
-            <Text className="text-white font-bold text-[15px]">Опубликовать</Text>
-          </Pressable>
-          <Pressable className="border border-[#E0E0E0] rounded-md py-3 items-center">
-            <Text className="text-[15px] font-semibold" style={{ color: C.muted }}>Сохранить черновик</Text>
-          </Pressable>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-function PhotoUploadState() {
-  return (
-    <StateSection title="CREATE_LISTING / Photo upload">
-      <PhoneFrame>
-        <StepHeader title="Новое объявление" step={2} />
-        <View className="p-4" style={{ gap: 16 }}>
-          <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">Фото</Text>
-          <View className="flex-row flex-wrap" style={{ gap: 8 }}>
-            {/* Uploaded thumbnails */}
-            <View style={{ position: 'relative' }}>
-              <View style={{ width: 80, height: 80, borderRadius: 6, backgroundColor: '#E0E0E0' }} />
-              <Text className="text-[11px] text-center mt-1" style={{ color: C.error }}>Удалить</Text>
-            </View>
-            <View style={{ position: 'relative' }}>
-              <View style={{ width: 80, height: 80, borderRadius: 6, backgroundColor: '#E0E0E0' }} />
-              <Text className="text-[11px] text-center mt-1" style={{ color: C.error }}>Удалить</Text>
-            </View>
-            {/* Loading spinner */}
-            <View style={{ width: 80, height: 80, borderRadius: 6, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' }}>
-              <ActivityIndicator size="small" color={C.green} />
-            </View>
-            {/* Add more slot */}
-            <Pressable style={{ width: 80, height: 80, borderRadius: 6, borderWidth: 2, borderStyle: 'dashed', borderColor: C.border, alignItems: 'center', justifyContent: 'center' }}>
-              <Text className="text-xl" style={{ color: C.green }}>+</Text>
-            </Pressable>
-          </View>
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MAIN EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
 
 export default function CreateListingStates() {
   return (
-    <View style={{ gap: 0 }}>
-      <Step1CategoryState />
-      <Step2DetailsState />
-      <Step3ReviewFreeState />
-      <Step3ReviewPaidState />
-      <PhotoUploadState />
-    </View>
+    <StateSection title="CREATE_LISTING / Multi-step form">
+      <CreateListingInteractive />
+    </StateSection>
   );
 }

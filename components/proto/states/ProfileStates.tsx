@@ -1,97 +1,136 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
-
-function PhoneFrame({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-  return (
-    <View
-      className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
-      style={isDesktop ? { width: 390, alignSelf: 'center' } : { width: '100%' }}
-    >
-      {children}
-    </View>
-  );
-}
+const C = {
+  green: '#00AA6C',
+  greenBg: '#E8F9F2',
+  white: '#FFFFFF',
+  text: '#1A1A1A',
+  muted: '#9E9E9E',
+  border: '#E8E8E8',
+  page: '#F5F5F5',
+  error: '#D32F2F',
+};
 
 function Avatar({ initials, size = 72 }: { initials: string; size?: number }) {
   return (
     <View
-      className="items-center justify-center"
       style={{
         width: size,
         height: size,
         borderRadius: size / 2,
         backgroundColor: C.green,
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
-      <Text className="text-white font-bold" style={{ fontSize: size * 0.3 }}>{initials}</Text>
+      <Text style={{ color: C.white, fontWeight: '700', fontSize: size * 0.3 }}>{initials}</Text>
     </View>
   );
 }
 
-function MenuRow({ label, isLast, isRed }: { label: string; isLast?: boolean; isRed?: boolean }) {
+function StatBox({ value, label }: { value: string; label: string }) {
   return (
-    <View>
-      <Pressable className="flex-row items-center justify-between py-3.5 px-4">
-        <Text
-          className="flex-1 text-[15px] font-medium"
-          style={{ color: isRed ? C.error : C.text }}
+    <View style={{ flex: 1, alignItems: 'center', paddingVertical: 16 }}>
+      <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>{value}</Text>
+      <Text style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{label}</Text>
+    </View>
+  );
+}
+
+// -- State 1: View mode --
+
+function ViewModeState() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
+  const profileCard = (
+    <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden', flex: isDesktop ? 1 : undefined }}>
+      {/* Avatar + name */}
+      <View style={{ alignItems: 'center', paddingTop: 28, paddingBottom: 20, paddingHorizontal: 20, gap: 8 }}>
+        <Avatar initials="ГК" size={80} />
+        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, marginTop: 4 }}>Георгий Каландадзе</Text>
+        <Text style={{ fontSize: 14, color: C.muted }}>g.kalandadze@gmail.com</Text>
+        <Text style={{ fontSize: 14, color: C.muted }}>+995 555 123 456</Text>
+        <Text style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>Участник с января 2024</Text>
+      </View>
+
+      {/* Divider */}
+      <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 16 }} />
+
+      {/* Stats row */}
+      <View style={{ flexDirection: 'row' }}>
+        <StatBox value="12" label="объявлений" />
+        <View style={{ width: 1, backgroundColor: C.border, marginVertical: 12 }} />
+        <StatBox value="38 000 ₾" label="продано" />
+        <View style={{ width: 1, backgroundColor: C.border, marginVertical: 12 }} />
+        <StatBox value="9" label="отзывов" />
+      </View>
+
+      {/* Edit button */}
+      <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
+        <Pressable
+          style={{
+            borderWidth: 1,
+            borderColor: C.green,
+            borderRadius: 8,
+            paddingVertical: 11,
+            alignItems: 'center',
+          }}
         >
-          {label}
-        </Text>
-        {!isRed && <Text style={{ fontSize: 16, color: C.muted }}>{'\u203A'}</Text>}
-      </Pressable>
-      {!isLast && <View className="h-px ml-4" style={{ backgroundColor: C.border }} />}
+          <Text style={{ color: C.green, fontWeight: '600', fontSize: 15 }}>Редактировать профиль</Text>
+        </Pressable>
+      </View>
     </View>
   );
-}
 
-// -- State 1: Default --
+  const statsPanel = (
+    <View style={{ flex: 1, gap: 12 }}>
+      {/* Active listings */}
+      <View style={{ backgroundColor: C.white, borderRadius: 12, padding: 16 }}>
+        <Text style={{ fontSize: 13, color: C.muted, marginBottom: 8, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          Активные объявления
+        </Text>
+        {['Toyota Camry 2019 — 45 000 ₾', 'iPhone 14 Pro — 2 400 ₾', 'Квартира 3-ком, Батуми — 85 000 ₾'].map((item, i) => (
+          <View key={i} style={{ paddingVertical: 10, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: C.border }}>
+            <Text style={{ fontSize: 14, color: C.text }}>{item}</Text>
+          </View>
+        ))}
+      </View>
 
-function DefaultState() {
+      {/* Recent reviews */}
+      <View style={{ backgroundColor: C.white, borderRadius: 12, padding: 16 }}>
+        <Text style={{ fontSize: 13, color: C.muted, marginBottom: 8, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          Последние отзывы
+        </Text>
+        {[
+          { name: 'Анна К.', text: 'Отличный продавец, рекомендую!' },
+          { name: 'Михаил Р.', text: 'Быстрая сделка, всё как описано.' },
+        ].map((r, i) => (
+          <View key={i} style={{ paddingVertical: 10, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: C.border }}>
+            <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>{r.name}</Text>
+            <Text style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>{r.text}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+
   return (
-    <StateSection title="PROFILE__DEFAULT">
-      <PhoneFrame>
-        <View style={{ backgroundColor: C.white }}>
-          {/* Top section */}
-          <View className="bg-white p-5 items-center" style={{ gap: 8 }}>
-            <Avatar initials={'\u0413\u041A'} />
-            <Text className="text-lg font-bold" style={{ color: C.text }}>{'\u0413\u0435\u043E\u0440\u0433\u0438\u0439 \u041A\u0430\u043B\u0430\u043D\u0434\u0430\u0434\u0437\u0435'}</Text>
-            <Text className="text-sm" style={{ color: C.muted }}>g.kalandadze@gmail.com</Text>
-            <Pressable className="rounded-md px-5 py-2 mt-1 border" style={{ borderColor: C.green }}>
-              <Text className="text-sm font-semibold" style={{ color: C.green }}>{'\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C'}</Text>
-            </Pressable>
+    <StateSection title="PROFILE__VIEW">
+      <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={isDesktop ? { flexDirection: 'row', padding: 20, gap: 16, alignItems: 'flex-start' } : { padding: 12, gap: 12 }}>
+            {profileCard}
+            {isDesktop && statsPanel}
           </View>
-
-          {/* Stats row */}
-          <View className="flex-row bg-white mt-px">
-            {[
-              { value: '10', label: '\u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0439' },
-              { value: '7', label: '\u043E\u0442\u0437\u044B\u0432\u043E\u0432' },
-              { value: '\u0421 2024', label: '' },
-            ].map((s, i) => (
-              <View key={i} className="flex-1 items-center py-3" style={{ borderRightWidth: i < 2 ? 1 : 0, borderRightColor: C.border }}>
-                <Text className="text-base font-bold" style={{ color: C.text }}>{s.value}</Text>
-                {s.label ? <Text className="text-xs" style={{ color: C.muted }}>{s.label}</Text> : null}
-              </View>
-            ))}
-          </View>
-
-          {/* Menu list */}
-          <View className="bg-white mt-2">
-            <MenuRow label={'\u041C\u043E\u0438 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u044F'} />
-            <MenuRow label={'\u0418\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435'} />
-            <MenuRow label={'\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439'} />
-            <MenuRow label={'\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438'} />
-            <MenuRow label={'\u041F\u043E\u043C\u043E\u0449\u044C'} />
-            <MenuRow label={'\u0412\u044B\u0439\u0442\u0438'} isLast isRed />
-          </View>
-        </View>
-      </PhoneFrame>
+          {!isDesktop && <View style={{ paddingHorizontal: 12, paddingBottom: 0, gap: 12 }}>{statsPanel}</View>}
+          {!isDesktop && <View style={{ height: 12 }} />}
+        </ScrollView>
+        {!isDesktop && <BottomNav active="profile" />}
+      </View>
     </StateSection>
   );
 }
@@ -99,67 +138,77 @@ function DefaultState() {
 // -- State 2: Edit mode --
 
 function EditModeState() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+  const [name, setName] = useState('Георгий Каландадзе');
+  const [phone, setPhone] = useState('+995 555 123 456');
+
+  const form = (
+    <View style={{ backgroundColor: C.white, borderRadius: 12, padding: 20, gap: 16, flex: isDesktop ? undefined : undefined, maxWidth: isDesktop ? 480 : undefined, alignSelf: isDesktop ? 'center' : undefined, width: isDesktop ? '100%' : undefined }}>
+      <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Редактировать профиль</Text>
+
+      {/* Avatar centered */}
+      <View style={{ alignItems: 'center', paddingVertical: 8 }}>
+        <Avatar initials="ГК" size={72} />
+        <Pressable style={{ marginTop: 8 }}>
+          <Text style={{ fontSize: 14, color: C.green, fontWeight: '600' }}>Изменить фото</Text>
+        </Pressable>
+      </View>
+
+      {/* Name */}
+      <View style={{ gap: 6 }}>
+        <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Имя</Text>
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 }}
+        />
+      </View>
+
+      {/* Email (read-only) */}
+      <View style={{ gap: 6 }}>
+        <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Email</Text>
+        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#FAFAFA' }}>
+          <Text style={{ fontSize: 15, color: C.muted }}>g.kalandadze@gmail.com</Text>
+        </View>
+        <Text style={{ fontSize: 12, color: C.muted }}>Email нельзя изменить</Text>
+      </View>
+
+      {/* Phone */}
+      <View style={{ gap: 6 }}>
+        <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Телефон</Text>
+        <TextInput
+          value={phone}
+          onChangeText={setPhone}
+          keyboardType="phone-pad"
+          placeholder="+995 5XX XXX XXX"
+          placeholderTextColor={C.muted}
+          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 }}
+        />
+      </View>
+
+      {/* Buttons */}
+      <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
+        <Pressable style={{ flex: 1, backgroundColor: C.green, borderRadius: 8, paddingVertical: 13, alignItems: 'center' }}>
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Сохранить</Text>
+        </Pressable>
+        <Pressable style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 13, alignItems: 'center' }}>
+          <Text style={{ color: C.muted, fontWeight: '600', fontSize: 15 }}>Отмена</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+
   return (
     <StateSection title="PROFILE__EDIT">
-      <PhoneFrame>
-        <View style={{ backgroundColor: C.white }}>
-          <View className="bg-white p-5" style={{ gap: 16 }}>
-            <Text className="text-lg font-bold" style={{ color: C.text }}>{'\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043F\u0440\u043E\u0444\u0438\u043B\u044C'}</Text>
-
-            <View>
-              <Text className="text-sm font-medium mb-1.5" style={{ color: C.text }}>{'\u0418\u043C\u044F'}</Text>
-              <TextInput
-                style={{
-                  borderWidth: 1,
-                  borderColor: C.border,
-                  borderRadius: 6,
-                  paddingHorizontal: 12,
-                  color: C.text,
-                  fontSize: 16,
-                  paddingVertical: 10,
-                }}
-                value={'\u0413\u0435\u043E\u0440\u0433\u0438\u0439'}
-                
-              />
-            </View>
-
-            <View>
-              <Text className="text-sm font-medium mb-1.5" style={{ color: C.text }}>{'\u0422\u0435\u043B\u0435\u0444\u043E\u043D'}</Text>
-              <TextInput
-                style={{
-                  borderWidth: 1,
-                  borderColor: C.border,
-                  borderRadius: 6,
-                  paddingHorizontal: 12,
-                  color: C.text,
-                  fontSize: 16,
-                  paddingVertical: 10,
-                }}
-                placeholder="+995 5XX XXX XXX"
-                placeholderTextColor={C.muted}
-                
-              />
-            </View>
-
-            <View>
-              <Text className="text-sm font-medium mb-1.5" style={{ color: C.text }}>{'\u0413\u043E\u0440\u043E\u0434'}</Text>
-              <Pressable className="border rounded-md px-3 py-2.5 flex-row items-center justify-between" style={{ borderColor: C.border }}>
-                <Text className="text-base" style={{ color: C.muted }}>{'\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0433\u043E\u0440\u043E\u0434'}</Text>
-                <Text style={{ color: C.muted, fontSize: 14 }}>{'\u25BC'}</Text>
-              </Pressable>
-            </View>
-
-            <View className="flex-row" style={{ gap: 12, marginTop: 8 }}>
-              <Pressable className="flex-1 rounded-md py-3 items-center" style={{ backgroundColor: C.green }}>
-                <Text className="text-white font-bold text-[15px]">{'\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C'}</Text>
-              </Pressable>
-              <Pressable className="flex-1 rounded-md py-3 items-center border" style={{ borderColor: C.border }}>
-                <Text className="font-semibold text-[15px]" style={{ color: C.muted }}>{'\u041E\u0442\u043C\u0435\u043D\u0430'}</Text>
-              </Pressable>
-            </View>
+      <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={{ padding: isDesktop ? 32 : 12 }}>
+            {form}
           </View>
-        </View>
-      </PhoneFrame>
+        </ScrollView>
+        {!isDesktop && <BottomNav active="profile" />}
+      </View>
     </StateSection>
   );
 }
@@ -169,7 +218,7 @@ function EditModeState() {
 export default function ProfileStates() {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <DefaultState />
+      <ViewModeState />
       <EditModeState />
     </ScrollView>
   );

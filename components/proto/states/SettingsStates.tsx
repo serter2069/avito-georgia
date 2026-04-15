@@ -1,160 +1,278 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = {
+  green: '#00AA6C',
+  greenBg: '#E8F9F2',
+  white: '#FFFFFF',
+  text: '#1A1A1A',
+  muted: '#9E9E9E',
+  border: '#E8E8E8',
+  page: '#F5F5F5',
+  error: '#D32F2F',
+};
 
-function PhoneFrame({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
+// Custom Toggle component
+function Toggle({ value, onToggle }: { value: boolean; onToggle: () => void }) {
   return (
-    <View
-      className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
-      style={isDesktop ? { width: 390, alignSelf: 'center' } : { width: '100%' }}
-    >
-      {children}
-    </View>
+    <Pressable onPress={onToggle} style={{ width: 46, height: 27, borderRadius: 14, backgroundColor: value ? C.green : '#D1D5DB', paddingHorizontal: 2, justifyContent: 'center' }}>
+      <View
+        style={{
+          width: 23,
+          height: 23,
+          borderRadius: 12,
+          backgroundColor: C.white,
+          alignSelf: value ? 'flex-end' : 'flex-start',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.15,
+          shadowRadius: 2,
+          elevation: 2,
+        }}
+      />
+    </Pressable>
   );
 }
 
-function SectionHeader({ text }: { text: string }) {
+function SectionLabel({ text }: { text: string }) {
   return (
-    <Text className="text-xs font-semibold uppercase tracking-wider mb-2 mt-4 px-4" style={{ color: C.muted }}>
+    <Text style={{ fontSize: 12, fontWeight: '600', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.6, paddingHorizontal: 4, paddingTop: 8, paddingBottom: 6 }}>
       {text}
     </Text>
   );
 }
 
-function RadioRow({ label, selected, isLast }: { label: string; selected?: boolean; isLast?: boolean }) {
+function Divider({ indent = 0 }: { indent?: number }) {
+  return <View style={{ height: 1, backgroundColor: C.border, marginLeft: indent }} />;
+}
+
+type SectionId = 'notifications' | 'security' | 'language' | 'about';
+
+interface NavItemProps {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}
+
+function DesktopNavItem({ label, active, onPress }: NavItemProps) {
   return (
-    <View>
-      <Pressable className="flex-row items-center justify-between py-3.5 px-4">
-        <Text className="text-[15px]" style={{ color: C.text }}>{label}</Text>
-        <View
-          className="w-5 h-5 rounded-full border-2 items-center justify-center"
-          style={{ borderColor: selected ? C.green : C.border }}
-        >
-          {selected && <View className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: C.green }} />}
-        </View>
-      </Pressable>
-      {!isLast && <View className="h-px ml-4" style={{ backgroundColor: C.border }} />}
-    </View>
+    <Pressable
+      onPress={onPress}
+      style={{
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        backgroundColor: active ? C.greenBg : 'transparent',
+      }}
+    >
+      <Text style={{ fontSize: 15, fontWeight: active ? '600' : '400', color: active ? C.green : C.text }}>
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
-function ToggleRow({ label, on, isLast }: { label: string; on?: boolean; isLast?: boolean }) {
+// Section content renderers
+
+function NotificationsSection() {
+  const [msgs, setMsgs] = useState(true);
+  const [listings, setListings] = useState(true);
+  const [promos, setPromos] = useState(false);
+
   return (
-    <View>
-      <View className="flex-row items-center justify-between py-3.5 px-4">
-        <Text className="text-[15px]" style={{ color: C.text }}>{label}</Text>
-        <View
-          className="justify-center"
-          style={{ width: 44, height: 26, borderRadius: 13, backgroundColor: on ? C.green : '#D1D5DB', paddingHorizontal: 2 }}
-        >
-          <View
-            className="bg-white"
-            style={{
-              width: 22,
-              height: 22,
-              borderRadius: 11,
-              alignSelf: on ? 'flex-end' : 'flex-start',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.15,
-              shadowRadius: 2,
-              elevation: 2,
-            }}
-          />
-        </View>
+    <View style={{ gap: 0 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+        <Text style={{ fontSize: 15, color: C.text }}>Новые сообщения</Text>
+        <Toggle value={msgs} onToggle={() => setMsgs(v => !v)} />
       </View>
-      {!isLast && <View className="h-px ml-4" style={{ backgroundColor: C.border }} />}
+      <Divider indent={16} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+        <Text style={{ fontSize: 15, color: C.text }}>Статус объявлений</Text>
+        <Toggle value={listings} onToggle={() => setListings(v => !v)} />
+      </View>
+      <Divider indent={16} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+        <Text style={{ fontSize: 15, color: C.text }}>Акции и предложения</Text>
+        <Toggle value={promos} onToggle={() => setPromos(v => !v)} />
+      </View>
+      <Text style={{ fontSize: 12, color: C.muted, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>
+        Уведомления отправляются на email
+      </Text>
     </View>
   );
 }
 
-function NavRow({ label, isLast, isRed }: { label: string; isLast?: boolean; isRed?: boolean }) {
+function SecuritySection() {
   return (
     <View>
-      <Pressable className="flex-row items-center justify-between py-3.5 px-4">
-        <Text className="text-[15px] font-medium" style={{ color: isRed ? C.error : C.text }}>{label}</Text>
-        {!isRed && <Text style={{ fontSize: 16, color: C.muted }}>{'\u203A'}</Text>}
+      <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+        <Text style={{ fontSize: 15, color: C.text }}>Изменить email</Text>
+        <Text style={{ fontSize: 18, color: C.muted }}>{'\u203A'}</Text>
       </Pressable>
-      {!isLast && <View className="h-px ml-4" style={{ backgroundColor: C.border }} />}
+      <Divider indent={16} />
+      <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+        <Text style={{ fontSize: 15, color: C.text }}>Активные сессии</Text>
+        <Text style={{ fontSize: 18, color: C.muted }}>{'\u203A'}</Text>
+      </Pressable>
     </View>
   );
 }
 
-// -- State 1: Default --
+type Lang = 'ru' | 'ka' | 'en';
+
+function LanguageSection() {
+  const [lang, setLang] = useState<Lang>('ru');
+  const langs: { id: Lang; label: string }[] = [
+    { id: 'ru', label: 'Русский' },
+    { id: 'ka', label: 'Georgian / \u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8' },
+    { id: 'en', label: 'English' },
+  ];
+
+  return (
+    <View style={{ paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      {langs.map(l => (
+        <Pressable
+          key={l.id}
+          onPress={() => setLang(l.id)}
+          style={{
+            paddingHorizontal: 16,
+            paddingVertical: 9,
+            borderRadius: 20,
+            borderWidth: 1.5,
+            borderColor: lang === l.id ? C.green : C.border,
+            backgroundColor: lang === l.id ? C.greenBg : C.white,
+          }}
+        >
+          <Text style={{ fontSize: 14, fontWeight: lang === l.id ? '600' : '400', color: lang === l.id ? C.green : C.text }}>
+            {l.label}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+function AboutSection() {
+  return (
+    <View>
+      {[
+        { label: 'Версия приложения', value: '1.4.2' },
+        { label: 'Условия использования', value: '\u203A' },
+        { label: 'Политика конфиденциальности', value: '\u203A' },
+      ].map((row, i) => (
+        <View key={i}>
+          {i > 0 && <Divider indent={16} />}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+            <Text style={{ fontSize: 15, color: C.text }}>{row.label}</Text>
+            <Text style={{ fontSize: row.value === '\u203A' ? 18 : 14, color: C.muted }}>{row.value}</Text>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const SECTIONS: { id: SectionId; label: string }[] = [
+  { id: 'notifications', label: 'Уведомления' },
+  { id: 'security', label: 'Безопасность' },
+  { id: 'language', label: 'Язык' },
+  { id: 'about', label: 'О приложении' },
+];
+
+function renderSection(id: SectionId) {
+  if (id === 'notifications') return <NotificationsSection />;
+  if (id === 'security') return <SecuritySection />;
+  if (id === 'language') return <LanguageSection />;
+  return <AboutSection />;
+}
+
+// -- State 1: Settings (interactive) --
 
 function DefaultState() {
-  return (
-    <StateSection title="SETTINGS__DEFAULT">
-      <PhoneFrame>
-        <View style={{ backgroundColor: C.page }}>
-          {/* Header */}
-          <View className="bg-white px-4 py-4 mb-2">
-            <Text className="text-xl font-bold" style={{ color: C.text }}>{'\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438'}</Text>
-          </View>
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+  const [activeSection, setActiveSection] = useState<SectionId>('notifications');
 
-          {/* Language */}
-          <SectionHeader text={'\u042F\u0437\u044B\u043A \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430'} />
-          <View className="bg-white">
-            <RadioRow label={'\u0420\u0443\u0441\u0441\u043A\u0438\u0439'} selected />
-            <RadioRow label={'Georgian / \u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8'} />
-            <RadioRow label="English" isLast />
-          </View>
+  if (isDesktop) {
+    return (
+      <StateSection title="SETTINGS__DEFAULT">
+        <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+          <View style={{ flexDirection: 'row', padding: 20, gap: 16, alignItems: 'flex-start' }}>
+            {/* Left nav */}
+            <View style={{ width: 200, backgroundColor: C.white, borderRadius: 12, padding: 8, gap: 2 }}>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, paddingHorizontal: 8, paddingVertical: 10 }}>Настройки</Text>
+              {SECTIONS.map(s => (
+                <DesktopNavItem key={s.id} label={s.label} active={activeSection === s.id} onPress={() => setActiveSection(s.id)} />
+              ))}
+              <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 8 }}>
+                <Pressable style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 }}>
+                  <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
+                </Pressable>
+              </View>
+            </View>
 
-          {/* Notifications */}
-          <SectionHeader text={'\u0423\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F'} />
-          <View className="bg-white">
-            <ToggleRow label={'\u041D\u043E\u0432\u044B\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u044F'} on />
-            <ToggleRow label={'\u0421\u0442\u0430\u0442\u0443\u0441 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0439'} on />
-            <ToggleRow label={'\u0410\u043A\u0446\u0438\u0438'} isLast />
-          </View>
-          <Text className="text-xs mt-1 px-4" style={{ color: C.muted }}>{'\u0423\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u044F\u044E\u0442\u0441\u044F \u043D\u0430 email'}</Text>
-
-          {/* Account */}
-          <SectionHeader text={'\u0410\u043A\u043A\u0430\u0443\u043D\u0442'} />
-          <View className="bg-white">
-            <NavRow label={'\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C email'} />
-            <NavRow label={'\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0430\u043A\u043A\u0430\u0443\u043D\u0442'} isLast isRed />
-          </View>
-
-          <View className="h-6" />
-        </View>
-      </PhoneFrame>
-    </StateSection>
-  );
-}
-
-// -- State 2: Delete confirm --
-
-function DeleteConfirmState() {
-  return (
-    <StateSection title="SETTINGS__DELETE_CONFIRM">
-      <PhoneFrame>
-        <View style={{ backgroundColor: 'rgba(0,0,0,0.4)', padding: 24, minHeight: 300, justifyContent: 'center' }}>
-          <View
-            className="bg-white rounded-xl p-6 items-center"
-            style={{ gap: 12 }}
-          >
-            <Text className="text-lg font-bold text-center" style={{ color: C.text }}>
-              {'\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0430\u043A\u043A\u0430\u0443\u043D\u0442?'}
-            </Text>
-            <Text className="text-sm text-center leading-5" style={{ color: C.muted, maxWidth: 260 }}>
-              {'\u0412\u0441\u0435 \u0434\u0430\u043D\u043D\u044B\u0435 \u0438 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u044F \u0431\u0443\u0434\u0443\u0442 \u0443\u0434\u0430\u043B\u0435\u043D\u044B.'}
-            </Text>
-            <View className="flex-row w-full mt-2" style={{ gap: 12 }}>
-              <Pressable className="flex-1 rounded-md py-3 items-center border" style={{ borderColor: C.border }}>
-                <Text className="font-semibold text-[15px]" style={{ color: C.text }}>{'\u041E\u0442\u043C\u0435\u043D\u0430'}</Text>
-              </Pressable>
-              <Pressable className="flex-1 rounded-md py-3 items-center" style={{ backgroundColor: C.error }}>
-                <Text className="text-white font-bold text-[15px]">{'\u0423\u0434\u0430\u043B\u0438\u0442\u044C'}</Text>
-              </Pressable>
+            {/* Right content */}
+            <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, padding: 16, borderBottomWidth: 1, borderBottomColor: C.border }}>
+                {SECTIONS.find(s => s.id === activeSection)?.label}
+              </Text>
+              {renderSection(activeSection)}
             </View>
           </View>
         </View>
-      </PhoneFrame>
+      </StateSection>
+    );
+  }
+
+  return (
+    <StateSection title="SETTINGS__DEFAULT">
+      <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={{ padding: 12, gap: 4 }}>
+            {/* Header */}
+            <View style={{ backgroundColor: C.white, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 }}>
+              <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Настройки</Text>
+            </View>
+
+            {/* Notifications */}
+            <SectionLabel text="Уведомления" />
+            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+              <NotificationsSection />
+            </View>
+
+            {/* Security */}
+            <SectionLabel text="Безопасность" />
+            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+              <SecuritySection />
+            </View>
+
+            {/* Language */}
+            <SectionLabel text="Язык" />
+            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+              <LanguageSection />
+            </View>
+
+            {/* About */}
+            <SectionLabel text="О приложении" />
+            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+              <AboutSection />
+            </View>
+
+            {/* Danger zone */}
+            <SectionLabel text="Аккаунт" />
+            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+              <Pressable style={{ paddingVertical: 14, paddingHorizontal: 16 }}>
+                <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
+              </Pressable>
+            </View>
+
+            <View style={{ height: 8 }} />
+          </View>
+        </ScrollView>
+        <BottomNav active="profile" />
+      </View>
     </StateSection>
   );
 }
@@ -165,7 +283,6 @@ export default function SettingsStates() {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
       <DefaultState />
-      <DeleteConfirmState />
     </ScrollView>
   );
 }

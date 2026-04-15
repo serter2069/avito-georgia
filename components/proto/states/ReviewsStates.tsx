@@ -1,181 +1,196 @@
 import React from 'react';
-import { View, Text, TextInput, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-// ─── Design Tokens ───────────────────────────────────────────────────────────
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = {
+  green: '#00AA6C',
+  greenBg: '#E8F9F2',
+  white: '#FFFFFF',
+  text: '#1A1A1A',
+  muted: '#9E9E9E',
+  border: '#E8E8E8',
+  page: '#F5F5F5',
+  star: '#F5A623',
+};
 
-// ─── Responsive wrapper ─────────────────────────────────────────────────────
-function ResponsiveFrame({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
+const REVIEWS = [
+  { name: 'Анна К.', letter: 'А', color: '#5B8DEF', rating: 5, date: '10 апр 2026', text: 'Отличный продавец! Машина точно как на фото. Быстро ответил на все вопросы, помог с документами. Рекомендую всем!' },
+  { name: 'Давид М.', letter: 'Д', color: '#E88B45', rating: 5, date: '3 апр 2026', text: 'Купил автомобиль, всё честно, без скрытых дефектов. Сделка прошла быстро и без проблем.' },
+  { name: 'Нино Г.', letter: 'Н', color: '#9B59B6', rating: 4, date: '28 мар 2026', text: 'В целом хорошо, но немного долго отвечал на сообщения. Товар соответствует описанию.' },
+  { name: 'Гиорги Т.', letter: 'Г', color: C.green, rating: 4, date: '15 мар 2026', text: 'Нормальная сделка, без проблем. Немного поторговался, договорились на хорошей цене.' },
+  { name: 'Тамара Б.', letter: 'Т', color: '#E91E63', rating: 5, date: '2 мар 2026', text: 'Прекрасный продавец, всё точно и вовремя. Уже второй раз покупаю у него.' },
+];
+
+const BREAKDOWN = [
+  { stars: 5, pct: 60 },
+  { stars: 4, pct: 25 },
+  { stars: 3, pct: 10 },
+  { stars: 2, pct: 3 },
+  { stars: 1, pct: 2 },
+];
+
+function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
   return (
-    <View style={isDesktop ? { width: 390, alignSelf: 'center', backgroundColor: C.white, borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: C.border } : { backgroundColor: C.white }}>
-      {children}
-    </View>
-  );
-}
-
-// ─── Stars as text ───────────────────────────────────────────────────────────
-function Stars({ rating }: { rating: number }) {
-  const full = Math.floor(rating);
-  const empty = 5 - full;
-  return (
-    <Text style={{ fontSize: 16, color: '#F5A623', letterSpacing: 2 }}>
-      {'★'.repeat(full)}{'☆'.repeat(empty)}
+    <Text style={{ fontSize: size, color: C.star, letterSpacing: 2 }}>
+      {'★'.repeat(Math.floor(rating))}{'☆'.repeat(5 - Math.floor(rating))}
     </Text>
   );
 }
 
-// ─── Avatar circle ───────────────────────────────────────────────────────────
-function Avatar({ letter, color }: { letter: string; color: string }) {
+function Avatar({ letter, color, size = 40 }: { letter: string; color: string; size?: number }) {
   return (
-    <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: C.white, fontWeight: '700', fontSize: 14 }}>{letter}</Text>
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
+      <Text style={{ color: C.white, fontWeight: '700', fontSize: size * 0.38 }}>{letter}</Text>
     </View>
   );
 }
 
-// ─── Review card ─────────────────────────────────────────────────────────────
-function ReviewCard({ name, letter, color, rating, date, text }: { name: string; letter: string; color: string; rating: number; date: string; text: string }) {
+function RatingSummary() {
   return (
-    <View style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border }}>
-      <View className="flex-row items-center" style={{ gap: 10, marginBottom: 6 }}>
-        <Avatar letter={letter} color={color} />
-        <View className="flex-1">
-          <Text className="text-[14px] font-semibold text-[#1A1A1A]">{name}</Text>
-          <View className="flex-row items-center" style={{ gap: 8 }}>
-            <Stars rating={rating} />
-            <Text className="text-[11px] text-[#737373]">{date}</Text>
+    <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.border }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 24 }}>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={{ fontSize: 52, fontWeight: '800', color: C.text, lineHeight: 58 }}>4.7</Text>
+          <Stars rating={4.7} />
+          <Text style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>128 отзывов</Text>
+        </View>
+        <View style={{ flex: 1, gap: 5 }}>
+          {BREAKDOWN.map(({ stars, pct }) => (
+            <View key={stars} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 11, color: C.muted, width: 8 }}>{stars}</Text>
+              <Text style={{ fontSize: 11, color: C.star }}>★</Text>
+              <View style={{ flex: 1, height: 6, backgroundColor: C.border, borderRadius: 3 }}>
+                <View style={{ width: `${pct}%`, height: 6, backgroundColor: C.star, borderRadius: 3 }} />
+              </View>
+              <Text style={{ fontSize: 11, color: C.muted, width: 28 }}>{pct}%</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function ReviewCard({ name, letter, color, rating, date, text }: typeof REVIEWS[0]) {
+  return (
+    <View style={{ paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+        <Avatar letter={letter} color={color} size={36} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>{name}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Stars rating={rating} size={13} />
+            <Text style={{ fontSize: 11, color: C.muted }}>{date}</Text>
           </View>
         </View>
       </View>
-      <Text className="text-[13px] text-[#1A1A1A] leading-5">{text}</Text>
+      <Text style={{ fontSize: 13, color: C.text, lineHeight: 20 }}>{text}</Text>
     </View>
   );
 }
 
-// ─── Header ──────────────────────────────────────────────────────────────────
-function ReviewsHeader() {
+function WriteReviewButton() {
   return (
-    <View className="flex-row items-center bg-white px-4 py-3 border-b border-[#E0E0E0]">
-      <Text className="text-[15px] text-[#737373] mr-2">←</Text>
-      <Text className="text-[16px] font-bold text-[#1A1A1A]">Отзывы о Михаиле</Text>
+    <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: C.border }}>
+      <Pressable style={{ backgroundColor: C.green, borderRadius: 8, paddingVertical: 13, alignItems: 'center' }}>
+        <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Написать отзыв</Text>
+      </Pressable>
     </View>
   );
 }
 
-// ─── Summary block ───────────────────────────────────────────────────────────
-function RatingSummary() {
-  return (
-    <View className="items-center py-5 border-b border-[#E0E0E0]">
-      <Text style={{ fontSize: 40, fontWeight: '800', color: C.text }}>4.7</Text>
-      <Stars rating={4} />
-      <Text className="text-[13px] text-[#737373] mt-1">8 отзывов</Text>
-    </View>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// STATE 1: Default (reviews list)
-// ═══════════════════════════════════════════════════════════════════════════════
 function ReviewsDefault() {
-  const reviews = [
-    { name: 'Анна К.', letter: 'А', color: '#5B8DEF', rating: 5, date: '10 апр 2026', text: 'Отличный продавец! Квартира точно как на фото. Быстро ответил на все вопросы, помог с документами.' },
-    { name: 'Давид М.', letter: 'Д', color: '#E88B45', rating: 5, date: '3 апр 2026', text: 'Купил машину, всё честно, без скрытых дефектов. Рекомендую.' },
-    { name: 'Нино Г.', letter: 'Н', color: '#9B59B6', rating: 4, date: '28 мар 2026', text: 'В целом хорошо, но долго отвечал на сообщения. Товар соответствует описанию.' },
-    { name: 'Гиорги Т.', letter: 'Г', color: C.green, rating: 4, date: '15 мар 2026', text: 'Нормальная сделка, без проблем. Немного торговался, но договорились.' },
-  ];
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
+  const header = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.white, gap: 12 }}>
+      <Pressable>
+        <Text style={{ fontSize: 20, color: C.muted }}>{'<'}</Text>
+      </Pressable>
+      <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>Отзывы о Михаиле</Text>
+    </View>
+  );
+
+  if (isDesktop) {
+    return (
+      <StateSection title="REVIEWS / Default">
+        <View style={{ maxWidth: 900, alignSelf: 'center', width: '100%', backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
+          {header}
+          <View style={{ flexDirection: 'row' }}>
+            {/* Left: summary */}
+            <View style={{ width: 300, borderRightWidth: 1, borderRightColor: C.border }}>
+              <RatingSummary />
+              <WriteReviewButton />
+            </View>
+            {/* Right: reviews list */}
+            <View style={{ flex: 1, paddingHorizontal: 20 }}>
+              {REVIEWS.map((r, i) => <ReviewCard key={i} {...r} />)}
+            </View>
+          </View>
+        </View>
+      </StateSection>
+    );
+  }
 
   return (
-    <StateSection title="REVIEWS_DEFAULT">
-      <ResponsiveFrame>
-        <ReviewsHeader />
+    <StateSection title="REVIEWS / Default">
+      <View style={{ backgroundColor: C.white }}>
+        {header}
         <RatingSummary />
-        <View className="px-4">
-          {reviews.map((r, i) => (
-            <ReviewCard key={i} {...r} />
-          ))}
+        <View style={{ paddingHorizontal: 16 }}>
+          {REVIEWS.map((r, i) => <ReviewCard key={i} {...r} />)}
         </View>
-        <View style={{ height: 16 }} />
-      </ResponsiveFrame>
+        <WriteReviewButton />
+        <BottomNav active="profile" />
+      </View>
     </StateSection>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// STATE 2: Empty
-// ═══════════════════════════════════════════════════════════════════════════════
 function ReviewsEmpty() {
-  return (
-    <StateSection title="REVIEWS_EMPTY">
-      <ResponsiveFrame>
-        <ReviewsHeader />
-        <View className="items-center py-16 px-6">
-          <Text className="text-lg font-bold text-[#1A1A1A] mb-2">Отзывов пока нет</Text>
-          <Text className="text-[13px] text-[#737373] text-center">
-            Станьте первым -- завершите сделку чтобы оставить отзыв
-          </Text>
-        </View>
-      </ResponsiveFrame>
-    </StateSection>
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
+  const content = (
+    <View style={{ backgroundColor: C.white }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, gap: 12 }}>
+        <Pressable>
+          <Text style={{ fontSize: 20, color: C.muted }}>{'<'}</Text>
+        </Pressable>
+        <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>Отзывы о Михаиле</Text>
+      </View>
+      <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 24 }}>
+        <Text style={{ fontSize: 40, fontWeight: '800', color: C.text }}>0</Text>
+        <Text style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>отзывов</Text>
+        <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, marginTop: 20, marginBottom: 8 }}>Отзывов пока нет</Text>
+        <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', lineHeight: 20 }}>
+          Станьте первым — завершите сделку чтобы оставить отзыв
+        </Text>
+      </View>
+      {!isDesktop && <BottomNav active="profile" />}
+    </View>
   );
+
+  if (isDesktop) {
+    return (
+      <StateSection title="REVIEWS / Empty">
+        <View style={{ maxWidth: 600, alignSelf: 'center', width: '100%', borderRadius: 12, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
+          {content}
+        </View>
+      </StateSection>
+    );
+  }
+
+  return <StateSection title="REVIEWS / Empty">{content}</StateSection>;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// STATE 3: Write Review
-// ═══════════════════════════════════════════════════════════════════════════════
-function ReviewsWrite() {
-  const existingReview = { name: 'Анна К.', letter: 'А', color: '#5B8DEF', rating: 5, date: '10 апр 2026', text: 'Отличный продавец! Квартира точно как на фото.' };
-
-  return (
-    <StateSection title="REVIEWS_WRITE">
-      <ResponsiveFrame>
-        <ReviewsHeader />
-        <RatingSummary />
-
-        {/* Existing review */}
-        <View className="px-4">
-          <ReviewCard {...existingReview} />
-        </View>
-
-        {/* Write review form */}
-        <View className="px-4 pt-4 pb-5">
-          <Text className="text-[14px] font-semibold text-[#1A1A1A] mb-3">Ваш отзыв</Text>
-
-          {/* Tappable rating row */}
-          <View className="flex-row mb-3" style={{ gap: 4 }}>
-            {[1,2,3,4,5].map((i) => (
-              <Text key={i} style={{ fontSize: 28, color: i <= 1 ? '#F5A623' : '#E0E0E0' }}>
-                {i <= 1 ? '★' : '☆'}
-              </Text>
-            ))}
-          </View>
-
-          {/* Text input */}
-          <View className="border border-[#E0E0E0] rounded-lg p-3 mb-4" style={{ minHeight: 100 }}>
-            <Text className="text-[14px] text-[#737373]">Ваш отзыв...</Text>
-          </View>
-
-          {/* Submit button */}
-          <Pressable className="bg-[#00AA6C] rounded-lg py-3 items-center">
-            <Text className="text-white font-bold text-[15px]">Отправить</Text>
-          </Pressable>
-        </View>
-      </ResponsiveFrame>
-    </StateSection>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MAIN EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
 export default function ReviewsStates() {
   return (
     <View style={{ gap: 32 }}>
       <ReviewsDefault />
       <ReviewsEmpty />
-      <ReviewsWrite />
     </View>
   );
 }
