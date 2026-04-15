@@ -95,7 +95,7 @@ const LISTINGS = [
 ];
 
 // ─── Interactive Feed ─────────────────────────────────────────────────────────
-function InteractiveFeed() {
+function InteractiveFeed({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [sortOrder, setSortOrder] = useState<'date' | 'price'>('date');
   const columns = useColumns();
@@ -110,7 +110,7 @@ function InteractiveFeed() {
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       {/* Header */}
-      {isMobile ? (
+      {showHeader && (isMobile ? (
         <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
             <Text style={{ fontSize: 18, fontWeight: '800', color: C.green }}>Avito GE</Text>
@@ -134,7 +134,7 @@ function InteractiveFeed() {
             </Pressable>
           </View>
         </View>
-      )}
+      ))}
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: isMobile ? 80 : 32 }}>
         <View style={isDesktop ? { maxWidth: 1200, alignSelf: 'center', width: '100%', paddingHorizontal: horizontalPadding } : {}}>
@@ -176,7 +176,7 @@ function InteractiveFeed() {
         </View>
       </ScrollView>
 
-      {isMobile && <BottomNav />}
+      {showBottomNav && isMobile && <BottomNav />}
     </View>
   );
 }
@@ -184,11 +184,11 @@ function InteractiveFeed() {
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN EXPORT
 // ═══════════════════════════════════════════════════════════════════════════════
-export default function ListingsFeedStates() {
+export default function ListingsFeedStates({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean } = {}) {
   return (
     <View style={{ gap: 32 }}>
       <StateSection title="LISTINGS_FEED_INTERACTIVE">
-        <InteractiveFeed />
+        <InteractiveFeed showHeader={showHeader} showBottomNav={showBottomNav} />
       </StateSection>
     </View>
   );

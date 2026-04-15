@@ -3,7 +3,7 @@ import { AppShell } from '../components/layout/AppShell';
 
 export default function SearchPage() {
   return (
-    <AppShell activeTab="browse" scrollable={false}>
+    <AppShell activeTab="browse">
       <SearchStates />
     </AppShell>
   );

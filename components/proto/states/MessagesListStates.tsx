@@ -182,7 +182,7 @@ function EmptySearch() {
 
 // -- State 1: Messages list (interactive) --
 
-function DefaultState() {
+function DefaultState({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   const [query, setQuery] = useState('');
@@ -273,7 +273,7 @@ function DefaultState() {
             />
           ))
         }
-        <BottomNav active="messages" />
+        {showBottomNav && <BottomNav active="messages" />}
       </View>
     </StateSection>
   );
@@ -281,10 +281,10 @@ function DefaultState() {
 
 // -- Main Export --
 
-export default function MessagesListStates() {
+export default function MessagesListStates({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean } = {}) {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <DefaultState />
+      <DefaultState showHeader={showHeader} showBottomNav={showBottomNav} />
     </ScrollView>
   );
 }

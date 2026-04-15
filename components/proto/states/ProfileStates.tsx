@@ -349,7 +349,7 @@ function EditProfileForm() {
 
 // ---- State 1: Own Profile ----
 
-function OwnProfileState() {
+function OwnProfileState({ showBottomNav = true }: { showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
@@ -365,7 +365,7 @@ function OwnProfileState() {
             <View style={{ height: isDesktop ? 0 : 80 }} />
           </View>
         </ScrollView>
-        {!isDesktop && <BottomNav active="profile" />}
+        {showBottomNav && !isDesktop && <BottomNav active="profile" />}
       </View>
     </StateSection>
   );
@@ -373,7 +373,7 @@ function OwnProfileState() {
 
 // ---- State 2: Other User ----
 
-function OtherUserState() {
+function OtherUserState({ showBottomNav = true }: { showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
@@ -396,7 +396,7 @@ function OtherUserState() {
             <View style={{ height: isDesktop ? 0 : 80 }} />
           </View>
         </ScrollView>
-        {!isDesktop && <BottomNav active="profile" />}
+        {showBottomNav && !isDesktop && <BottomNav active="profile" />}
       </View>
     </StateSection>
   );
@@ -404,11 +404,11 @@ function OtherUserState() {
 
 // ---- Main Export ----
 
-export default function ProfileStates() {
+export default function ProfileStates({ showBottomNav = true }: { showBottomNav?: boolean } = {}) {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <OwnProfileState />
-      <OtherUserState />
+      <OwnProfileState showBottomNav={showBottomNav} />
+      <OtherUserState showBottomNav={showBottomNav} />
     </ScrollView>
   );
 }
