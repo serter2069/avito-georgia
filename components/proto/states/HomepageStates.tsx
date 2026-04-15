@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, Pressable, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../ProtoPlaceholderImage';
@@ -10,66 +10,117 @@ const C = {
   text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8',
 };
 
-// ─── SVG icon helpers ────────────────────────────────────────────────────────
-function si(svg: string) {
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-function icon(path: string, color: string, fill = false) {
-  return si(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${fill ? color : 'none'}" stroke="${fill ? 'none' : color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`
+// ─── View-drawn category icons (no SVG, no Image, guaranteed cross-platform) ──
+function IconAll({ color }: { color: string }) {
+  const s = 7;
+  return (
+    <View style={{ width: 20, height: 20, flexWrap: 'wrap', flexDirection: 'row', gap: 2 }}>
+      {[0,1,2,3].map(i => <View key={i} style={{ width: s, height: s, borderRadius: 2, backgroundColor: color }} />)}
+    </View>
   );
 }
-function iconW(path: string, fill = false) {
-  return icon(path, '#fff', fill);
+function IconAuto({ color }: { color: string }) {
+  return (
+    <View style={{ width: 22, height: 16, position: 'relative' }}>
+      <View style={{ position: 'absolute', bottom: 4, left: 0, right: 0, height: 7, borderRadius: 3, backgroundColor: color }} />
+      <View style={{ position: 'absolute', top: 0, left: 4, right: 4, height: 8, borderRadius: 3, backgroundColor: color }} />
+      <View style={{ position: 'absolute', bottom: 0, left: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
+      <View style={{ position: 'absolute', bottom: 0, right: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
+    </View>
+  );
 }
+function IconRealty({ color }: { color: string }) {
+  return (
+    <View style={{ width: 20, height: 20, alignItems: 'center' }}>
+      {/* roof triangle */}
+      <View style={{ width: 0, height: 0, borderLeftWidth: 10, borderRightWidth: 10, borderBottomWidth: 8, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: color }} />
+      {/* body */}
+      <View style={{ width: 14, height: 11, backgroundColor: color, borderRadius: 1 }}>
+        {/* door */}
+        <View style={{ position: 'absolute', bottom: 0, left: 5, width: 4, height: 5, backgroundColor: C.white, borderRadius: 1 }} />
+      </View>
+    </View>
+  );
+}
+function IconTech({ color }: { color: string }) {
+  return (
+    <View style={{ width: 13, height: 20, borderRadius: 3, borderWidth: 2, borderColor: color, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 2 }}>
+      <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: color }} />
+    </View>
+  );
+}
+function IconClothes({ color }: { color: string }) {
+  return (
+    <View style={{ width: 20, height: 18, position: 'relative' }}>
+      {/* sleeves */}
+      <View style={{ position: 'absolute', top: 0, left: 0, width: 7, height: 7, borderRadius: 2, backgroundColor: color, transform: [{ rotate: '-20deg' }] }} />
+      <View style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: 2, backgroundColor: color, transform: [{ rotate: '20deg' }] }} />
+      {/* body */}
+      <View style={{ position: 'absolute', bottom: 0, left: 3, right: 3, top: 5, backgroundColor: color, borderRadius: 2 }} />
+    </View>
+  );
+}
+function IconHome({ color }: { color: string }) {
+  return (
+    <View style={{ width: 22, height: 16, position: 'relative' }}>
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 10, borderRadius: 2, backgroundColor: color }} />
+      <View style={{ position: 'absolute', top: 2, left: 3, right: 3, height: 6, borderRadius: 2, backgroundColor: color, opacity: 0.6 }} />
+      {/* legs */}
+      <View style={{ position: 'absolute', bottom: -2, left: 2, width: 3, height: 3, backgroundColor: color }} />
+      <View style={{ position: 'absolute', bottom: -2, right: 2, width: 3, height: 3, backgroundColor: color }} />
+    </View>
+  );
+}
+function IconJobs({ color }: { color: string }) {
+  return (
+    <View style={{ width: 22, height: 18, alignItems: 'center' }}>
+      {/* handle */}
+      <View style={{ width: 10, height: 4, borderTopLeftRadius: 3, borderTopRightRadius: 3, borderWidth: 2, borderColor: color, borderBottomWidth: 0, marginBottom: -1 }} />
+      {/* case */}
+      <View style={{ width: 22, height: 13, borderRadius: 3, borderWidth: 2, borderColor: color }}>
+        <View style={{ position: 'absolute', top: 4, left: 0, right: 0, height: 1.5, backgroundColor: color }} />
+      </View>
+    </View>
+  );
+}
+function IconServices({ color }: { color: string }) {
+  return (
+    <View style={{ width: 20, height: 20, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 8, height: 8, borderRadius: 4, borderWidth: 2, borderColor: color }} />
+      {[[0,0],[0,9],[9,0],[9,9],[4.5,0],[4.5,9],[0,4.5],[9,4.5]].map(([l,t], i) => (
+        <View key={i} style={{ position: 'absolute', width: 3, height: 3, borderRadius: 1.5, backgroundColor: color, top: t + 4, left: l + 4 }} />
+      ))}
+    </View>
+  );
+}
+function IconAnimals({ color }: { color: string }) {
+  return (
+    <View style={{ width: 20, height: 20, position: 'relative' }}>
+      <View style={{ position: 'absolute', top: 0, left: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
+      <View style={{ position: 'absolute', top: 0, right: 2, width: 5, height: 5, borderRadius: 2.5, backgroundColor: color }} />
+      <View style={{ position: 'absolute', top: 4, left: 0, width: 4, height: 4, borderRadius: 2, backgroundColor: color }} />
+      <View style={{ position: 'absolute', top: 4, right: 0, width: 4, height: 4, borderRadius: 2, backgroundColor: color }} />
+      <View style={{ position: 'absolute', bottom: 0, left: 3, right: 3, height: 9, borderRadius: 4, backgroundColor: color }} />
+    </View>
+  );
+}
+
+const CAT_ICONS: Record<string, React.ComponentType<{ color: string }>> = {
+  all: IconAll, auto: IconAuto, realty: IconRealty, tech: IconTech,
+  clothes: IconClothes, home: IconHome, jobs: IconJobs, services: IconServices, animals: IconAnimals,
+};
 
 // ─── Category definitions ────────────────────────────────────────────────────
 const CATEGORIES = [
-  {
-    id: 'all', label: 'Все', bg: '#E8F9F2', color: '#00AA6C',
-    svg: icon('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>', '#00AA6C', true),
-    svgW: iconW('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>', true),
-  },
-  {
-    id: 'auto', label: 'Авто', bg: '#E3F2FD', color: '#1976D2',
-    svg: icon('<path d="M5 11 7 6h10l2 5H5z"/><rect x="2" y="11" width="20" height="6" rx="1.5"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/><line x1="7" y1="11" x2="7" y2="17"/><line x1="17" y1="11" x2="17" y2="17"/>', '#1976D2'),
-    svgW: iconW('<path d="M5 11 7 6h10l2 5H5z"/><rect x="2" y="11" width="20" height="6" rx="1.5"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/>'),
-  },
-  {
-    id: 'realty', label: 'Жильё', bg: '#E8F5E9', color: '#388E3C',
-    svg: icon('<path d="M3 12 12 3l9 9"/><path d="M5 10v10h5v-5h4v5h5V10"/>', '#388E3C'),
-    svgW: iconW('<path d="M3 12 12 3l9 9"/><path d="M5 10v10h5v-5h4v5h5V10"/>'),
-  },
-  {
-    id: 'tech', label: 'Техника', bg: '#EDE7F6', color: '#7B1FA2',
-    svg: icon('<rect x="7" y="2" width="10" height="20" rx="2"/><line x1="10" y1="7" x2="14" y2="7"/><circle cx="12" cy="17" r="1" fill="#7B1FA2" stroke="none"/>', '#7B1FA2'),
-    svgW: iconW('<rect x="7" y="2" width="10" height="20" rx="2"/><line x1="10" y1="7" x2="14" y2="7"/><circle cx="12" cy="17" r="1" fill="#fff" stroke="none"/>'),
-  },
-  {
-    id: 'clothes', label: 'Одежда', bg: '#FCE4EC', color: '#C2185B',
-    svg: icon('<path d="M20 8 16 4l-3 3a1 1 0 01-2 0L8 4 4 8l3 3v9h10V11z"/>', '#C2185B'),
-    svgW: iconW('<path d="M20 8 16 4l-3 3a1 1 0 01-2 0L8 4 4 8l3 3v9h10V11z"/>'),
-  },
-  {
-    id: 'home', label: 'Дом', bg: '#FFF3E0', color: '#E65100',
-    svg: icon('<rect x="3" y="10" width="18" height="8" rx="2"/><rect x="7" y="7" width="10" height="5" rx="1"/><line x1="7" y1="18" x2="7" y2="21"/><line x1="17" y1="18" x2="17" y2="21"/>', '#E65100'),
-    svgW: iconW('<rect x="3" y="10" width="18" height="8" rx="2"/><rect x="7" y="7" width="10" height="5" rx="1"/><line x1="7" y1="18" x2="7" y2="21"/><line x1="17" y1="18" x2="17" y2="21"/>'),
-  },
-  {
-    id: 'jobs', label: 'Работа', bg: '#F3E5F5', color: '#6A1B9A',
-    svg: icon('<rect x="2" y="8" width="20" height="13" rx="2"/><path d="M8 8V6a2 2 0 014 0v2"/><line x1="2" y1="13" x2="22" y2="13"/>', '#6A1B9A'),
-    svgW: iconW('<rect x="2" y="8" width="20" height="13" rx="2"/><path d="M8 8V6a2 2 0 014 0v2"/><line x1="2" y1="13" x2="22" y2="13"/>'),
-  },
-  {
-    id: 'services', label: 'Услуги', bg: '#E0F2F1', color: '#00695C',
-    svg: icon('<circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9 2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9 2.83-2.83"/>', '#00695C'),
-    svgW: iconW('<circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9 2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9 2.83-2.83"/>'),
-  },
-  {
-    id: 'animals', label: 'Животные', bg: '#FFF8E1', color: '#F57F17',
-    svg: si('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="7" cy="5" r="2" fill="#F57F17"/><circle cx="17" cy="5" r="2" fill="#F57F17"/><circle cx="4" cy="11" r="2" fill="#F57F17"/><circle cx="20" cy="11" r="2" fill="#F57F17"/><path d="M12 22c-3.3 0-6-2.2-6-5 0-1.8 1.5-3.2 3.5-3.8L12 12l2.5.7c2 .6 3.5 2 3.5 3.8 0 2.8-2.7 5-6 5z" fill="#F57F17"/></svg>'),
-    svgW: si('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="7" cy="5" r="2" fill="#fff"/><circle cx="17" cy="5" r="2" fill="#fff"/><circle cx="4" cy="11" r="2" fill="#fff"/><circle cx="20" cy="11" r="2" fill="#fff"/><path d="M12 22c-3.3 0-6-2.2-6-5 0-1.8 1.5-3.2 3.5-3.8L12 12l2.5.7c2 .6 3.5 2 3.5 3.8 0 2.8-2.7 5-6 5z" fill="#fff"/></svg>'),
-  },
+  { id: 'all',      label: 'Все',      bg: '#E8F9F2', color: '#00AA6C' },
+  { id: 'auto',     label: 'Авто',     bg: '#E3F2FD', color: '#1976D2' },
+  { id: 'realty',   label: 'Жильё',    bg: '#E8F5E9', color: '#388E3C' },
+  { id: 'tech',     label: 'Техника',  bg: '#EDE7F6', color: '#7B1FA2' },
+  { id: 'clothes',  label: 'Одежда',   bg: '#FCE4EC', color: '#C2185B' },
+  { id: 'home',     label: 'Дом',      bg: '#FFF3E0', color: '#E65100' },
+  { id: 'jobs',     label: 'Работа',   bg: '#F3E5F5', color: '#6A1B9A' },
+  { id: 'services', label: 'Услуги',   bg: '#E0F2F1', color: '#00695C' },
+  { id: 'animals',  label: 'Животные', bg: '#FFF8E1', color: '#F57F17' },
 ];
 
 const CITIES = ['Все города', 'Тбилиси', 'Батуми', 'Кутаиси', 'Рустави', 'Гори', 'Зугдиди'];
@@ -233,10 +284,11 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: hPad, paddingVertical: 10, gap: 10 }}>
           {CATEGORIES.map((cat) => {
             const active = category === cat.id;
+            const IconComp = CAT_ICONS[cat.id];
             return (
               <Pressable key={cat.id} onPress={() => setCategory(cat.id)} style={{ alignItems: 'center', gap: 5, minWidth: 52 }}>
                 <View style={{ width: 48, height: 48, borderRadius: 13, backgroundColor: active ? cat.color : cat.bg, alignItems: 'center', justifyContent: 'center', borderWidth: active ? 0 : 1, borderColor: C.border }}>
-                  <Image source={{ uri: active ? cat.svgW : cat.svg }} style={{ width: 22, height: 22 }} resizeMode="contain" />
+                  {IconComp && <IconComp color={active ? '#fff' : cat.color} />}
                 </View>
                 <Text style={{ fontSize: 10, color: active ? cat.color : C.muted, fontWeight: active ? '700' : '400', textAlign: 'center' }} numberOfLines={1}>
                   {cat.label}
