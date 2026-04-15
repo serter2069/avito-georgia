@@ -1,10 +1,5 @@
-import MapViewStates from '../../components/proto/states/MapViewStates';
-import { AppShell } from '../../components/layout/AppShell';
+import { MapMobile } from '../../components/proto/states/MapViewStates';
 
 export default function MapPage() {
-  return (
-    <AppShell showBottomNav={false} showBack scrollable={false}>
-      <MapViewStates />
-    </AppShell>
-  );
+  return <MapMobile />;
 }

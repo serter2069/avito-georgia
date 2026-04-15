@@ -273,7 +273,7 @@ function Step3({ onBack }: { onBack: () => void }) {
   return form;
 }
 
-function CreateListingInteractive() {
+export function CreateListingInteractive() {
   const [step, setStep] = useState(1);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;

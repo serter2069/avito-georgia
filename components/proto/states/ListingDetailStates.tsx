@@ -242,7 +242,7 @@ function CTAButtons({ loading }: { loading: boolean }) {
 }
 
 // ─── Default View ─────────────────────────────────────────────────────────────
-function DefaultView() {
+export function DefaultView() {
   const [fav, setFav] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);

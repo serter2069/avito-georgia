@@ -1,5 +1,5 @@
-import AuthOtpStates from '../../components/proto/states/AuthOtpStates';
+import { AuthOtpDefault } from '../../components/proto/states/AuthOtpStates';
 
-export default function AuthOtpPage() {
-  return <AuthOtpStates />;
+export default function OtpPage() {
+  return <AuthOtpDefault />;
 }

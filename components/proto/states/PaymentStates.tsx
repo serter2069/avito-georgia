@@ -122,7 +122,7 @@ function LoadingState() {
   );
 }
 
-function CheckoutState() {
+export function PaymentCheckout() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
@@ -201,7 +201,7 @@ export default function PaymentStates() {
   return (
     <View style={{ gap: 0 }}>
       <LoadingState />
-      <CheckoutState />
+      <PaymentCheckout />
       <SuccessState />
       <ErrorState />
     </View>

@@ -1,10 +1,5 @@
-import ListingDetailStates from '../../components/proto/states/ListingDetailStates';
-import { AppShell } from '../../components/layout/AppShell';
+import { DefaultView } from '../../components/proto/states/ListingDetailStates';
 
 export default function ListingDetailPage() {
-  return (
-    <AppShell showBottomNav={false} showBack scrollable={false}>
-      <ListingDetailStates />
-    </AppShell>
-  );
+  return <DefaultView />;
 }

@@ -1,5 +1,5 @@
-import AuthEmailStates from '../../components/proto/states/AuthEmailStates';
+import { AuthEmailDefault } from '../../components/proto/states/AuthEmailStates';
 
-export default function AuthEmailPage() {
-  return <AuthEmailStates />;
+export default function AuthPage() {
+  return <AuthEmailDefault />;
 }

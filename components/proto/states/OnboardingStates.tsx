@@ -87,7 +87,7 @@ function PrimaryButton({ label, disabled }: { label: string; disabled?: boolean 
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-function DefaultState() {
+export function OnboardingDefault() {
   return (
     <ResponsiveWrapper>
       <View className="bg-white" style={{ paddingHorizontal: 24, paddingTop: 48, paddingBottom: 40, gap: 28 }}>
@@ -218,7 +218,7 @@ export default function OnboardingStates() {
   return (
     <View style={{ gap: 40 }}>
       <StateSection title="ONBOARDING — Default">
-        <DefaultState />
+        <OnboardingDefault />
       </StateSection>
 
       <StateSection title="ONBOARDING — Filled">

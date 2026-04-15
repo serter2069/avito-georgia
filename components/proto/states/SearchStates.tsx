@@ -38,7 +38,7 @@ function ListingCard({ title, price, city, time, idx }: { title: string; price: 
 // ═══════════════════════════════════════════════════════════════════════════════
 // STATE 1: Default (focused, empty query)
 // ═══════════════════════════════════════════════════════════════════════════════
-function SearchDefault() {
+export function SearchDefault() {
   const recentQueries = ['квартира батуми', 'toyota camry', 'ноутбук'];
 
   return (

@@ -137,7 +137,7 @@ function ListingRow({
   );
 }
 
-function MyListingsInteractive({ showBottomNav = true }: { showBottomNav?: boolean }) {
+export function MyListingsInteractive({ showBottomNav = true }: { showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
   const isDesktop = width >= 1024;

@@ -1,10 +1,5 @@
-import ChatThreadStates from '../../../components/proto/states/ChatThreadStates';
-import { AppShell } from '../../../components/layout/AppShell';
+import { ChatThreadDefault } from '../../../components/proto/states/ChatThreadStates';
 
-export default function ChatThreadPage() {
-  return (
-    <AppShell showBottomNav={false} showBack scrollable={false}>
-      <ChatThreadStates />
-    </AppShell>
-  );
+export default function ChatPage() {
+  return <ChatThreadDefault />;
 }

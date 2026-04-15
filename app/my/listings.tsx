@@ -1,10 +1,6 @@
-import MyListingsStates from '../../components/proto/states/MyListingsStates';
+import { MyListingsInteractive } from '../../components/proto/states/MyListingsStates';
 import { AppShell } from '../../components/layout/AppShell';
 
 export default function MyListingsPage() {
-  return (
-    <AppShell activeTab="profile">
-      <MyListingsStates showHeader={false} showBottomNav={false} />
-    </AppShell>
-  );
+  return <AppShell activeTab="profile"><MyListingsInteractive showBottomNav={false} /></AppShell>;
 }
