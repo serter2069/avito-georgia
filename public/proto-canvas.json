@@ -1,0 +1,409 @@
+{
+  "version": 1,
+  "screen": {
+    "w": 390,
+    "h": 844
+  },
+  "nodes": [
+    {
+      "id": "overview",
+      "title": "Project Overview",
+      "group": "Overview",
+      "route": "/",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "brand",
+      "title": "Brand & Styles",
+      "group": "Brand",
+      "route": "/proto/brand",
+      "x": 0,
+      "y": 1144,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "components",
+      "title": "UI Components",
+      "group": "Brand",
+      "route": "/proto/states/components",
+      "x": 510,
+      "y": 1144,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "auth-email",
+      "title": "Email Login",
+      "group": "Auth",
+      "route": "/(auth)",
+      "x": 0,
+      "y": 2288,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "auth-otp",
+      "title": "OTP Verification",
+      "group": "Auth",
+      "route": "/(auth)/otp",
+      "x": 510,
+      "y": 2288,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "onboarding",
+      "title": "Onboarding",
+      "group": "Onboarding",
+      "route": "/onboarding",
+      "x": 0,
+      "y": 3432,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "landing",
+      "title": "Landing",
+      "group": "Public",
+      "route": "/proto/landing",
+      "x": 0,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "homepage",
+      "title": "Homepage",
+      "group": "Public",
+      "route": "/",
+      "x": 510,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "listings-feed",
+      "title": "Listings Feed",
+      "group": "Public",
+      "route": "/listings",
+      "x": 1020,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "listing-detail",
+      "title": "Listing Detail",
+      "group": "Public",
+      "route": "/listings/[id]",
+      "x": 1530,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "search",
+      "title": "Search",
+      "group": "Public",
+      "route": "/search",
+      "x": 2040,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "map-view",
+      "title": "Map View",
+      "group": "Public",
+      "route": "/search?view=map",
+      "x": 2550,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "cities",
+      "title": "Cities & Regions",
+      "group": "Public",
+      "route": "/cities",
+      "x": 3060,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "seller-profile",
+      "title": "Seller Profile",
+      "group": "Public",
+      "route": "/users/[id]",
+      "x": 3570,
+      "y": 4576,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "my-listings",
+      "title": "My Listings",
+      "group": "My Listings",
+      "route": "/my/listings",
+      "x": 0,
+      "y": 5720,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "create-listing",
+      "title": "Create Listing",
+      "group": "My Listings",
+      "route": "/my/listings/create",
+      "x": 510,
+      "y": 5720,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "edit-listing",
+      "title": "Edit Listing",
+      "group": "My Listings",
+      "route": "/my/listings/[id]/edit",
+      "x": 1020,
+      "y": 5720,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "messages-list",
+      "title": "Messages List",
+      "group": "Dashboard",
+      "route": "/dashboard/messages",
+      "x": 0,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "chat-thread",
+      "title": "Chat Thread",
+      "group": "Dashboard",
+      "route": "/dashboard/messages/[id]",
+      "x": 510,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "favorites",
+      "title": "Favorites",
+      "group": "Dashboard",
+      "route": "/dashboard/favorites",
+      "x": 1020,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "notifications",
+      "title": "Notifications",
+      "group": "Dashboard",
+      "route": "/dashboard/notifications",
+      "x": 1530,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "profile",
+      "title": "Profile",
+      "group": "Dashboard",
+      "route": "/dashboard/profile",
+      "x": 2040,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "settings",
+      "title": "Settings",
+      "group": "Dashboard",
+      "route": "/dashboard/settings",
+      "x": 2550,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "payment-history",
+      "title": "Payment History",
+      "group": "Dashboard",
+      "route": "/dashboard/payments",
+      "x": 3060,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "subscription",
+      "title": "Premium Subscription",
+      "group": "Dashboard",
+      "route": "/dashboard/subscription",
+      "x": 3570,
+      "y": 6864,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "promote-listing",
+      "title": "Promote Listing",
+      "group": "Promotions",
+      "route": "/promotions/promote",
+      "x": 0,
+      "y": 8008,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "promotion-success",
+      "title": "Promotion Success",
+      "group": "Promotions",
+      "route": "/promotions/success",
+      "x": 510,
+      "y": 8008,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "promotion-cancelled",
+      "title": "Promotion Cancelled",
+      "group": "Promotions",
+      "route": "/promotions/cancelled",
+      "x": 1020,
+      "y": 8008,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "slot-success",
+      "title": "Listing Slot Success",
+      "group": "Promotions",
+      "route": "/promotions/slot-success",
+      "x": 1530,
+      "y": 8008,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "admin-dashboard",
+      "title": "Admin Dashboard",
+      "group": "Admin",
+      "route": "/admin",
+      "x": 0,
+      "y": 9152,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "admin-users",
+      "title": "Admin Users",
+      "group": "Admin",
+      "route": "/admin/users",
+      "x": 510,
+      "y": 9152,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "admin-moderation",
+      "title": "Admin Moderation",
+      "group": "Admin",
+      "route": "/admin/moderation",
+      "x": 1020,
+      "y": 9152,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "admin-categories",
+      "title": "Admin Categories",
+      "group": "Admin",
+      "route": "/admin/categories",
+      "x": 1530,
+      "y": 9152,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "admin-reports",
+      "title": "Admin Reports",
+      "group": "Admin",
+      "route": "/admin/reports",
+      "x": 2040,
+      "y": 9152,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "admin-payments",
+      "title": "Admin Payments",
+      "group": "Admin",
+      "route": "/admin/payments",
+      "x": 2550,
+      "y": 9152,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "admin-settings",
+      "title": "Admin Settings",
+      "group": "Admin",
+      "route": "/admin/settings",
+      "x": 3060,
+      "y": 9152,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "about",
+      "title": "About",
+      "group": "Static",
+      "route": "/about",
+      "x": 0,
+      "y": 10296,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "help",
+      "title": "Help",
+      "group": "Static",
+      "route": "/help",
+      "x": 510,
+      "y": 10296,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "privacy",
+      "title": "Privacy Policy",
+      "group": "Static",
+      "route": "/privacy",
+      "x": 1020,
+      "y": 10296,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "id": "terms",
+      "title": "Terms of Service",
+      "group": "Static",
+      "route": "/terms",
+      "x": 1530,
+      "y": 10296,
+      "w": 390,
+      "h": 844
+    }
+  ]
+}
