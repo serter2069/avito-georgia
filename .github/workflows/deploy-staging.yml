@@ -45,37 +45,3 @@ jobs:
           sudo ln -sf /etc/nginx/sites-available/avito-georgia /etc/nginx/sites-enabled/avito-georgia
           sudo nginx -t && sudo systemctl reload nginx
 
-  deploy-api:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Doppler CLI
-        run: |
-          if ! command -v doppler &> /dev/null; then
-            curl -sLf --retry 3 --tlsv1.2 --proto "=https" \
-              'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | \
-              sudo apt-key add - 2>/dev/null || true
-            echo "deb https://packages.doppler.com/public/cli/deb/debian any-version main" | \
-              sudo tee /etc/apt/sources.list.d/doppler-cli.list
-            sudo apt-get update -qq && sudo apt-get install -y doppler
-          fi
-          doppler --version
-        env:
-          DEBIAN_FRONTEND: noninteractive
-
-      - name: Deploy API
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_STG }}
-        run: |
-          sudo chown -R root:www-data /var/www/avito-georgia/api/ || true
-          rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
-            api/ /var/www/avito-georgia/api/
-          cd /var/www/avito-georgia/api && npm ci && npx prisma generate && doppler run -- npm run build
-          sudo chmod -R g+rw /var/www/avito-georgia/api/
-          doppler secrets download --no-file --format env > /var/www/avito-georgia/api/.env
-          chmod 600 /var/www/avito-georgia/api/.env
-          sudo pm2 delete avito-georgia-api 2>/dev/null || true
-          sudo pm2 start /var/www/avito-georgia/api/dist/index.js \
-            --name avito-georgia-api \
-            --cwd /var/www/avito-georgia/api
