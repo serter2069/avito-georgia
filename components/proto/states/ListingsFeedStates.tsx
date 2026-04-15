@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import ProtoImage from '../ProtoPlaceholderImage';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 const C = { green: '#00AA6C', greenBg: '#E8F9F2', white: '#FFFFFF', text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8' };
@@ -28,7 +29,7 @@ function ListingCard({ title, price, location, colorIndex = 0, id }: {
   return (
     <View style={{ backgroundColor: C.white, borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
       <View style={{ position: 'relative' }}>
-        <View style={{ height: 120, backgroundColor: IMG_COLORS[colorIndex % IMG_COLORS.length], width: '100%' }} />
+        <ProtoImage seed={colorIndex + 20} width="100%" height={120} />
         <Pressable
           onPress={() => setFav(!fav)}
           style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' }}

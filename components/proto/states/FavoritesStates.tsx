@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import ProtoImage from '../ProtoPlaceholderImage';
 
 const C = {
   green: '#00AA6C',
@@ -59,7 +60,7 @@ function FavCard({
     >
       {/* Image area */}
       <View style={{ position: 'relative' }}>
-        <View style={{ height: 110, backgroundColor: IMG_COLORS[item.colorIdx % IMG_COLORS.length] }} />
+        <ProtoImage seed={item.colorIdx + 40} width="100%" height={110} />
         {/* Heart button — filled red since in favorites */}
         <Pressable
           onPress={handleHeart}

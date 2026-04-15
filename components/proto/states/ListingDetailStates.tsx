@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import ProtoImage from '../ProtoPlaceholderImage';
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const C = { green: '#00AA6C', greenBg: '#E8F9F2', white: '#FFFFFF', text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8' };
@@ -20,7 +21,7 @@ function PhotoGallery({ onFavPress, fav }: { onFavPress: () => void; fav: boolea
 
   return (
     <View style={{ position: 'relative', height: galleryHeight, width: '100%' }}>
-      <View style={{ height: galleryHeight, backgroundColor: IMG_COLORS[activePhoto % IMG_COLORS.length], width: '100%' }} />
+      <ProtoImage seed={activePhoto + 30} width="100%" height={galleryHeight} />
 
       {/* Heart button top-right */}
       <Pressable

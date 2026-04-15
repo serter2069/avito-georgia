@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import ProtoImage from '../ProtoPlaceholderImage';
 
 const C = {
   green: '#00AA6C',
@@ -133,7 +134,7 @@ function ListingCard({
       }}
     >
       <View style={{ position: 'relative' }}>
-        <View style={{ height: 100, backgroundColor: IMG_COLORS[listing.colorIdx % IMG_COLORS.length] }} />
+        <ProtoImage seed={listing.colorIdx + 60} width="100%" height={100} />
         {/* Heart */}
         <Pressable
           onPress={() => setLiked(!liked)}

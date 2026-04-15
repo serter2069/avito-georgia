@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import ProtoImage from '../ProtoPlaceholderImage';
 
 const C = {
   green: '#00AA6C', greenBg: '#E8F9F2',
@@ -46,7 +47,8 @@ function ListingCard({ title, price, loc, age, badge, colorIdx }: {
   const [fav, setFav] = useState(false);
   return (
     <View style={{ borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: C.border, backgroundColor: C.white }}>
-      <View style={{ height: 130, backgroundColor: IMG_COLORS[colorIdx % IMG_COLORS.length] }}>
+      <View style={{ height: 130, position: 'relative' }}>
+        <ProtoImage seed={colorIdx + 10} width="100%" height={130} />
         {badge && (
           <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: C.greenBg, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
             <Text style={{ fontSize: 10, fontWeight: '700', color: C.green }}>{badge}</Text>

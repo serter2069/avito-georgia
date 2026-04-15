@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import ProtoImage from '../ProtoPlaceholderImage';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
@@ -119,7 +120,7 @@ function MapPreview() {
             </Text>
             {/* Preview listing card */}
             <View className="flex-row border border-[#E0E0E0] rounded-lg overflow-hidden">
-              <View style={{ width: 90, height: 72, backgroundColor: '#F0F0F0' }} />
+              <ProtoImage seed={71} width={90} height={72} />
               <View className="flex-1 justify-center px-3 py-2">
                 <Text className="text-[14px] font-bold text-[#1A1A1A] mb-0.5">₾62 000</Text>
                 <Text className="text-[12px] text-[#1A1A1A]" numberOfLines={1}>2-комн. квартира, 55м²</Text>
