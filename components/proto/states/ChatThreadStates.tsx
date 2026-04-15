@@ -323,7 +323,7 @@ function InteractiveChat() {
             onChangeText={setInput}
             placeholder="Написать..."
             placeholderTextColor="#9E9E9E"
-            style={{ flex: 1, fontSize: 15, color: '#1A1A1A', paddingVertical: 10, outlineWidth: 0 } as any}
+            style={{ flex: 1, fontSize: 15, color: '#1A1A1A', paddingVertical: 10, outlineWidth: 0, borderWidth: 0, backgroundColor: 'transparent' } as any}
             onSubmitEditing={sendMessage}
             returnKeyType="send"
           />
