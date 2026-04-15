@@ -137,7 +137,7 @@ function ListingRow({
   );
 }
 
-function MyListingsInteractive() {
+function MyListingsInteractive({ showBottomNav = true }: { showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
   const isDesktop = width >= 1024;
@@ -238,20 +238,22 @@ function MyListingsInteractive() {
     <View>
       {tabBar}
       {listContent}
-      {isMobile && <BottomNav active="browse" />}
+      {showBottomNav && isMobile && <BottomNav active="browse" />}
     </View>
   );
 }
 
-function MyListingsEmpty() {
+function MyListingsEmpty({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
 
   return (
     <View>
+      {showHeader && (
       <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border }}>
         <Text style={{ fontSize: 17, fontWeight: '600', color: C.text }}>Мои объявления</Text>
       </View>
+      )}
       <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 32 }}>
         <Text style={{ fontSize: 15, fontWeight: '500', color: C.text, marginBottom: 6 }}>Нет объявлений</Text>
         <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', marginBottom: 24, lineHeight: 18 }}>
@@ -261,12 +263,12 @@ function MyListingsEmpty() {
           <Text style={{ color: C.white, fontWeight: '600', fontSize: 14 }}>Подать объявление</Text>
         </Pressable>
       </View>
-      {isMobile && <BottomNav active="browse" />}
+      {showBottomNav && isMobile && <BottomNav active="browse" />}
     </View>
   );
 }
 
-export default function MyListingsStates() {
+export default function MyListingsStates({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean } = {}) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
 
@@ -274,19 +276,21 @@ export default function MyListingsStates() {
     <View style={{ gap: 0 }}>
       <StateSection title="MY_LISTINGS / Interactive Tabs (active/inactive/draft)">
         <View style={isDesktop ? { borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', backgroundColor: C.white } : { backgroundColor: C.white }}>
+          {showHeader && (
           <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={{ fontSize: 17, fontWeight: '600', color: C.text }}>Мои объявления</Text>
             <Pressable style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: C.border }}>
               <Text style={{ fontSize: 13, color: C.action, fontWeight: '500' }}>+ Подать</Text>
             </Pressable>
           </View>
-          <MyListingsInteractive />
+          )}
+          <MyListingsInteractive showBottomNav={showBottomNav} />
         </View>
       </StateSection>
 
       <StateSection title="MY_LISTINGS / Empty State">
         <View style={isDesktop ? { borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', backgroundColor: C.white } : { backgroundColor: C.white }}>
-          <MyListingsEmpty />
+          <MyListingsEmpty showHeader={showHeader} showBottomNav={showBottomNav} />
         </View>
       </StateSection>
     </View>

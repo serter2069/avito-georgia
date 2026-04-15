@@ -3,8 +3,8 @@ import { AppShell } from '../../../components/layout/AppShell';
 
 export default function MessagesPage() {
   return (
-    <AppShell activeTab="messages" scrollable={false}>
-      <MessagesListStates />
+    <AppShell activeTab="messages">
+      <MessagesListStates showHeader={false} showBottomNav={false} />
     </AppShell>
   );
 }

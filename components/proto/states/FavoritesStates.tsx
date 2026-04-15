@@ -161,7 +161,7 @@ function FavoritesGrid({ items, onRemove }: { items: FavItem[]; onRemove: (id: n
   );
 }
 
-function FavoritesInteractive() {
+function FavoritesInteractive({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
   const [items, setItems] = useState<FavItem[]>(INITIAL_FAVORITES);
@@ -172,6 +172,7 @@ function FavoritesInteractive() {
 
   return (
     <View>
+      {showHeader && (
       <View
         style={{
           paddingHorizontal: 16,
@@ -184,13 +185,14 @@ function FavoritesInteractive() {
           Избранное{items.length > 0 ? ` · ${items.length}` : ''}
         </Text>
       </View>
+      )}
       <FavoritesGrid items={items} onRemove={handleRemove} />
-      {isMobile && <BottomNav active="profile" />}
+      {showBottomNav && isMobile && <BottomNav active="profile" />}
     </View>
   );
 }
 
-export default function FavoritesStates() {
+export default function FavoritesStates({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean } = {}) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
 
@@ -204,7 +206,7 @@ export default function FavoritesStates() {
               : { backgroundColor: C.white }
           }
         >
-          <FavoritesInteractive />
+          <FavoritesInteractive showHeader={showHeader} showBottomNav={showBottomNav} />
         </View>
       </StateSection>
     </View>

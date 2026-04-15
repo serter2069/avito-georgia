@@ -3,8 +3,8 @@ import { AppShell } from '../../components/layout/AppShell';
 
 export default function MyListingsPage() {
   return (
-    <AppShell activeTab="profile" scrollable={false}>
-      <MyListingsStates />
+    <AppShell activeTab="profile">
+      <MyListingsStates showHeader={false} showBottomNav={false} />
     </AppShell>
   );
 }

@@ -110,7 +110,7 @@ function LangSelect({ value, onChange }: { value: string; onChange: (v: string) 
 
 // ─── Main content ─────────────────────────────────────────────────────────────
 
-function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
+function HomepageContent({ loggedIn, showHeader = true, showBottomNav = true }: { loggedIn?: boolean; showHeader?: boolean; showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
   const isTablet = width >= 640;
@@ -142,6 +142,7 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
     <View style={{ backgroundColor: C.white }}>
 
       {/* ─── Header ──────────────────────────────────────────────────────────── */}
+      {showHeader && (
       <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: hPad, paddingVertical: 10, maxWidth: maxW, alignSelf: isDesktop ? 'center' : undefined, width: '100%' }}>
           {/* Logo */}
@@ -198,6 +199,7 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
           )}
         </View>
       </View>
+      )}
 
       {/* ─── City pills ──────────────────────────────────────────────────────── */}
       <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }}>
@@ -309,20 +311,20 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
         )}
       </View>
 
-      {!isTablet && <BottomNav active="home" />}
+      {showBottomNav && !isTablet && <BottomNav active="home" />}
     </View>
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-export default function HomepageStates() {
+export default function HomepageStates({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean } = {}) {
   return (
     <View style={{ gap: 40 }}>
       <StateSection title="HOMEPAGE — Guest">
-        <HomepageContent />
+        <HomepageContent showHeader={showHeader} showBottomNav={showBottomNav} />
       </StateSection>
       <StateSection title="HOMEPAGE — Logged In">
-        <HomepageContent loggedIn />
+        <HomepageContent loggedIn showHeader={showHeader} showBottomNav={showBottomNav} />
       </StateSection>
     </View>
   );

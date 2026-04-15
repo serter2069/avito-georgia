@@ -190,7 +190,7 @@ function renderSection(id: SectionId) {
 
 // -- State 1: Settings (interactive) --
 
-function DefaultState() {
+function DefaultState({ showBottomNav = true }: { showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   const [activeSection, setActiveSection] = useState<SectionId>('notifications');
@@ -271,7 +271,7 @@ function DefaultState() {
             <View style={{ height: 8 }} />
           </View>
         </ScrollView>
-        <BottomNav active="profile" />
+        {showBottomNav && <BottomNav active="profile" />}
       </View>
     </StateSection>
   );
@@ -279,10 +279,10 @@ function DefaultState() {
 
 // -- Main Export --
 
-export default function SettingsStates() {
+export default function SettingsStates({ showBottomNav = true }: { showBottomNav?: boolean } = {}) {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <DefaultState />
+      <DefaultState showBottomNav={showBottomNav} />
     </ScrollView>
   );
 }
