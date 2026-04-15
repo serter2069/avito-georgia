@@ -26,21 +26,23 @@ interface Listing {
   views: string;
   photos: number;
   colorIdx: number;
+  expiresDate?: string;   // 'DD.MM.YYYY' — only for active
+  daysLeft?: number;      // computed for display
 }
 
 const LISTINGS: Record<Tab, Listing[]> = {
   active: [
-    { id: 1, title: 'Toyota Camry 2019, 45 000 км', price: '12 500 ₾', views: '24 просмотра', photos: 8, colorIdx: 0 },
-    { id: 2, title: 'Квартира 3-комн., Батуми центр', price: '85 000 ₾', views: '12 просмотров', photos: 12, colorIdx: 1 },
-    { id: 3, title: 'iPhone 14 Pro Max 256GB', price: '2 400 ₾', views: '8 просмотров', photos: 5, colorIdx: 2 },
+    { id: 1, title: 'Toyota Camry 2019, 45 000 км',   price: '12 500 ₾', views: '24 просмотра',  photos: 8,  colorIdx: 0, expiresDate: '22.04.2026', daysLeft: 7  },
+    { id: 2, title: 'Квартира 3-комн., Батуми центр', price: '85 000 ₾', views: '12 просмотров', photos: 12, colorIdx: 1, expiresDate: '03.05.2026', daysLeft: 18 },
+    { id: 3, title: 'iPhone 14 Pro Max 256GB',         price: '2 400 ₾',  views: '8 просмотров',  photos: 5,  colorIdx: 2, expiresDate: '16.04.2026', daysLeft: 1  },
   ],
   inactive: [
     { id: 4, title: 'Велосипед горный, алюминий', price: '450 ₾', views: '3 просмотра', photos: 3, colorIdx: 3 },
-    { id: 5, title: 'Диван угловой, бежевый', price: '350 ₾', views: '1 просмотр', photos: 4, colorIdx: 4 },
+    { id: 5, title: 'Диван угловой, бежевый',     price: '350 ₾', views: '1 просмотр',  photos: 4, colorIdx: 4 },
   ],
   draft: [
-    { id: 6, title: 'Ноутбук Dell Inspiron 15', price: '1 800 ₾', views: '', photos: 2, colorIdx: 5 },
-    { id: 7, title: 'Холодильник Samsung NoFrost', price: '900 ₾', views: '', photos: 1, colorIdx: 6 },
+    { id: 6, title: 'Ноутбук Dell Inspiron 15',    price: '1 800 ₾', views: '', photos: 2, colorIdx: 5 },
+    { id: 7, title: 'Холодильник Samsung NoFrost',  price: '900 ₾',   views: '', photos: 1, colorIdx: 6 },
   ],
 };
 
@@ -118,29 +120,41 @@ function ListingCard({
         {listing.views ? (
           <Text style={{ fontSize: 12, color: C.muted }}>{listing.views}</Text>
         ) : (
-          <View
-            style={{
-              alignSelf: 'flex-start',
-              backgroundColor: '#FFFFFF',
-              borderRadius: 4,
-              paddingHorizontal: 6,
-              paddingVertical: 2,
-            }}
-          >
+          <View style={{ alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
             <Text style={{ fontSize: 11, fontWeight: '600', color: C.muted }}>Черновик</Text>
           </View>
         )}
 
+        {/* Expiry badge for active listings */}
+        {tab === 'active' && listing.expiresDate && (() => {
+          const urgent = (listing.daysLeft ?? 99) <= 3;
+          const soon   = !urgent && (listing.daysLeft ?? 99) <= 7;
+          const bgColor  = urgent ? '#FEE2E2' : soon ? '#FEF3C7' : C.greenBg;
+          const txtColor = urgent ? C.error   : soon ? '#92400E' : C.green;
+          const label = urgent
+            ? `Истекает ${listing.daysLeft === 1 ? 'завтра' : `через ${listing.daysLeft} дн.`} · ${listing.expiresDate}`
+            : soon
+            ? `Ещё ${listing.daysLeft} дн. · до ${listing.expiresDate}`
+            : `Активно до ${listing.expiresDate}`;
+          return (
+            <View style={{ alignSelf: 'flex-start', backgroundColor: bgColor, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3, marginTop: 2 }}>
+              <Text style={{ fontSize: 11, fontWeight: '600', color: txtColor }}>{label}</Text>
+            </View>
+          );
+        })()}
+
         {/* Actions */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 2 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
           {tab === 'active' && (
             <>
               <Pressable>
                 <Text style={{ fontSize: 13, fontWeight: '600', color: C.green }}>Редактировать</Text>
               </Pressable>
-              <Pressable>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: C.green }}>Продлить</Text>
-              </Pressable>
+              {(listing.daysLeft ?? 99) <= 7 && (
+                <Pressable>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: (listing.daysLeft ?? 99) <= 3 ? C.error : '#92400E' }}>Продлить — 3 ₾</Text>
+                </Pressable>
+              )}
             </>
           )}
           {tab === 'inactive' && (
