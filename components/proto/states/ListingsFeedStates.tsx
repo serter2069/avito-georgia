@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockListings } from '../../../constants/protoMockData';
 
 type SortOption = 'new' | 'price_asc' | 'price_desc';
@@ -81,7 +82,7 @@ export default function ListingsFeedStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <FilterBar sort={sort} onSort={setSort} />
           {isDesktop ? (
@@ -100,16 +101,20 @@ export default function ListingsFeedStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
+      <StateSection title="LOADING">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <FilterBar sort={sort} onSort={setSort} />
-          <View className="py-12 items-center">
-            <ActivityIndicator size="large" color="#00AA6C" />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, paddingTop: 8 }}>
+            {[1, 2, 3].map(i => (
+              <View key={i} style={{ width: isDesktop ? '48%' : '100%' }}>
+                <SkeletonCard />
+              </View>
+            ))}
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <FilterBar sort={sort} onSort={setSort} />
           <View className="py-12 items-center">
@@ -120,7 +125,7 @@ export default function ListingsFeedStates() {
         </View>
       </StateSection>
 
-      <StateSection title="filtered_empty">
+      <StateSection title="FILTERED_EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row gap-2 mb-4 flex-wrap">
             <View className="flex-row items-center bg-primary/10 border border-primary rounded-lg px-3 py-2">

@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 
 function PlanCard({ name, price, features, isPrimary, isDesktop }: { name: string; price: string; features: string[]; isPrimary?: boolean; isDesktop?: boolean }) {
   return (
@@ -29,7 +30,7 @@ export default function SubscriptionStates() {
 
   return (
     <View>
-      <StateSection title="no_subscription">
+      <StateSection title="NO_SUBSCRIPTION">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Premium подписка</Text>
           {isDesktop ? (
@@ -54,7 +55,7 @@ export default function SubscriptionStates() {
         </View>
       </StateSection>
 
-      <StateSection title="active_subscription">
+      <StateSection title="ACTIVE_SUBSCRIPTION">
         <View className="py-4" style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           <View className="bg-primary/10 border border-primary rounded-lg p-4 mb-4">
             <View className="flex-row items-center justify-between mb-2">
@@ -72,20 +73,39 @@ export default function SubscriptionStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]} style={{ paddingVertical: 16 }}>
+          <SkeletonBlock width={180} height={20} style={{ marginBottom: 16 }} />
+          {[1, 2].map(i => (
+            <View key={i} style={{ borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', padding: 16, marginBottom: 12, gap: 10 }}>
+              <SkeletonBlock width={80} height={16} />
+              <SkeletonBlock width={120} height={28} />
+              {[1, 2, 3].map(j => (
+                <View key={j} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <SkeletonBlock width={16} height={16} radius={8} />
+                  <SkeletonBlock width="60%" height={12} />
+                </View>
+              ))}
+              <SkeletonBlock height={40} radius={8} />
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="purchasing">
+      <StateSection title="PURCHASING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
-          <Text className="text-text-muted text-sm mt-3">Оформляем подписку...</Text>
+          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,170,108,0.1)', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            <Feather name="award" size={28} color="#00AA6C" />
+          </View>
+          <Text style={{ color: '#1A1A1A', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Оформляем подписку...</Text>
+          <Text style={{ color: '#737373', fontSize: 14 }}>Это займёт несколько секунд</Text>
+          <View style={{ width: '50%', height: 4, backgroundColor: '#E8EDF0', borderRadius: 2, marginTop: 24, overflow: 'hidden' }}>
+            <View style={{ width: '40%', height: 4, backgroundColor: '#00AA6C', borderRadius: 2 }} />
+          </View>
         </View>
       </StateSection>
 
-      <StateSection title="cancel_confirm">
+      <StateSection title="CANCEL_CONFIRM">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="alert-triangle" size={48} color="#C0392B" />

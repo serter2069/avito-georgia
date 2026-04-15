@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 
 function OtpInputRow({ values, hasError }: { values: string[]; hasError?: boolean }) {
   return (
@@ -28,7 +29,7 @@ export default function AuthOtpStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -52,7 +53,7 @@ export default function AuthOtpStates() {
         </View>
       </StateSection>
 
-      <StateSection title="error">
+      <StateSection title="ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -66,20 +67,23 @@ export default function AuthOtpStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
+      <StateSection title="LOADING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
           <View style={[{ width: '100%' }, formStyle]}>
             <OtpInputRow values={['0', '0', '0', '0', '0', '0']} />
             <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center opacity-50 mb-3">
-              <ActivityIndicator color="#ffffff" />
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: "rgba(255,255,255,0.4)" }} />
+              <Text style={{ color: "rgba(255,255,255,0.6)", fontWeight: "600", fontSize: 14 }}>Проверка...</Text>
+            </View>
             </TouchableOpacity>
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="blocked">
+      <StateSection title="BLOCKED">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Слишком много попыток</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -96,7 +100,7 @@ export default function AuthOtpStates() {
         </View>
       </StateSection>
 
-      <StateSection title="resend_available">
+      <StateSection title="RESEND_AVAILABLE">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>
@@ -112,7 +116,7 @@ export default function AuthOtpStates() {
         </View>
       </StateSection>
 
-      <StateSection title="captcha_required">
+      <StateSection title="CAPTCHA_REQUIRED">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-text-primary text-xl font-bold mb-2">Введите код</Text>
           <Text className="text-text-muted text-sm mb-6">Отправлен на irakli@gmail.com</Text>

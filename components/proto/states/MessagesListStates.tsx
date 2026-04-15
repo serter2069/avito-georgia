@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockMessages } from '../../../constants/protoMockData';
 
 function ThreadRow({ msg }: { msg: typeof mockMessages[0] }) {
@@ -33,7 +34,7 @@ export default function MessagesListStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           {mockMessages.map((msg) => (
             <ThreadRow key={msg.id} msg={msg} />
@@ -41,13 +42,17 @@ export default function MessagesListStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          {[1, 2, 3, 4, 5].map(i => (
+            <View key={i} style={{ borderBottomWidth: 1, borderBottomColor: '#E8EDF0' }}>
+              <SkeletonRow />
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="message-circle" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет сообщений</Text>

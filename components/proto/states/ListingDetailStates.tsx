@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, TextInput, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockListings, mockUsers } from '../../../constants/protoMockData';
 
 const listing = mockListings[0];
@@ -32,7 +33,7 @@ export default function ListingDetailStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           {isDesktop ? (
             // Desktop: 2-column layout (photo left, details right)
@@ -177,13 +178,35 @@ export default function ListingDetailStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <SkeletonBlock height={192} radius={8} style={{ marginBottom: 16 }} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+            <SkeletonBlock width="40%" height={28} />
+            <SkeletonBlock width={70} height={24} radius={12} />
+          </View>
+          <SkeletonBlock width="80%" height={18} style={{ marginBottom: 8 }} />
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+            <SkeletonBlock width={80} height={12} />
+            <SkeletonBlock width={60} height={12} />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+            <SkeletonBlock height={44} radius={8} style={{ flex: 1 }} />
+            <SkeletonBlock height={44} radius={8} style={{ flex: 1 }} />
+          </View>
+          <SkeletonBlock width="30%" height={16} style={{ marginBottom: 8 }} />
+          <SkeletonBlock height={60} style={{ marginBottom: 16 }} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#F5F7F8', borderRadius: 8, padding: 12 }}>
+            <SkeletonBlock width={48} height={48} radius={24} />
+            <View style={{ flex: 1, gap: 6 }}>
+              <SkeletonBlock width="50%" height={14} />
+              <SkeletonBlock width="30%" height={10} />
+            </View>
+          </View>
         </View>
       </StateSection>
 
-      <StateSection title="error_not_found">
+      <StateSection title="ERROR_NOT_FOUND">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="alert-circle" size={48} color="#C0392B" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Объявление не найдено</Text>
@@ -191,7 +214,7 @@ export default function ListingDetailStates() {
         </View>
       </StateSection>
 
-      <StateSection title="phone_revealed">
+      <StateSection title="PHONE_REVEALED">
         <View style={[{ minHeight: 844 }, containerStyle]} className="bg-surface rounded-lg p-4 items-center">
           <Feather name="phone" size={24} color="#00AA6C" />
           <Text className="text-text-primary text-lg font-bold mt-2">+995 555 12 34 56</Text>
@@ -199,7 +222,7 @@ export default function ListingDetailStates() {
         </View>
       </StateSection>
 
-      <StateSection title="report_modal_open">
+      <StateSection title="REPORT_MODAL_OPEN">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center' as const, width: '100%' } : {}]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Пожаловаться</Text>
           {['Мошенничество', 'Спам', 'Неприемлемый контент', 'Другое'].map((reason) => (

@@ -26,7 +26,7 @@ export default function SettingsStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]} className="py-4">
           <View className="mb-4">
             <Text className="text-text-secondary text-sm mb-1 font-medium">Язык</Text>
@@ -63,7 +63,7 @@ export default function SettingsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="delete_confirm_alert">
+      <StateSection title="DELETE_CONFIRM_ALERT">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="alert-triangle" size={48} color="#C0392B" />
@@ -81,7 +81,7 @@ export default function SettingsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="logout_confirm">
+      <StateSection title="LOGOUT_CONFIRM">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]} className="bg-white border border-border rounded-lg p-4">
           <View className="items-center mb-4">
             <Feather name="log-out" size={48} color="#00AA6C" />

@@ -1,8 +1,9 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator,
+import { View, Text, TextInput, TouchableOpacity,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockCategoryIcons } from '../../../constants/protoMockData';
 
 const categoryTree = [
@@ -72,7 +73,7 @@ export default function AdminCategoriesStates() {  const { width } = useWindowDi
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-text-primary text-lg font-bold">Категории ({categoryTree.length})</Text>
@@ -86,13 +87,23 @@ export default function AdminCategoriesStates() {  const { width } = useWindowDi
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+            <SkeletonBlock width={140} height={20} />
+            <SkeletonBlock width={80} height={36} radius={8} />
+          </View>
+          {[1, 2, 3, 4, 5].map(i => (
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#E8EDF0' }}>
+              <SkeletonBlock width={40} height={40} radius={8} />
+              <SkeletonBlock width={100} height={14} style={{ flex: 1 }} />
+              <SkeletonBlock width={24} height={14} />
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="add_modal">
+      <StateSection title="ADD_MODAL">
         <View style={[{ minHeight: 844 }, containerStyle]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-4">Новая категория</Text>
           <View className="mb-3">
@@ -118,7 +129,7 @@ export default function AdminCategoriesStates() {  const { width } = useWindowDi
         </View>
       </StateSection>
 
-      <StateSection title="edit_modal">
+      <StateSection title="EDIT_MODAL">
         <View style={[{ minHeight: 844 }, containerStyle]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-1">Редактировать категорию</Text>
           <Text className="text-text-muted text-sm mb-4">Транспорт</Text>

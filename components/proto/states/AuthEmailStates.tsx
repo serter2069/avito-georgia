@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 
 export default function AuthEmailStates() {
   const [email, setEmail] = useState('');
@@ -13,7 +14,7 @@ export default function AuthEmailStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>
@@ -37,7 +38,7 @@ export default function AuthEmailStates() {
         </View>
       </StateSection>
 
-      <StateSection title="validation_error">
+      <StateSection title="VALIDATION_ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>
@@ -58,7 +59,7 @@ export default function AuthEmailStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
+      <StateSection title="LOADING">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>
@@ -72,13 +73,16 @@ export default function AuthEmailStates() {
               />
             </View>
             <TouchableOpacity className="bg-primary w-full py-3 rounded-lg items-center opacity-50">
-              <ActivityIndicator color="#ffffff" />
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: "rgba(255,255,255,0.4)" }} />
+              <Text style={{ color: "rgba(255,255,255,0.6)", fontWeight: "600", fontSize: 14 }}>Отправка...</Text>
+            </View>
             </TouchableOpacity>
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="network_error">
+      <StateSection title="NETWORK_ERROR">
         <View style={[{ minHeight: 844 }, containerStyle]} className="items-center py-8">
           <Text className="text-primary text-2xl font-bold mb-2">Avito Georgia</Text>
           <Text className="text-text-muted text-sm mb-8">Войдите или зарегистрируйтесь</Text>

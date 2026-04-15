@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, ActivityIndicator,
+import { View, Text, TouchableOpacity,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockPayments, mockUsers } from '../../../constants/protoMockData';
 
 const statusBadge: Record<string, { bg: string; text: string; label: string }> = {
@@ -28,7 +29,7 @@ export default function AdminPaymentsStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="flex-row items-center justify-between mb-3">
             <Text className="text-text-primary text-lg font-bold">Платежи</Text>
@@ -72,13 +73,30 @@ export default function AdminPaymentsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <SkeletonBlock width={100} height={20} style={{ marginBottom: 12 }} />
+          <View style={{ flexDirection: 'row', gap: 4, marginBottom: 16 }}>
+            {[1, 2, 3, 4].map(i => (
+              <SkeletonBlock key={i} height={30} radius={6} style={{ flex: 1 }} />
+            ))}
+          </View>
+          {[1, 2, 3, 4].map(i => (
+            <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#E8EDF0' }}>
+              <View style={{ gap: 6 }}>
+                <SkeletonBlock width={120} height={14} />
+                <SkeletonBlock width={160} height={10} />
+              </View>
+              <View style={{ alignItems: 'flex-end', gap: 6 }}>
+                <SkeletonBlock width={50} height={14} />
+                <SkeletonBlock width={60} height={18} radius={9} />
+              </View>
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="credit-card" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет платежей</Text>

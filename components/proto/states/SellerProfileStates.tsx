@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockUsers, mockListings } from '../../../constants/protoMockData';
 
 const seller = mockUsers[0];
@@ -14,7 +15,7 @@ export default function SellerProfileStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           {isDesktop ? (
             // Desktop: 2-column layout (profile left, listings right)
@@ -88,13 +89,24 @@ export default function SellerProfileStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <View style={{ alignItems: 'center', marginBottom: 16 }}>
+            <SkeletonBlock width={96} height={96} radius={48} style={{ marginBottom: 12 }} />
+            <SkeletonBlock width={160} height={20} style={{ marginBottom: 8 }} />
+            <SkeletonBlock width={100} height={12} style={{ marginBottom: 4 }} />
+            <SkeletonBlock width={80} height={12} />
+          </View>
+          <SkeletonBlock width={120} height={16} style={{ marginBottom: 12 }} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            {[1, 2, 3].map(i => (
+              <View key={i} style={{ width: '48%' }}><SkeletonCard /></View>
+            ))}
+          </View>
         </View>
       </StateSection>
 
-      <StateSection title="empty_listings">
+      <StateSection title="EMPTY_LISTINGS">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View className="items-center mb-4">
             <Image source={{ uri: 'https://picsum.photos/seed/seller-empty/96/96' }} style={{ width: 96, height: 96, borderRadius: 48, marginBottom: 12 }} />

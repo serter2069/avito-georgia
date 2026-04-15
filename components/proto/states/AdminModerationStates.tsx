@@ -1,8 +1,9 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image,
+import { View, Text, TextInput, TouchableOpacity, Image,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockListings } from '../../../constants/protoMockData';
 
 const pendingListings = mockListings.filter(l => l.status === 'pending_moderation');
@@ -39,7 +40,7 @@ export default function AdminModerationStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <Text className="text-text-primary text-lg font-bold mb-4">Очередь модерации ({pendingListings.length})</Text>
           {pendingListings.map((l) => (
@@ -69,13 +70,26 @@ export default function AdminModerationStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <SkeletonBlock width={200} height={20} style={{ marginBottom: 16 }} />
+          {[1, 2].map(i => (
+            <View key={i} style={{ borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', overflow: 'hidden', marginBottom: 12 }}>
+              <SkeletonBlock height={128} radius={0} />
+              <View style={{ padding: 12, gap: 8 }}>
+                <SkeletonBlock width="60%" height={14} />
+                <SkeletonBlock width="40%" height={10} />
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <SkeletonBlock height={36} radius={8} style={{ flex: 1 }} />
+                  <SkeletonBlock height={36} radius={8} style={{ flex: 1 }} />
+                </View>
+              </View>
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="empty_queue">
+      <StateSection title="EMPTY_QUEUE">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="check-circle" size={48} color="#2E7D30" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Очередь пуста</Text>
@@ -83,7 +97,7 @@ export default function AdminModerationStates() {
         </View>
       </StateSection>
 
-      <StateSection title="reject_reason_modal">
+      <StateSection title="REJECT_REASON_MODAL">
         <View style={[{ minHeight: 844 }, containerStyle]} className="bg-white border border-border rounded-lg p-4">
           <Text className="text-text-primary text-lg font-bold mb-2">Причина отклонения</Text>
           <Text className="text-text-muted text-sm mb-3">Объявление: "Диван угловой IKEA"</Text>

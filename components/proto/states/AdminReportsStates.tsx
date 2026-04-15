@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, ActivityIndicator,
+import { View, Text, TouchableOpacity,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockReports } from '../../../constants/protoMockData';
 
 const typeBadge: Record<string, { bg: string; text: string; label: string }> = {
@@ -57,7 +58,7 @@ export default function AdminReportsStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <Text className="text-text-primary text-lg font-bold mb-4">Жалобы ({mockReports.length})</Text>
           {mockReports.map((r) => (
@@ -86,13 +87,24 @@ export default function AdminReportsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <SkeletonBlock width={140} height={20} style={{ marginBottom: 16 }} />
+          {[1, 2, 3].map(i => (
+            <View key={i} style={{ borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', padding: 12, marginBottom: 12, gap: 8 }}>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <SkeletonBlock width={60} height={20} radius={10} />
+                <SkeletonBlock width={60} height={20} radius={10} />
+              </View>
+              <SkeletonBlock width="60%" height={14} />
+              <SkeletonBlock width="40%" height={12} />
+              <SkeletonBlock width="80%" height={12} />
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="flag" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет жалоб</Text>

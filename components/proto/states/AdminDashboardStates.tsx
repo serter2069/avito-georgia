@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, ActivityIndicator,
+import { View, Text, TouchableOpacity,
   useWindowDimensions} from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockAdminStats } from '../../../constants/protoMockData';
 
 function StatCard({ label, value, icon, color }: { label: string; value: string; icon: string; color: string }) {
@@ -72,7 +73,7 @@ export default function AdminDashboardStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <Text className="text-text-primary text-lg font-bold mb-4">Admin Dashboard</Text>
           <View className="flex-row flex-wrap gap-3 mb-4">
@@ -107,18 +108,36 @@ export default function AdminDashboardStates() {
             />
           </View>
 
-          <NavCard title="Пользователи" icon="users" />
-          <NavCard title="Модерация" icon="shield" count={23} />
-          <NavCard title="Категории" icon="grid" />
-          <NavCard title="Жалобы" icon="flag" count={3} />
-          <NavCard title="Платежи" icon="credit-card" />
-          <NavCard title="Настройки" icon="settings" />
+          <NavCard title="ПОЛЬЗОВАТЕЛИ" icon="users" />
+          <NavCard title="МОДЕРАЦИЯ" icon="shield" count={23} />
+          <NavCard title="КАТЕГОРИИ" icon="grid" />
+          <NavCard title="ЖАЛОБЫ" icon="flag" count={3} />
+          <NavCard title="ПЛАТЕЖИ" icon="credit-card" />
+          <NavCard title="НАСТРОЙКИ" icon="settings" />
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <SkeletonBlock width={160} height={20} style={{ marginBottom: 16 }} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+            {[1, 2, 3, 4].map(i => (
+              <View key={i} style={{ width: '48%', backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', padding: 16, gap: 8 }}>
+                <SkeletonBlock width={80} height={12} />
+                <SkeletonBlock width={60} height={28} />
+              </View>
+            ))}
+          </View>
+          <View style={{ backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', padding: 16, marginBottom: 16 }}>
+            <SkeletonBlock width={120} height={14} style={{ marginBottom: 12 }} />
+            <SkeletonBlock height={40} />
+          </View>
+          {[1, 2, 3].map(i => (
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#E8EDF0' }}>
+              <SkeletonBlock width={40} height={40} radius={8} />
+              <SkeletonBlock width={120} height={14} style={{ flex: 1 }} />
+            </View>
+          ))}
         </View>
       </StateSection>
     </View>

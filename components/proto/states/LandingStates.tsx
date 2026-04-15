@@ -373,17 +373,17 @@ function DefaultState({ onLogin }: { onLogin: () => void }) {
           <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 12 }}>
             <FeatureCard
               icon="shield"
-              title="Безопасно"
+              title="БЕЗОПАСНО"
               description="Проверенные продавцы и система жалоб. Ваши сделки под защитой."
             />
             <FeatureCard
               icon="zap"
-              title="Быстро"
+              title="БЫСТРО"
               description="Разместите объявление за 2 минуты. Модерация в течение часа."
             />
             <FeatureCard
               icon="map-pin"
-              title="Локально"
+              title="ЛОКАЛЬНО"
               description="Находите предложения рядом с вами — от Тбилиси до Зугдиди."
             />
           </View>

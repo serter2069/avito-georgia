@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockListings } from '../../../constants/protoMockData';
 
 export default function FavoritesStates() {
@@ -13,7 +14,7 @@ export default function FavoritesStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]} className="flex-row flex-wrap gap-3">
           {listings.map((l) => (
             <View
@@ -37,13 +38,19 @@ export default function FavoritesStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            {[1, 2, 3, 4].map(i => (
+              <View key={i} style={{ width: isDesktop ? '31%' : '48%' }}>
+                <SkeletonCard />
+              </View>
+            ))}
+          </View>
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="heart" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет избранных</Text>

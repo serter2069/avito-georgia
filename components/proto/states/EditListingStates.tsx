@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Pressable, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockListings, mockCategories, mockCategoryIcons, mockCities } from '../../../constants/protoMockData';
 
 const C = {
@@ -140,22 +141,34 @@ export default function EditListingStates() {
 
   return (
     <View>
-      <StateSection title="loading_data">
+      <StateSection title="LOADING_DATA">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View style={{ paddingVertical: 16 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <Feather name="edit-3" size={20} color={C.primary} />
               <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Редактирование</Text>
             </View>
-            <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-              <ActivityIndicator size="large" color={C.primary} />
-              <Text style={{ fontSize: 14, color: C.muted, marginTop: 12 }}>Загрузка данных объявления...</Text>
+            <View style={{ gap: 16 }}>
+              <SkeletonBlock width="100%" height={80} radius={8} />
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <SkeletonBlock width={100} height={80} radius={8} />
+                <SkeletonBlock width={100} height={80} radius={8} />
+                <SkeletonBlock width={100} height={80} radius={8} />
+              </View>
+              <SkeletonBlock width="40%" height={14} />
+              <SkeletonBlock width="100%" height={44} radius={8} />
+              <SkeletonBlock width="40%" height={14} />
+              <SkeletonBlock width="100%" height={44} radius={8} />
+              <SkeletonBlock width="40%" height={14} />
+              <SkeletonBlock width="100%" height={80} radius={8} />
+              <SkeletonBlock width="40%" height={14} />
+              <SkeletonBlock width="100%" height={44} radius={8} />
             </View>
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View style={{ paddingVertical: 16 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
@@ -222,7 +235,7 @@ export default function EditListingStates() {
         </View>
       </StateSection>
 
-      <StateSection title="saving">
+      <StateSection title="SAVING">
         <View style={[{ minHeight: 844, opacity: 0.6 }, containerStyle]}>
           <View style={{ paddingVertical: 16 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
@@ -238,14 +251,17 @@ export default function EditListingStates() {
             </View>
 
             <FormContent editable={false} />
-            <TouchableOpacity style={{ backgroundColor: C.primary, paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 8 }}>
-              <ActivityIndicator color="#ffffff" size="small" />
+            <TouchableOpacity style={{ backgroundColor: C.primary, paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 8, opacity: 0.7 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.4)' }} />
+                <Text style={{ color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>Сохранение...</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
       </StateSection>
 
-      <StateSection title="success">
+      <StateSection title="SUCCESS">
         <View style={[{ minHeight: 844 }, containerStyle]}>
           <View style={{ paddingVertical: 16 }}>
             <View style={{

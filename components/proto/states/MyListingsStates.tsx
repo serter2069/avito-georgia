@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockListings } from '../../../constants/protoMockData';
 
 const statusBadge: Record<string, { bg: string; text: string; label: string }> = {
@@ -57,7 +58,7 @@ export default function MyListingsStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           <View className="flex-row gap-2 mb-4 flex-wrap">
             {['Активные', 'На модерации', 'Черновики', 'Проданные', 'Удалённые'].map((tab, i) => (
@@ -84,7 +85,7 @@ export default function MyListingsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
           <Feather name="file-text" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">У вас пока нет объявлений</Text>
@@ -95,13 +96,30 @@ export default function MyListingsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-12 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+            {[1, 2, 3].map(i => (
+              <SkeletonBlock key={i} width={80} height={36} radius={8} />
+            ))}
+          </View>
+          {[1, 2, 3].map(i => (
+            <View key={i} style={{ flexDirection: 'row', borderRadius: 8, borderWidth: 1, borderColor: '#E8EDF0', overflow: 'hidden', marginBottom: 12 }}>
+              <SkeletonBlock width={96} height={96} radius={0} />
+              <View style={{ flex: 1, padding: 12, gap: 8 }}>
+                <SkeletonBlock width="70%" height={14} />
+                <SkeletonBlock width="40%" height={14} />
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  <SkeletonBlock width={80} height={24} radius={4} />
+                  <SkeletonBlock width={60} height={24} radius={4} />
+                </View>
+              </View>
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="confirm_delete_modal">
+      <StateSection title="CONFIRM_DELETE_MODAL">
         <View className="bg-white border border-border rounded-lg p-4" style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 480, alignSelf: 'center', width: '100%' } : undefined]}>
           <Text className="text-text-primary text-lg font-bold mb-2">Удалить объявление?</Text>
           <Text className="text-text-muted text-sm mb-4">Объявление "Toyota Camry 2020" будет удалено. Это действие нельзя отменить.</Text>

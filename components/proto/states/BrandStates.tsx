@@ -181,7 +181,7 @@ export default function BrandStates() {
 
         {/* ── 1. Color System ─────────────────────────────────────────────── */}
         <View>
-          <SectionHeading number="01" title="Color System" />
+          <SectionHeading number="01" title="COLOR SYSTEM" />
           <Card>
             <View style={{
               flexDirection: 'row',
@@ -213,7 +213,7 @@ export default function BrandStates() {
 
         {/* ── 2. Typography ───────────────────────────────────────────────── */}
         <View>
-          <SectionHeading number="02" title="Typography" />
+          <SectionHeading number="02" title="TYPOGRAPHY" />
           <Card style={{ gap: 0 }}>
             {[
               {
@@ -303,7 +303,7 @@ export default function BrandStates() {
 
         {/* ── 3. UI Primitives ────────────────────────────────────────────── */}
         <View>
-          <SectionHeading number="03" title="UI Primitives" />
+          <SectionHeading number="03" title="UI PRIMITIVES" />
 
           {/* Buttons */}
           <Card style={{ marginBottom: 16 }}>
@@ -437,7 +437,7 @@ export default function BrandStates() {
 
         {/* ── 4. Spacing & Radius ─────────────────────────────────────────── */}
         <View>
-          <SectionHeading number="04" title="Spacing & Radius" />
+          <SectionHeading number="04" title="SPACING & RADIUS" />
 
           {/* Spacing */}
           <Card style={{ marginBottom: 16 }}>

@@ -89,7 +89,7 @@ function NavigationSection() {
 
   return (
     <View>
-      <SectionHeading number="01" title="Navigation" />
+      <SectionHeading number="01" title="NAVIGATION" />
       <Card style={{ gap: 16 }}>
         {/* Header */}
         <SubLabel text="Header bar" />
@@ -177,7 +177,7 @@ function InputsSection() {
 
   return (
     <View>
-      <SectionHeading number="02" title="Inputs" />
+      <SectionHeading number="02" title="INPUTS" />
       <Card style={{ gap: 20 }}>
         {/* Search bar */}
         <View>
@@ -282,7 +282,7 @@ function ButtonsSection() {
 
   return (
     <View>
-      <SectionHeading number="03" title="Buttons" />
+      <SectionHeading number="03" title="BUTTONS" />
       <Card style={{ gap: 16 }}>
         <SubLabel text="Tap any button to see loading state" />
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
@@ -415,7 +415,7 @@ function CardsSection({ isDesktop }: { isDesktop: boolean }) {
 
   return (
     <View>
-      <SectionHeading number="04" title="Cards" />
+      <SectionHeading number="04" title="CARDS" />
       <View style={{
         flexDirection: isDesktop ? 'row' : 'column',
         gap: 16,
@@ -486,7 +486,7 @@ function ListsSection() {
 
   return (
     <View>
-      <SectionHeading number="05" title="Lists" />
+      <SectionHeading number="05" title="LISTS" />
       <Card style={{ padding: 0, overflow: 'hidden' }}>
         {items.map((item, idx) => (
           <View key={item.name}>
@@ -524,7 +524,7 @@ function ListsSection() {
 function EmptyStateSection() {
   return (
     <View>
-      <SectionHeading number="06" title="Empty States" />
+      <SectionHeading number="06" title="EMPTY STATES" />
       <Card style={{ alignItems: 'center', paddingVertical: 40 }}>
         <View style={{
           width: 72, height: 72,
@@ -596,7 +596,7 @@ function AlertsSection() {
 
   return (
     <View>
-      <SectionHeading number="07" title="Alerts / Banners" />
+      <SectionHeading number="07" title="ALERTS / BANNERS" />
       <View style={{ gap: 12 }}>
         {alerts.map((alert) => (
           <Card key={alert.type} style={{

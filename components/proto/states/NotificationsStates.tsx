@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
+import { SkeletonBlock, SkeletonRow, SkeletonCard } from '../SkeletonBlock';
 import { mockNotifications } from '../../../constants/protoMockData';
 
 const iconMap: Record<string, string> = {
@@ -41,7 +42,7 @@ export default function NotificationsStates() {
 
   return (
     <View>
-      <StateSection title="default">
+      <StateSection title="DEFAULT">
         <View style={[{ minHeight: 844 }, isDesktop ? { maxWidth: 960, alignSelf: 'center', width: '100%' } : undefined]}>
           {mockNotifications.map((n) => (
             <NotificationRow key={n.id} n={n} />
@@ -49,13 +50,22 @@ export default function NotificationsStates() {
         </View>
       </StateSection>
 
-      <StateSection title="loading">
-        <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
-          <ActivityIndicator size="large" color="#00AA6C" />
+      <StateSection title="LOADING">
+        <View style={[{ minHeight: 844 }, containerStyle]}>
+          {[1, 2, 3, 4].map(i => (
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#E8EDF0' }}>
+              <SkeletonBlock width={40} height={40} radius={20} />
+              <View style={{ flex: 1, gap: 8 }}>
+                <SkeletonBlock width="50%" height={14} />
+                <SkeletonBlock width="80%" height={12} />
+                <SkeletonBlock width="30%" height={10} />
+              </View>
+            </View>
+          ))}
         </View>
       </StateSection>
 
-      <StateSection title="empty">
+      <StateSection title="EMPTY">
         <View style={[{ minHeight: 844 }, containerStyle]} className="py-16 items-center">
           <Feather name="bell" size={48} color="#737373" />
           <Text className="text-text-primary text-lg font-semibold mt-3">Нет уведомлений</Text>
