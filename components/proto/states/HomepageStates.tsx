@@ -41,15 +41,6 @@ const LISTINGS = [
   { title: 'Кресло офисное, Herman Miller', price: '₾420', loc: 'Тбилиси', age: '5ч', cat: 'home' },
 ];
 
-// ─── Search icon (drawn with Views) ─────────────────────────────────────────
-function SearchIcon({ color = C.muted }: { color?: string }) {
-  return (
-    <View style={{ width: 17, height: 17, flexShrink: 0 }}>
-      <View style={{ position: 'absolute', top: 0, left: 0, width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: color }} />
-      <View style={{ position: 'absolute', bottom: 0, right: 0, width: 2, height: 8, backgroundColor: color, borderRadius: 1, transform: [{ rotate: '-45deg' }, { translateX: 1 }, { translateY: -1 }] }} />
-    </View>
-  );
-}
 
 // ─── Listing card ────────────────────────────────────────────────────────────
 function ListingCard({ title, price, loc, age, badge, colorIdx }: {
@@ -81,28 +72,43 @@ function ListingCard({ title, price, loc, age, badge, colorIdx }: {
   );
 }
 
-// ─── Main content ────────────────────────────────────────────────────────────
-function LangSelect({ value, onChange, compact }: { value: string; onChange: (v: string) => void; compact?: boolean }) {
+// ─── Custom language switcher (no native select) ─────────────────────────────
+const LANGS: ('RU' | 'EN' | 'KA')[] = ['RU', 'EN', 'KA'];
+
+function LangSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
   return (
-    <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 6, paddingHorizontal: compact ? 4 : 7, paddingVertical: 0, backgroundColor: C.white, flexDirection: 'row', alignItems: 'center' }}>
-      {/* @ts-ignore */}
-      <select
-        value={value}
-        onChange={(e: any) => onChange(e.target.value)}
-        style={{
-          fontSize: 12, color: '#6B6B6B', backgroundColor: 'transparent',
-          border: 'none', outline: 'none', paddingTop: 4, paddingBottom: 4,
-          cursor: 'pointer', appearance: 'none', paddingRight: compact ? 14 : 20,
-        }}
+    <View style={{ position: 'relative', zIndex: 100 }}>
+      <Pressable
+        onPress={() => setOpen(o => !o)}
+        style={{ borderWidth: 1, borderColor: C.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: C.white }}
       >
-        <option value="RU">{compact ? 'RU' : '🇷🇺 Русский'}</option>
-        <option value="EN">{compact ? 'EN' : '🇬🇧 English'}</option>
-        <option value="KA">{compact ? 'KA' : '🇬🇪 ქართული'}</option>
-      </select>
-      <Text style={{ fontSize: 9, color: C.muted, marginLeft: compact ? -12 : -16, pointerEvents: 'none' as any }}>▾</Text>
+        <Text style={{ fontSize: 12, fontWeight: '600', color: '#5C5C5C' }}>{value}</Text>
+        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={10} color={C.muted} />
+      </Pressable>
+      {open && (
+        <View style={{
+          position: 'absolute', top: '100%' as any, left: 0, marginTop: 4,
+          backgroundColor: C.white, borderRadius: 8, borderWidth: 1, borderColor: C.border,
+          overflow: 'hidden', minWidth: 56, zIndex: 200,
+          shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1, shadowRadius: 8, elevation: 8,
+        }}>
+          {LANGS.map(l => (
+            <Pressable key={l} onPress={() => { onChange(l); setOpen(false); }}
+              style={{ paddingHorizontal: 12, paddingVertical: 9, backgroundColor: value === l ? '#F5F5F5' : C.white }}>
+              <Text style={{ fontSize: 12, fontWeight: value === l ? '700' : '400', color: value === l ? C.green : '#5C5C5C' }}>
+                {l}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
+
+// ─── Main content ─────────────────────────────────────────────────────────────
 
 function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
   const { width } = useWindowDimensions();
@@ -149,14 +155,14 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
                 <Text style={{ fontWeight: '600', fontSize: 12, color: C.green }}>.ge</Text>
               </View>
             )}
-            {!isTablet && <LangSelect value={lang} onChange={setLang} compact />}
+            {!isTablet && <LangSelect value={lang} onChange={setLang} />}
           </View>
 
           {/* Search */}
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: C.green, borderRadius: 9, backgroundColor: C.white, paddingHorizontal: 10, paddingVertical: isTablet ? 8 : 10, gap: 8 }}>
-            <SearchIcon />
+            <Ionicons name="search-outline" size={17} color={C.muted} />
             <TextInput
-              style={{ flex: 1, fontSize: 14, color: C.text, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 }}
+              style={{ flex: 1, fontSize: 14, color: C.text, borderWidth: 0, borderStyle: 'solid', backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
               placeholder="Что ищете?"
               placeholderTextColor={C.muted}
               value={query}
