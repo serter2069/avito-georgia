@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import { ProtoImage } from '../ProtoPlaceholderImage';
 
 const C = {
   green: '#00AA6C',
@@ -12,233 +14,354 @@ const C = {
   border: '#E8E8E8',
   page: '#F5F5F5',
   error: '#D32F2F',
+  amber: '#F59E0B',
+  starEmpty: '#D0D0D0',
 };
 
-function PhotoEditor() {
-  const [showOptions, setShowOptions] = useState(false);
-  const [hasPhoto, setHasPhoto] = useState(false);
-  return (
-    <View style={{ alignItems: 'center', paddingVertical: 12, gap: 10 }}>
-      <Pressable onPress={() => setShowOptions(!showOptions)} style={{ position: 'relative' }}>
-        {hasPhoto ? (
-          <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#B2DFDB', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 11, color: '#00695C', fontWeight: '600' }}>фото</Text>
-          </View>
-        ) : (
-          <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 26 }}>ГК</Text>
-          </View>
-        )}
-        {/* Camera badge */}
-        <View style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: '#1A1A1A', borderWidth: 2, borderColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: '#fff', fontSize: 12 }}>+</Text>
-        </View>
-      </Pressable>
-      <Pressable onPress={() => setShowOptions(!showOptions)}>
-        <Text style={{ fontSize: 14, color: C.green, fontWeight: '600' }}>Сменить фото</Text>
-      </Pressable>
-      {showOptions && (
-        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', width: '100%', backgroundColor: C.white }}>
-          {[
-            { label: 'Сделать фото', action: () => { setHasPhoto(true); setShowOptions(false); } },
-            { label: 'Выбрать из галереи', action: () => { setHasPhoto(true); setShowOptions(false); } },
-            { label: 'Удалить фото', action: () => { setHasPhoto(false); setShowOptions(false); }, red: true },
-          ].map((opt, i) => (
-            <Pressable key={i} onPress={opt.action} style={{ paddingVertical: 13, paddingHorizontal: 16, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: C.border }}>
-              <Text style={{ fontSize: 15, color: opt.red ? '#D32F2F' : C.text, textAlign: 'center' }}>{opt.label}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-}
+// ---- Data ----
 
-function Avatar({ initials, size = 72 }: { initials: string; size?: number }) {
+const USER = {
+  name: 'Георгий Мелашвили',
+  initials: 'ГМ',
+  city: 'Тбилиси',
+  memberSince: 'На сайте с 2022',
+  rating: '4.8',
+  reviewCount: 23,
+  listingCount: 7,
+};
+
+const LISTINGS = [
+  { id: 1, title: 'Toyota Camry 2019', price: '45 000 ₾', seed: 'camry19' },
+  { id: 2, title: 'iPhone 14 Pro Max', price: '2 400 ₾', seed: 'iphone14' },
+  { id: 3, title: 'Квартира 3-ком, Батуми', price: '85 000 ₾', seed: 'batumi3' },
+  { id: 4, title: 'MacBook Pro 14" M2', price: '3 800 ₾', seed: 'macm2' },
+  { id: 5, title: 'Диван угловой', price: '1 200 ₾', seed: 'sofa5' },
+  { id: 6, title: 'Honda CBR 600RR', price: '18 500 ₾', seed: 'cbr600' },
+  { id: 7, title: 'Холодильник Samsung', price: '950 ₾', seed: 'fridge7' },
+];
+
+const REVIEWS = [
+  {
+    id: 1,
+    name: 'Нино Беридзе',
+    initials: 'НБ',
+    rating: 5,
+    date: '12 апреля 2025',
+    text: 'Отличный продавец! Машина полностью соответствует описанию, документы в порядке. Очень рекомендую.',
+  },
+  {
+    id: 2,
+    name: 'Михаил Робакидзе',
+    initials: 'МР',
+    rating: 5,
+    date: '3 апреля 2025',
+    text: 'Быстрая сделка, Георгий всё объяснил и помог с оформлением. Честный человек.',
+  },
+  {
+    id: 3,
+    name: 'Тамара Чиковани',
+    initials: 'ТЧ',
+    rating: 4,
+    date: '28 марта 2025',
+    text: 'Всё хорошо, телефон как новый. Немного задержался с ответом, но в целом доволен.',
+  },
+  {
+    id: 4,
+    name: 'Давид Кварацхелия',
+    initials: 'ДК',
+    rating: 5,
+    date: '15 марта 2025',
+    text: 'Купил квартиру через Георгия. Профессионал! Помог оформить все документы, ответил на все вопросы.',
+  },
+  {
+    id: 5,
+    name: 'Анна Гогиашвили',
+    initials: 'АГ',
+    rating: 4,
+    date: '2 марта 2025',
+    text: 'Хороший продавец, MacBook в отличном состоянии. Цена немного завышена, но качество того стоит.',
+  },
+];
+
+// ---- Sub-components ----
+
+function AvatarCircle({ initials, size = 80 }: { initials: string; size?: number }) {
   return (
     <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: C.green,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
+      className="items-center justify-center"
+      style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: C.green }}
     >
       <Text style={{ color: C.white, fontWeight: '700', fontSize: size * 0.3 }}>{initials}</Text>
     </View>
   );
 }
 
-function StatBox({ value, label }: { value: string; label: string }) {
+function ReviewerAvatar({ initials }: { initials: string }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', paddingVertical: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>{value}</Text>
-      <Text style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{label}</Text>
+    <View
+      className="items-center justify-center"
+      style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#E0F0FF' }}
+    >
+      <Text style={{ color: '#1565C0', fontWeight: '700', fontSize: 13 }}>{initials}</Text>
     </View>
   );
 }
 
-// -- State 1: View mode --
+function StarRow({ rating, size = 14 }: { rating: number; size?: number }) {
+  return (
+    <View className="flex-row gap-0.5">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Ionicons
+          key={i}
+          name={i <= rating ? 'star' : 'star-outline'}
+          size={size}
+          color={i <= rating ? C.amber : C.starEmpty}
+        />
+      ))}
+    </View>
+  );
+}
 
-function ViewModeState() {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
+function UserHeader({ showEditButton, onEdit }: { showEditButton?: boolean; onEdit?: () => void }) {
+  return (
+    <View className="bg-white rounded-xl overflow-hidden">
+      {/* Top gradient band */}
+      <View style={{ height: 72, backgroundColor: C.green, opacity: 0.12 }} />
 
-  const profileCard = (
-    <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden', flex: isDesktop ? 1 : undefined }}>
-      {/* Avatar + name */}
-      <View style={{ alignItems: 'center', paddingTop: 28, paddingBottom: 20, paddingHorizontal: 20, gap: 8 }}>
-        <Avatar initials="ГК" size={80} />
-        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, marginTop: 4 }}>Георгий Каландадзе</Text>
-        <Text style={{ fontSize: 14, color: C.muted }}>g.kalandadze@gmail.com</Text>
-        <Text style={{ fontSize: 14, color: C.muted }}>+995 555 123 456</Text>
-        <Text style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>Участник с января 2024</Text>
+      <View className="px-4 pb-5" style={{ marginTop: -40 }}>
+        {/* Avatar */}
+        <View className="flex-row items-end justify-between">
+          <View style={{ borderWidth: 3, borderColor: C.white, borderRadius: 44 }}>
+            <AvatarCircle initials={USER.initials} size={80} />
+          </View>
+          {showEditButton && (
+            <Pressable
+              onPress={onEdit}
+              className="flex-row items-center gap-1 px-3 py-2 rounded-lg"
+              style={{ borderWidth: 1, borderColor: C.border }}
+            >
+              <Ionicons name="pencil-outline" size={16} color={C.green} />
+              <Text style={{ fontSize: 13, color: C.green, fontWeight: '600' }}>Изменить</Text>
+            </Pressable>
+          )}
+        </View>
+
+        {/* Name + city + since */}
+        <View className="mt-3 gap-1">
+          <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>{USER.name}</Text>
+          <View className="flex-row items-center gap-1">
+            <Ionicons name="location-outline" size={14} color={C.muted} />
+            <Text style={{ fontSize: 13, color: C.muted }}>{USER.city}</Text>
+            <Text style={{ fontSize: 13, color: C.muted }}>·</Text>
+            <Ionicons name="calendar-outline" size={14} color={C.muted} />
+            <Text style={{ fontSize: 13, color: C.muted }}>{USER.memberSince}</Text>
+          </View>
+        </View>
+
+        {/* Stats row */}
+        <View
+          className="flex-row items-center mt-3 rounded-xl px-4 py-3 gap-4"
+          style={{ backgroundColor: C.page }}
+        >
+          <View className="items-center flex-1">
+            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{USER.listingCount}</Text>
+            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>объявлений</Text>
+          </View>
+          <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
+          <View className="items-center flex-1">
+            <View className="flex-row items-center gap-1">
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{USER.rating}</Text>
+              <Ionicons name="star" size={14} color={C.amber} />
+            </View>
+            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>рейтинг</Text>
+          </View>
+          <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
+          <View className="items-center flex-1">
+            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{USER.reviewCount}</Text>
+            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>отзыва</Text>
+          </View>
+        </View>
+
+        {/* Action buttons */}
+        {!showEditButton && (
+          <View className="flex-row gap-3 mt-4">
+            <Pressable
+              className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3"
+              style={{ backgroundColor: C.green }}
+            >
+              <Ionicons name="chatbubble-outline" size={16} color={C.white} />
+              <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Написать</Text>
+            </Pressable>
+            <Pressable
+              className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3"
+              style={{ borderWidth: 1.5, borderColor: C.green }}
+            >
+              <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Поднять</Text>
+            </Pressable>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+function ListingsSection({ listings }: { listings: typeof LISTINGS }) {
+  return (
+    <View className="rounded-xl overflow-hidden" style={{ backgroundColor: C.white }}>
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
+        <Text style={{ fontSize: 15, fontWeight: '700', color: C.text }}>Активные объявления</Text>
+        <Pressable>
+          <Text style={{ fontSize: 13, color: C.green, fontWeight: '600' }}>
+            Смотреть все ({USER.listingCount})
+          </Text>
+        </Pressable>
       </View>
 
-      {/* Divider */}
+      {/* Horizontal scroll of cards */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 14, gap: 10 }}
+      >
+        {listings.map((item) => (
+          <Pressable
+            key={item.id}
+            className="rounded-xl overflow-hidden"
+            style={{ width: 130, borderWidth: 1, borderColor: C.border }}
+          >
+            <ProtoImage seed={item.seed} width={130} height={90} />
+            <View className="p-2 gap-0.5">
+              <Text style={{ fontSize: 12, color: C.text, fontWeight: '600' }} numberOfLines={2}>
+                {item.title}
+              </Text>
+              <Text style={{ fontSize: 13, color: C.green, fontWeight: '700' }}>{item.price}</Text>
+            </View>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+function ReviewsSection() {
+  return (
+    <View className="rounded-xl overflow-hidden" style={{ backgroundColor: C.white }}>
+      {/* Header with rating badge */}
+      <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
+        <Text style={{ fontSize: 15, fontWeight: '700', color: C.text }}>Отзывы</Text>
+        <View
+          className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{ backgroundColor: C.greenBg }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: '800', color: C.green }}>{USER.rating}</Text>
+          <Text style={{ fontSize: 13, color: C.muted }}>/</Text>
+          <Text style={{ fontSize: 13, color: C.muted }}>5</Text>
+          <Ionicons name="star" size={14} color={C.amber} />
+        </View>
+      </View>
+
       <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 16 }} />
 
-      {/* Stats row */}
-      <View style={{ flexDirection: 'row' }}>
-        <StatBox value="12" label="объявлений" />
-        <View style={{ width: 1, backgroundColor: C.border, marginVertical: 12 }} />
-        <StatBox value="38 000 ₾" label="продано" />
-        <View style={{ width: 1, backgroundColor: C.border, marginVertical: 12 }} />
-        <StatBox value="9" label="отзывов" />
-      </View>
-
-      {/* Edit button */}
-      <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
-        <Pressable
-          style={{
-            borderWidth: 1,
-            borderColor: C.green,
-            borderRadius: 8,
-            paddingVertical: 11,
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ color: C.green, fontWeight: '600', fontSize: 15 }}>Редактировать профиль</Text>
-        </Pressable>
-      </View>
+      {/* Review items */}
+      {REVIEWS.map((r, i) => (
+        <View key={r.id}>
+          <View className="px-4 py-3 gap-2">
+            <View className="flex-row items-center gap-3">
+              <ReviewerAvatar initials={r.initials} />
+              <View className="flex-1">
+                <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{r.name}</Text>
+                <View className="flex-row items-center gap-2 mt-0.5">
+                  <StarRow rating={r.rating} size={12} />
+                  <Text style={{ fontSize: 12, color: C.muted }}>{r.date}</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={{ fontSize: 14, color: C.text, lineHeight: 20 }}>{r.text}</Text>
+          </View>
+          {i < REVIEWS.length - 1 && (
+            <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 16 }} />
+          )}
+        </View>
+      ))}
+      <View style={{ height: 8 }} />
     </View>
-  );
-
-  const statsPanel = (
-    <View style={{ flex: 1, gap: 12 }}>
-      {/* Active listings */}
-      <View style={{ backgroundColor: C.white, borderRadius: 12, padding: 16 }}>
-        <Text style={{ fontSize: 13, color: C.muted, marginBottom: 8, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-          Активные объявления
-        </Text>
-        {['Toyota Camry 2019 — 45 000 ₾', 'iPhone 14 Pro — 2 400 ₾', 'Квартира 3-ком, Батуми — 85 000 ₾'].map((item, i) => (
-          <View key={i} style={{ paddingVertical: 10, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: C.border }}>
-            <Text style={{ fontSize: 14, color: C.text }}>{item}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Recent reviews */}
-      <View style={{ backgroundColor: C.white, borderRadius: 12, padding: 16 }}>
-        <Text style={{ fontSize: 13, color: C.muted, marginBottom: 8, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-          Последние отзывы
-        </Text>
-        {[
-          { name: 'Анна К.', text: 'Отличный продавец, рекомендую!' },
-          { name: 'Михаил Р.', text: 'Быстрая сделка, всё как описано.' },
-        ].map((r, i) => (
-          <View key={i} style={{ paddingVertical: 10, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: C.border }}>
-            <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>{r.name}</Text>
-            <Text style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>{r.text}</Text>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-
-  return (
-    <StateSection title="PROFILE__VIEW">
-      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={isDesktop ? { flexDirection: 'row', padding: 20, gap: 16, alignItems: 'flex-start' } : { padding: 12, gap: 12 }}>
-            {profileCard}
-            {isDesktop && statsPanel}
-          </View>
-          {!isDesktop && <View style={{ paddingHorizontal: 12, paddingBottom: 0, gap: 12 }}>{statsPanel}</View>}
-          {!isDesktop && <View style={{ height: 12 }} />}
-        </ScrollView>
-        {!isDesktop && <BottomNav active="profile" />}
-      </View>
-    </StateSection>
   );
 }
 
-// -- State 2: Edit mode --
+function EditProfileForm() {
+  const [name, setName] = useState(USER.name);
+  const [phone, setPhone] = useState('+995 555 987 654');
+  const [city, setCity] = useState(USER.city);
 
-function EditModeState() {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-  const [name, setName] = useState('Георгий Каландадзе');
-  const [phone, setPhone] = useState('+995 555 123 456');
+  const fields = [
+    { label: 'Имя', value: name, setter: setName, placeholder: 'Ваше имя', keyboard: 'default' as const },
+    { label: 'Телефон', value: phone, setter: setPhone, placeholder: '+995 5XX XXX XXX', keyboard: 'phone-pad' as const },
+    { label: 'Город', value: city, setter: setCity, placeholder: 'Тбилиси', keyboard: 'default' as const },
+  ];
 
-  const form = (
-    <View style={{ backgroundColor: C.white, borderRadius: 12, padding: 20, gap: 16, flex: isDesktop ? undefined : undefined, maxWidth: isDesktop ? 480 : undefined, alignSelf: isDesktop ? 'center' : undefined, width: isDesktop ? '100%' : undefined }}>
-      <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Редактировать профиль</Text>
+  return (
+    <View className="rounded-xl overflow-hidden px-4 py-4 gap-4" style={{ backgroundColor: C.white }}>
+      <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>Редактировать профиль</Text>
 
-      <PhotoEditor />
-
-      {/* Name */}
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Имя</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 }}
-        />
-      </View>
-
-      {/* Email (read-only) */}
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Email</Text>
-        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#FAFAFA' }}>
-          <Text style={{ fontSize: 15, color: C.muted }}>g.kalandadze@gmail.com</Text>
+      {fields.map((f) => (
+        <View key={f.label} className="gap-1.5">
+          <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>{f.label}</Text>
+          <TextInput
+            value={f.value}
+            onChangeText={f.setter}
+            keyboardType={f.keyboard}
+            placeholder={f.placeholder}
+            placeholderTextColor={C.muted}
+            style={{
+              borderWidth: 1,
+              borderColor: C.border,
+              borderRadius: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 11,
+              fontSize: 15,
+              color: C.text,
+              outlineWidth: 0,
+            }}
+          />
         </View>
-        <Text style={{ fontSize: 12, color: C.muted }}>Email нельзя изменить</Text>
-      </View>
+      ))}
 
-      {/* Phone */}
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Телефон</Text>
-        <TextInput
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-          placeholder="+995 5XX XXX XXX"
-          placeholderTextColor={C.muted}
-          style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 }}
-        />
-      </View>
-
-      {/* Buttons */}
-      <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
-        <Pressable style={{ flex: 1, backgroundColor: C.green, borderRadius: 8, paddingVertical: 13, alignItems: 'center' }}>
+      {/* Save / Cancel */}
+      <View className="flex-row gap-3 mt-1">
+        <Pressable
+          className="flex-1 items-center justify-center rounded-xl py-3"
+          style={{ backgroundColor: C.green }}
+        >
           <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Сохранить</Text>
         </Pressable>
-        <Pressable style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 13, alignItems: 'center' }}>
+        <Pressable
+          className="flex-1 items-center justify-center rounded-xl py-3"
+          style={{ borderWidth: 1, borderColor: C.border }}
+        >
           <Text style={{ color: C.muted, fontWeight: '600', fontSize: 15 }}>Отмена</Text>
         </Pressable>
       </View>
     </View>
   );
+}
+
+// ---- State 1: Own Profile ----
+
+function OwnProfileState() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
 
   return (
-    <StateSection title="PROFILE__EDIT">
+    <StateSection title="PROFILE / Own profile">
       <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ padding: isDesktop ? 32 : 12 }}>
-            {form}
+          <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
+            <UserHeader showEditButton />
+            <EditProfileForm />
+            <ListingsSection listings={LISTINGS.slice(0, 4)} />
+            <ReviewsSection />
+            <View style={{ height: isDesktop ? 0 : 80 }} />
           </View>
         </ScrollView>
         {!isDesktop && <BottomNav active="profile" />}
@@ -247,13 +370,44 @@ function EditModeState() {
   );
 }
 
-// -- Main Export --
+// ---- State 2: Other User ----
+
+function OtherUserState() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+
+  return (
+    <StateSection title="PROFILE / Other user">
+      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
+            {/* Back bar */}
+            <View className="flex-row items-center gap-2 pb-1">
+              <Pressable className="flex-row items-center gap-1">
+                <Ionicons name="chevron-back" size={24} color={C.text} />
+                <Text style={{ fontSize: 15, color: C.text }}>Назад</Text>
+              </Pressable>
+            </View>
+
+            <UserHeader showEditButton={false} />
+            <ListingsSection listings={LISTINGS.slice(0, 4)} />
+            <ReviewsSection />
+            <View style={{ height: isDesktop ? 0 : 80 }} />
+          </View>
+        </ScrollView>
+        {!isDesktop && <BottomNav active="profile" />}
+      </View>
+    </StateSection>
+  );
+}
+
+// ---- Main Export ----
 
 export default function ProfileStates() {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <ViewModeState />
-      <EditModeState />
+      <OwnProfileState />
+      <OtherUserState />
     </ScrollView>
   );
 }
