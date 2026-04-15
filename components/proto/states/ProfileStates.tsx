@@ -14,6 +14,46 @@ const C = {
   error: '#D32F2F',
 };
 
+function PhotoEditor() {
+  const [showOptions, setShowOptions] = useState(false);
+  const [hasPhoto, setHasPhoto] = useState(false);
+  return (
+    <View style={{ alignItems: 'center', paddingVertical: 12, gap: 10 }}>
+      <Pressable onPress={() => setShowOptions(!showOptions)} style={{ position: 'relative' }}>
+        {hasPhoto ? (
+          <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#B2DFDB', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#00695C', fontWeight: '600' }}>фото</Text>
+          </View>
+        ) : (
+          <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 26 }}>ГК</Text>
+          </View>
+        )}
+        {/* Camera badge */}
+        <View style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: '#1A1A1A', borderWidth: 2, borderColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: '#fff', fontSize: 12 }}>+</Text>
+        </View>
+      </Pressable>
+      <Pressable onPress={() => setShowOptions(!showOptions)}>
+        <Text style={{ fontSize: 14, color: C.green, fontWeight: '600' }}>Сменить фото</Text>
+      </Pressable>
+      {showOptions && (
+        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', width: '100%', backgroundColor: C.white }}>
+          {[
+            { label: 'Сделать фото', action: () => { setHasPhoto(true); setShowOptions(false); } },
+            { label: 'Выбрать из галереи', action: () => { setHasPhoto(true); setShowOptions(false); } },
+            { label: 'Удалить фото', action: () => { setHasPhoto(false); setShowOptions(false); }, red: true },
+          ].map((opt, i) => (
+            <Pressable key={i} onPress={opt.action} style={{ paddingVertical: 13, paddingHorizontal: 16, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: C.border }}>
+              <Text style={{ fontSize: 15, color: opt.red ? '#D32F2F' : C.text, textAlign: 'center' }}>{opt.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 function Avatar({ initials, size = 72 }: { initials: string; size?: number }) {
   return (
     <View
@@ -147,13 +187,7 @@ function EditModeState() {
     <View style={{ backgroundColor: C.white, borderRadius: 12, padding: 20, gap: 16, flex: isDesktop ? undefined : undefined, maxWidth: isDesktop ? 480 : undefined, alignSelf: isDesktop ? 'center' : undefined, width: isDesktop ? '100%' : undefined }}>
       <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Редактировать профиль</Text>
 
-      {/* Avatar centered */}
-      <View style={{ alignItems: 'center', paddingVertical: 8 }}>
-        <Avatar initials="ГК" size={72} />
-        <Pressable style={{ marginTop: 8 }}>
-          <Text style={{ fontSize: 14, color: C.green, fontWeight: '600' }}>Изменить фото</Text>
-        </Pressable>
-      </View>
+      <PhotoEditor />
 
       {/* Name */}
       <View style={{ gap: 6 }}>
