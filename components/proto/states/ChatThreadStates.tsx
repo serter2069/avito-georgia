@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, Modal, useWindowDimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../ProtoPlaceholderImage';
 
-const C = {
-  green: '#00AA6C',
-  greenBg: '#E8F9F2',
-  white: '#FFFFFF',
-  text: '#1A1A1A',
-  muted: '#9E9E9E',
-  border: '#E8E8E8',
-};
-
-// Photo seeds pool — each "attached" photo gets a unique seed
+// Photo seeds pool
 const PHOTO_SEEDS = [101, 102, 103, 104, 105, 106, 107, 108];
 
 type PhotoMsg = { seeds: number[] };
@@ -24,20 +16,21 @@ interface Message {
   photos?: PhotoMsg;
   mine: boolean;
   time: string;
+  read?: boolean;
 }
 
 const INITIAL_MESSAGES: Message[] = [
-  { id: 1, text: 'Здравствуйте, машина ещё продаётся?', mine: true,  time: '14:10' },
+  { id: 1, text: 'Здравствуйте, машина ещё продаётся?', mine: true,  time: '14:10', read: true },
   { id: 2, text: 'Да, ещё продаётся. Что вас интересует?', mine: false, time: '14:12' },
-  { id: 3, text: 'Можно посмотреть завтра? Я из Тбилиси.', mine: true,  time: '14:14' },
+  { id: 3, text: 'Можно посмотреть завтра? Я из Тбилиси.', mine: true,  time: '14:14', read: true },
   { id: 4, text: 'Конечно, приходите в первой половине дня.', mine: false, time: '14:15' },
   // Photo message from other person (1 photo)
   { id: 5, photos: { seeds: [101] }, mine: false, time: '14:16' },
   { id: 6, text: 'Вот фото салона, всё в отличном состоянии.', mine: false, time: '14:16' },
-  { id: 7, text: 'Отлично! А двигатель как?', mine: true, time: '14:17' },
+  { id: 7, text: 'Отлично! А двигатель как?', mine: true, time: '14:17', read: false },
   // Photo message from me (3 photos)
-  { id: 8, photos: { seeds: [102, 103, 104] }, mine: true, time: '14:18' },
-  { id: 9, text: 'Прислал фото из объявления', mine: true, time: '14:18' },
+  { id: 8, photos: { seeds: [102, 103, 104] }, mine: true, time: '14:18', read: false },
+  { id: 9, text: 'Прислал фото из объявления', mine: true, time: '14:18', read: false },
   { id: 10, text: 'Хорошо, жду вас около 11:00.', mine: false, time: '14:19' },
 ];
 
@@ -45,16 +38,25 @@ const INITIAL_MESSAGES: Message[] = [
 function PhotoGrid({ seeds, onPress }: { seeds: number[]; onPress: (idx: number) => void }) {
   if (seeds.length === 1) {
     return (
-      <Pressable onPress={() => onPress(0)} style={{ borderRadius: 10, overflow: 'hidden', width: 200, height: 150 }}>
+      <Pressable
+        onPress={() => onPress(0)}
+        className="rounded-[10px] overflow-hidden"
+        style={{ width: 200, height: 150 }}
+      >
         <ProtoImage seed={seeds[0]} width={200} height={150} />
       </Pressable>
     );
   }
   if (seeds.length === 2) {
     return (
-      <View style={{ flexDirection: 'row', gap: 3, borderRadius: 10, overflow: 'hidden' }}>
+      <View className="flex-row rounded-[10px] overflow-hidden" style={{ gap: 3 }}>
         {seeds.map((s, i) => (
-          <Pressable key={i} onPress={() => onPress(i)} style={{ width: 120, height: 120, borderRadius: 8, overflow: 'hidden' }}>
+          <Pressable
+            key={i}
+            onPress={() => onPress(i)}
+            className="rounded-lg overflow-hidden"
+            style={{ width: 120, height: 120 }}
+          >
             <ProtoImage seed={s} width={120} height={120} />
           </Pressable>
         ))}
@@ -63,18 +65,26 @@ function PhotoGrid({ seeds, onPress }: { seeds: number[]; onPress: (idx: number)
   }
   // 3+: main + 2 side
   return (
-    <View style={{ flexDirection: 'row', gap: 3, borderRadius: 10, overflow: 'hidden', maxWidth: 240 }}>
-      <Pressable onPress={() => onPress(0)} style={{ width: 155, height: 155, borderRadius: 8, overflow: 'hidden' }}>
+    <View className="flex-row rounded-[10px] overflow-hidden" style={{ gap: 3, maxWidth: 240 }}>
+      <Pressable
+        onPress={() => onPress(0)}
+        className="rounded-lg overflow-hidden"
+        style={{ width: 155, height: 155 }}
+      >
         <ProtoImage seed={seeds[0]} width={155} height={155} />
       </Pressable>
       <View style={{ gap: 3 }}>
         {seeds.slice(1, 3).map((s, i) => (
-          <Pressable key={i} onPress={() => onPress(i + 1)} style={{ width: 78, height: 75, borderRadius: 6, overflow: 'hidden', position: 'relative' }}>
+          <Pressable
+            key={i}
+            onPress={() => onPress(i + 1)}
+            className="rounded-md overflow-hidden"
+            style={{ width: 78, height: 75 }}
+          >
             <ProtoImage seed={s} width={78} height={75} />
-            {/* +N overlay on last tile if more photos */}
             {i === 1 && seeds.length > 3 && (
-              <View style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>+{seeds.length - 3}</Text>
+              <View className="absolute inset-0 bg-black/50 items-center justify-center">
+                <Text className="text-white font-bold text-base">+{seeds.length - 3}</Text>
               </View>
             )}
           </Pressable>
@@ -96,41 +106,67 @@ function PhotoLightbox({ seeds, initialIdx, onClose }: {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.93)', alignItems: 'center', justifyContent: 'center' }}>
+      <View className="flex-1 bg-black/95 items-center justify-center">
         {/* Close */}
-        <Pressable onPress={onClose} style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: '#fff', fontSize: 22 }}>×</Text>
+        <Pressable
+          onPress={onClose}
+          className="absolute top-5 right-5 z-10 w-10 h-10 rounded-full bg-white/20 items-center justify-center"
+        >
+          <Ionicons name="close" size={28} color="#fff" />
         </Pressable>
 
         {/* Counter */}
         {seeds.length > 1 && (
-          <View style={{ position: 'absolute', top: 28, left: 0, right: 0, alignItems: 'center' }}>
-            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{idx + 1} / {seeds.length}</Text>
+          <View className="absolute top-7 left-0 right-0 items-center">
+            <Text className="text-white text-sm font-semibold">{idx + 1} / {seeds.length}</Text>
           </View>
         )}
 
         {/* Image */}
-        <View style={{ width: Math.min(width - 40, 700), aspectRatio: 4/3, borderRadius: 10, overflow: 'hidden' }}>
+        <View
+          className="rounded-[10px] overflow-hidden"
+          style={{ width: Math.min(width - 40, 700), aspectRatio: 4 / 3 }}
+        >
           <ProtoImage seed={seeds[idx]} width="100%" height={400} />
         </View>
 
-        {/* Arrows */}
+        {/* Prev arrow */}
         {idx > 0 && (
-          <Pressable onPress={() => setIdx(idx - 1)} style={{ position: 'absolute', left: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: '#fff', fontSize: 26 }}>‹</Text>
+          <Pressable
+            onPress={() => setIdx(idx - 1)}
+            className="absolute left-3 w-12 h-12 rounded-full bg-white/20 items-center justify-center"
+            style={{ top: '50%', transform: [{ translateY: -24 }] }}
+          >
+            <Ionicons name="chevron-back" size={32} color="#fff" />
           </Pressable>
         )}
+
+        {/* Next arrow */}
         {idx < seeds.length - 1 && (
-          <Pressable onPress={() => setIdx(idx + 1)} style={{ position: 'absolute', right: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: '#fff', fontSize: 26 }}>›</Text>
+          <Pressable
+            onPress={() => setIdx(idx + 1)}
+            className="absolute right-3 w-12 h-12 rounded-full bg-white/20 items-center justify-center"
+            style={{ top: '50%', transform: [{ translateY: -24 }] }}
+          >
+            <Ionicons name="chevron-forward" size={32} color="#fff" />
           </Pressable>
         )}
 
         {/* Thumbnails */}
         {seeds.length > 1 && (
-          <View style={{ position: 'absolute', bottom: 20, flexDirection: 'row', gap: 8 }}>
+          <View className="absolute bottom-5 flex-row" style={{ gap: 8 }}>
             {seeds.map((s, i) => (
-              <Pressable key={i} onPress={() => setIdx(i)} style={{ width: 48, height: 36, borderRadius: 5, overflow: 'hidden', borderWidth: 2, borderColor: i === idx ? C.green : 'rgba(255,255,255,0.25)' }}>
+              <Pressable
+                key={i}
+                onPress={() => setIdx(i)}
+                className="rounded overflow-hidden"
+                style={{
+                  width: 48,
+                  height: 36,
+                  borderWidth: 2,
+                  borderColor: i === idx ? '#00AA6C' : 'rgba(255,255,255,0.25)',
+                }}
+              >
                 <ProtoImage seed={s} width={48} height={36} />
               </Pressable>
             ))}
@@ -149,41 +185,48 @@ function MessageBubble({ msg, onPhotoPress }: {
   const hasPhotos = msg.photos && msg.photos.seeds.length > 0;
   const hasText = !!msg.text;
 
-  const bubbleStyle = msg.mine
-    ? { backgroundColor: C.greenBg, borderRadius: 14, borderBottomRightRadius: 4 }
-    : { backgroundColor: C.white, borderRadius: 14, borderBottomLeftRadius: 4, borderWidth: 1, borderColor: C.border };
+  const bubbleClass = msg.mine
+    ? 'bg-[#E8F9F2] rounded-[14px] rounded-br px-3 py-2 max-w-[260px]'
+    : 'bg-white border border-[#E8E8E8] rounded-[14px] rounded-bl px-3 py-2 max-w-[260px]';
 
   const content = (
     <View>
       {hasPhotos && (
-        <View style={{ marginBottom: hasText ? 6 : 0 }}>
+        <View className={hasText ? 'mb-1.5' : ''}>
           <PhotoGrid
             seeds={msg.photos!.seeds}
-            onPress={(idx) => onPhotoPress(msg.photos!.seeds, idx)}
+            onPress={(i) => onPhotoPress(msg.photos!.seeds, i)}
           />
         </View>
       )}
       {hasText && (
-        <View style={[bubbleStyle, { paddingHorizontal: 12, paddingVertical: 8, maxWidth: 260 }]}>
-          <Text style={{ fontSize: 14, color: C.text, lineHeight: 20 }}>{msg.text}</Text>
+        <View className={bubbleClass}>
+          <Text className="text-sm text-[#1A1A1A] leading-5">{msg.text}</Text>
         </View>
       )}
-      {hasPhotos && !hasText && null}
     </View>
   );
 
   if (msg.mine) {
     return (
-      <View style={{ alignItems: 'flex-end', paddingHorizontal: 16, marginBottom: 6 }}>
+      <View className="items-end px-4 mb-1.5">
         {content}
-        <Text style={{ fontSize: 10, color: C.muted, marginTop: 3 }}>{msg.time} ✓✓</Text>
+        <View className="flex-row items-center mt-0.5" style={{ gap: 3 }}>
+          <Text className="text-[10px] text-[#9E9E9E]">{msg.time}</Text>
+          <Ionicons
+            name="checkmark-done"
+            size={14}
+            color={msg.read ? '#00AA6C' : '#9E9E9E'}
+          />
+        </View>
       </View>
     );
   }
+
   return (
-    <View style={{ alignItems: 'flex-start', paddingHorizontal: 16, marginBottom: 6 }}>
+    <View className="items-start px-4 mb-1.5">
       {content}
-      <Text style={{ fontSize: 10, color: C.muted, marginTop: 3 }}>{msg.time}</Text>
+      <Text className="text-[10px] text-[#9E9E9E] mt-0.5">{msg.time}</Text>
     </View>
   );
 }
@@ -192,34 +235,23 @@ function MessageBubble({ msg, onPhotoPress }: {
 function AttachPreview({ seeds, onRemove }: { seeds: number[]; onRemove: (i: number) => void }) {
   if (seeds.length === 0) return null;
   return (
-    <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingTop: 8, flexWrap: 'wrap' }}>
+    <View className="flex-row flex-wrap px-3 pt-2" style={{ gap: 6 }}>
       {seeds.map((s, i) => (
-        <View key={i} style={{ position: 'relative' }}>
-          <View style={{ width: 56, height: 56, borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+        <View key={i} className="relative">
+          <View
+            className="rounded-lg overflow-hidden border border-[#E8E8E8]"
+            style={{ width: 56, height: 56 }}
+          >
             <ProtoImage seed={s} width={56} height={56} />
           </View>
           <Pressable
             onPress={() => onRemove(i)}
-            style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: 9, backgroundColor: '#333', alignItems: 'center', justifyContent: 'center' }}
+            className="absolute -top-1.5 -right-1.5 items-center justify-center"
           >
-            <Text style={{ color: '#fff', fontSize: 10, lineHeight: 11 }}>×</Text>
+            <Ionicons name="close-circle" size={18} color="#fff" />
           </Pressable>
         </View>
       ))}
-    </View>
-  );
-}
-
-// ─── Paperclip (camera) icon drawn with Views ─────────────────────────────────
-function CameraIcon({ color }: { color: string }) {
-  return (
-    <View style={{ width: 22, height: 18, position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-      {/* Body */}
-      <View style={{ position: 'absolute', bottom: 0, width: 22, height: 13, borderRadius: 4, borderWidth: 2, borderColor: color }} />
-      {/* Lens */}
-      <View style={{ position: 'absolute', bottom: 2, width: 8, height: 8, borderRadius: 4, borderWidth: 2, borderColor: color }} />
-      {/* Bump top */}
-      <View style={{ position: 'absolute', top: 0, left: 6, width: 7, height: 5, borderTopLeftRadius: 3, borderTopRightRadius: 3, borderWidth: 2, borderColor: color, borderBottomWidth: 0 }} />
     </View>
   );
 }
@@ -231,13 +263,10 @@ function InteractiveChat() {
   const [attachSeeds, setAttachSeeds] = useState<number[]>([]);
   const [lightbox, setLightbox] = useState<{ seeds: number[]; idx: number } | null>(null);
 
-  let nextSeed = PHOTO_SEEDS.length + 10;
+  const pool = [105, 106, 107, 108, 109, 110, 111, 112];
 
   function addPhoto() {
-    // Simulate attaching: pick next seed from pool
-    const pool = [105, 106, 107, 108, 109, 110, 111, 112];
-    const used = attachSeeds.length % pool.length;
-    setAttachSeeds(prev => [...prev, pool[used + prev.length % (pool.length - used)] ?? pool[0]]);
+    setAttachSeeds(prev => [...prev, pool[prev.length % pool.length]]);
   }
 
   function removeAttach(i: number) {
@@ -249,7 +278,7 @@ function InteractiveChat() {
     if (!text && attachSeeds.length === 0) return;
     const now = new Date();
     const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const newMsg: Message = { id: Date.now(), mine: true, time };
+    const newMsg: Message = { id: Date.now(), mine: true, time, read: false };
     if (attachSeeds.length > 0) newMsg.photos = { seeds: [...attachSeeds] };
     if (text) newMsg.text = text;
     setMessages(prev => [...prev, newMsg]);
@@ -257,9 +286,14 @@ function InteractiveChat() {
     setAttachSeeds([]);
   }
 
+  const canSend = input.trim().length > 0 || attachSeeds.length > 0;
+
   return (
-    <View style={{ flex: 1, backgroundColor: C.white }}>
-      <ScrollView contentContainerStyle={{ paddingTop: 12, paddingBottom: 8 }} showsVerticalScrollIndicator={false}>
+    <View className="flex-1 bg-[#F5F5F5]">
+      <ScrollView
+        contentContainerStyle={{ paddingTop: 12, paddingBottom: 8 }}
+        showsVerticalScrollIndicator={false}
+      >
         {messages.map(msg => (
           <MessageBubble
             key={msg.id}
@@ -273,40 +307,45 @@ function InteractiveChat() {
       <AttachPreview seeds={attachSeeds} onRemove={removeAttach} />
 
       {/* Input bar */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 8, borderTopWidth: 1, borderTopColor: C.border, backgroundColor: C.white, gap: 8 }}>
-        {/* Camera button */}
+      <View className="flex-row items-center px-2.5 py-2 border-t border-[#E8E8E8] bg-white" style={{ gap: 8 }}>
+        {/* Image attach button */}
         <Pressable
           onPress={addPhoto}
-          style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#F0F0F0', alignItems: 'center', justifyContent: 'center' }}
+          className="w-9 h-9 rounded-full bg-[#F0F0F0] items-center justify-center"
         >
-          <CameraIcon color={C.muted} />
+          <Ionicons name="image-outline" size={24} color="#9E9E9E" />
         </Pressable>
 
         {/* Text input */}
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 20, paddingHorizontal: 14 }}>
+        <View className="flex-1 flex-row items-center border border-[#E8E8E8] rounded-[20px] px-3.5">
           <TextInput
             value={input}
             onChangeText={setInput}
             placeholder="Написать..."
-            placeholderTextColor={C.muted}
-            style={{ flex: 1, fontSize: 15, color: C.text, paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
+            placeholderTextColor="#9E9E9E"
+            style={{ flex: 1, fontSize: 15, color: '#1A1A1A', paddingVertical: 10, outlineWidth: 0 } as any}
             onSubmitEditing={sendMessage}
             returnKeyType="send"
           />
         </View>
 
-        {/* Send */}
-        <Pressable
-          onPress={sendMessage}
-          style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: (input.trim() || attachSeeds.length > 0) ? C.green : '#E0E0E0', alignItems: 'center', justifyContent: 'center' }}
-        >
-          <Text style={{ color: C.white, fontSize: 16, fontWeight: '700', marginLeft: 2 }}>›</Text>
+        {/* Send button */}
+        <Pressable onPress={sendMessage}>
+          <Ionicons
+            name="arrow-up-circle"
+            size={32}
+            color={canSend ? '#00AA6C' : '#D0D0D0'}
+          />
         </Pressable>
       </View>
 
       {/* Lightbox */}
       {lightbox && (
-        <PhotoLightbox seeds={lightbox.seeds} initialIdx={lightbox.idx} onClose={() => setLightbox(null)} />
+        <PhotoLightbox
+          seeds={lightbox.seeds}
+          initialIdx={lightbox.idx}
+          onClose={() => setLightbox(null)}
+        />
       )}
     </View>
   );
@@ -315,18 +354,23 @@ function InteractiveChat() {
 // ─── Header ───────────────────────────────────────────────────────────────────
 function Header() {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.white, gap: 12 }}>
-      <Pressable>
-        <Text style={{ fontSize: 22, color: C.muted, lineHeight: 22 }}>{'<'}</Text>
+    <View className="flex-row items-center px-4 py-3 border-b border-[#E8E8E8] bg-white" style={{ gap: 12 }}>
+      {/* Back button */}
+      <Pressable className="w-8 h-8 items-center justify-center">
+        <Ionicons name="chevron-back" size={26} color="#1A1A1A" />
       </Pressable>
-      <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: '#5B8DEF', alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>М</Text>
+
+      {/* Avatar */}
+      <View className="w-10 h-10 rounded-full bg-[#5B8DEF] items-center justify-center">
+        <Text className="text-white font-bold text-base">М</Text>
       </View>
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>Михаил</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: C.green }} />
-          <Text style={{ fontSize: 12, color: C.green }}>онлайн</Text>
+
+      {/* Name + status */}
+      <View className="flex-1">
+        <Text className="text-[15px] font-semibold text-[#1A1A1A]">Михаил</Text>
+        <View className="flex-row items-center" style={{ gap: 4 }}>
+          <View className="w-2 h-2 rounded-full bg-[#00AA6C]" />
+          <Text className="text-xs text-[#00AA6C]">онлайн</Text>
         </View>
       </View>
     </View>
@@ -339,7 +383,7 @@ function ChatThreadDefault() {
   const isDesktop = width >= 640;
 
   const inner = (
-    <View style={{ flex: 1, minHeight: 560 }}>
+    <View className="flex-1" style={{ minHeight: 560 }}>
       <Header />
       <InteractiveChat />
       {!isDesktop && <BottomNav active="messages" />}
@@ -349,7 +393,7 @@ function ChatThreadDefault() {
   if (isDesktop) {
     return (
       <StateSection title="CHAT_THREAD / Default (with photo attach)">
-        <View style={{ maxWidth: 800, alignSelf: 'center', width: '100%', backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
+        <View className="max-w-[800px] self-center w-full bg-white rounded-xl border border-[#E8E8E8] overflow-hidden">
           {inner}
         </View>
       </StateSection>
@@ -358,7 +402,7 @@ function ChatThreadDefault() {
 
   return (
     <StateSection title="CHAT_THREAD / Default (with photo attach)">
-      <View style={{ backgroundColor: C.white }}>
+      <View className="bg-white">
         {inner}
       </View>
     </StateSection>
@@ -368,7 +412,7 @@ function ChatThreadDefault() {
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function ChatThreadStates() {
   return (
-    <View style={{ gap: 0 }}>
+    <View>
       <ChatThreadDefault />
     </View>
   );
