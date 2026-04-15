@@ -82,6 +82,9 @@ function ListingCard({ title, price, loc, age, badge, colorIdx }: {
 }
 
 // ─── Main content ────────────────────────────────────────────────────────────
+const LANGS: Array<'RU' | 'EN' | 'KA'> = ['RU', 'EN', 'KA'];
+const LANG_FLAGS: Record<string, string> = { RU: '🇷🇺', EN: '🇬🇧', KA: '🇬🇪' };
+
 function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
@@ -96,6 +99,14 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
   const [sort, setSort] = useState<'date' | 'price_asc' | 'price_desc'>('date');
+  const [lang, setLang] = useState<'RU' | 'EN' | 'KA'>('RU');
+
+  function cycleLang() {
+    setLang(prev => {
+      const idx = LANGS.indexOf(prev);
+      return LANGS[(idx + 1) % LANGS.length];
+    });
+  }
 
   const filtered = LISTINGS.filter(l => {
     const matchCat = category === 'all' || l.cat === category;
@@ -125,6 +136,15 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
                 <Text style={{ fontWeight: '700', fontSize: 17, color: C.text }}>avito</Text>
                 <Text style={{ fontWeight: '600', fontSize: 12, color: C.green }}>.ge</Text>
               </View>
+            )}
+            {/* Mobile lang pill — only on mobile, shown next to logo */}
+            {!isTablet && (
+              <Pressable
+                onPress={cycleLang}
+                style={{ borderWidth: 1, borderColor: C.border, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 4 }}
+              >
+                <Text style={{ fontSize: 12, color: C.muted }}>{lang}</Text>
+              </Pressable>
             )}
           </View>
 
@@ -156,11 +176,31 @@ function HomepageContent({ loggedIn }: { loggedIn?: boolean }) {
               <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>Г</Text>
               </View>
+              {isTablet && (
+                <Pressable
+                  onPress={cycleLang}
+                  style={{ borderWidth: 1, borderColor: C.border, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 3 }}
+                >
+                  <Text style={{ fontSize: 12 }}>{LANG_FLAGS[lang]}</Text>
+                  <Text style={{ fontSize: 12, color: C.muted }}>{lang}</Text>
+                </Pressable>
+              )}
             </View>
           ) : (
-            <Pressable style={{ backgroundColor: C.green, borderRadius: 7, paddingHorizontal: 12, paddingVertical: 7, flexShrink: 0 }}>
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Войти</Text>
-            </Pressable>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              <Pressable style={{ backgroundColor: C.green, borderRadius: 7, paddingHorizontal: 12, paddingVertical: 7 }}>
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Войти</Text>
+              </Pressable>
+              {isTablet && (
+                <Pressable
+                  onPress={cycleLang}
+                  style={{ borderWidth: 1, borderColor: C.border, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 3 }}
+                >
+                  <Text style={{ fontSize: 12 }}>{LANG_FLAGS[lang]}</Text>
+                  <Text style={{ fontSize: 12, color: C.muted }}>{lang}</Text>
+                </Pressable>
+              )}
+            </View>
           )}
         </View>
       </View>
