@@ -6,17 +6,16 @@ import ProtoImage from '../ProtoPlaceholderImage';
 
 const C = {
   green: '#00AA6C',
-  greenBg: '#E8F9F2',
+  greenBg: '#F0FBF6',
   white: '#FFFFFF',
   text: '#1A1A1A',
   sub: '#6B6B6B',
-  muted: '#B0B0B0',
+  muted: '#ABABAB',
   border: '#EFEFEF',
-  error: '#D32F2F',
-  errorBg: '#FEE2E2',
-  warnBg: '#FEF3C7',
-  warnTxt: '#92400E',
+  error: '#B45309',
+  warnTxt: '#A16207',
   page: '#F7F7F7',
+  action: '#5C7C6A',  // softer green for secondary action links
 };
 
 type Tab = 'active' | 'inactive' | 'draft';
@@ -108,24 +107,24 @@ function ListingRow({
           {tab === 'active' && (
             <>
               <Pressable>
-                <Text style={{ fontSize: 12, color: C.green, fontWeight: '500' }}>Редактировать</Text>
+                <Text style={{ fontSize: 12, color: C.action, fontWeight: '500' }}>Редактировать</Text>
               </Pressable>
               {(listing.daysLeft ?? 99) <= 7 && (
                 <Pressable>
-                  <Text style={{ fontSize: 12, color: urgent ? C.error : C.warnTxt, fontWeight: '600' }}>Продлить — 3 ₾</Text>
+                  <Text style={{ fontSize: 12, color: C.warnTxt, fontWeight: '500' }}>Продлить — 3 ₾</Text>
                 </Pressable>
               )}
             </>
           )}
           {tab === 'inactive' && (
             <Pressable>
-              <Text style={{ fontSize: 12, color: C.green, fontWeight: '600' }}>Возобновить — 3 ₾</Text>
+              <Text style={{ fontSize: 12, color: C.action, fontWeight: '500' }}>Возобновить — 3 ₾</Text>
             </Pressable>
           )}
           {tab === 'draft' && (
             <>
               <Pressable>
-                <Text style={{ fontSize: 12, color: C.green, fontWeight: '600' }}>Опубликовать</Text>
+                <Text style={{ fontSize: 12, color: C.action, fontWeight: '500' }}>Опубликовать</Text>
               </Pressable>
               <Pressable onPress={() => onDelete(listing.id)}>
                 <Text style={{ fontSize: 12, color: C.muted }}>Удалить</Text>
@@ -222,7 +221,7 @@ function MyListingsInteractive() {
                   backgroundColor: active ? C.greenBg : C.white,
                 }}
               >
-                <Text style={{ fontSize: 13, color: active ? C.green : C.text, fontWeight: active ? '600' : '400' }}>
+                <Text style={{ fontSize: 13, color: active ? C.action : C.sub, fontWeight: active ? '600' : '400' }}>
                   {label}
                 </Text>
                 <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>{counts[key]} объявлений</Text>
@@ -278,7 +277,7 @@ export default function MyListingsStates() {
           <View style={{ paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={{ fontSize: 17, fontWeight: '600', color: C.text }}>Мои объявления</Text>
             <Pressable style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: C.border }}>
-              <Text style={{ fontSize: 13, color: C.green, fontWeight: '500' }}>+ Подать</Text>
+              <Text style={{ fontSize: 13, color: C.action, fontWeight: '500' }}>+ Подать</Text>
             </Pressable>
           </View>
           <MyListingsInteractive />
