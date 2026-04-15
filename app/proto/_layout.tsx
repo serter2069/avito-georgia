@@ -11,7 +11,7 @@ const WIDTHS = [
   { label: 'full', value: 0 },
 ];
 
-const GROUPS: PageGroup[] = ['Overview', 'Brand', 'Auth', 'Onboarding', 'Public', 'My Listings', 'Dashboard', 'Promotions', 'Admin', 'Static'];
+const GROUPS: PageGroup[] = ['Design'];
 
 // localStorage helpers (web only)
 function loadBool(key: string, fallback: boolean): boolean {
