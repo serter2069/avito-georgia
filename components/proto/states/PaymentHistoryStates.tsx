@@ -1,21 +1,9 @@
 import React from 'react';
 import { View, Text, ScrollView, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
+import BottomNav from '../BottomNav';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', page:'#F5F5F5', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
-
-function PhoneFrame({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-  return (
-    <View
-      className="bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
-      style={isDesktop ? { width: 390, alignSelf: 'center' } : { width: '100%' }}
-    >
-      {children}
-    </View>
-  );
-}
+const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
 interface Payment {
   date: string;
@@ -26,79 +14,77 @@ interface Payment {
 }
 
 const PAYMENTS: Payment[] = [
-  { date: '10.04.2026', type: '\u041F\u0443\u0431\u043B\u0438\u043A\u0430\u0446\u0438\u044F', listing: 'Toyota Camry 2019', amount: '\u20BE5.00', status: 'paid' },
-  { date: '01.04.2026', type: '\u041F\u0440\u043E\u0434\u043B\u0435\u043D\u0438\u0435', listing: '\u041A\u0432\u0430\u0440\u0442\u0438\u0440\u0430 \u0411\u0430\u0442\u0443\u043C\u0438', amount: '\u20BE3.00', status: 'paid' },
-  { date: '15.03.2026', type: '\u041F\u0443\u0431\u043B\u0438\u043A\u0430\u0446\u0438\u044F', listing: 'iPhone 14', amount: '\u20BE5.00', status: 'paid' },
+  { date: '10.04.2026', type: 'Публикация', listing: 'Toyota Camry 2019', amount: '₾5.00', status: 'paid' },
+  { date: '01.04.2026', type: 'Продление', listing: 'Квартира Батуми', amount: '₾3.00', status: 'paid' },
+  { date: '15.03.2026', type: 'Публикация', listing: 'iPhone 14', amount: '₾5.00', status: 'paid' },
 ];
 
 function StatusBadge() {
   return (
-    <View className="rounded-full px-2.5 py-0.5" style={{ backgroundColor: C.greenBg }}>
-      <Text className="text-[11px] font-bold" style={{ color: C.green }}>
-        {'\u041E\u043F\u043B\u0430\u0447\u0435\u043D\u043E'}
-      </Text>
+    <View style={{ backgroundColor: C.greenBg, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 2 }}>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: C.green }}>Оплачено</Text>
     </View>
   );
 }
 
-// -- State 1: Default --
+function PageContent({ payments }: { payments: Payment[] }) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+  const maxW = isDesktop ? 600 : undefined;
+
+  return (
+    <View style={{ backgroundColor: C.white, padding: 16, gap: 16, maxWidth: maxW, width: '100%', alignSelf: isDesktop ? 'center' : undefined }}>
+      <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>История платежей</Text>
+
+      <View style={{ backgroundColor: C.white, borderRadius: 10, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
+        {payments.length === 0 ? (
+          <View style={{ alignItems: 'center', paddingVertical: 40, paddingHorizontal: 24, gap: 8 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>Нет платежей</Text>
+            <Text style={{ fontSize: 14, color: C.muted, textAlign: 'center' }}>Платежи появятся после публикации объявлений</Text>
+          </View>
+        ) : payments.map((p, idx) => (
+          <View key={idx}>
+            <View style={{ paddingHorizontal: 16, paddingVertical: 14, gap: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: 13, color: C.muted }}>{p.date} · {p.type}</Text>
+                <StatusBadge />
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: C.text, flex: 1 }} numberOfLines={1}>{p.listing}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: C.text, marginLeft: 8 }}>{p.amount}</Text>
+              </View>
+            </View>
+            {idx < payments.length - 1 && <View style={{ height: 1, backgroundColor: C.border, marginLeft: 16 }} />}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 function DefaultState() {
+  const { width } = useWindowDimensions();
   return (
     <StateSection title="PAYMENT_HISTORY__DEFAULT">
-      <PhoneFrame>
-        <View style={{ backgroundColor: C.page, padding: 16, gap: 16 }}>
-          <Text className="text-xl font-bold" style={{ color: C.text }}>{'\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439'}</Text>
-
-          <View className="bg-white rounded-lg border border-[#E0E0E0] overflow-hidden">
-            {PAYMENTS.map((p, idx) => (
-              <View key={idx}>
-                <View className="px-4 py-3.5" style={{ gap: 4 }}>
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-sm" style={{ color: C.muted }}>
-                      {p.date} {'\u00B7'} {p.type}
-                    </Text>
-                    <StatusBadge />
-                  </View>
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-sm font-semibold" style={{ color: C.text }} numberOfLines={1}>{p.listing}</Text>
-                    <Text className="text-sm font-bold" style={{ color: C.text }}>{p.amount}</Text>
-                  </View>
-                </View>
-                {idx < PAYMENTS.length - 1 && <View className="h-px bg-[#E0E0E0] ml-4" />}
-              </View>
-            ))}
-          </View>
-        </View>
-      </PhoneFrame>
+      <View style={{ backgroundColor: C.white }}>
+        <PageContent payments={PAYMENTS} />
+        {width < 640 && <BottomNav active="profile" />}
+      </View>
     </StateSection>
   );
 }
-
-// -- State 2: Empty --
 
 function EmptyState() {
+  const { width } = useWindowDimensions();
   return (
     <StateSection title="PAYMENT_HISTORY__EMPTY">
-      <PhoneFrame>
-        <View style={{ backgroundColor: C.page, padding: 16, gap: 16 }}>
-          <Text className="text-xl font-bold" style={{ color: C.text }}>{'\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439'}</Text>
-
-          <View className="bg-white rounded-lg border border-[#E0E0E0] overflow-hidden">
-            <View className="items-center py-10 px-6" style={{ gap: 8 }}>
-              <Text className="text-base font-bold" style={{ color: C.text }}>{'\u041D\u0435\u0442 \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439'}</Text>
-              <Text className="text-sm text-center" style={{ color: C.muted }}>
-                {'\u041F\u043B\u0430\u0442\u0435\u0436\u0438 \u043F\u043E\u044F\u0432\u044F\u0442\u0441\u044F \u043F\u043E\u0441\u043B\u0435 \u043F\u0443\u0431\u043B\u0438\u043A\u0430\u0446\u0438\u0438 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0439'}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </PhoneFrame>
+      <View style={{ backgroundColor: C.white }}>
+        <PageContent payments={[]} />
+        {width < 640 && <BottomNav active="profile" />}
+      </View>
     </StateSection>
   );
 }
-
-// -- Main Export --
 
 export default function PaymentHistoryStates() {
   return (

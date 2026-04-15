@@ -670,7 +670,7 @@ export default function DesignSystemStates() {
   return (
     <StateSection title="DESIGN_SYSTEM">
       <ScrollView
-        contentContainerStyle={{ padding: isDesktop ? 32 : 16, gap: 40, backgroundColor: C.page }}
+        contentContainerStyle={{ padding: isDesktop ? 32 : 16, gap: 40, backgroundColor: C.white }}
         showsVerticalScrollIndicator={false}
       >
         {/* Page Header */}

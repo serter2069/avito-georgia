@@ -107,7 +107,7 @@ function InteractiveFeed() {
   const colWidth = availableWidth / columns;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       {/* Header */}
       {isMobile ? (
         <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border }}>
@@ -115,7 +115,7 @@ function InteractiveFeed() {
             <Text style={{ fontSize: 18, fontWeight: '800', color: C.green }}>Avito GE</Text>
             <Text style={{ fontSize: 22, color: C.text }}>☰</Text>
           </View>
-          <View style={{ marginHorizontal: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 8, borderWidth: 1, borderColor: C.border, paddingHorizontal: 12, paddingVertical: 8 }}>
+          <View style={{ marginHorizontal: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: C.border, paddingHorizontal: 12, paddingVertical: 8 }}>
             <Text style={{ fontSize: 14, color: C.muted, flex: 1 }}>Поиск по объявлениям...</Text>
             <Text style={{ fontSize: 14, color: C.muted }}>🔍</Text>
           </View>
@@ -124,7 +124,7 @@ function InteractiveFeed() {
         <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, paddingHorizontal: horizontalPadding, paddingVertical: 14 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, maxWidth: isDesktop ? 1200 : undefined, alignSelf: isDesktop ? 'center' : undefined, width: '100%' }}>
             <Text style={{ fontSize: 20, fontWeight: '800', color: C.green, minWidth: 90 }}>Avito GE</Text>
-            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 8, borderWidth: 1, borderColor: C.border, paddingHorizontal: 14, paddingVertical: 9 }}>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: C.border, paddingHorizontal: 14, paddingVertical: 9 }}>
               <Text style={{ fontSize: 14, color: C.muted, flex: 1 }}>Поиск по объявлениям...</Text>
               <Text style={{ fontSize: 14, color: C.muted }}>🔍</Text>
             </View>

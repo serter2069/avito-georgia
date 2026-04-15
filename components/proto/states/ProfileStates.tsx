@@ -160,7 +160,7 @@ function ViewModeState() {
 
   return (
     <StateSection title="PROFILE__VIEW">
-      <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={isDesktop ? { flexDirection: 'row', padding: 20, gap: 16, alignItems: 'flex-start' } : { padding: 12, gap: 12 }}>
             {profileCard}
@@ -235,7 +235,7 @@ function EditModeState() {
 
   return (
     <StateSection title="PROFILE__EDIT">
-      <View style={{ backgroundColor: C.page, borderRadius: 12, overflow: 'hidden' }}>
+      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ padding: isDesktop ? 32 : 12 }}>
             {form}
