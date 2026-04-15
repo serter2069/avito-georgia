@@ -7,7 +7,6 @@ import AuthEmailStates from '../../../components/proto/states/AuthEmailStates';
 import AuthOtpStates from '../../../components/proto/states/AuthOtpStates';
 import OnboardingStates from '../../../components/proto/states/OnboardingStates';
 import HomepageStates from '../../../components/proto/states/HomepageStates';
-import ListingsFeedStates from '../../../components/proto/states/ListingsFeedStates';
 import ListingDetailStates from '../../../components/proto/states/ListingDetailStates';
 import MapViewStates from '../../../components/proto/states/MapViewStates';
 import SellerProfileStates from '../../../components/proto/states/SellerProfileStates';
@@ -36,7 +35,6 @@ const stateComponents: Record<string, React.ComponentType> = {
   'auth-otp':        AuthOtpStates,
   'onboarding':      OnboardingStates,
   'homepage':        HomepageStates,
-  'listings-feed':   ListingsFeedStates,
   'listing-detail':  ListingDetailStates,
   'map-view':        MapViewStates,
   'seller-profile':  SellerProfileStates,

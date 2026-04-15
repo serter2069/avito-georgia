@@ -46,15 +46,6 @@
       "h": 844
     },
     {
-      "id": "listings-feed",
-      "title": "Listings Feed",
-      "group": "PUBLIC",
-      "x": 510,
-      "y": 3000,
-      "w": 390,
-      "h": 844
-    },
-    {
       "id": "listing-detail",
       "title": "Listing Detail",
       "group": "PUBLIC",
