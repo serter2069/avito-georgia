@@ -48,14 +48,14 @@ function InputField({ label, placeholder, value, suffix, multiline }: {
   return (
     <View>
       <Text className="text-sm font-medium text-[#1A1A1A] mb-1.5">{label}</Text>
-      <View className="border border-[#E0E0E0] rounded-md bg-white flex-row items-center px-3">
+      <View style={{ borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 6, backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}>
         <TextInput
           placeholder={placeholder}
           placeholderTextColor={C.muted}
           value={value}
           editable={false}
           multiline={multiline}
-          style={multiline ? { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, height: 80, textAlignVertical: 'top' } : { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10 }}
+          style={multiline ? { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, height: 80, textAlignVertical: 'top', borderWidth: 0, backgroundColor: 'transparent' } : { flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent' }}
         />
         {suffix && <Text className="text-sm text-[#737373] ml-2">{suffix}</Text>}
       </View>

@@ -49,7 +49,7 @@ function SearchDefault() {
               placeholder="Поиск объявлений..."
               placeholderTextColor={C.muted}
               editable={false}
-              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12 }}
+              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent' }}
             />
           </View>
         </View>

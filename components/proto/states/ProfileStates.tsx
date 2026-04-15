@@ -108,25 +108,37 @@ function EditModeState() {
 
             <View>
               <Text className="text-sm font-medium mb-1.5" style={{ color: C.text }}>{'\u0418\u043C\u044F'}</Text>
-              <View className="border rounded-md px-3" style={{ borderColor: C.border }}>
-                <TextInput
-                  style={{ color: C.text, fontSize: 16, paddingVertical: 10 }}
-                  value={'\u0413\u0435\u043E\u0440\u0433\u0438\u0439'}
-                  editable={false}
-                />
-              </View>
+              <TextInput
+                style={{
+                  borderWidth: 1,
+                  borderColor: C.border,
+                  borderRadius: 6,
+                  paddingHorizontal: 12,
+                  color: C.text,
+                  fontSize: 16,
+                  paddingVertical: 10,
+                }}
+                value={'\u0413\u0435\u043E\u0440\u0433\u0438\u0439'}
+                editable={false}
+              />
             </View>
 
             <View>
               <Text className="text-sm font-medium mb-1.5" style={{ color: C.text }}>{'\u0422\u0435\u043B\u0435\u0444\u043E\u043D'}</Text>
-              <View className="border rounded-md px-3" style={{ borderColor: C.border }}>
-                <TextInput
-                  style={{ color: C.text, fontSize: 16, paddingVertical: 10 }}
-                  placeholder="+995 5XX XXX XXX"
-                  placeholderTextColor={C.muted}
-                  editable={false}
-                />
-              </View>
+              <TextInput
+                style={{
+                  borderWidth: 1,
+                  borderColor: C.border,
+                  borderRadius: 6,
+                  paddingHorizontal: 12,
+                  color: C.text,
+                  fontSize: 16,
+                  paddingVertical: 10,
+                }}
+                placeholder="+995 5XX XXX XXX"
+                placeholderTextColor={C.muted}
+                editable={false}
+              />
             </View>
 
             <View>
