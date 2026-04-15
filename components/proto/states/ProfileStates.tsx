@@ -354,20 +354,18 @@ export function OwnProfileState({ showBottomNav = true }: { showBottomNav?: bool
   const isDesktop = width >= 640;
 
   return (
-    <StateSection title="PROFILE / Own profile">
-      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
-            <UserHeader showEditButton />
-            <EditProfileForm />
-            <ListingsSection listings={LISTINGS.slice(0, 4)} />
-            <ReviewsSection />
-            <View style={{ height: isDesktop ? 0 : 80 }} />
-          </View>
-        </ScrollView>
-        {showBottomNav && !isDesktop && <BottomNav active="profile" />}
-      </View>
-    </StateSection>
+    <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
+          <UserHeader showEditButton />
+          <EditProfileForm />
+          <ListingsSection listings={LISTINGS.slice(0, 4)} />
+          <ReviewsSection />
+          <View style={{ height: isDesktop ? 0 : 80 }} />
+        </View>
+      </ScrollView>
+      {showBottomNav && !isDesktop && <BottomNav active="profile" />}
+    </View>
   );
 }
 
@@ -407,7 +405,7 @@ function OtherUserState({ showBottomNav = true }: { showBottomNav?: boolean }) {
 export default function ProfileStates({ showBottomNav = true }: { showBottomNav?: boolean } = {}) {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <OwnProfileState showBottomNav={showBottomNav} />
+      <StateSection title="PROFILE / Own profile"><OwnProfileState showBottomNav={showBottomNav} /></StateSection>
       <OtherUserState showBottomNav={showBottomNav} />
     </ScrollView>
   );

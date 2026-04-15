@@ -235,7 +235,7 @@ export function MyListingsInteractive({ showBottomNav = true }: { showBottomNav?
   }
 
   return (
-    <View>
+    <View style={{ flex: 1, backgroundColor: C.white }}>
       {tabBar}
       {listContent}
       {showBottomNav && isMobile && <BottomNav active="browse" />}

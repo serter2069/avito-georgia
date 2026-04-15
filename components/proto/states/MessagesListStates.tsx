@@ -247,35 +247,31 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true }: { s
 
   if (isDesktop) {
     return (
-      <StateSection title="MESSAGES_LIST__DEFAULT">
-        <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden', flexDirection: 'row', height: 520 }}>
-          {listPanel}
-          {chatPlaceholder}
-        </View>
-      </StateSection>
+      <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden', flexDirection: 'row', height: 520 }}>
+        {listPanel}
+        {chatPlaceholder}
+      </View>
     );
   }
 
   return (
-    <StateSection title="MESSAGES_LIST__DEFAULT">
-      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-        <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
-          <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Сообщения</Text>
-        </View>
-        <SearchBar value={query} onChangeText={setQuery} />
-        {filtered.length === 0
-          ? <EmptySearch />
-          : filtered.map((conv, idx) => (
-            <ConversationRow
-              key={conv.id}
-              conv={conv}
-              isLast={idx === filtered.length - 1}
-            />
-          ))
-        }
-        {showBottomNav && <BottomNav active="messages" />}
+    <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
+        <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Сообщения</Text>
       </View>
-    </StateSection>
+      <SearchBar value={query} onChangeText={setQuery} />
+      {filtered.length === 0
+        ? <EmptySearch />
+        : filtered.map((conv, idx) => (
+          <ConversationRow
+            key={conv.id}
+            conv={conv}
+            isLast={idx === filtered.length - 1}
+          />
+        ))
+      }
+      {showBottomNav && <BottomNav active="messages" />}
+    </View>
   );
 }
 
@@ -284,7 +280,9 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true }: { s
 export default function MessagesListStates({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean } = {}) {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <MessagesDefault showHeader={showHeader} showBottomNav={showBottomNav} />
+      <StateSection title="MESSAGES_LIST__DEFAULT">
+        <MessagesDefault showHeader={showHeader} showBottomNav={showBottomNav} />
+      </StateSection>
     </ScrollView>
   );
 }

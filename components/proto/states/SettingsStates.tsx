@@ -197,83 +197,79 @@ export function SettingsDefault({ showBottomNav = true }: { showBottomNav?: bool
 
   if (isDesktop) {
     return (
-      <StateSection title="SETTINGS__DEFAULT">
-        <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-          <View style={{ flexDirection: 'row', padding: 20, gap: 16, alignItems: 'flex-start' }}>
-            {/* Left nav */}
-            <View style={{ width: 200, backgroundColor: C.white, borderRadius: 12, padding: 8, gap: 2 }}>
-              <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, paddingHorizontal: 8, paddingVertical: 10 }}>Настройки</Text>
-              {SECTIONS.map(s => (
-                <DesktopNavItem key={s.id} label={s.label} active={activeSection === s.id} onPress={() => setActiveSection(s.id)} />
-              ))}
-              <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 8 }}>
-                <Pressable style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 }}>
-                  <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
-                </Pressable>
-              </View>
-            </View>
-
-            {/* Right content */}
-            <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, padding: 16, borderBottomWidth: 1, borderBottomColor: C.border }}>
-                {SECTIONS.find(s => s.id === activeSection)?.label}
-              </Text>
-              {renderSection(activeSection)}
+      <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+        <View style={{ flexDirection: 'row', padding: 20, gap: 16, alignItems: 'flex-start' }}>
+          {/* Left nav */}
+          <View style={{ width: 200, backgroundColor: C.white, borderRadius: 12, padding: 8, gap: 2 }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, paddingHorizontal: 8, paddingVertical: 10 }}>Настройки</Text>
+            {SECTIONS.map(s => (
+              <DesktopNavItem key={s.id} label={s.label} active={activeSection === s.id} onPress={() => setActiveSection(s.id)} />
+            ))}
+            <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 8 }}>
+              <Pressable style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 }}>
+                <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
+              </Pressable>
             </View>
           </View>
+
+          {/* Right content */}
+          <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, padding: 16, borderBottomWidth: 1, borderBottomColor: C.border }}>
+              {SECTIONS.find(s => s.id === activeSection)?.label}
+            </Text>
+            {renderSection(activeSection)}
+          </View>
         </View>
-      </StateSection>
+      </View>
     );
   }
 
   return (
-    <StateSection title="SETTINGS__DEFAULT">
-      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ padding: 12, gap: 4 }}>
-            {/* Header */}
-            <View style={{ backgroundColor: C.white, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 }}>
-              <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Настройки</Text>
-            </View>
-
-            {/* Notifications */}
-            <SectionLabel text="Уведомления" />
-            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-              <NotificationsSection />
-            </View>
-
-            {/* Security */}
-            <SectionLabel text="Безопасность" />
-            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-              <SecuritySection />
-            </View>
-
-            {/* Language */}
-            <SectionLabel text="Язык" />
-            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-              <LanguageSection />
-            </View>
-
-            {/* About */}
-            <SectionLabel text="О приложении" />
-            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-              <AboutSection />
-            </View>
-
-            {/* Danger zone */}
-            <SectionLabel text="Аккаунт" />
-            <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-              <Pressable style={{ paddingVertical: 14, paddingHorizontal: 16 }}>
-                <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
-              </Pressable>
-            </View>
-
-            <View style={{ height: 8 }} />
+    <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{ padding: 12, gap: 4 }}>
+          {/* Header */}
+          <View style={{ backgroundColor: C.white, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 }}>
+            <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Настройки</Text>
           </View>
-        </ScrollView>
-        {showBottomNav && <BottomNav active="profile" />}
-      </View>
-    </StateSection>
+
+          {/* Notifications */}
+          <SectionLabel text="Уведомления" />
+          <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+            <NotificationsSection />
+          </View>
+
+          {/* Security */}
+          <SectionLabel text="Безопасность" />
+          <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+            <SecuritySection />
+          </View>
+
+          {/* Language */}
+          <SectionLabel text="Язык" />
+          <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+            <LanguageSection />
+          </View>
+
+          {/* About */}
+          <SectionLabel text="О приложении" />
+          <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+            <AboutSection />
+          </View>
+
+          {/* Danger zone */}
+          <SectionLabel text="Аккаунт" />
+          <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+            <Pressable style={{ paddingVertical: 14, paddingHorizontal: 16 }}>
+              <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
+            </Pressable>
+          </View>
+
+          <View style={{ height: 8 }} />
+        </View>
+      </ScrollView>
+      {showBottomNav && <BottomNav active="profile" />}
+    </View>
   );
 }
 
@@ -282,7 +278,9 @@ export function SettingsDefault({ showBottomNav = true }: { showBottomNav?: bool
 export default function SettingsStates({ showBottomNav = true }: { showBottomNav?: boolean } = {}) {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 24 }} showsVerticalScrollIndicator={false}>
-      <SettingsDefault showBottomNav={showBottomNav} />
+      <StateSection title="SETTINGS__DEFAULT">
+        <SettingsDefault showBottomNav={showBottomNav} />
+      </StateSection>
     </ScrollView>
   );
 }

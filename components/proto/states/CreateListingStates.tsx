@@ -279,7 +279,7 @@ export function CreateListingInteractive() {
   const isDesktop = width >= 640;
 
   return (
-    <View style={{ backgroundColor: C.white }}>
+    <View style={{ flex: 1, backgroundColor: C.white }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border }}>
         <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>Новое объявление</Text>
       </View>

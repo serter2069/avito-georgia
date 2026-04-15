@@ -42,44 +42,42 @@ export function SearchDefault() {
   const recentQueries = ['квартира батуми', 'toyota camry', 'ноутбук'];
 
   return (
-    <StateSection title="SEARCH_DEFAULT">
-      <ResponsiveFrame>
-        {/* Search input focused */}
-        <View className="px-4 pt-4 pb-3">
-          <View className="flex-row items-center border-2 border-[#00AA6C] rounded-lg bg-white px-3" style={{ gap: 8 }}>
-            <TextInput
-              placeholder="Поиск объявлений..."
-              placeholderTextColor={C.muted}
-              style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
-            />
-          </View>
+    <ResponsiveFrame>
+      {/* Search input focused */}
+      <View className="px-4 pt-4 pb-3">
+        <View className="flex-row items-center border-2 border-[#00AA6C] rounded-lg bg-white px-3" style={{ gap: 8 }}>
+          <TextInput
+            placeholder="Поиск объявлений..."
+            placeholderTextColor={C.muted}
+            style={{ flex: 1, fontSize: 16, color: '#1A1A1A', paddingVertical: 12, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
+          />
         </View>
+      </View>
 
-        {/* Recent queries */}
-        <View className="px-4 pb-3">
-          <Text className="text-[13px] font-semibold text-[#737373] mb-2">Недавние запросы</Text>
-          <View style={{ gap: 10 }}>
-            {recentQueries.map((q) => (
-              <View key={q} className="flex-row items-center" style={{ gap: 8 }}>
-                <Text className="text-sm text-[#737373]">←</Text>
-                <Text className="text-[15px] text-[#1A1A1A]">{q}</Text>
-              </View>
-            ))}
-          </View>
+      {/* Recent queries */}
+      <View className="px-4 pb-3">
+        <Text className="text-[13px] font-semibold text-[#737373] mb-2">Недавние запросы</Text>
+        <View style={{ gap: 10 }}>
+          {recentQueries.map((q) => (
+            <View key={q} className="flex-row items-center" style={{ gap: 8 }}>
+              <Text className="text-sm text-[#737373]">←</Text>
+              <Text className="text-[15px] text-[#1A1A1A]">{q}</Text>
+            </View>
+          ))}
         </View>
+      </View>
 
-        {/* Category chips */}
-        <View className="px-4 pb-4">
-          <View className="flex-row flex-wrap" style={{ gap: 8 }}>
-            {CATEGORIES.map((label) => (
-              <View key={label} className="bg-[#F0F0F0] rounded-full px-3.5 py-2">
-                <Text className="text-[13px] font-medium text-[#1A1A1A]">{label}</Text>
-              </View>
-            ))}
-          </View>
+      {/* Category chips */}
+      <View className="px-4 pb-4">
+        <View className="flex-row flex-wrap" style={{ gap: 8 }}>
+          {CATEGORIES.map((label) => (
+            <View key={label} className="bg-[#F0F0F0] rounded-full px-3.5 py-2">
+              <Text className="text-[13px] font-medium text-[#1A1A1A]">{label}</Text>
+            </View>
+          ))}
         </View>
-      </ResponsiveFrame>
-    </StateSection>
+      </View>
+    </ResponsiveFrame>
   );
 }
 
@@ -164,7 +162,7 @@ function SearchNoResults() {
 export default function SearchStates() {
   return (
     <View style={{ gap: 32 }}>
-      <SearchDefault />
+      <StateSection title="SEARCH_DEFAULT"><SearchDefault /></StateSection>
       <SearchResults />
       <SearchNoResults />
     </View>

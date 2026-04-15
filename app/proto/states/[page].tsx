@@ -28,6 +28,14 @@ import {
   PrivacyStates,
   TermsStates,
 } from '../../../components/proto/states/LegalStates';
+import { StateSection } from '../../../components/proto/StateSection';
+
+function PrivacyStatesProto() {
+  return <StateSection title="PRIVACY"><PrivacyStates /></StateSection>;
+}
+function TermsStatesProto() {
+  return <StateSection title="TERMS"><TermsStates /></StateSection>;
+}
 
 const stateComponents: Record<string, React.ComponentType> = {
   'design-system':   DesignSystemStates,
@@ -52,8 +60,8 @@ const stateComponents: Record<string, React.ComponentType> = {
   'settings':        SettingsStates,
   'about':           AboutStates,
   'help':            HelpStates,
-  'privacy':         PrivacyStates,
-  'terms':           TermsStates,
+  'privacy':         PrivacyStatesProto,
+  'terms':           TermsStatesProto,
 };
 
 export default function ProtoStatesPage() {

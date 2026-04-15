@@ -127,13 +127,13 @@ export function PaymentCheckout() {
   const isDesktop = width >= 640;
 
   return (
-    <StateSection title="PAYMENT / Checkout">
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <FormFrame>
         <SectionHeader title="Оплата" />
         <CheckoutContent />
         {!isDesktop && <BottomNav />}
       </FormFrame>
-    </StateSection>
+    </View>
   );
 }
 
@@ -201,7 +201,7 @@ export default function PaymentStates() {
   return (
     <View style={{ gap: 0 }}>
       <LoadingState />
-      <PaymentCheckout />
+      <StateSection title="PAYMENT / Checkout"><PaymentCheckout /></StateSection>
       <SuccessState />
       <ErrorState />
     </View>

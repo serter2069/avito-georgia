@@ -55,11 +55,7 @@ function useProtectedRoute() {
       segments[0] === 'proto';
     const inDashboard = segments[0] === 'dashboard' || segments[0] === 'my';
 
-    if (!user && inOnboarding) {
-      // Unauthenticated users cannot access onboarding
-      isRedirectingRef.current = true;
-      router.replace('/(auth)');
-    } else if (user && inAuthGroup) {
+    if (user && inAuthGroup) {
       isRedirectingRef.current = true;
       router.replace('/');
     } else if (user && inOnboarding && user.isOnboarded === true) {

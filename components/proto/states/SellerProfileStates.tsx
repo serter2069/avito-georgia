@@ -274,7 +274,7 @@ export function SellerProfileMain() {
   }
 
   return (
-    <View>
+    <View style={{ flex: 1, backgroundColor: C.white }}>
       {/* Back nav */}
       <View
         style={{

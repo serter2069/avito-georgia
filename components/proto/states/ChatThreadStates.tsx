@@ -392,20 +392,16 @@ export function ChatThreadDefault() {
 
   if (isDesktop) {
     return (
-      <StateSection title="CHAT_THREAD / Default (with photo attach)">
-        <View className="max-w-[800px] self-center w-full bg-white rounded-xl border border-[#E8E8E8] overflow-hidden">
-          {inner}
-        </View>
-      </StateSection>
+      <View className="max-w-[800px] self-center w-full bg-white rounded-xl border border-[#E8E8E8] overflow-hidden">
+        {inner}
+      </View>
     );
   }
 
   return (
-    <StateSection title="CHAT_THREAD / Default (with photo attach)">
-      <View className="bg-white">
-        {inner}
-      </View>
-    </StateSection>
+    <View className="bg-white" style={{ flex: 1 }}>
+      {inner}
+    </View>
   );
 }
 
@@ -413,7 +409,9 @@ export function ChatThreadDefault() {
 export default function ChatThreadStates() {
   return (
     <View>
-      <ChatThreadDefault />
+      <StateSection title="CHAT_THREAD / Default (with photo attach)">
+        <ChatThreadDefault />
+      </StateSection>
     </View>
   );
 }
