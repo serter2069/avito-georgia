@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ActivityIndicator, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
 import BottomNav from '../BottomNav';
+import ProtoImage from '../ProtoPlaceholderImage';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
@@ -12,7 +13,7 @@ function ExpiredListingCard({ title, price }: { title: string; price: string }) 
   const isDesktop = width >= 640;
   return (
     <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', maxWidth: isDesktop ? 480 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined }}>
-      <View style={{ height: 160, backgroundColor: IMG_COLOR, opacity: 0.6 }} />
+      <View style={{ height: 160, opacity: 0.6 }}><ProtoImage seed={80} width="100%" height={160} /></View>
       <View style={{ padding: 12, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text style={{ fontSize: 15, fontWeight: '600', color: C.text, flex: 1 }} numberOfLines={1}>{title}</Text>
