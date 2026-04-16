@@ -26,59 +26,6 @@ interface Conversation {
   unread?: number;
 }
 
-const CONVERSATIONS: Conversation[] = [
-  {
-    id: '1',
-    initials: 'МК',
-    colorIdx: 0,
-    name: 'Михаил Кипиани',
-    lastMessage: 'Да, приходите завтра посмотреть — я буду с 11:00',
-    time: '14:35',
-    unread: 3,
-  },
-  {
-    id: '2',
-    initials: 'АН',
-    colorIdx: 1,
-    name: 'Анна Нобиани',
-    lastMessage: 'Можно посмотреть в субботу?',
-    time: '12:10',
-    unread: 1,
-  },
-  {
-    id: '3',
-    initials: 'ДГ',
-    colorIdx: 2,
-    name: 'Давид Гелашвили',
-    lastMessage: 'Вы: Скину фото вечером',
-    time: 'Вчера',
-  },
-  {
-    id: '4',
-    initials: 'НМ',
-    colorIdx: 3,
-    name: 'Нино Мчедлишвили',
-    lastMessage: 'Вы: Спасибо, подумаю',
-    time: 'Вчера',
-  },
-  {
-    id: '5',
-    initials: 'ГЧ',
-    colorIdx: 4,
-    name: 'Георгий Чхеидзе',
-    lastMessage: 'Какой размер рамы у велосипеда?',
-    time: 'Пн',
-  },
-  {
-    id: '6',
-    initials: 'ЛД',
-    colorIdx: 5,
-    name: 'Лела Данелия',
-    lastMessage: 'Торг уместен?',
-    time: 'Вс',
-  },
-];
-
 function AvatarCircle({ initials, colorIdx, size = 46 }: { initials: string; colorIdx: number; size?: number }) {
   return (
     <View
@@ -180,7 +127,17 @@ function EmptySearch() {
   );
 }
 
+function EmptyThreads() {
+  return (
+    <View style={{ alignItems: 'center', paddingVertical: 60 }}>
+      <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>Нет сообщений</Text>
+      <Text style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>Начните общение с продавцом</Text>
+    </View>
+  );
+}
+
 // -- Helper: map real thread to Conversation --
+// API shape: { id, listing?, otherUser?, lastMessage?, updatedAt, unreadCount }
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -188,24 +145,33 @@ function formatTime(iso: string): string {
   const diffMs = now.getTime() - d.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   if (diffDays === 0) return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
-  if (diffDays === 1) return 'Вчера';
-  const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-  if (diffDays < 7) return days[d.getDay()];
+  if (diffDays === 1) return 'вчера';
+  if (diffDays < 7) {
+    const days = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+    return days[d.getDay()];
+  }
   return `${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
 function threadToConversation(thread: any, idx: number): Conversation {
-  const participant = thread.participants?.[0]?.user;
-  const name = participant?.name ?? 'Пользователь';
-  const lastMsg = thread.messages?.[0];
+  const other = thread.otherUser;
+  const name = other?.name ?? thread.listing?.title ?? 'Пользователь';
+  const initials = name
+    .split(' ')
+    .slice(0, 2)
+    .map((w: string) => w[0] ?? '')
+    .join('')
+    .toUpperCase() || '?';
+  const lastMsg = thread.lastMessage;
   const listingTitle = thread.listing?.title ?? '';
   return {
     id: thread.id,
-    initials: name.split(' ').slice(0, 2).map((w: string) => w[0]).join('').toUpperCase() || '?',
+    initials,
     colorIdx: idx % AVATAR_COLORS.length,
     name,
     lastMessage: lastMsg?.text ?? (listingTitle ? `По объявлению: ${listingTitle}` : ''),
     time: thread.updatedAt ? formatTime(thread.updatedAt) : '',
+    unread: thread.unreadCount > 0 ? thread.unreadCount : undefined,
   };
 }
 
@@ -218,9 +184,7 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const router = useRouter();
 
-  const conversations: Conversation[] = threads
-    ? threads.map((t, i) => threadToConversation(t, i))
-    : CONVERSATIONS;
+  const conversations: Conversation[] = (threads ?? []).map((t, i) => threadToConversation(t, i));
 
   const filtered = conversations.filter(c =>
     c.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -228,6 +192,23 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
   );
 
   const selectedConv = conversations.find(c => c.id === selectedId);
+
+  const listContent = () => {
+    if (conversations.length === 0) return <EmptyThreads />;
+    if (filtered.length === 0) return <EmptySearch />;
+    return filtered.map((conv, idx) => (
+      <ConversationRow
+        key={conv.id}
+        conv={conv}
+        isLast={idx === filtered.length - 1}
+        isSelected={isDesktop && selectedId === conv.id}
+        onPress={() => {
+          router.push(`/dashboard/messages/${conv.id}` as any);
+          if (isDesktop) setSelectedId(conv.id);
+        }}
+      />
+    ));
+  };
 
   const listPanel = (
     <View style={{ flex: isDesktop ? undefined : 1, width: isDesktop ? 320 : undefined, backgroundColor: C.white, borderRightWidth: isDesktop ? 1 : 0, borderRightColor: C.border }}>
@@ -239,24 +220,7 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
       <SearchBar value={query} onChangeText={setQuery} />
       {/* List */}
       <ScrollView showsVerticalScrollIndicator={false}>
-        {filtered.length === 0
-          ? <EmptySearch />
-          : filtered.map((conv, idx) => (
-            <ConversationRow
-              key={conv.id}
-              conv={conv}
-              isLast={idx === filtered.length - 1}
-              isSelected={isDesktop && selectedId === conv.id}
-              onPress={() => {
-                if (threads) {
-                  router.push(`/dashboard/messages/${conv.id}` as any);
-                } else {
-                  setSelectedId(conv.id);
-                }
-              }}
-            />
-          ))
-        }
+        {listContent()}
       </ScrollView>
     </View>
   );
@@ -300,21 +264,7 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
         <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Сообщения</Text>
       </View>
       <SearchBar value={query} onChangeText={setQuery} />
-      {filtered.length === 0
-        ? <EmptySearch />
-        : filtered.map((conv, idx) => (
-          <ConversationRow
-            key={conv.id}
-            conv={conv}
-            isLast={idx === filtered.length - 1}
-            onPress={() => {
-              if (threads) {
-                router.push(`/dashboard/messages/${conv.id}` as any);
-              }
-            }}
-          />
-        ))
-      }
+      {listContent()}
       {showBottomNav && <BottomNav active="messages" />}
     </View>
   );

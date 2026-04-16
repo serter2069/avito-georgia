@@ -9,7 +9,7 @@ export default function MessagesPage() {
 
   useEffect(() => {
     apiFetch('/chat/threads')
-      .then(r => setThreads(r.threads || []))
+      .then(r => setThreads(Array.isArray(r) ? r : []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
