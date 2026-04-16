@@ -1,12 +1,28 @@
+import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '../../store/auth';
 import AuthEmail from '../../components/screens/AuthEmail';
+import { apiFetch } from '../../lib/api';
 
 export default function AuthEmailPage() {
   const router = useRouter();
-  const login = useAuthStore(s => s.login);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Mock: pressing "Получить код" goes to OTP screen
-  // In real app this would send OTP to email
-  return <AuthEmail onSubmit={() => router.push('/auth/otp' as any)} />;
+  const handleSubmit = async (email: string) => {
+    setLoading(true);
+    setError('');
+    try {
+      await apiFetch('/auth/request-otp', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      });
+      router.push({ pathname: '/auth/otp', params: { email } } as any);
+    } catch (e: any) {
+      setError(e.error || 'Ошибка отправки кода');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return <AuthEmail onSubmit={handleSubmit} loading={loading} error={error} />;
 }
