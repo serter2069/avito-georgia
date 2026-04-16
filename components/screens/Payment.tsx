@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
 import BottomNav from '../BottomNav';
+import { apiFetch } from '../../lib/api';
 
 const C = {
   green: '#00AA6C',
@@ -12,6 +13,20 @@ const C = {
   page: '#F5F5F5',
   error: '#D32F2F',
 };
+
+interface PriceItem {
+  key: string;
+  label: string;
+  price: number;
+  currency: string;
+  durationDays: number;
+}
+
+export interface PaymentProps {
+  listingId?: string;
+  promotionType?: string;
+  onPay?: (type: string) => Promise<void>;
+}
 
 function FormFrame({ children }: { children: React.ReactNode }) {
   const { width } = useWindowDimensions();
@@ -37,157 +52,129 @@ function SectionHeader({ title }: { title: string }) {
   );
 }
 
-function CheckoutContent() {
-  const [cardNum, setCardNum] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
+function PaymentCheckout({ listingId, promotionType, onPay }: PaymentProps) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 640;
+  const [prices, setPrices] = useState<PriceItem[]>([]);
+  const [selectedType, setSelectedType] = useState<string>(promotionType ?? 'top_7d');
+  const [loadingPrices, setLoadingPrices] = useState(true);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState('');
+
+  useEffect(() => {
+    apiFetch('/promotions/prices')
+      .then(r => {
+        setPrices(r.prices ?? []);
+        // Default to first item if promotionType not in list
+        if (r.prices?.length && !r.prices.find((p: PriceItem) => p.key === selectedType)) {
+          setSelectedType(r.prices[0].key);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoadingPrices(false));
+  }, []);
+
+  const selected = prices.find(p => p.key === selectedType);
+
+  const handlePay = async () => {
+    if (!onPay) return;
+    setPaying(true);
+    setPayError('');
+    try {
+      await onPay(selectedType);
+    } catch (e: any) {
+      setPayError(e.error || e.message || 'Ошибка оплаты');
+      setPaying(false);
+    }
+  };
 
   return (
-    <View style={{ padding: 16, gap: 16 }}>
-      {/* Amount block */}
-      <View style={{ backgroundColor: C.greenBg, borderRadius: 10, padding: 16, alignItems: 'center' }}>
-        <Text style={{ fontSize: 32, fontWeight: '800', color: C.text }}>₾5.00</Text>
-        <Text style={{ fontSize: 14, color: C.muted, marginTop: 4 }}>Публикация объявления</Text>
-        <Text style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>Toyota Camry 2019, 45 000 км</Text>
-      </View>
+    <View style={{ flex: 1, backgroundColor: C.white }}>
+      <FormFrame>
+        <SectionHeader title="Оплата" />
 
-      {/* Card fields */}
-      <View style={{ gap: 10 }}>
-        <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Данные карты</Text>
-        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
-          <TextInput
-            value={cardNum}
-            onChangeText={setCardNum}
-            placeholder="Номер карты"
-            placeholderTextColor={C.muted}
-            keyboardType="numeric"
-            maxLength={19}
-            style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-          />
-        </View>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
-            <TextInput
-              value={expiry}
-              onChangeText={setExpiry}
-              placeholder="MM / ГГ"
-              placeholderTextColor={C.muted}
-              keyboardType="numeric"
-              maxLength={5}
-              style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-            />
+        {loadingPrices ? (
+          <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 60 }}>
+            <ActivityIndicator size="large" color={C.green} />
           </View>
-          <View style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
-            <TextInput
-              value={cvv}
-              onChangeText={setCvv}
-              placeholder="CVV"
-              placeholderTextColor={C.muted}
-              keyboardType="numeric"
-              maxLength={4}
-              secureTextEntry
-              style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-            />
+        ) : (
+          <View style={{ padding: 16, gap: 16 }}>
+            {/* Amount block */}
+            <View style={{ backgroundColor: C.greenBg, borderRadius: 10, padding: 16, alignItems: 'center' }}>
+              {selected ? (
+                <>
+                  <Text style={{ fontSize: 32, fontWeight: '800', color: C.text }}>
+                    {selected.currency === 'GEL' ? '₾' : selected.currency}{selected.price.toFixed(2)}
+                  </Text>
+                  <Text style={{ fontSize: 14, color: C.muted, marginTop: 4 }}>{selected.label}</Text>
+                  <Text style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>
+                    {selected.durationDays} {selected.durationDays === 1 ? 'день' : selected.durationDays < 5 ? 'дня' : 'дней'}
+                  </Text>
+                </>
+              ) : (
+                <Text style={{ fontSize: 14, color: C.muted }}>Нет доступных тарифов</Text>
+              )}
+            </View>
+
+            {/* Promotion type selector */}
+            {prices.length > 0 && (
+              <View style={{ gap: 8 }}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: C.text }}>Тариф</Text>
+                <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, overflow: 'hidden' }}>
+                  {prices.map((p, idx) => (
+                    <Pressable
+                      key={p.key}
+                      onPress={() => setSelectedType(p.key)}
+                      style={{
+                        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+                        paddingHorizontal: 12, paddingVertical: 10,
+                        borderBottomWidth: idx < prices.length - 1 ? 1 : 0,
+                        borderBottomColor: C.border,
+                        backgroundColor: selectedType === p.key ? C.greenBg : C.white,
+                      }}
+                    >
+                      <Text style={{ fontSize: 15, color: C.text }}>{p.label}</Text>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: selectedType === p.key ? C.green : C.text }}>
+                        {p.currency === 'GEL' ? '₾' : p.currency}{p.price.toFixed(2)}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {payError ? (
+              <Text style={{ fontSize: 13, color: C.error, textAlign: 'center' }}>{payError}</Text>
+            ) : null}
+
+            <Pressable
+              onPress={handlePay}
+              disabled={paying || !selected || !onPay}
+              style={{
+                backgroundColor: C.green, borderRadius: 8, paddingVertical: 14,
+                alignItems: 'center', opacity: (paying || !selected || !onPay) ? 0.7 : 1,
+              }}
+            >
+              {paying ? (
+                <ActivityIndicator color={C.white} size="small" />
+              ) : (
+                <Text style={{ color: C.white, fontWeight: '700', fontSize: 16 }}>
+                  Оплатить {selected ? `${selected.currency === 'GEL' ? '₾' : selected.currency}${selected.price.toFixed(2)}` : ''}
+                </Text>
+              )}
+            </Pressable>
+
+            <Text style={{ fontSize: 11, color: C.muted, textAlign: 'center' }}>
+              Вы будете перенаправлены на страницу оплаты Stripe.
+            </Text>
           </View>
-        </View>
-      </View>
+        )}
 
-      <Pressable style={{ backgroundColor: C.green, borderRadius: 8, paddingVertical: 14, alignItems: 'center' }}>
-        <Text style={{ color: C.white, fontWeight: '700', fontSize: 16 }}>Оплатить ₾5.00</Text>
-      </Pressable>
-
-      <Text style={{ fontSize: 11, color: C.muted, textAlign: 'center' }}>
-        Защищённый платёж. Данные карты не сохраняются.
-      </Text>
+        {!isDesktop && <BottomNav />}
+      </FormFrame>
     </View>
   );
 }
 
-function LoadingState() {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-
-  return (
-      <FormFrame>
-        <SectionHeader title="Оплата" />
-        <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 80 }}>
-          <ActivityIndicator size="large" color={C.green} />
-          <Text style={{ fontSize: 14, color: C.muted, marginTop: 14 }}>Перенаправление на оплату...</Text>
-        </View>
-        {!isDesktop && <BottomNav />}
-      </FormFrame>
-  );
-}
-
-export function PaymentCheckout() {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-
-  return (
-    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      <FormFrame>
-        <SectionHeader title="Оплата" />
-        <CheckoutContent />
-        {!isDesktop && <BottomNav />}
-      </FormFrame>
-    </View>
-  );
-}
-
-function SuccessState() {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-
-  return (
-      <FormFrame>
-        <SectionHeader title="Оплата" />
-        <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 24, gap: 12 }}>
-          <View style={{
-            width: 68, height: 68, borderRadius: 34,
-            borderWidth: 3, borderColor: C.green,
-            alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Text style={{ fontSize: 30, color: C.green, fontWeight: '700', lineHeight: 34 }}>✓</Text>
-          </View>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Оплата прошла!</Text>
-          <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', lineHeight: 20 }}>
-            Ваше объявление отправлено на проверку.{'\n'}Обычно это занимает до 2 часов.
-          </Text>
-          <Pressable style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 32, paddingVertical: 12, marginTop: 8 }}>
-            <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Перейти к объявлениям</Text>
-          </Pressable>
-        </View>
-        {!isDesktop && <BottomNav />}
-      </FormFrame>
-  );
-}
-
-function ErrorState() {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-
-  return (
-      <FormFrame>
-        <SectionHeader title="Оплата" />
-        <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 24, gap: 12 }}>
-          <View style={{
-            width: 68, height: 68, borderRadius: 34,
-            borderWidth: 3, borderColor: C.error,
-            alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Text style={{ fontSize: 30, color: C.error, fontWeight: '700', lineHeight: 34 }}>x</Text>
-          </View>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>Оплата не прошла</Text>
-          <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', lineHeight: 20 }}>
-            Попробуйте другую карту или обратитесь в банк.
-          </Text>
-          <Pressable style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 32, paddingVertical: 12, marginTop: 8 }}>
-            <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Попробовать снова</Text>
-          </Pressable>
-        </View>
-        {!isDesktop && <BottomNav />}
-      </FormFrame>
-  );
-}
-
+export { PaymentCheckout };
 export default PaymentCheckout;
