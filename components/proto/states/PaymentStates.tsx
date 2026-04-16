@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
 import { StateSection } from '../StateSection';
-import BottomNav from '../BottomNav';
+import BottomNav from '../../BottomNav';
 
 const C = {
   green: '#00AA6C',

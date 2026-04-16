@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import BottomNav from '../BottomNav';
+import BottomNav from '../../BottomNav';
 import ProtoImage from '../ProtoPlaceholderImage';
+import Header from '../../Header';
 
 const C = {
   green: '#00AA6C', greenBg: '#E8F9F2',
@@ -72,42 +73,6 @@ function ListingCard({ title, price, loc, age, badge, colorIdx }: {
   );
 }
 
-// ─── Custom language switcher (no native select) ─────────────────────────────
-const LANGS: ('RU' | 'EN' | 'KA')[] = ['RU', 'EN', 'KA'];
-
-function LangSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <View style={{ position: 'relative', zIndex: 100 }}>
-      <Pressable
-        onPress={() => setOpen(o => !o)}
-        style={{ borderWidth: 1, borderColor: C.border, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: C.white }}
-      >
-        <Text style={{ fontSize: 12, fontWeight: '600', color: '#5C5C5C' }}>{value}</Text>
-        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={10} color={C.muted} />
-      </Pressable>
-      {open && (
-        <View style={{
-          position: 'absolute', top: '100%' as any, left: 0, marginTop: 4,
-          backgroundColor: C.white, borderRadius: 8, borderWidth: 1, borderColor: C.border,
-          overflow: 'hidden', minWidth: 56, zIndex: 200,
-          shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.1, shadowRadius: 8, elevation: 8,
-        }}>
-          {LANGS.map(l => (
-            <Pressable key={l} onPress={() => { onChange(l); setOpen(false); }}
-              style={{ paddingHorizontal: 12, paddingVertical: 9, backgroundColor: value === l ? '#F5F5F5' : C.white }}>
-              <Text style={{ fontSize: 12, fontWeight: value === l ? '700' : '400', color: value === l ? C.green : '#5C5C5C' }}>
-                {l}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-}
-
 // ─── Main content ─────────────────────────────────────────────────────────────
 
 export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = true }: { loggedIn?: boolean; showHeader?: boolean; showBottomNav?: boolean }) {
@@ -124,7 +89,6 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
   const [sort, setSort] = useState<'date' | 'price_asc' | 'price_desc'>('date');
-  const [lang, setLang] = useState<'RU' | 'EN' | 'KA'>('RU');
 
   const filtered = LISTINGS.filter(l => {
     const matchCat = category === 'all' || l.cat === category;
@@ -142,64 +106,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
     <View style={{ backgroundColor: C.white }}>
 
       {/* ─── Header ──────────────────────────────────────────────────────────── */}
-      {showHeader && (
-      <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: hPad, paddingVertical: 10, maxWidth: maxW, alignSelf: isDesktop ? 'center' : undefined, width: '100%' }}>
-          {/* Logo */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-            <View style={{ width: 30, height: 30, backgroundColor: C.green, borderRadius: 7, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 17 }}>A</Text>
-            </View>
-            {isTablet && (
-              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <Text style={{ fontWeight: '700', fontSize: 17, color: C.text }}>avito</Text>
-                <Text style={{ fontWeight: '600', fontSize: 12, color: C.green }}>.ge</Text>
-              </View>
-            )}
-            {!isTablet && <LangSelect value={lang} onChange={setLang} />}
-          </View>
-
-          {/* Search */}
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: C.green, borderRadius: 9, backgroundColor: C.white, paddingHorizontal: 10, paddingVertical: isTablet ? 8 : 10, gap: 8 }}>
-            <Ionicons name="search-outline" size={17} color={C.muted} />
-            <TextInput
-              style={{ flex: 1, fontSize: 14, color: C.text, borderWidth: 0, borderStyle: 'solid', backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
-              placeholder="Что ищете?"
-              placeholderTextColor={C.muted}
-              value={query}
-              onChangeText={setQuery}
-            />
-            {query.length > 0 && (
-              <Pressable onPress={() => setQuery('')}>
-                <Text style={{ color: C.muted, fontSize: 18, lineHeight: 18 }}>×</Text>
-              </Pressable>
-            )}
-          </View>
-
-          {/* Right */}
-          {loggedIn ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              {isTablet && (
-                <Pressable style={{ backgroundColor: C.green, borderRadius: 7, paddingHorizontal: 12, paddingVertical: 7 }}>
-                  <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>+ Подать</Text>
-                </Pressable>
-              )}
-              <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>Г</Text>
-              </View>
-              {isTablet && <LangSelect value={lang} onChange={setLang} />}
-            </View>
-          ) : (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              <Pressable style={{ backgroundColor: C.green, borderRadius: 7, paddingHorizontal: 12, paddingVertical: 7 }}>
-                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Войти</Text>
-              </Pressable>
-              {isTablet && <LangSelect value={lang} onChange={setLang} />}
-            </View>
-          )}
-        </View>
-      </View>
-      )}
+      {showHeader && <Header loggedIn={loggedIn} search={{ value: query, onChange: setQuery }} />}
 
       {/* ─── City pills ──────────────────────────────────────────────────────── */}
       <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }}>
