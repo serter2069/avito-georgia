@@ -1,10 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import MyListings from '../../components/screens/MyListings';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
+import { SkeletonBox } from '../../components/SkeletonBox';
 import { apiFetch } from '../../lib/api';
+
+function ListingSkeleton() {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#F7F7F7', padding: 16, gap: 12 }}>
+      {[0, 1, 2].map(i => (
+        <View key={i} style={{ flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 14 }}>
+          <SkeletonBox width={72} height={72} borderRadius={8} />
+          <View style={{ flex: 1, gap: 8, justifyContent: 'center' }}>
+            <SkeletonBox width="80%" height={14} />
+            <SkeletonBox width="50%" height={14} />
+            <SkeletonBox width="40%" height={11} />
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 export default function MyListingsPage() {
   const router = useRouter();
@@ -27,7 +45,7 @@ export default function MyListingsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View>;
+  if (loading) return <ListingSkeleton />;
   if (error) return <ErrorState message="Не удалось загрузить объявления" onRetry={load} />;
   if (listings.length === 0) return (
     <EmptyState
