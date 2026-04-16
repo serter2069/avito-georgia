@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StateSection } from '../StateSection';
-import BottomNav from '../BottomNav';
+import BottomNav from '../../BottomNav';
 import { ProtoImage } from '../ProtoPlaceholderImage';
 
 const C = {
