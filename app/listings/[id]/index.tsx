@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import ListingDetail from '../../../components/screens/ListingDetail';
 import { apiFetch } from '../../../lib/api';
+import { useAuthStore } from '../../../store/auth';
 
 export default function ListingDetailPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (!id) return;
@@ -22,5 +24,6 @@ export default function ListingDetailPage() {
       <ActivityIndicator size="large" color="#00AA6C" />
     </View>
   );
-  return <ListingDetail listing={listing} />;
+  const isOwner = !!user && listing?.userId === user.id;
+  return <ListingDetail listing={listing} isOwner={isOwner} />;
 }

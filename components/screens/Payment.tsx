@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import { apiFetch } from '../../lib/api';
 
@@ -42,9 +43,10 @@ function FormFrame({ children }: { children: React.ReactNode }) {
 }
 
 function SectionHeader({ title }: { title: string }) {
+  const router = useRouter();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, gap: 10 }}>
-      <Pressable>
+      <Pressable onPress={() => router.back()}>
         <Text style={{ fontSize: 20, color: C.muted }}>{'<'}</Text>
       </Pressable>
       <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>{title}</Text>
