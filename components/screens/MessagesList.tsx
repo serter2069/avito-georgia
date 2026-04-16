@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 
 const C = {
@@ -179,20 +180,54 @@ function EmptySearch() {
   );
 }
 
+// -- Helper: map real thread to Conversation --
+
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+  if (diffDays === 1) return 'Вчера';
+  const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  if (diffDays < 7) return days[d.getDay()];
+  return `${d.getDate()}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function threadToConversation(thread: any, idx: number): Conversation {
+  const participant = thread.participants?.[0]?.user;
+  const name = participant?.name ?? 'Пользователь';
+  const lastMsg = thread.messages?.[0];
+  const listingTitle = thread.listing?.title ?? '';
+  return {
+    id: thread.id,
+    initials: name.split(' ').slice(0, 2).map((w: string) => w[0]).join('').toUpperCase() || '?',
+    colorIdx: idx % AVATAR_COLORS.length,
+    name,
+    lastMessage: lastMsg?.text ?? (listingTitle ? `По объявлению: ${listingTitle}` : ''),
+    time: thread.updatedAt ? formatTime(thread.updatedAt) : '',
+  };
+}
+
 // -- State 1: Messages list (interactive) --
 
-export function MessagesDefault({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
+export function MessagesDefault({ showHeader = true, showBottomNav = true, threads }: { showHeader?: boolean; showBottomNav?: boolean; threads?: any[] }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const router = useRouter();
 
-  const filtered = CONVERSATIONS.filter(c =>
+  const conversations: Conversation[] = threads
+    ? threads.map((t, i) => threadToConversation(t, i))
+    : CONVERSATIONS;
+
+  const filtered = conversations.filter(c =>
     c.name.toLowerCase().includes(query.toLowerCase()) ||
     c.lastMessage.toLowerCase().includes(query.toLowerCase())
   );
 
-  const selectedConv = CONVERSATIONS.find(c => c.id === selectedId);
+  const selectedConv = conversations.find(c => c.id === selectedId);
 
   const listPanel = (
     <View style={{ flex: isDesktop ? undefined : 1, width: isDesktop ? 320 : undefined, backgroundColor: C.white, borderRightWidth: isDesktop ? 1 : 0, borderRightColor: C.border }}>
@@ -212,7 +247,13 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true }: { s
               conv={conv}
               isLast={idx === filtered.length - 1}
               isSelected={isDesktop && selectedId === conv.id}
-              onPress={() => setSelectedId(conv.id)}
+              onPress={() => {
+                if (threads) {
+                  router.push(`/dashboard/messages/${conv.id}` as any);
+                } else {
+                  setSelectedId(conv.id);
+                }
+              }}
             />
           ))
         }
@@ -266,6 +307,11 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true }: { s
             key={conv.id}
             conv={conv}
             isLast={idx === filtered.length - 1}
+            onPress={() => {
+              if (threads) {
+                router.push(`/dashboard/messages/${conv.id}` as any);
+              }
+            }}
           />
         ))
       }
