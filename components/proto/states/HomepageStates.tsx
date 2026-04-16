@@ -230,9 +230,9 @@ export default function HomepageStates({ showHeader = true, showBottomNav = true
       <StateSection title="HOMEPAGE — Guest">
         <HomepageContent showHeader={showHeader} showBottomNav={showBottomNav} />
       </StateSection>
-      <StateSection title="HOMEPAGE — Logged In">
+      {/* <StateSection title="HOMEPAGE — Logged In">
         <HomepageContent loggedIn showHeader={showHeader} showBottomNav={showBottomNav} />
-      </StateSection>
+      </StateSection> */}
     </View>
   );
 }
