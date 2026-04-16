@@ -3,6 +3,8 @@ import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicat
 import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
+import { apiFetch } from '../../lib/api';
+import { useAuthStore } from '../../store/auth';
 
 const C = { green: '#00AA6C', greenBg: '#E8F9F2', white: '#FFFFFF', text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8' };
 
@@ -247,6 +249,41 @@ function ListingInfo({ listing }: { listing?: any }) {
 // ─── CTA Buttons ──────────────────────────────────────────────────────────────
 function CTAButtons({ loading, listingId, isOwner, listing }: { loading: boolean; listingId?: string; isOwner?: boolean; listing?: any }) {
   const router = useRouter();
+  const { isLoggedIn } = useAuthStore();
+  const [phoneLoading, setPhoneLoading] = useState(false);
+
+  const handleCall = async () => {
+    if (!isLoggedIn) {
+      Alert.alert(
+        'Требуется вход',
+        'Войдите в аккаунт, чтобы увидеть номер телефона',
+        [
+          { text: 'Отмена', style: 'cancel' },
+          { text: 'Войти', onPress: () => router.push('/auth' as any) },
+        ]
+      );
+      return;
+    }
+    if (!listingId) return;
+    setPhoneLoading(true);
+    try {
+      const data = await apiFetch(`/listings/${listingId}/phone`);
+      if (data.phone) {
+        Linking.openURL('tel:' + data.phone);
+      } else {
+        Alert.alert('Телефон не указан', 'Продавец не указал номер телефона.');
+      }
+    } catch (err: any) {
+      if (err?.statusCode === 429 || err?.status === 429) {
+        Alert.alert('Слишком много запросов', 'Попробуйте позже.');
+      } else {
+        Alert.alert('Ошибка', 'Не удалось получить номер телефона.');
+      }
+    } finally {
+      setPhoneLoading(false);
+    }
+  };
+
   if (isOwner) {
     return (
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
@@ -278,17 +315,15 @@ function CTAButtons({ loading, listingId, isOwner, listing }: { loading: boolean
         )}
       </Pressable>
       <Pressable
-        onPress={() => {
-          const phone = listing?.phone || listing?.user?.phone;
-          if (phone) {
-            Linking.openURL('tel:' + phone);
-          } else {
-            Alert.alert('Телефон не указан', 'Продавец не указал номер телефона.');
-          }
-        }}
+        onPress={handleCall}
+        disabled={phoneLoading}
         style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: C.green, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
       >
-        <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Позвонить</Text>
+        {phoneLoading ? (
+          <ActivityIndicator color={C.green} size="small" />
+        ) : (
+          <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Позвонить</Text>
+        )}
       </Pressable>
     </View>
   );
