@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, TextInput, ActivityIndicator, useWindowDimensions } from 'react-native';
 
 // ─── Core Design Tokens ───────────────────────────────────────────────────────
 const C = { green:'#00AA6C', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F', bg:'#F5F5F5' };
@@ -58,17 +58,19 @@ function OtpBoxes({ digits, error }: { digits: string[]; error?: boolean }) {
   );
 }
 
-function ConfirmButton({ disabled }: { disabled?: boolean }) {
+function ConfirmButton({ disabled, loading }: { disabled?: boolean; loading?: boolean }) {
   return (
     <View
-      className="rounded-lg items-center justify-center"
+      className="rounded-lg items-center justify-center flex-row"
       style={{
         backgroundColor: C.green,
         paddingVertical: 14,
         borderRadius: 8,
+        gap: 8,
         opacity: disabled ? 0.5 : 1,
       }}
     >
+      {loading && <ActivityIndicator size="small" color="#fff" />}
       <Text className="text-white font-bold" style={{ fontSize: 16 }}>Подтвердить</Text>
     </View>
   );
@@ -76,7 +78,21 @@ function ConfirmButton({ disabled }: { disabled?: boolean }) {
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-export function AuthOtpDefault({ onConfirm }: { onConfirm?: () => void } = {}) {
+export function AuthOtpDefault({
+  email,
+  onConfirm,
+  loading,
+  error: externalError,
+}: {
+  email?: string;
+  onConfirm?: (code: string) => void;
+  loading?: boolean;
+  error?: string;
+} = {}) {
+  const [code, setCode] = React.useState('');
+  const digits = code.split('');
+  const isReady = code.length === 6;
+
   return (
     <ResponsiveWrapper>
       <View className="bg-white">
@@ -87,13 +103,34 @@ export function AuthOtpDefault({ onConfirm }: { onConfirm?: () => void } = {}) {
               Введите код
             </Text>
             <Text className="text-sm text-center" style={{ color: C.muted }}>
-              Отправили код на user@gmail.com
+              Отправили код на {email || 'ваш email'}
             </Text>
           </View>
 
-          <OtpBoxes digits={[]} />
-          <Pressable onPress={onConfirm}>
-            <ConfirmButton />
+          <View style={{ gap: 8 }}>
+            <OtpBoxes digits={digits} error={!!externalError} />
+            {/* Hidden text input to capture keystrokes */}
+            <TextInput
+              value={code}
+              onChangeText={(v) => setCode(v.replace(/\D/g, '').slice(0, 6))}
+              keyboardType="number-pad"
+              maxLength={6}
+              style={{
+                position: 'absolute',
+                opacity: 0,
+                width: 1,
+                height: 1,
+              }}
+              autoFocus
+              editable={!loading}
+            />
+            {externalError ? (
+              <Text className="text-center text-sm" style={{ color: C.error }}>{externalError}</Text>
+            ) : null}
+          </View>
+
+          <Pressable onPress={() => isReady && !loading && onConfirm?.(code)} style={{ opacity: isReady && !loading ? 1 : 0.5 }}>
+            <ConfirmButton disabled={!isReady || loading} loading={loading} />
           </Pressable>
 
           <View className="items-center">

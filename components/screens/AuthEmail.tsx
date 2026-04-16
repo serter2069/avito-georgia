@@ -87,7 +87,15 @@ function PrimaryButton({ label, disabled, loading }: { label: string; disabled?:
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-export function AuthEmailDefault({ onSubmit }: { onSubmit?: () => void } = {}) {
+export function AuthEmailDefault({
+  onSubmit,
+  loading,
+  error: externalError,
+}: {
+  onSubmit?: (email: string) => void;
+  loading?: boolean;
+  error?: string;
+} = {}) {
   const [email, setEmail] = React.useState('');
   return (
     <ResponsiveWrapper>
@@ -102,9 +110,41 @@ export function AuthEmailDefault({ onSubmit }: { onSubmit?: () => void } = {}) {
           </Text>
         </View>
         <View style={{ gap: 16 }}>
-          <EmailInput value={email} />
-          <Pressable onPress={onSubmit} style={{ opacity: email.length > 0 ? 1 : 0.5 }}>
-            <PrimaryButton label="Получить код" disabled={email.length === 0} />
+          <View>
+            <View style={{
+              borderWidth: 1,
+              borderColor: C.border,
+              borderRadius: 8,
+              backgroundColor: loading ? C.bg : C.white,
+            }}>
+              <TextInput
+                style={{
+                  borderWidth: 0,
+                  backgroundColor: 'transparent',
+                  paddingHorizontal: 16,
+                  color: C.text,
+                  fontSize: 16,
+                  paddingVertical: 12,
+                  outlineWidth: 0,
+                } as any}
+                placeholder="ваш@email.com"
+                placeholderTextColor={C.muted}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!loading}
+              />
+            </View>
+            {externalError ? (
+              <Text style={{ color: C.error, fontSize: 13, marginTop: 6 }}>{externalError}</Text>
+            ) : null}
+          </View>
+          <Pressable
+            onPress={() => email.length > 0 && !loading && onSubmit?.(email)}
+            style={{ opacity: email.length > 0 && !loading ? 1 : 0.5 }}
+          >
+            <PrimaryButton label="Получить код" disabled={email.length === 0 || loading} loading={loading} />
           </Pressable>
         </View>
       </View>
