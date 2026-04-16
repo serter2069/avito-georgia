@@ -199,6 +199,35 @@ router.delete('/me', requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/users/me/sessions — list active sessions for current user
+router.get('/me/sessions', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const sessions = await prisma.session.findMany({
+      where: { userId, expiresAt: { gte: new Date() } },
+      select: { id: true, createdAt: true, expiresAt: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({ sessions });
+  } catch (err) {
+    console.error('GET /users/me/sessions error:', err);
+    res.status(500).json({ error: 'Failed to fetch sessions' });
+  }
+});
+
+// DELETE /api/users/me/sessions/:id — revoke a specific session
+router.delete('/me/sessions/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const sessionId = req.params.id;
+    await prisma.session.deleteMany({ where: { id: sessionId, userId } });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('DELETE /users/me/sessions/:id error:', err);
+    res.status(500).json({ error: 'Failed to revoke session' });
+  }
+});
+
 // GET /api/users/:id — public seller profile
 router.get('/:id', async (req: Request, res: Response) => {
   const id = String(req.params.id);

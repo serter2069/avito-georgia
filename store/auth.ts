@@ -9,6 +9,7 @@ export interface AuthUser {
   city?: string | null;
   avatarUrl: string | null;
   role?: string;
+  locale?: string | null;
   isOnboarded: boolean;
   initial: string;
 }
