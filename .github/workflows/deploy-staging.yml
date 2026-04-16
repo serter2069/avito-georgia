@@ -76,6 +76,8 @@ jobs:
           cd ${{ env.DEPLOY_DIR }}
           export DOPPLER_TOKEN=$(cat ${{ env.DOPPLER_TOKEN_FILE }})
           doppler run -- npx expo export --platform web
+          # Ensure nginx root (dist/) is always up to date
+          # expo export outputs to dist/ — nginx serves from dist/
 
       - name: Install API dependencies
         run: |
