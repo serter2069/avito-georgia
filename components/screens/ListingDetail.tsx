@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Modal, Image } from 'react-native';
+import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Modal, Image, Linking, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
@@ -245,7 +245,7 @@ function ListingInfo({ listing }: { listing?: any }) {
 }
 
 // ─── CTA Buttons ──────────────────────────────────────────────────────────────
-function CTAButtons({ loading, listingId, isOwner }: { loading: boolean; listingId?: string; isOwner?: boolean }) {
+function CTAButtons({ loading, listingId, isOwner, listing }: { loading: boolean; listingId?: string; isOwner?: boolean; listing?: any }) {
   const router = useRouter();
   if (isOwner) {
     return (
@@ -277,7 +277,17 @@ function CTAButtons({ loading, listingId, isOwner }: { loading: boolean; listing
           <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Написать продавцу</Text>
         )}
       </Pressable>
-      <Pressable style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: C.green, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}>
+      <Pressable
+        onPress={() => {
+          const phone = listing?.phone || listing?.user?.phone;
+          if (phone) {
+            Linking.openURL('tel:' + phone);
+          } else {
+            Alert.alert('Телефон не указан', 'Продавец не указал номер телефона.');
+          }
+        }}
+        style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: C.green, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+      >
         <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Позвонить</Text>
       </Pressable>
     </View>
@@ -328,7 +338,7 @@ export function DefaultView({ listing, isOwner }: { listing?: any; isOwner?: boo
               {/* Right: info */}
               <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 24 }}>
                 <ListingInfo listing={listing} />
-                <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} />
+                <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} listing={listing} />
                 <View style={{ marginTop: 24 }}>
                   <SimilarListings />
                 </View>
@@ -342,7 +352,7 @@ export function DefaultView({ listing, isOwner }: { listing?: any; isOwner?: boo
             </View>
             <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
               <ListingInfo listing={listing} />
-              <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} />
+              <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} listing={listing} />
               <View style={{ marginTop: 24 }}><FakeMap /></View>
               <SimilarListings />
             </View>

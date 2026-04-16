@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
+import { apiFetch } from '../../lib/api';
 
 const C = {
   green: '#00AA6C',
@@ -20,7 +22,7 @@ const C = {
 type Tab = 'active' | 'inactive' | 'draft';
 
 interface Listing {
-  id: number;
+  id: string | number;
   title: string;
   price: string;
   views: string;
@@ -56,16 +58,22 @@ function ListingRow({
   listing,
   tab,
   onDelete,
+  onPublish,
 }: {
   listing: Listing;
   tab: Tab;
-  onDelete: (id: number) => void;
+  onDelete: (id: string | number) => void;
+  onPublish?: (id: string | number) => void;
 }) {
+  const router = useRouter();
   const urgent = tab === 'active' && (listing.daysLeft ?? 99) <= 3;
   const soon   = tab === 'active' && !urgent && (listing.daysLeft ?? 99) <= 7;
 
   return (
-    <View style={{ flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 14, gap: 12, backgroundColor: C.white }}>
+    <Pressable
+      onPress={() => router.push('/listings/' + listing.id as any)}
+      style={{ flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 14, gap: 12, backgroundColor: C.white }}
+    >
       {/* Thumbnail */}
       <View style={{ borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
         <ProtoImage seed={listing.colorIdx + 50} width={72} height={72} />
@@ -105,34 +113,34 @@ function ListingRow({
         <View style={{ flexDirection: 'row', gap: 14, marginTop: 4 }}>
           {tab === 'active' && (
             <>
-              <Pressable>
+              <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/listings/' + listing.id + '/edit' as any); }}>
                 <Text style={{ fontSize: 12, color: C.action, fontWeight: '500' }}>Редактировать</Text>
               </Pressable>
               {(listing.daysLeft ?? 99) <= 7 && (
-                <Pressable>
+                <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/payment?listingId=' + listing.id + '&type=renewal' as any); }}>
                   <Text style={{ fontSize: 12, color: C.warnTxt, fontWeight: '500' }}>Продлить — 3 ₾</Text>
                 </Pressable>
               )}
             </>
           )}
           {tab === 'inactive' && (
-            <Pressable>
+            <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/payment?listingId=' + listing.id + '&type=renewal' as any); }}>
               <Text style={{ fontSize: 12, color: C.action, fontWeight: '500' }}>Возобновить — 3 ₾</Text>
             </Pressable>
           )}
           {tab === 'draft' && (
             <>
-              <Pressable>
+              <Pressable onPress={(e) => { e.stopPropagation?.(); onPublish?.(listing.id); }}>
                 <Text style={{ fontSize: 12, color: C.action, fontWeight: '500' }}>Опубликовать</Text>
               </Pressable>
-              <Pressable onPress={() => onDelete(listing.id)}>
+              <Pressable onPress={(e) => { e.stopPropagation?.(); onDelete(listing.id); }}>
                 <Text style={{ fontSize: 12, color: C.muted }}>Удалить</Text>
               </Pressable>
             </>
           )}
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -168,8 +176,26 @@ export function MyListingsInteractive({ showBottomNav = true, listings: apiListi
     if (apiListings) setItems(mapApiListings(apiListings));
   }, [apiListings]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: string | number) => {
+    try {
+      await apiFetch('/listings/' + id, { method: 'DELETE' });
+    } catch {}
     setItems((prev) => ({ ...prev, draft: prev.draft.filter((l) => l.id !== id) }));
+  };
+
+  const handlePublish = async (id: string | number) => {
+    try {
+      await apiFetch('/listings/' + id, { method: 'PATCH', body: JSON.stringify({ status: 'active' }) });
+      setItems((prev) => {
+        const listing = prev.draft.find((l) => l.id === id);
+        if (!listing) return prev;
+        return {
+          ...prev,
+          active: [...prev.active, { ...listing, views: '0 просмотров' }],
+          draft: prev.draft.filter((l) => l.id !== id),
+        };
+      });
+    } catch {}
   };
 
   const counts: Record<Tab, number> = {
@@ -218,7 +244,7 @@ export function MyListingsInteractive({ showBottomNav = true, listings: apiListi
         currentList.map((listing, i) => (
           <View key={listing.id}>
             {i > 0 && <View style={{ height: 1, backgroundColor: C.border, marginLeft: 100 }} />}
-            <ListingRow listing={listing} tab={tab} onDelete={handleDelete} />
+            <ListingRow listing={listing} tab={tab} onDelete={handleDelete} onPublish={handlePublish} />
           </View>
         ))
       )}
@@ -269,6 +295,7 @@ export function MyListingsInteractive({ showBottomNav = true, listings: apiListi
 function MyListingsEmpty({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
+  const router = useRouter();
 
   return (
     <View>
@@ -282,7 +309,7 @@ function MyListingsEmpty({ showHeader = true, showBottomNav = true }: { showHead
         <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', marginBottom: 24, lineHeight: 18 }}>
           3 бесплатных объявления в каждой категории
         </Text>
-        <Pressable style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 22, paddingVertical: 11 }}>
+        <Pressable onPress={() => router.push('/listings/create' as any)} style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 22, paddingVertical: 11 }}>
           <Text style={{ color: C.white, fontWeight: '600', fontSize: 14 }}>Подать объявление</Text>
         </Pressable>
       </View>

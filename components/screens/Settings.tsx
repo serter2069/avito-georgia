@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, ScrollView, useWindowDimensions, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 
 const C = {
@@ -126,14 +127,21 @@ function NotificationsSection({ prefs, onToggle }: NotificationsSectionProps) {
 }
 
 function SecuritySection() {
+  const router = useRouter();
   return (
     <View>
-      <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+      <Pressable
+        onPress={() => Alert.alert('Смена email', 'Для смены email обратитесь в поддержку: support@avito.ge')}
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}
+      >
         <Text style={{ fontSize: 15, color: C.text }}>Изменить email</Text>
         <Text style={{ fontSize: 18, color: C.muted }}>{'\u203A'}</Text>
       </Pressable>
       <Divider indent={16} />
-      <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+      <Pressable
+        onPress={() => router.push('/dashboard/sessions' as any)}
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}
+      >
         <Text style={{ fontSize: 15, color: C.text }}>Активные сессии</Text>
         <Text style={{ fontSize: 18, color: C.muted }}>{'\u203A'}</Text>
       </Pressable>

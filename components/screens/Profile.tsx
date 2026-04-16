@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import BottomNav from '../BottomNav';
 import { ProtoImage } from '../proto/ProtoPlaceholderImage';
@@ -65,6 +66,29 @@ function StarRow({ rating, size = 14 }: { rating: number; size?: number }) {
           color={i <= rating ? C.amber : C.starEmpty}
         />
       ))}
+    </View>
+  );
+}
+
+function ActionButtons() {
+  const router = useRouter();
+  return (
+    <View className="flex-row gap-3 mt-4">
+      <Pressable
+        onPress={() => router.push('/dashboard/messages' as any)}
+        className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3"
+        style={{ backgroundColor: C.green }}
+      >
+        <Ionicons name="chatbubble-outline" size={16} color={C.white} />
+        <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Написать</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => router.push('/payment' as any)}
+        className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3"
+        style={{ borderWidth: 1.5, borderColor: C.green }}
+      >
+        <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Поднять</Text>
+      </Pressable>
     </View>
   );
 }
@@ -147,21 +171,7 @@ function UserHeader({
 
         {/* Action buttons — only for other user view */}
         {!showEditButton && (
-          <View className="flex-row gap-3 mt-4">
-            <Pressable
-              className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3"
-              style={{ backgroundColor: C.green }}
-            >
-              <Ionicons name="chatbubble-outline" size={16} color={C.white} />
-              <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Написать</Text>
-            </Pressable>
-            <Pressable
-              className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3"
-              style={{ borderWidth: 1.5, borderColor: C.green }}
-            >
-              <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Поднять</Text>
-            </Pressable>
-          </View>
+          <ActionButtons />
         )}
       </View>
     </View>
@@ -169,6 +179,8 @@ function UserHeader({
 }
 
 function ListingsSection({ listings }: { listings: any[] }) {
+  const router = useRouter();
+
   if (!listings || listings.length === 0) {
     return (
       <View className="rounded-xl overflow-hidden px-4 py-5" style={{ backgroundColor: C.white }}>
@@ -187,7 +199,7 @@ function ListingsSection({ listings }: { listings: any[] }) {
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
         <Text style={{ fontSize: 15, fontWeight: '700', color: C.text }}>Активные объявления</Text>
-        <Pressable>
+        <Pressable onPress={() => router.push('/dashboard/listings' as any)}>
           <Text style={{ fontSize: 13, color: C.green, fontWeight: '600' }}>
             Смотреть все ({listings.length})
           </Text>
@@ -203,6 +215,7 @@ function ListingsSection({ listings }: { listings: any[] }) {
         {listings.map((item) => (
           <Pressable
             key={item.id}
+            onPress={() => router.push('/listings/' + item.id as any)}
             className="rounded-xl overflow-hidden"
             style={{ width: 130, borderWidth: 1, borderColor: C.border }}
           >
