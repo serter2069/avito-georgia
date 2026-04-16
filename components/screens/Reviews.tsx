@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
-import BottomNav from '../../BottomNav';
+import BottomNav from '../BottomNav';
 
 const C = {
   green: '#00AA6C',
