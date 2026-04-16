@@ -255,12 +255,49 @@ function AttachPreview({ seeds, onRemove }: { seeds: number[]; onRemove: (i: num
   );
 }
 
+// ─── Helper: format ISO time ──────────────────────────────────────────────────
+function formatMsgTime(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+// ─── Map real API message to internal Message ─────────────────────────────────
+function apiMsgToInternal(m: any, currentUserId?: string): Message {
+  return {
+    id: m.id,
+    text: m.text,
+    mine: currentUserId ? m.senderId === currentUserId : false,
+    time: m.createdAt ? formatMsgTime(m.createdAt) : '',
+    read: true,
+  };
+}
+
 // ─── Interactive Chat ─────────────────────────────────────────────────────────
-function InteractiveChat() {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+function InteractiveChat({
+  externalMessages,
+  currentUserId,
+  onSend,
+}: {
+  externalMessages?: any[];
+  currentUserId?: string;
+  onSend?: (text: string) => Promise<void>;
+}) {
+  const useRealData = !!externalMessages;
+  const [messages, setMessages] = useState<Message[]>(
+    useRealData
+      ? externalMessages!.map(m => apiMsgToInternal(m, currentUserId))
+      : INITIAL_MESSAGES
+  );
   const [input, setInput] = useState('');
   const [attachSeeds, setAttachSeeds] = useState<number[]>([]);
   const [lightbox, setLightbox] = useState<{ seeds: number[]; idx: number } | null>(null);
+
+  // Sync external messages when they change
+  React.useEffect(() => {
+    if (useRealData) {
+      setMessages(externalMessages!.map(m => apiMsgToInternal(m, currentUserId)));
+    }
+  }, [externalMessages]);
 
   const pool = [105, 106, 107, 108, 109, 110, 111, 112];
 
@@ -272,11 +309,19 @@ function InteractiveChat() {
     setAttachSeeds(prev => prev.filter((_, idx) => idx !== i));
   }
 
-  function sendMessage() {
+  async function sendMessage() {
     const text = input.trim();
     if (!text && attachSeeds.length === 0) return;
     const now = new Date();
     const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    if (useRealData && onSend && text) {
+      setInput('');
+      setAttachSeeds([]);
+      await onSend(text);
+      return;
+    }
+
     const newMsg: Message = { id: Date.now(), mine: true, time, read: false };
     if (attachSeeds.length > 0) newMsg.photos = { seeds: [...attachSeeds] };
     if (text) newMsg.text = text;
@@ -377,14 +422,26 @@ function Header() {
 }
 
 // ─── Main state ───────────────────────────────────────────────────────────────
-export function ChatThreadDefault() {
+export function ChatThreadDefault({
+  messages: externalMessages,
+  currentUserId,
+  onSend,
+}: {
+  messages?: any[];
+  currentUserId?: string;
+  onSend?: (text: string) => Promise<void>;
+} = {}) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
   const inner = (
     <View className="flex-1" style={{ minHeight: 560 }}>
       <Header />
-      <InteractiveChat />
+      <InteractiveChat
+        externalMessages={externalMessages}
+        currentUserId={currentUserId}
+        onSend={onSend}
+      />
       {!isDesktop && <BottomNav active="messages" />}
     </View>
   );
