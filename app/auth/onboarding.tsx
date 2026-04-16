@@ -16,7 +16,7 @@ export default function OnboardingPage() {
     try {
       await apiFetch('/users/me', {
         method: 'PATCH',
-        body: JSON.stringify({ name: data.name, isOnboarded: true }),
+        body: JSON.stringify({ name: data.name, city: data.city, isOnboarded: true }),
       });
       await fetchMe();
       router.replace('/' as any);

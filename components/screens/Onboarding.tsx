@@ -122,7 +122,26 @@ export function OnboardingDefault({ onSubmit, loading, error }: OnboardingProps)
 
         <View style={{ gap: 16 }}>
           <InputField label="Имя *" placeholder="Введите ваше имя" value={name} onChangeText={setName} required />
-          <SelectField label="Город" value={city || undefined} />
+          <View>
+            <Text className="text-sm font-medium mb-1.5" style={{ color: C.text }}>Город</Text>
+            <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, backgroundColor: C.white }}>
+              {/* @ts-ignore */}
+              <select
+                value={city}
+                onChange={(e: any) => setCity(e.target.value)}
+                style={{
+                  fontSize: 16, color: city ? '#1A1A1A' : '#737373', backgroundColor: 'transparent',
+                  border: 'none', outline: 'none', padding: '12px 16px', width: '100%',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="">Выберите город</option>
+                {['Тбилиси', 'Батуми', 'Кутаиси', 'Рустави', 'Гори', 'Зугдиди'].map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </View>
+          </View>
         </View>
 
         {!!error && (

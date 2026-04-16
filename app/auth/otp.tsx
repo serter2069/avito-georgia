@@ -21,7 +21,11 @@ export default function AuthOtpPage() {
       });
       const initial = (res.user.name || res.user.email || 'Г')[0].toUpperCase();
       setUser({ ...res.user, initial });
-      router.replace('/' as any);
+      if (!res.user.isOnboarded) {
+        router.replace('/auth/onboarding' as any);
+      } else {
+        router.replace('/' as any);
+      }
     } catch (e: any) {
       setError(e.error || 'Неверный код');
     } finally {
