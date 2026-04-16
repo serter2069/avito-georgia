@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import BottomNav from '../BottomNav';
-import ProtoImage from '../ProtoPlaceholderImage';
+import ProtoImage from '../proto/ProtoPlaceholderImage';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
 
