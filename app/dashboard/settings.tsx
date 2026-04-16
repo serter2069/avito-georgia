@@ -1,2 +1,4 @@
 import Settings from '../../components/screens/Settings';
-export default Settings;
+export default function SettingsPage() {
+  return <Settings showBottomNav={false} />;
+}

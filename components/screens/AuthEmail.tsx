@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
 
 // ─── Core Design Tokens ───────────────────────────────────────────────────────
 const C = { green:'#00AA6C', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F', bg:'#F5F5F5' };
@@ -87,7 +87,8 @@ function PrimaryButton({ label, disabled, loading }: { label: string; disabled?:
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-export function AuthEmailDefault() {
+export function AuthEmailDefault({ onSubmit }: { onSubmit?: () => void } = {}) {
+  const [email, setEmail] = React.useState('');
   return (
     <ResponsiveWrapper>
       <View className="bg-white" style={{ paddingHorizontal: 24, paddingTop: 80, paddingBottom: 40, gap: 32 }}>
@@ -101,8 +102,10 @@ export function AuthEmailDefault() {
           </Text>
         </View>
         <View style={{ gap: 16 }}>
-          <EmailInput />
-          <PrimaryButton label="Получить код" disabled />
+          <EmailInput value={email} />
+          <Pressable onPress={onSubmit} style={{ opacity: email.length > 0 ? 1 : 0.5 }}>
+            <PrimaryButton label="Получить код" disabled={email.length === 0} />
+          </Pressable>
         </View>
       </View>
     </ResponsiveWrapper>

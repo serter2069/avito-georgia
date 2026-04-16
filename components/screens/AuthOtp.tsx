@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 
 // ─── Core Design Tokens ───────────────────────────────────────────────────────
 const C = { green:'#00AA6C', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F', bg:'#F5F5F5' };
@@ -76,7 +76,7 @@ function ConfirmButton({ disabled }: { disabled?: boolean }) {
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-export function AuthOtpDefault() {
+export function AuthOtpDefault({ onConfirm }: { onConfirm?: () => void } = {}) {
   return (
     <ResponsiveWrapper>
       <View className="bg-white">
@@ -92,7 +92,9 @@ export function AuthOtpDefault() {
           </View>
 
           <OtpBoxes digits={[]} />
-          <ConfirmButton disabled />
+          <Pressable onPress={onConfirm}>
+            <ConfirmButton />
+          </Pressable>
 
           <View className="items-center">
             <Text className="text-sm" style={{ color: C.muted }}>
