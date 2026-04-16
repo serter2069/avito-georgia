@@ -18,6 +18,19 @@ function useResponsiveMaxWidth() {
 
 const NO_CHROME_PREFIXES = ['/auth/', '/proto'];
 
+// Routes that require auth — redirect to /auth/email if not logged in
+const PRIVATE_PREFIXES = [
+  '/dashboard',
+  '/listings/create',
+  '/payment',
+];
+const PRIVATE_EXACT = ['/listings/create'];
+
+function isPrivate(path: string) {
+  return PRIVATE_PREFIXES.some(p => path === p || path.startsWith(p + '/') || path.startsWith(p))
+    || path.match(/^\/listings\/[^/]+\/(edit|expired)$/);
+}
+
 export default function RootLayout() {
   const rawMaxWidth = useResponsiveMaxWidth();
   const pathname = usePathname();
@@ -30,6 +43,13 @@ export default function RootLayout() {
   const showChrome = !NO_CHROME_PREFIXES.some(p => pathname.startsWith(p));
 
   const { isLoggedIn, user } = useAuthStore();
+
+  // Redirect to login if accessing private route without auth
+  useEffect(() => {
+    if (!isLoggedIn && isPrivate(pathname)) {
+      router.replace('/auth/email' as any);
+    }
+  }, [isLoggedIn, pathname]);
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
