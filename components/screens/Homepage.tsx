@@ -104,6 +104,12 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
   const [priceTo, setPriceTo] = useState('');
   const [sort, setSort] = useState<'date' | 'price_asc' | 'price_desc'>('date');
 
+  // ─── Autocomplete + history state ──────────────────────────────────────────
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const autocompleteRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // ─── API data ───────────────────────────────────────────────────────────────
   const [listings, setListings] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
@@ -118,6 +124,34 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
     apiFetch('/cities').then(r => setCities(r.cities ?? [])).catch(console.error);
     apiFetch('/categories').then(r => setApiCategories(r.categories ?? [])).catch(console.error);
   }, []);
+
+  // Load search history from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('search_history');
+      if (stored) setSearchHistory(JSON.parse(stored));
+    } catch {}
+  }, []);
+
+  // Autocomplete fetch when query changes (300ms debounce, min 2 chars)
+  useEffect(() => {
+    if (autocompleteRef.current) clearTimeout(autocompleteRef.current);
+    if (!query || query.length < 2) { setSuggestions([]); return; }
+    autocompleteRef.current = setTimeout(async () => {
+      try {
+        const r = await apiFetch(`/listings/autocomplete?q=${encodeURIComponent(query)}`);
+        setSuggestions(r.suggestions ?? []);
+      } catch { setSuggestions([]); }
+    }, 300);
+    return () => { if (autocompleteRef.current) clearTimeout(autocompleteRef.current); };
+  }, [query]);
+
+  const saveToHistory = (q: string) => {
+    if (!q.trim()) return;
+    const updated = [q, ...searchHistory.filter(h => h !== q)].slice(0, 10);
+    setSearchHistory(updated);
+    try { localStorage.setItem('search_history', JSON.stringify(updated)); } catch {}
+  };
 
   // Fetch listings when filters change (debounced for text inputs)
   useEffect(() => {
@@ -158,7 +192,70 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
     <View style={{ backgroundColor: C.white }}>
 
       {/* ─── Header ──────────────────────────────────────────────────────────── */}
-      {showHeader && <Header loggedIn={loggedIn} search={{ value: query, onChange: setQuery }} />}
+      {showHeader && (
+        <Header
+          loggedIn={loggedIn}
+          search={{
+            value: query,
+            onChange: setQuery,
+            onFocus: () => setSearchFocused(true),
+            onBlur: () => setTimeout(() => setSearchFocused(false), 150),
+          }}
+        />
+      )}
+
+      {/* ─── Autocomplete / history dropdown ─────────────────────────────────── */}
+      {searchFocused && (query.length >= 2 ? suggestions.length > 0 : searchHistory.length > 0) && (
+        <View style={{
+          backgroundColor: '#fff',
+          borderBottomWidth: 1,
+          borderBottomColor: '#E8E8E8',
+          paddingVertical: 4,
+          zIndex: 100,
+        }}>
+          {/* History header */}
+          {query.length < 2 && searchHistory.length > 0 && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 }}>
+              <Text style={{ fontSize: 12, color: '#9E9E9E', fontWeight: '600' }}>ИСТОРИЯ</Text>
+              <Pressable onPress={() => {
+                setSearchHistory([]);
+                try { localStorage.removeItem('search_history'); } catch {}
+              }}>
+                <Text style={{ fontSize: 12, color: '#00AA6C' }}>Очистить</Text>
+              </Pressable>
+            </View>
+          )}
+          {(query.length < 2 ? searchHistory : suggestions).map((item, i) => (
+            <Pressable
+              key={i}
+              onPress={() => {
+                setQuery(item);
+                saveToHistory(item);
+                setSearchFocused(false);
+                setSuggestions([]);
+              }}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 12 }}
+            >
+              <Ionicons
+                name={query.length < 2 ? 'time-outline' : 'search-outline'}
+                size={16}
+                color="#9E9E9E"
+              />
+              <Text style={{ fontSize: 15, color: '#1A1A1A', flex: 1 }}>{item}</Text>
+              {query.length < 2 && (
+                <Pressable onPress={(e) => {
+                  e.stopPropagation();
+                  const updated = searchHistory.filter((_, idx) => idx !== i);
+                  setSearchHistory(updated);
+                  try { localStorage.setItem('search_history', JSON.stringify(updated)); } catch {}
+                }}>
+                  <Ionicons name="close" size={16} color="#9E9E9E" />
+                </Pressable>
+              )}
+            </Pressable>
+          ))}
+        </View>
+      )}
 
       {/* ─── City pills ──────────────────────────────────────────────────────── */}
       <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }}>

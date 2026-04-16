@@ -96,7 +96,7 @@ export interface HeaderProps {
   /** Called when the avatar is pressed. */
   onAvatarPress?: () => void;
   /** Optional controlled search value + handler. */
-  search?: { value: string; onChange: (v: string) => void };
+  search?: { value: string; onChange: (v: string) => void; onFocus?: () => void; onBlur?: () => void };
   /** Hide the search input entirely (default: true — shown). */
   showSearch?: boolean;
   /** Initial letter / avatar placeholder (default 'Г'). */
@@ -194,6 +194,8 @@ export default function Header({
               placeholderTextColor={C.muted}
               value={query}
               onChangeText={setQuery}
+              onFocus={search?.onFocus}
+              onBlur={search?.onBlur}
             />
             {query.length > 0 && (
               <Pressable onPress={() => setQuery('')}>

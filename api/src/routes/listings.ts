@@ -135,6 +135,31 @@ router.get('/map', async (req: Request, res: Response) => {
   );
 });
 
+// GET /api/listings/autocomplete?q= — top 5 title suggestions
+router.get('/autocomplete', searchRateLimit, async (req: Request, res: Response) => {
+  try {
+    const q = String(req.query.q ?? '').trim();
+    if (q.length < 2) {
+      res.json({ suggestions: [] });
+      return;
+    }
+    const listings = await prisma.listing.findMany({
+      where: {
+        status: 'active',
+        title: { contains: q, mode: 'insensitive' },
+      },
+      select: { title: true },
+      distinct: ['title'],
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({ suggestions: listings.map((l: { title: string }) => l.title) });
+  } catch (err) {
+    console.error('GET /listings/autocomplete error:', err);
+    res.status(500).json({ error: 'Failed to get suggestions' });
+  }
+});
+
 // GET /api/listings
 router.get('/', searchRateLimit, async (req: Request, res: Response) => {
   const q = qs(req.query.q);
