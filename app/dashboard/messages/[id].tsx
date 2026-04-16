@@ -8,13 +8,18 @@ import { useAuthStore } from '../../../store/auth';
 export default function ChatThreadPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [messages, setMessages] = useState<any[]>([]);
+  const [otherUser, setOtherUser] = useState<{ id: string; name: string; avatarUrl?: string } | undefined>();
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
 
   const load = async () => {
     try {
-      const r = await apiFetch(`/chat/threads/${id}/messages`);
-      setMessages(r.messages || []);
+      const [msgRes, threadRes] = await Promise.all([
+        apiFetch(`/chat/threads/${id}/messages`),
+        apiFetch(`/chat/threads/${id}`),
+      ]);
+      setMessages(msgRes.messages || []);
+      if (threadRes.thread?.otherUser) setOtherUser(threadRes.thread.otherUser);
       // Mark as seen
       apiFetch(`/chat/threads/${id}/seen`, { method: 'POST' }).catch(() => {});
     } catch {}
@@ -38,5 +43,5 @@ export default function ChatThreadPage() {
       <ActivityIndicator />
     </View>
   );
-  return <ChatThread messages={messages} currentUserId={user?.id} onSend={handleSend} />;
+  return <ChatThread messages={messages} currentUserId={user?.id} onSend={handleSend} otherUser={otherUser} />;
 }
