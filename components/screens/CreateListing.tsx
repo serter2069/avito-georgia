@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, ActivityIndicator, useWindowDimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, Pressable, ActivityIndicator, useWindowDimensions, Image, Platform } from 'react-native';
 import BottomNav from '../BottomNav';
 import { apiFetch } from '../../lib/api';
 
@@ -14,8 +14,6 @@ const C = {
   error: '#D32F2F',
 };
 
-const PHOTO_COLORS = ['#B0C4DE', '#D2B48C', '#A8D8A8'];
-
 interface Category { id: string; name: string; slug: string; }
 interface City { id: string; name: string; }
 
@@ -28,7 +26,14 @@ interface FormState {
 }
 
 export interface CreateListingProps {
-  onSubmit: (data: { title: string; price: string; categoryId: string; cityId: string; description?: string }) => void;
+  onSubmit: (data: {
+    title: string;
+    price: string;
+    categoryId: string;
+    cityId: string;
+    description?: string;
+    selectedFiles?: File[];
+  }) => void;
   loading?: boolean;
   error?: string;
 }
@@ -74,16 +79,56 @@ function FieldLabel({ text }: { text: string }) {
 }
 
 // --- STEP 1: Фото ---
-function Step1({ onNext }: { onNext: () => void }) {
-  const [uploaded, setUploaded] = useState(false);
+function Step1({ onNext, selectedFiles, onFilesChange }: {
+  onNext: () => void;
+  selectedFiles: File[];
+  onFilesChange: (files: File[]) => void;
+}) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
+  const fileInputRef = useRef<any>(null);
+  const [previews, setPreviews] = useState<string[]>([]);
+
+  // Revoke old object URLs on unmount
+  useEffect(() => {
+    return () => { previews.forEach(url => URL.revokeObjectURL(url)); };
+  }, [previews]);
+
+  const handleFileChange = (e: any) => {
+    const files: File[] = Array.from(e.target.files as FileList);
+    if (!files.length) return;
+    // Combine with existing, cap at 10
+    const combined = [...selectedFiles, ...files].slice(0, 10);
+    onFilesChange(combined);
+    const newPreviews = combined.map(f => URL.createObjectURL(f));
+    setPreviews(newPreviews);
+  };
+
+  const removePhoto = (idx: number) => {
+    URL.revokeObjectURL(previews[idx]);
+    const newFiles = selectedFiles.filter((_, i) => i !== idx);
+    const newPreviews = previews.filter((_, i) => i !== idx);
+    onFilesChange(newFiles);
+    setPreviews(newPreviews);
+  };
 
   const photoArea = (
     <View style={{ padding: 16 }}>
-      {!uploaded ? (
+      {/* Hidden native file input (web only) */}
+      {Platform.OS === 'web' && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
+      )}
+
+      {previews.length === 0 ? (
         <Pressable
-          onPress={() => setUploaded(true)}
+          onPress={() => fileInputRef.current?.click()}
           style={{
             borderWidth: 2, borderStyle: 'dashed', borderColor: C.border, borderRadius: 10,
             paddingVertical: 48, alignItems: 'center', justifyContent: 'center',
@@ -95,20 +140,45 @@ function Step1({ onNext }: { onNext: () => void }) {
         </Pressable>
       ) : (
         <View>
-          <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Фото</Text>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>
+            Фото ({previews.length}/10)
+          </Text>
           <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-            {PHOTO_COLORS.map((bg, i) => (
-              <View key={i} style={{ width: 90, height: 90, borderRadius: 8, backgroundColor: bg }} />
+            {previews.map((uri, i) => (
+              <View key={i} style={{ position: 'relative' }}>
+                <Image
+                  source={{ uri }}
+                  style={{ width: 90, height: 90, borderRadius: 8 }}
+                />
+                <Pressable
+                  onPress={() => removePhoto(i)}
+                  style={{
+                    position: 'absolute', top: 4, right: 4,
+                    width: 20, height: 20, borderRadius: 10,
+                    backgroundColor: 'rgba(0,0,0,0.55)',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ color: C.white, fontSize: 11, fontWeight: '700', lineHeight: 14 }}>✕</Text>
+                </Pressable>
+              </View>
             ))}
-            <Pressable style={{
-              width: 90, height: 90, borderRadius: 8, borderWidth: 2, borderStyle: 'dashed', borderColor: C.border,
-              alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Text style={{ fontSize: 26, color: C.green }}>+</Text>
-            </Pressable>
+            {previews.length < 10 && (
+              <Pressable
+                onPress={() => fileInputRef.current?.click()}
+                style={{
+                  width: 90, height: 90, borderRadius: 8, borderWidth: 2,
+                  borderStyle: 'dashed', borderColor: C.border,
+                  alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 26, color: C.green }}>+</Text>
+              </Pressable>
+            )}
           </View>
         </View>
       )}
+
       <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'flex-end' }}>
         <Pressable onPress={onNext} style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 32, paddingVertical: 12 }}>
           <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Далее</Text>
@@ -123,6 +193,9 @@ function Step1({ onNext }: { onNext: () => void }) {
         <View style={{ flex: 2 }}>{photoArea}</View>
         <View style={{ flex: 1, padding: 16, paddingLeft: 0 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Предпросмотр</Text>
+          {previews[0] && (
+            <Image source={{ uri: previews[0] }} style={{ width: '100%', height: 160, borderRadius: 8 }} />
+          )}
         </View>
       </View>
     );
@@ -326,6 +399,7 @@ function CreateListingInteractive({ onSubmit, loading, error }: CreateListingPro
   const [categories, setCategories] = useState<Category[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [loadingMeta, setLoadingMeta] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
@@ -346,6 +420,7 @@ function CreateListingInteractive({ onSubmit, loading, error }: CreateListingPro
       categoryId: form.categoryId,
       cityId: form.cityId,
       description: form.desc || undefined,
+      selectedFiles,
     });
   };
 
@@ -355,7 +430,13 @@ function CreateListingInteractive({ onSubmit, loading, error }: CreateListingPro
         <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>Новое объявление</Text>
       </View>
       <StepIndicator step={step} />
-      {step === 1 && <Step1 onNext={() => setStep(2)} />}
+      {step === 1 && (
+        <Step1
+          onNext={() => setStep(2)}
+          selectedFiles={selectedFiles}
+          onFilesChange={setSelectedFiles}
+        />
+      )}
       {step === 2 && (
         <Step2
           onNext={() => setStep(3)}
