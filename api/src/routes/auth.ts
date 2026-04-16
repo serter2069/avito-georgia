@@ -100,7 +100,9 @@ router.post('/request-otp', async (req: Request, res: Response) => {
     data: { email, code: otp, expiresAt, userId: user.id },
   });
 
-  await sendOtpEmail(email, otp, getLocale(req));
+  if (process.env.DEV_AUTH !== 'true') {
+    await sendOtpEmail(email, otp, getLocale(req));
+  }
   res.json({ ok: true });
 });
 
