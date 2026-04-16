@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Modal } from 'react-native';
+import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Modal, Image } from 'react-native';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
 
 const C = { green: '#00AA6C', greenBg: '#E8F9F2', white: '#FFFFFF', text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8' };
 
-const PHOTOS = [30, 31, 32, 33, 34]; // seeds
+const FALLBACK_SEEDS = [30, 31, 32, 33, 34]; // used when listing has no photos
 
 function useLayout() {
   const { width } = useWindowDimensions();
@@ -13,7 +13,8 @@ function useLayout() {
 }
 
 // ─── Photo Gallery with thumbnails ───────────────────────────────────────────
-function PhotoGallery({ onFavPress, fav, onPhotoPress }: {
+function PhotoGallery({ photos, onFavPress, fav, onPhotoPress }: {
+  photos: { url?: string; seed?: number }[];
   onFavPress: () => void;
   fav: boolean;
   onPhotoPress: (idx: number) => void;
@@ -22,11 +23,18 @@ function PhotoGallery({ onFavPress, fav, onPhotoPress }: {
   const { isDesktop } = useLayout();
   const mainH = isDesktop ? 380 : 260;
 
+  function renderPhoto(photo: { url?: string; seed?: number }, width: any, height: number, style?: any) {
+    if (photo.url) {
+      return <Image source={{ uri: photo.url }} style={[{ width, height }, style]} resizeMode="cover" />;
+    }
+    return <ProtoImage seed={photo.seed ?? 30} width={width} height={height} />;
+  }
+
   return (
     <View>
       {/* Main photo */}
       <Pressable onPress={() => onPhotoPress(active)} style={{ position: 'relative' }}>
-        <ProtoImage seed={PHOTOS[active]} width="100%" height={mainH} />
+        {renderPhoto(photos[active] ?? {}, '100%', mainH)}
 
         {/* Heart */}
         <Pressable
@@ -38,7 +46,7 @@ function PhotoGallery({ onFavPress, fav, onPhotoPress }: {
 
         {/* Counter */}
         <View style={{ position: 'absolute', bottom: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3 }}>
-          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{active + 1} / {PHOTOS.length}</Text>
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{active + 1} / {photos.length}</Text>
         </View>
 
         {/* Expand hint */}
@@ -49,7 +57,7 @@ function PhotoGallery({ onFavPress, fav, onPhotoPress }: {
 
       {/* Thumbnail strip */}
       <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
-        {PHOTOS.map((seed, i) => (
+        {photos.map((photo, i) => (
           <Pressable
             key={i}
             onPress={() => setActive(i)}
@@ -58,7 +66,7 @@ function PhotoGallery({ onFavPress, fav, onPhotoPress }: {
               borderWidth: 2, borderColor: i === active ? C.green : 'transparent',
             }}
           >
-            <ProtoImage seed={seed} width="100%" height={56} />
+            {renderPhoto(photo, '100%', 56)}
           </Pressable>
         ))}
       </View>
@@ -67,16 +75,22 @@ function PhotoGallery({ onFavPress, fav, onPhotoPress }: {
 }
 
 // ─── Photo Lightbox (modal) ───────────────────────────────────────────────────
-function PhotoLightbox({ visible, initialIndex, onClose }: {
+function PhotoLightbox({ photos, visible, initialIndex, onClose }: {
+  photos: { url?: string; seed?: number }[];
   visible: boolean;
   initialIndex: number;
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(initialIndex);
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   // sync idx when lightbox opens
   React.useEffect(() => { if (visible) setIdx(initialIndex); }, [visible, initialIndex]);
+
+  function renderPhoto(photo: { url?: string; seed?: number }, w: any, h: number) {
+    if (photo?.url) return <Image source={{ uri: photo.url }} style={{ width: w, height: h }} resizeMode="cover" />;
+    return <ProtoImage seed={photo?.seed ?? 30} width={w} height={h} />;
+  }
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -88,12 +102,12 @@ function PhotoLightbox({ visible, initialIndex, onClose }: {
 
         {/* Counter */}
         <View style={{ position: 'absolute', top: 28, left: 0, right: 0, alignItems: 'center' }}>
-          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{idx + 1} / {PHOTOS.length}</Text>
+          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{idx + 1} / {photos.length}</Text>
         </View>
 
         {/* Main image */}
         <View style={{ width: Math.min(width - 32, 800), aspectRatio: 4 / 3, borderRadius: 8, overflow: 'hidden' }}>
-          <ProtoImage seed={PHOTOS[idx]} width="100%" height={400} />
+          {renderPhoto(photos[idx] ?? {}, '100%', 400)}
         </View>
 
         {/* Prev / Next */}
@@ -102,7 +116,7 @@ function PhotoLightbox({ visible, initialIndex, onClose }: {
             <Text style={{ color: '#fff', fontSize: 22 }}>‹</Text>
           </Pressable>
         )}
-        {idx < PHOTOS.length - 1 && (
+        {idx < photos.length - 1 && (
           <Pressable onPress={() => setIdx(idx + 1)} style={{ position: 'absolute', right: 16, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: '#fff', fontSize: 22 }}>›</Text>
           </Pressable>
@@ -110,9 +124,9 @@ function PhotoLightbox({ visible, initialIndex, onClose }: {
 
         {/* Thumbnail strip */}
         <View style={{ position: 'absolute', bottom: 20, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 8, paddingHorizontal: 24 }}>
-          {PHOTOS.map((seed, i) => (
+          {photos.map((photo, i) => (
             <Pressable key={i} onPress={() => setIdx(i)} style={{ width: 52, height: 38, borderRadius: 5, overflow: 'hidden', borderWidth: 2, borderColor: i === idx ? C.green : 'rgba(255,255,255,0.3)' }}>
-              <ProtoImage seed={seed} width={52} height={38} />
+              {renderPhoto(photo, 52, 38)}
             </Pressable>
           ))}
         </View>
@@ -185,39 +199,46 @@ function SimilarListings() {
 }
 
 // ─── Seller Row ───────────────────────────────────────────────────────────────
-function SellerRow() {
+function SellerRow({ user }: { user?: { name?: string; avatarUrl?: string | null } }) {
+  const name = user?.name ?? 'Продавец';
+  const initials = name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderTopWidth: 1, borderTopColor: C.border, marginTop: 4 }}>
-      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#B2DFDB', alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ fontSize: 17, fontWeight: '700', color: '#00695C' }}>МК</Text>
+      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#B2DFDB', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        {user?.avatarUrl
+          ? <Image source={{ uri: user.avatarUrl }} style={{ width: 44, height: 44 }} />
+          : <Text style={{ fontSize: 17, fontWeight: '700', color: '#00695C' }}>{initials}</Text>
+        }
       </View>
       <View style={{ flex: 1, marginLeft: 12 }}>
-        <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>Михаил Кварацхелия</Text>
-        <Text style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>★ 4.8 · На сайте с 2022</Text>
+        <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>{name}</Text>
       </View>
-      {/* Removed "Профиль" text — arrow is enough */}
       <Text style={{ fontSize: 18, color: C.muted }}>›</Text>
     </View>
   );
 }
 
 // ─── Listing Info ─────────────────────────────────────────────────────────────
-function ListingInfo() {
+function ListingInfo({ listing }: { listing?: any }) {
+  const title = listing?.title ?? '3-комнатная квартира, Батуми, вид на море';
+  const currency = listing?.currency === 'GEL' ? '₾' : (listing?.currency ?? '₾');
+  const price = listing?.price != null
+    ? `${currency}${Number(listing.price).toLocaleString('ru-RU')}${listing.isNegotiable ? ' (торг)' : ''}`
+    : '₾125 000';
+  const cityName = listing?.city?.name ?? 'Батуми';
+  const description = listing?.description ?? '';
+
   return (
     <View>
-      <Text style={{ fontSize: 22, fontWeight: '700', color: C.text, lineHeight: 30 }}>
-        3-комнатная квартира, Батуми, вид на море
-      </Text>
-      <Text style={{ fontSize: 26, fontWeight: '800', color: C.text, marginTop: 10 }}>₾125 000</Text>
+      <Text style={{ fontSize: 22, fontWeight: '700', color: C.text, lineHeight: 30 }}>{title}</Text>
+      <Text style={{ fontSize: 26, fontWeight: '800', color: C.text, marginTop: 10 }}>{price}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 }}>
-        <Text style={{ fontSize: 13, color: C.muted }}>Батуми, Аджара</Text>
-        <Text style={{ fontSize: 13, color: C.border }}>·</Text>
-        <Text style={{ fontSize: 13, color: C.muted }}>3 часа назад</Text>
+        <Text style={{ fontSize: 13, color: C.muted }}>{cityName}{listing?.address ? `, ${listing.address}` : ''}</Text>
       </View>
-      <SellerRow />
-      <Text style={{ fontSize: 15, color: C.text, lineHeight: 24 }}>
-        Просторная 3-комнатная квартира с панорамным видом на море. Современный ремонт, полностью меблирована. 5 минут пешком до пляжа, рядом вся инфраструктура. Окна выходят на Черное море. Есть кондиционеры, встроенная кухня, джакузи.
-      </Text>
+      <SellerRow user={listing?.user} />
+      {description ? (
+        <Text style={{ fontSize: 15, color: C.text, lineHeight: 24 }}>{description}</Text>
+      ) : null}
     </View>
   );
 }
@@ -241,7 +262,7 @@ function CTAButtons({ loading }: { loading: boolean }) {
 }
 
 // ─── Default View ─────────────────────────────────────────────────────────────
-export function DefaultView() {
+export function DefaultView({ listing }: { listing?: any }) {
   const [fav, setFav] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);
@@ -249,6 +270,11 @@ export function DefaultView() {
   const horizontalPadding = isDesktop ? 32 : 16;
 
   const openLightbox = (idx: number) => { setLightboxIdx(idx); setLightboxOpen(true); };
+
+  // Build photos array: real photos from API or fallback seeds
+  const photos: { url?: string; seed?: number }[] = listing?.photos?.length
+    ? listing.photos.map((p: any) => ({ url: p.url }))
+    : FALLBACK_SEEDS.map(seed => ({ seed }));
 
   return (
     <View style={{ flex: 1, backgroundColor: C.white }}>
@@ -269,7 +295,7 @@ export function DefaultView() {
               {/* Left: gallery */}
               <View style={{ width: '55%' }}>
                 <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: C.border, padding: 12, gap: 8, backgroundColor: C.white }}>
-                  <PhotoGallery onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={openLightbox} />
+                  <PhotoGallery photos={photos} onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={openLightbox} />
                 </View>
                 <View style={{ marginTop: 20 }}>
                   <FakeMap />
@@ -277,7 +303,7 @@ export function DefaultView() {
               </View>
               {/* Right: info */}
               <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 24 }}>
-                <ListingInfo />
+                <ListingInfo listing={listing} />
                 <CTAButtons loading={false} />
                 <View style={{ marginTop: 24 }}>
                   <SimilarListings />
@@ -288,10 +314,10 @@ export function DefaultView() {
         ) : (
           <View>
             <View style={{ padding: 10, paddingBottom: 0 }}>
-              <PhotoGallery onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={openLightbox} />
+              <PhotoGallery photos={photos} onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={openLightbox} />
             </View>
             <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
-              <ListingInfo />
+              <ListingInfo listing={listing} />
               <CTAButtons loading={false} />
               <View style={{ marginTop: 24 }}><FakeMap /></View>
               <SimilarListings />
@@ -303,15 +329,16 @@ export function DefaultView() {
       {isMobile && <BottomNav />}
 
       {/* Photo lightbox */}
-      <PhotoLightbox visible={lightboxOpen} initialIndex={lightboxIdx} onClose={() => setLightboxOpen(false)} />
+      <PhotoLightbox photos={photos} visible={lightboxOpen} initialIndex={lightboxIdx} onClose={() => setLightboxOpen(false)} />
     </View>
   );
 }
 
-// ─── Photo Lightbox State (static preview) ───────────────────────────────────
+// ─── Photo Lightbox State (static preview — uses fallback seeds) ──────────────
 function LightboxPreview() {
   const { width } = useWindowDimensions();
   const [idx, setIdx] = useState(2);
+  const photos = FALLBACK_SEEDS.map(seed => ({ seed }));
   return (
       <View style={{ backgroundColor: 'rgba(0,0,0,0.95)', minHeight: 400, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}>
         {/* Close */}
@@ -321,27 +348,27 @@ function LightboxPreview() {
 
         {/* Counter */}
         <View style={{ position: 'absolute', top: 24, left: 0, right: 0, alignItems: 'center' }}>
-          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{idx + 1} / {PHOTOS.length}</Text>
+          <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{idx + 1} / {photos.length}</Text>
         </View>
 
         {/* Main image */}
         <View style={{ width: Math.min(width - 80, 720), aspectRatio: 4 / 3, borderRadius: 8, overflow: 'hidden' }}>
-          <ProtoImage seed={PHOTOS[idx]} width="100%" height={400} />
+          <ProtoImage seed={photos[idx].seed} width="100%" height={400} />
         </View>
 
         {/* Arrows */}
         <Pressable onPress={() => setIdx(Math.max(0, idx - 1))} style={{ position: 'absolute', left: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: 26 }}>‹</Text>
         </Pressable>
-        <Pressable onPress={() => setIdx(Math.min(PHOTOS.length - 1, idx + 1))} style={{ position: 'absolute', right: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable onPress={() => setIdx(Math.min(photos.length - 1, idx + 1))} style={{ position: 'absolute', right: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: 26 }}>›</Text>
         </Pressable>
 
         {/* Thumbnail strip */}
         <View style={{ position: 'absolute', bottom: 16, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-          {PHOTOS.map((seed, i) => (
+          {photos.map((photo, i) => (
             <Pressable key={i} onPress={() => setIdx(i)} style={{ width: 52, height: 38, borderRadius: 5, overflow: 'hidden', borderWidth: 2, borderColor: i === idx ? C.green : 'rgba(255,255,255,0.3)' }}>
-              <ProtoImage seed={seed} width={52} height={38} />
+              <ProtoImage seed={photo.seed} width={52} height={38} />
             </Pressable>
           ))}
         </View>
@@ -367,7 +394,7 @@ function ContactLoadingView() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: isMobile ? 80 : 32 }}>
         <View>
           <View style={{ padding: 10, paddingBottom: 0 }}>
-            <PhotoGallery onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={() => {}} />
+            <PhotoGallery photos={FALLBACK_SEEDS.map(seed => ({ seed }))} onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={() => {}} />
           </View>
           <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
             <ListingInfo />
@@ -386,4 +413,6 @@ function ContactLoadingView() {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export default DefaultView;
+export default function ListingDetail({ listing }: { listing?: any }) {
+  return <DefaultView listing={listing} />;
+}
