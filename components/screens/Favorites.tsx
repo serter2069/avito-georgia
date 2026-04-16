@@ -160,13 +160,52 @@ function FavoritesGrid({ items, onRemove }: { items: FavItem[]; onRemove: (id: n
   );
 }
 
-export function FavoritesInteractive({ showHeader = true, showBottomNav = true }: { showHeader?: boolean; showBottomNav?: boolean }) {
+function mapApiItems(apiItems: any[]): FavItem[] {
+  return apiItems.map((f, i) => {
+    const l = f.listing ?? f;
+    const price = l.price != null ? `${l.price} ${l.currency ?? '₾'}` : '';
+    // use listing id so delete calls work with /api/favorites/:listingId
+    return {
+      id: l.id,
+      title: l.title ?? '',
+      price,
+      city: l.city?.name ?? '',
+      photos: l.photos?.length ?? 0,
+      colorIdx: i % 8,
+    };
+  });
+}
+
+export function FavoritesInteractive({
+  showHeader = true,
+  showBottomNav = true,
+  items: apiItems,
+  loading,
+  onRemove: onRemoveApi,
+}: {
+  showHeader?: boolean;
+  showBottomNav?: boolean;
+  items?: any[];
+  loading?: boolean;
+  onRemove?: (listingId: string) => Promise<void>;
+}) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
-  const [items, setItems] = useState<FavItem[]>(INITIAL_FAVORITES);
 
-  const handleRemove = (id: number) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
+  const [items, setItems] = useState<FavItem[]>(
+    apiItems ? mapApiItems(apiItems) : INITIAL_FAVORITES
+  );
+
+  React.useEffect(() => {
+    if (apiItems) setItems(mapApiItems(apiItems));
+  }, [apiItems]);
+
+  const handleRemove = async (id: number) => {
+    if (onRemoveApi) {
+      await onRemoveApi(String(id));
+    } else {
+      setItems((prev) => prev.filter((i) => i.id !== id));
+    }
   };
 
   return (
