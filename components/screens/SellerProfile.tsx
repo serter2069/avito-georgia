@@ -15,22 +15,41 @@ const C = {
 };
 const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7', '#FFF9C4', '#FFCCBC'];
 
+interface ApiListing {
+  id: string;
+  title: string;
+  price: number;
+  currency: string;
+  photos: { url: string }[];
+  city?: { name: string };
+}
+
 interface SellerListing {
-  id: number;
+  id: string;
   title: string;
   price: string;
   photos: number;
   colorIdx: number;
 }
 
-const SELLER_LISTINGS: SellerListing[] = [
-  { id: 1, title: '3-комн. квартира, центр Батуми', price: '85 000 ₾', photos: 14, colorIdx: 0 },
-  { id: 2, title: 'Toyota Camry 2019, 45 000 км', price: '25 000 ₾', photos: 8, colorIdx: 1 },
-  { id: 3, title: 'Угловой диван, бежевый', price: '700 ₾', photos: 4, colorIdx: 2 },
-  { id: 4, title: 'MacBook Pro 14" M3', price: '3 600 ₾', photos: 6, colorIdx: 3 },
-  { id: 5, title: 'Велосипед Trek Marlin', price: '1 200 ₾', photos: 5, colorIdx: 4 },
-  { id: 6, title: 'Samsung Galaxy S24 Ultra', price: '3 100 ₾', photos: 7, colorIdx: 5 },
-];
+function formatPrice(price: number, currency: string): string {
+  return `${price.toLocaleString()} ${currency === 'GEL' ? '₾' : currency}`;
+}
+
+function formatJoined(createdAt: string): string {
+  const date = new Date(createdAt);
+  const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  return `${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 function StarRating({ rating }: { rating: number }) {
   const full = Math.floor(rating);
@@ -79,7 +98,6 @@ function SellerHeader({ name, initials, joined, rating, listingCount }: {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <StarRating rating={rating} />
         <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{rating.toFixed(1)}</Text>
-        <Text style={{ fontSize: 13, color: C.muted }}>· 24 отзыва</Text>
       </View>
 
       {/* Action buttons */}
@@ -181,8 +199,6 @@ function ListingsGrid({ listings }: { listings: SellerListing[] }) {
   const isDesktop = width >= 1024;
   const isTablet = width >= 640;
 
-  // When desktop, the grid is inside the right column (approximately width - 280px sidebar)
-  // We compute columns relative to available space
   const cols = isDesktop ? 3 : isTablet ? 3 : 2;
   const hPad = isDesktop ? 0 : 16;
   const availableWidth = isDesktop ? width - 280 - 32 : width - hPad * 2;
@@ -219,18 +235,42 @@ function ListingsGrid({ listings }: { listings: SellerListing[] }) {
   );
 }
 
-export function SellerProfileMain() {
+interface SellerProfileProps {
+  seller: {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    createdAt: string;
+    _count?: { listings: number };
+  } | null;
+  listings: ApiListing[];
+}
+
+function SellerProfileMain({ seller, listings }: SellerProfileProps) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
   const isDesktop = width >= 1024;
 
+  const name = seller?.name ?? 'Продавец';
+  const initials = getInitials(name);
+  const joined = seller?.createdAt ? formatJoined(seller.createdAt) : '';
+  const listingCount = seller?._count?.listings ?? listings.length;
+
+  const mappedListings: SellerListing[] = listings.map((l, i) => ({
+    id: l.id,
+    title: l.title,
+    price: formatPrice(l.price, l.currency),
+    photos: l.photos?.length ?? 0,
+    colorIdx: i % IMG_COLORS.length,
+  }));
+
   const headerContent = (
     <SellerHeader
-      name="Михаил Т."
-      initials="МТ"
-      joined="марта 2023"
-      rating={4.5}
-      listingCount={42}
+      name={name}
+      initials={initials}
+      joined={joined}
+      rating={0}
+      listingCount={listingCount}
     />
   );
 
@@ -246,7 +286,7 @@ export function SellerProfileMain() {
         backgroundColor: '#FAFAFA',
       }}
     >
-      <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>Объявления продавца (42)</Text>
+      <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>Объявления продавца ({listingCount})</Text>
     </View>
   );
 
@@ -266,7 +306,7 @@ export function SellerProfileMain() {
         {/* Listings */}
         <View style={{ flex: 1 }}>
           {sectionHeader}
-          <ListingsGrid listings={SELLER_LISTINGS} />
+          <ListingsGrid listings={mappedListings} />
         </View>
       </View>
     );
@@ -287,62 +327,7 @@ export function SellerProfileMain() {
       </View>
       {headerContent}
       {sectionHeader}
-      <ListingsGrid listings={SELLER_LISTINGS} />
-      {isMobile && <BottomNav active="browse" />}
-    </View>
-  );
-}
-
-function SellerProfileEmpty() {
-  const { width } = useWindowDimensions();
-  const isMobile = width < 640;
-  const isDesktop = width >= 1024;
-
-  const headerContent = (
-    <SellerHeader
-      name="Георгий К."
-      initials="ГК"
-      joined="января 2024"
-      rating={4.0}
-      listingCount={0}
-    />
-  );
-
-  if (isDesktop) {
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        <View style={{ width: 280, borderRightWidth: 1, borderRightColor: C.border }}>
-          {headerContent}
-        </View>
-        <View style={{ flex: 1, alignItems: 'center', paddingVertical: 48 }}>
-          <Text style={{ fontSize: 14, color: C.muted }}>Нет активных объявлений</Text>
-        </View>
-      </View>
-    );
-  }
-
-  return (
-    <View>
-      <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border }}>
-        <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>← Назад</Text>
-      </View>
-      {headerContent}
-      <View
-        style={{
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-          borderTopWidth: 1,
-          borderTopColor: C.border,
-          borderBottomWidth: 1,
-          borderBottomColor: C.border,
-          backgroundColor: '#FAFAFA',
-        }}
-      >
-        <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>Объявления продавца</Text>
-      </View>
-      <View style={{ alignItems: 'center', paddingVertical: 48 }}>
-        <Text style={{ fontSize: 14, color: C.muted }}>Нет активных объявлений</Text>
-      </View>
+      <ListingsGrid listings={mappedListings} />
       {isMobile && <BottomNav active="browse" />}
     </View>
   );
