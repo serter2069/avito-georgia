@@ -3,7 +3,7 @@ import { Stack, usePathname, useRouter } from 'expo-router';
 import { View, Platform, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import { useAuthStore } from '../store/auth';
@@ -43,13 +43,16 @@ export default function RootLayout() {
   const showChrome = !NO_CHROME_PREFIXES.some(p => pathname.startsWith(p));
 
   const { isLoggedIn, user } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   // Redirect to login if accessing private route without auth
   useEffect(() => {
+    if (!mounted) return;
     if (!isLoggedIn && isPrivate(pathname)) {
       router.replace('/auth/email' as any);
     }
-  }, [isLoggedIn, pathname]);
+  }, [mounted, isLoggedIn, pathname]);
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
