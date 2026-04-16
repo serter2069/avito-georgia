@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
 import Header from '../Header';
@@ -49,6 +50,7 @@ function ListingCard({ listing, colorIdx }: {
   listing: any; colorIdx: number;
 }) {
   const [fav, setFav] = useState(false);
+  const router = useRouter();
   const photoUrl = listing.photos?.[0]?.url;
   const photoCount = listing.photos?.length ?? 0;
   const price = formatPrice(listing.price, listing.currency, listing.isNegotiable);
@@ -56,14 +58,17 @@ function ListingCard({ listing, colorIdx }: {
   const loc = listing.city?.name ?? '';
 
   return (
-    <View style={{ borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: C.border, backgroundColor: C.white }}>
+    <Pressable
+      onPress={() => router.push(`/listings/${listing.id}` as any)}
+      style={{ borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: C.border, backgroundColor: C.white }}
+    >
       <View style={{ position: 'relative' }}>
         {photoUrl ? (
           <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 130 }} resizeMode="cover" />
         ) : (
           <ProtoImage seed={colorIdx + 10} width="100%" height={130} />
         )}
-        <Pressable onPress={() => setFav(!fav)} style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable onPress={(e) => { e.stopPropagation(); setFav(!fav); }} style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 14, color: fav ? '#E53935' : C.muted }}>{fav ? '♥' : '♡'}</Text>
         </Pressable>
         {photoCount > 0 && (
@@ -77,7 +82,7 @@ function ListingCard({ listing, colorIdx }: {
         <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, marginTop: 4 }}>{price}</Text>
         <Text style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{loc}{age ? ` · ${age}` : ''}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

@@ -152,6 +152,39 @@ router.post('/threads/:threadId/seen', requireAuth, async (req: Request, res: Re
   }
 });
 
+// GET /api/threads/:id — single thread with otherUser (must be after /threads/unread-count)
+router.get('/threads/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const threadId = req.params.id as string;
+
+    const thread = await prisma.thread.findFirst({
+      where: { id: threadId, participants: { some: { userId } } },
+      include: {
+        listing: { select: { id: true, title: true, price: true, currency: true, photos: { take: 1, select: { url: true } } } },
+        participants: { include: { user: { select: { id: true, name: true, avatarUrl: true } } } },
+      },
+    });
+
+    if (!thread) {
+      res.status(404).json({ error: 'Thread not found' });
+      return;
+    }
+
+    res.json({
+      thread: {
+        id: thread.id,
+        listing: thread.listing,
+        otherUser: thread.participants.find((p: { userId: string }) => p.userId !== userId)?.user || null,
+        updatedAt: thread.updatedAt,
+      },
+    });
+  } catch (err) {
+    console.error('GET /threads/:id error:', err);
+    res.status(500).json({ error: 'Failed to fetch thread' });
+  }
+});
+
 // GET /api/threads/:id/messages — paginated messages for a thread
 router.get('/threads/:id/messages', requireAuth, async (req: Request, res: Response) => {
   try {

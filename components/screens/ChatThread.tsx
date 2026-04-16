@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, Modal, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
 
@@ -315,10 +316,10 @@ function InteractiveChat({
     const now = new Date();
     const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-    if (useRealData && onSend && text) {
+    if (useRealData && onSend) {
       setInput('');
       setAttachSeeds([]);
-      await onSend(text);
+      if (text) await onSend(text);
       return;
     }
 
@@ -396,26 +397,26 @@ function InteractiveChat({
 }
 
 // ─── Header ───────────────────────────────────────────────────────────────────
-function Header() {
+function Header({ otherUser }: { otherUser?: { id: string; name: string; avatarUrl?: string } }) {
+  const router = useRouter();
+  const name = otherUser?.name ?? 'Собеседник';
+  const initial = name.charAt(0).toUpperCase();
+
   return (
     <View className="flex-row items-center px-4 py-3 border-b border-[#E8E8E8] bg-white" style={{ gap: 12 }}>
       {/* Back button */}
-      <Pressable className="w-8 h-8 items-center justify-center">
+      <Pressable onPress={() => router.back()} className="w-8 h-8 items-center justify-center">
         <Ionicons name="chevron-back" size={26} color="#1A1A1A" />
       </Pressable>
 
       {/* Avatar */}
       <View className="w-10 h-10 rounded-full bg-[#5B8DEF] items-center justify-center">
-        <Text className="text-white font-bold text-base">М</Text>
+        <Text className="text-white font-bold text-base">{initial}</Text>
       </View>
 
-      {/* Name + status */}
+      {/* Name */}
       <View className="flex-1">
-        <Text className="text-[15px] font-semibold text-[#1A1A1A]">Михаил</Text>
-        <View className="flex-row items-center" style={{ gap: 4 }}>
-          <View className="w-2 h-2 rounded-full bg-[#00AA6C]" />
-          <Text className="text-xs text-[#00AA6C]">онлайн</Text>
-        </View>
+        <Text className="text-[15px] font-semibold text-[#1A1A1A]">{name}</Text>
       </View>
     </View>
   );
@@ -426,17 +427,19 @@ export function ChatThreadDefault({
   messages: externalMessages,
   currentUserId,
   onSend,
+  otherUser,
 }: {
   messages?: any[];
   currentUserId?: string;
   onSend?: (text: string) => Promise<void>;
+  otherUser?: { id: string; name: string; avatarUrl?: string };
 } = {}) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
   const inner = (
     <View className="flex-1" style={{ minHeight: 560 }}>
-      <Header />
+      <Header otherUser={otherUser} />
       <InteractiveChat
         externalMessages={externalMessages}
         currentUserId={currentUserId}
