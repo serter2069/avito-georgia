@@ -29,6 +29,19 @@ const LABELS = [
   { text:'Парк',             x:188, y:283 },
 ];
 
+// ─── Lat/lng → canvas pixel projection ────────────────────────────────────────
+// Canvas covers approximate Tbilisi bounding box
+const GEO_BOUNDS = { latMin: 41.66, latMax: 41.77, lngMin: 44.74, lngMax: 44.87 };
+
+function latLngToXY(lat: number, lng: number): { x: number; y: number } {
+  const x = ((lng - GEO_BOUNDS.lngMin) / (GEO_BOUNDS.lngMax - GEO_BOUNDS.lngMin)) * MAP_W;
+  const y = ((GEO_BOUNDS.latMax - lat) / (GEO_BOUNDS.latMax - GEO_BOUNDS.latMin)) * MAP_H;
+  return {
+    x: Math.max(20, Math.min(MAP_W - 20, Math.round(x))),
+    y: Math.max(20, Math.min(MAP_H - 20, Math.round(y))),
+  };
+}
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 interface ML {
   id: number;
@@ -41,7 +54,7 @@ interface ML {
   clusterId: string;
 }
 
-const PINS: ML[] = [
+const FALLBACK_PINS: ML[] = [
   // Single pins
   { id:1,  x:115, y:118, price:'₾95 000',    title:'3-комн., 87м²',         address:'пр. Руставели, 22',  seed:10, premium:true, clusterId:'r22'    },
   { id:3,  x:295, y:122, price:'₾28 500',    title:'Toyota Prius 2018',      address:'ул. Сабуртало, 5',   seed:12,              clusterId:'sab5'   },
@@ -60,6 +73,24 @@ const PINS: ML[] = [
   { id:17, x:115, y:285, price:'₾1 100/мес', title:'Офис 35м², 1 этаж',      address:'пр. Костава, 8',     seed:26,              clusterId:'kost8'  },
   { id:18, x:115, y:285, price:'₾2 200/мес', title:'Офис 80м², 5 этаж',      address:'пр. Костава, 8',     seed:27,              clusterId:'kost8'  },
 ];
+
+// ─── Convert API pins to internal ML format ───────────────────────────────────
+function apiPinsToML(apiPins: any[]): ML[] {
+  return apiPins.map((p, i) => {
+    const coords = p.lat && p.lng ? latLngToXY(p.lat, p.lng) : { x: 100 + (i % 5) * 50, y: 100 + Math.floor(i / 5) * 60 };
+    const currency = p.currency === 'GEL' ? '₾' : (p.currency ?? '₾');
+    return {
+      id: i + 1,
+      x: coords.x,
+      y: coords.y,
+      price: `${currency}${Number(p.price).toLocaleString('ru-RU')}`,
+      title: p.title,
+      address: p.title,
+      seed: (i % 20) + 10,
+      clusterId: p.id ?? String(i),
+    };
+  });
+}
 
 // ─── Cluster logic ────────────────────────────────────────────────────────────
 interface Cluster {
@@ -199,10 +230,11 @@ function ListingRow({ pin, onPress }: { pin: ML; onPress(): void }) {
 }
 
 // ─── Mobile ───────────────────────────────────────────────────────────────────
-export function MapMobile() {
+export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
   const { width } = useWindowDimensions();
   const [activeId, setActiveId] = useState<string|null>(null);
 
+  const PINS = apiPins && apiPins.length > 0 ? apiPinsToML(apiPins) : FALLBACK_PINS;
   const clusters    = buildClusters(PINS);
   const activeCluster = activeId ? clusters.find(c => c.clusterId === activeId) : null;
   const toggle      = (id: string) => setActiveId(prev => prev === id ? null : id);
@@ -287,9 +319,10 @@ export function MapMobile() {
 }
 
 // ─── Desktop ──────────────────────────────────────────────────────────────────
-export function MapDesktop() {
+export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
   const [activeId, setActiveId] = useState<string|null>(null);
 
+  const PINS = apiPins && apiPins.length > 0 ? apiPinsToML(apiPins) : FALLBACK_PINS;
   const clusters      = buildClusters(PINS);
   const activeCluster = activeId ? clusters.find(c => c.clusterId === activeId) : null;
   const toggle        = (id: string) => setActiveId(prev => prev === id ? null : id);
@@ -381,4 +414,6 @@ export function MapDesktop() {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
-export default MapMobile;
+export default function MapView({ pins }: { pins?: any[] }) {
+  return <MapMobile pins={pins} />;
+}
