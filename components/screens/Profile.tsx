@@ -3,6 +3,7 @@ import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } fro
 import { Ionicons } from '@expo/vector-icons';
 import BottomNav from '../BottomNav';
 import { ProtoImage } from '../proto/ProtoPlaceholderImage';
+import { AuthUser } from '../../store/auth';
 
 const C = {
   green: '#00AA6C',
@@ -121,7 +122,20 @@ function StarRow({ rating, size = 14 }: { rating: number; size?: number }) {
   );
 }
 
-function UserHeader({ showEditButton, onEdit }: { showEditButton?: boolean; onEdit?: () => void }) {
+function UserHeader({
+  showEditButton,
+  onEdit,
+  realUser,
+}: {
+  showEditButton?: boolean;
+  onEdit?: () => void;
+  realUser?: AuthUser | null;
+}) {
+  const displayName = realUser?.name || USER.name;
+  const displayInitials = realUser
+    ? (realUser.name ?? realUser.email ?? '?')[0].toUpperCase()
+    : USER.initials;
+
   return (
     <View className="bg-white rounded-xl overflow-hidden">
       {/* Top gradient band */}
@@ -131,7 +145,7 @@ function UserHeader({ showEditButton, onEdit }: { showEditButton?: boolean; onEd
         {/* Avatar */}
         <View className="flex-row items-end justify-between">
           <View style={{ borderWidth: 3, borderColor: C.white, borderRadius: 44 }}>
-            <AvatarCircle initials={USER.initials} size={80} />
+            <AvatarCircle initials={displayInitials} size={80} />
           </View>
           {showEditButton && (
             <Pressable
@@ -147,7 +161,7 @@ function UserHeader({ showEditButton, onEdit }: { showEditButton?: boolean; onEd
 
         {/* Name + city + since */}
         <View className="mt-3 gap-1">
-          <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>{USER.name}</Text>
+          <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>{displayName}</Text>
           <View className="flex-row items-center gap-1">
             <Ionicons name="location-outline" size={14} color={C.muted} />
             <Text style={{ fontSize: 13, color: C.muted }}>{USER.city}</Text>
@@ -348,7 +362,7 @@ function EditProfileForm() {
 
 // ---- State 1: Own Profile ----
 
-export function OwnProfileState({ showBottomNav = true }: { showBottomNav?: boolean }) {
+export function OwnProfileState({ showBottomNav = true, user }: { showBottomNav?: boolean; user?: AuthUser | null }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
@@ -356,7 +370,7 @@ export function OwnProfileState({ showBottomNav = true }: { showBottomNav?: bool
     <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
-          <UserHeader showEditButton />
+          <UserHeader showEditButton realUser={user} />
           <EditProfileForm />
           <ListingsSection listings={LISTINGS.slice(0, 4)} />
           <ReviewsSection />

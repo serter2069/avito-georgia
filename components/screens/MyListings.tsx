@@ -136,13 +136,37 @@ function ListingRow({
   );
 }
 
-export function MyListingsInteractive({ showBottomNav = true }: { showBottomNav?: boolean }) {
+function mapApiListings(apiListings: any[]): Record<Tab, Listing[]> {
+  const result: Record<Tab, Listing[]> = { active: [], inactive: [], draft: [] };
+  apiListings.forEach((l, i) => {
+    const price = l.price != null ? `${l.price} ${l.currency ?? '₾'}` : '';
+    const listing: Listing = {
+      id: l.id,
+      title: l.title ?? '',
+      price,
+      views: '',
+      photos: l.photos?.length ?? 0,
+      colorIdx: i % 8,
+    };
+    const status: Tab = l.status === 'inactive' ? 'inactive' : l.status === 'draft' ? 'draft' : 'active';
+    result[status].push(listing);
+  });
+  return result;
+}
+
+export function MyListingsInteractive({ showBottomNav = true, listings: apiListings }: { showBottomNav?: boolean; listings?: any[] }) {
   const { width } = useWindowDimensions();
   const isMobile = width < 640;
   const isDesktop = width >= 1024;
 
   const [tab, setTab] = useState<Tab>('active');
-  const [items, setItems] = useState<Record<Tab, Listing[]>>(LISTINGS);
+  const [items, setItems] = useState<Record<Tab, Listing[]>>(
+    apiListings ? mapApiListings(apiListings) : LISTINGS
+  );
+
+  React.useEffect(() => {
+    if (apiListings) setItems(mapApiListings(apiListings));
+  }, [apiListings]);
 
   const handleDelete = (id: number) => {
     setItems((prev) => ({ ...prev, draft: prev.draft.filter((l) => l.id !== id) }));

@@ -5,9 +5,11 @@ export interface AuthUser {
   id: string;
   name: string | null;
   email: string;
-  initial: string;
+  phone?: string;
   avatarUrl: string | null;
+  role?: string;
   isOnboarded: boolean;
+  initial: string;
 }
 
 interface AuthState {
@@ -15,6 +17,7 @@ interface AuthState {
   user: AuthUser | null;
   loading: boolean;
   setUser: (user: AuthUser) => void;
+  login: (user: AuthUser) => void;
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
 }
@@ -24,6 +27,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
   setUser: (user) => set({ isLoggedIn: true, user, loading: false }),
+  login: (user) => set({ isLoggedIn: true, user, loading: false }),
   logout: async () => {
     try { await apiFetch('/auth/logout', { method: 'POST' }); } catch {}
     set({ isLoggedIn: false, user: null, loading: false });
