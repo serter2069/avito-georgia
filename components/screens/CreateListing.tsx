@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ActivityIndicator, useWindowDimensions } from 'react-native';
 import BottomNav from '../BottomNav';
+import { apiFetch } from '../../lib/api';
 
 const C = {
   green: '#00AA6C',
@@ -10,9 +11,27 @@ const C = {
   muted: '#9E9E9E',
   border: '#E8E8E8',
   page: '#F5F5F5',
+  error: '#D32F2F',
 };
 
 const PHOTO_COLORS = ['#B0C4DE', '#D2B48C', '#A8D8A8'];
+
+interface Category { id: string; name: string; slug: string; }
+interface City { id: string; name: string; }
+
+interface FormState {
+  title: string;
+  desc: string;
+  price: string;
+  categoryId: string;
+  cityId: string;
+}
+
+export interface CreateListingProps {
+  onSubmit: (data: { title: string; price: string; categoryId: string; cityId: string; description?: string }) => void;
+  loading?: boolean;
+  error?: string;
+}
 
 function StepIndicator({ step }: { step: number }) {
   const steps = ['Фото', 'Описание', 'Цена и контакты'];
@@ -52,43 +71,6 @@ function StepIndicator({ step }: { step: number }) {
 
 function FieldLabel({ text }: { text: string }) {
   return <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 6 }}>{text}</Text>;
-}
-
-function SelectRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ marginBottom: 14 }}>
-      <FieldLabel text={label} />
-      <View style={{
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-        borderWidth: 1, borderColor: C.border, borderRadius: 8,
-        paddingHorizontal: 12, paddingVertical: 12,
-        backgroundColor: C.white,
-      }}>
-        <Text style={{ fontSize: 15, color: C.text }}>{value}</Text>
-        <Text style={{ fontSize: 16, color: C.muted }}>{'>'}</Text>
-      </View>
-    </View>
-  );
-}
-
-// Preview card shown on desktop right column
-function PreviewCard({ step }: { step: number }) {
-  return (
-    <View style={{
-      borderWidth: 1, borderColor: C.border, borderRadius: 10, overflow: 'hidden', backgroundColor: C.white,
-    }}>
-      <View style={{ height: 180, backgroundColor: step >= 1 ? PHOTO_COLORS[0] : C.border }} />
-      <View style={{ padding: 12 }}>
-        <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, marginBottom: 4 }}>
-          {step >= 3 ? '12 500 ₾' : '—'}
-        </Text>
-        <Text style={{ fontSize: 14, color: C.text, marginBottom: 4 }}>
-          {step >= 2 ? 'Toyota Camry 2019, 45 000 км' : 'Заголовок объявления'}
-        </Text>
-        <Text style={{ fontSize: 12, color: C.muted }}>Тбилиси</Text>
-      </View>
-    </View>
-  );
 }
 
 // --- STEP 1: Фото ---
@@ -141,7 +123,6 @@ function Step1({ onNext }: { onNext: () => void }) {
         <View style={{ flex: 2 }}>{photoArea}</View>
         <View style={{ flex: 1, padding: 16, paddingLeft: 0 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Предпросмотр</Text>
-          <PreviewCard step={uploaded ? 1 : 0} />
         </View>
       </View>
     );
@@ -150,33 +131,68 @@ function Step1({ onNext }: { onNext: () => void }) {
 }
 
 // --- STEP 2: Описание ---
-function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [title, setTitle] = useState('');
-  const [desc, setDesc] = useState('');
+function Step2({
+  onNext, onBack, form, setForm, categories, cities, loadingMeta,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+  form: FormState;
+  setForm: React.Dispatch<React.SetStateAction<FormState>>;
+  categories: Category[];
+  cities: City[];
+  loadingMeta: boolean;
+}) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
-  const form = (
+  const formEl = (
     <View style={{ padding: 16, gap: 14 }}>
       <View>
         <FieldLabel text="Заголовок" />
         <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
           <TextInput
-            value={title}
-            onChangeText={setTitle}
+            value={form.title}
+            onChangeText={v => setForm(f => ({ ...f, title: v }))}
             placeholder="Что продаёте?"
             placeholderTextColor={C.muted}
             style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
           />
         </View>
       </View>
-      <SelectRow label="Категория" value="Авто" />
+
+      {/* Category select */}
+      <View style={{ marginBottom: 4 }}>
+        <FieldLabel text="Категория" />
+        {loadingMeta ? (
+          <ActivityIndicator size="small" color={C.green} />
+        ) : (
+          <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, backgroundColor: C.white, overflow: 'hidden' }}>
+            {categories.map((cat, idx) => (
+              <Pressable
+                key={cat.id}
+                onPress={() => setForm(f => ({ ...f, categoryId: cat.id }))}
+                style={{
+                  flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+                  paddingHorizontal: 12, paddingVertical: 10,
+                  borderBottomWidth: idx < categories.length - 1 ? 1 : 0,
+                  borderBottomColor: C.border,
+                  backgroundColor: form.categoryId === cat.id ? C.greenBg : C.white,
+                }}
+              >
+                <Text style={{ fontSize: 15, color: C.text }}>{cat.name}</Text>
+                {form.categoryId === cat.id && <Text style={{ color: C.green }}>✓</Text>}
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </View>
+
       <View>
         <FieldLabel text="Описание" />
         <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
           <TextInput
-            value={desc}
-            onChangeText={setDesc}
+            value={form.desc}
+            onChangeText={v => setForm(f => ({ ...f, desc: v }))}
             placeholder="Опишите товар подробнее..."
             placeholderTextColor={C.muted}
             multiline
@@ -185,7 +201,34 @@ function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
           />
         </View>
       </View>
-      <SelectRow label="Город" value="Тбилиси" />
+
+      {/* City select */}
+      <View style={{ marginBottom: 4 }}>
+        <FieldLabel text="Город" />
+        {loadingMeta ? (
+          <ActivityIndicator size="small" color={C.green} />
+        ) : (
+          <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8, backgroundColor: C.white, overflow: 'hidden' }}>
+            {cities.map((city, idx) => (
+              <Pressable
+                key={city.id}
+                onPress={() => setForm(f => ({ ...f, cityId: city.id }))}
+                style={{
+                  flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+                  paddingHorizontal: 12, paddingVertical: 10,
+                  borderBottomWidth: idx < cities.length - 1 ? 1 : 0,
+                  borderBottomColor: C.border,
+                  backgroundColor: form.cityId === city.id ? C.greenBg : C.white,
+                }}
+              >
+                <Text style={{ fontSize: 15, color: C.text }}>{city.name}</Text>
+                {form.cityId === city.id && <Text style={{ color: C.green }}>✓</Text>}
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </View>
+
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
         <Pressable onPress={onBack} style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
           <Text style={{ fontSize: 15, fontWeight: '600', color: C.muted }}>Назад</Text>
@@ -200,32 +243,38 @@ function Step2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   if (isDesktop) {
     return (
       <View style={{ flexDirection: 'row', gap: 24 }}>
-        <View style={{ flex: 2 }}>{form}</View>
+        <View style={{ flex: 2 }}>{formEl}</View>
         <View style={{ flex: 1, padding: 16, paddingLeft: 0 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Предпросмотр</Text>
-          <PreviewCard step={2} />
         </View>
       </View>
     );
   }
-  return form;
+  return formEl;
 }
 
 // --- STEP 3: Цена и контакты ---
-function Step3({ onBack }: { onBack: () => void }) {
-  const [price, setPrice] = useState('');
-  const [phone, setPhone] = useState('');
+function Step3({
+  onBack, form, setForm, onSubmit, loading, error,
+}: {
+  onBack: () => void;
+  form: FormState;
+  setForm: React.Dispatch<React.SetStateAction<FormState>>;
+  onSubmit: () => void;
+  loading?: boolean;
+  error?: string;
+}) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
 
-  const form = (
+  const formEl = (
     <View style={{ padding: 16, gap: 14 }}>
       <View>
         <FieldLabel text="Цена" />
         <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12 }}>
           <TextInput
-            value={price}
-            onChangeText={setPrice}
+            value={form.price}
+            onChangeText={v => setForm(f => ({ ...f, price: v }))}
             placeholder="0"
             placeholderTextColor={C.muted}
             keyboardType="numeric"
@@ -234,25 +283,25 @@ function Step3({ onBack }: { onBack: () => void }) {
           <Text style={{ fontSize: 16, fontWeight: '600', color: C.text }}>₾</Text>
         </View>
       </View>
-      <View>
-        <FieldLabel text="Контактный телефон" />
-        <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 8 }}>
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="+995 5XX XXX XXX"
-            placeholderTextColor={C.muted}
-            keyboardType="phone-pad"
-            style={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: C.text, outlineWidth: 0 } as any}
-          />
-        </View>
-      </View>
+
+      {error ? (
+        <Text style={{ fontSize: 13, color: C.error, textAlign: 'center' }}>{error}</Text>
+      ) : null}
+
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
-        <Pressable onPress={onBack} style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
+        <Pressable onPress={onBack} disabled={loading} style={{ flex: 1, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
           <Text style={{ fontSize: 15, fontWeight: '600', color: C.muted }}>Назад</Text>
         </Pressable>
-        <Pressable style={{ flex: 2, backgroundColor: C.green, borderRadius: 8, paddingVertical: 12, alignItems: 'center' }}>
-          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Опубликовать</Text>
+        <Pressable
+          onPress={onSubmit}
+          disabled={loading}
+          style={{ flex: 2, backgroundColor: C.green, borderRadius: 8, paddingVertical: 12, alignItems: 'center', opacity: loading ? 0.7 : 1 }}
+        >
+          {loading ? (
+            <ActivityIndicator color={C.white} size="small" />
+          ) : (
+            <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Опубликовать</Text>
+          )}
         </Pressable>
       </View>
     </View>
@@ -261,21 +310,44 @@ function Step3({ onBack }: { onBack: () => void }) {
   if (isDesktop) {
     return (
       <View style={{ flexDirection: 'row', gap: 24 }}>
-        <View style={{ flex: 2 }}>{form}</View>
+        <View style={{ flex: 2 }}>{formEl}</View>
         <View style={{ flex: 1, padding: 16, paddingLeft: 0 }}>
           <Text style={{ fontSize: 13, fontWeight: '600', color: C.text, marginBottom: 10 }}>Предпросмотр</Text>
-          <PreviewCard step={3} />
         </View>
       </View>
     );
   }
-  return form;
+  return formEl;
 }
 
-export function CreateListingInteractive() {
+function CreateListingInteractive({ onSubmit, loading, error }: CreateListingProps) {
   const [step, setStep] = useState(1);
+  const [form, setForm] = useState<FormState>({ title: '', desc: '', price: '', categoryId: '', cityId: '' });
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loadingMeta, setLoadingMeta] = useState(false);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
+
+  useEffect(() => {
+    setLoadingMeta(true);
+    Promise.all([
+      apiFetch('/categories').then(r => setCategories(r.categories ?? [])),
+      apiFetch('/cities').then(r => setCities(r.cities ?? [])),
+    ])
+      .catch(console.error)
+      .finally(() => setLoadingMeta(false));
+  }, []);
+
+  const handleSubmit = () => {
+    onSubmit({
+      title: form.title,
+      price: form.price,
+      categoryId: form.categoryId,
+      cityId: form.cityId,
+      description: form.desc || undefined,
+    });
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: C.white }}>
@@ -284,11 +356,31 @@ export function CreateListingInteractive() {
       </View>
       <StepIndicator step={step} />
       {step === 1 && <Step1 onNext={() => setStep(2)} />}
-      {step === 2 && <Step2 onNext={() => setStep(3)} onBack={() => setStep(1)} />}
-      {step === 3 && <Step3 onBack={() => setStep(2)} />}
+      {step === 2 && (
+        <Step2
+          onNext={() => setStep(3)}
+          onBack={() => setStep(1)}
+          form={form}
+          setForm={setForm}
+          categories={categories}
+          cities={cities}
+          loadingMeta={loadingMeta}
+        />
+      )}
+      {step === 3 && (
+        <Step3
+          onBack={() => setStep(2)}
+          form={form}
+          setForm={setForm}
+          onSubmit={handleSubmit}
+          loading={loading}
+          error={error}
+        />
+      )}
       {!isDesktop && <BottomNav active="post" />}
     </View>
   );
 }
 
+export { CreateListingInteractive };
 export default CreateListingInteractive;
