@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
-import { StateSection } from '../StateSection';
 import BottomNav from '../../BottomNav';
 
 const C = {
@@ -115,7 +114,6 @@ function Reviews() {
 
   if (isDesktop) {
     return (
-      <StateSection title="REVIEWS / Default">
         <View style={{ maxWidth: 900, alignSelf: 'center', width: '100%', backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
           {header}
           <View style={{ flexDirection: 'row' }}>
@@ -130,12 +128,10 @@ function Reviews() {
             </View>
           </View>
         </View>
-      </StateSection>
     );
   }
 
   return (
-    <StateSection title="REVIEWS / Default">
       <View style={{ backgroundColor: C.white }}>
         {header}
         <RatingSummary />
@@ -145,7 +141,6 @@ function Reviews() {
         <WriteReviewButton />
         <BottomNav active="profile" />
       </View>
-    </StateSection>
   );
 }
 
@@ -175,15 +170,15 @@ function ReviewsEmpty() {
 
   if (isDesktop) {
     return (
-      <StateSection title="REVIEWS / Empty">
         <View style={{ maxWidth: 600, alignSelf: 'center', width: '100%', borderRadius: 12, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
           {content}
         </View>
-      </StateSection>
     );
   }
 
-  return <StateSection title="REVIEWS / Empty">{content}</StateSection>;
+  return
+{content}
+;
 }
 
 export default Reviews;

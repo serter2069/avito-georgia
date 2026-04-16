@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
-import { StateSection } from '../StateSection';
 import BottomNav from '../../BottomNav';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
@@ -83,14 +82,12 @@ function EditListing() {
   );
 
   return (
-    <StateSection title="EDIT_LISTING / Default">
       <View style={{ backgroundColor: C.white }}>
         <View style={{ padding: isDesktop ? 24 : 16 }}>
           {form}
         </View>
         {width < 640 && <BottomNav active="post" />}
       </View>
-    </StateSection>
   );
 }
 
@@ -105,7 +102,6 @@ function UnsavedChangesState() {
   const [price, setPrice] = useState('12500');
 
   return (
-    <StateSection title="EDIT_LISTING / Unsaved warning">
       <View style={{ backgroundColor: C.white }}>
         <View style={{ padding: isDesktop ? 24 : 16, gap: 16, maxWidth: isDesktop ? 560 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: C.border, paddingBottom: 14 }}>
@@ -145,7 +141,6 @@ function UnsavedChangesState() {
 
         {width < 640 && <BottomNav active="post" />}
       </View>
-    </StateSection>
   );
 }
 

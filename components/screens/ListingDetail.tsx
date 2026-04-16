@@ -313,7 +313,6 @@ function LightboxPreview() {
   const { width } = useWindowDimensions();
   const [idx, setIdx] = useState(2);
   return (
-    <StateSection title="LISTING_DETAIL__PHOTO_LIGHTBOX">
       <View style={{ backgroundColor: 'rgba(0,0,0,0.95)', minHeight: 400, justifyContent: 'center', alignItems: 'center', paddingVertical: 24 }}>
         {/* Close */}
         <View style={{ position: 'absolute', top: 16, right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
@@ -347,7 +346,6 @@ function LightboxPreview() {
           ))}
         </View>
       </View>
-    </StateSection>
   );
 }
 

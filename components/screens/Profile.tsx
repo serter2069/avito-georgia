@@ -375,7 +375,6 @@ function OtherUserState({ showBottomNav = true }: { showBottomNav?: boolean }) {
   const isDesktop = width >= 640;
 
   return (
-    <StateSection title="PROFILE / Other user">
       <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
@@ -395,7 +394,6 @@ function OtherUserState({ showBottomNav = true }: { showBottomNav?: boolean }) {
         </ScrollView>
         {showBottomNav && !isDesktop && <BottomNav active="profile" />}
       </View>
-    </StateSection>
   );
 }
 

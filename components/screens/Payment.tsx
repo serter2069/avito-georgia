@@ -108,7 +108,6 @@ function LoadingState() {
   const isDesktop = width >= 640;
 
   return (
-    <StateSection title="PAYMENT / Loading">
       <FormFrame>
         <SectionHeader title="Оплата" />
         <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 80 }}>
@@ -117,7 +116,6 @@ function LoadingState() {
         </View>
         {!isDesktop && <BottomNav />}
       </FormFrame>
-    </StateSection>
   );
 }
 
@@ -141,7 +139,6 @@ function SuccessState() {
   const isDesktop = width >= 640;
 
   return (
-    <StateSection title="PAYMENT / Success">
       <FormFrame>
         <SectionHeader title="Оплата" />
         <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 24, gap: 12 }}>
@@ -162,7 +159,6 @@ function SuccessState() {
         </View>
         {!isDesktop && <BottomNav />}
       </FormFrame>
-    </StateSection>
   );
 }
 
@@ -171,7 +167,6 @@ function ErrorState() {
   const isDesktop = width >= 640;
 
   return (
-    <StateSection title="PAYMENT / Error">
       <FormFrame>
         <SectionHeader title="Оплата" />
         <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 24, gap: 12 }}>
@@ -192,7 +187,6 @@ function ErrorState() {
         </View>
         {!isDesktop && <BottomNav />}
       </FormFrame>
-    </StateSection>
   );
 }
 

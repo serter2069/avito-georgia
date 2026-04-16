@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
-import { StateSection } from '../StateSection';
 
 const C = { green: '#00AA6C', white: '#FFFFFF', text: '#1A1A1A', muted: '#737373', border: '#E0E0E0' };
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
-import { StateSection } from '../StateSection';
 
 const C = { green: '#00AA6C', white: '#FFFFFF', text: '#1A1A1A', muted: '#737373', border: '#E0E0E0' };
 
@@ -54,7 +53,6 @@ function Help() {
   const filtered = FAQ.filter(f => !query || f.q.toLowerCase().includes(query.toLowerCase()) || f.a.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <StateSection title="HELP">
       <PageWrapper>
         <PageHeader title="Помощь" />
         <View style={{ padding: 16, gap: 14 }}>
@@ -106,7 +104,6 @@ function Help() {
           </View>
         </View>
       </PageWrapper>
-    </StateSection>
   );
 }
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, ScrollView, useWindowDimensions } from 'react-native';
-import { StateSection } from '../StateSection';
 import BottomNav from '../../BottomNav';
 
 const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
@@ -65,24 +64,20 @@ function PageContent({ payments }: { payments: Payment[] }) {
 function PaymentHistory() {
   const { width } = useWindowDimensions();
   return (
-    <StateSection title="PAYMENT_HISTORY__DEFAULT">
       <View style={{ backgroundColor: C.white }}>
         <PageContent payments={PAYMENTS} />
         {width < 640 && <BottomNav active="profile" />}
       </View>
-    </StateSection>
   );
 }
 
 function EmptyState() {
   const { width } = useWindowDimensions();
   return (
-    <StateSection title="PAYMENT_HISTORY__EMPTY">
       <View style={{ backgroundColor: C.white }}>
         <PageContent payments={[]} />
         {width < 640 && <BottomNav active="profile" />}
       </View>
-    </StateSection>
   );
 }
 

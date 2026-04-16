@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, Pressable, ScrollView, useWindowDimensions } from 'react-native';
-import { StateSection } from '../StateSection';
 import BottomNav from '../../BottomNav';
 import ProtoImage from '../ProtoPlaceholderImage';
 
@@ -44,7 +43,6 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
 function ListingExpired() {
   const { width } = useWindowDimensions();
   return (
-    <StateSection title="LISTING_EXPIRED / Default">
       <View style={{ backgroundColor: C.white }}>
         <PageWrapper>
           <ExpiredListingCard title="Toyota Camry 2019, 45 000 км" price="12 500 ₾" />
@@ -58,14 +56,12 @@ function ListingExpired() {
         </PageWrapper>
         {width < 640 && <BottomNav active="post" />}
       </View>
-    </StateSection>
   );
 }
 
 function FreeRenewalState() {
   const { width } = useWindowDimensions();
   return (
-    <StateSection title="LISTING_EXPIRED / Free renewal">
       <View style={{ backgroundColor: C.white }}>
         <PageWrapper>
           <ExpiredListingCard title="Toyota Camry 2019, 45 000 км" price="12 500 ₾" />
@@ -81,14 +77,12 @@ function FreeRenewalState() {
         </PageWrapper>
         {width < 640 && <BottomNav active="post" />}
       </View>
-    </StateSection>
   );
 }
 
 function RenewingLoadingState() {
   const { width } = useWindowDimensions();
   return (
-    <StateSection title="LISTING_EXPIRED / Renewing loading">
       <View style={{ backgroundColor: C.white }}>
         <PageWrapper>
           <ExpiredListingCard title="Toyota Camry 2019, 45 000 км" price="12 500 ₾" />
@@ -102,14 +96,12 @@ function RenewingLoadingState() {
         </PageWrapper>
         {width < 640 && <BottomNav active="post" />}
       </View>
-    </StateSection>
   );
 }
 
 function SuccessState() {
   const { width } = useWindowDimensions();
   return (
-    <StateSection title="LISTING_EXPIRED / Success">
       <View style={{ backgroundColor: C.white }}>
         <View style={{ alignItems: 'center', paddingVertical: 60, paddingHorizontal: 24, gap: 12 }}>
           <View style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 3, borderColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
@@ -123,7 +115,6 @@ function SuccessState() {
         </View>
         {width < 640 && <BottomNav active="post" />}
       </View>
-    </StateSection>
   );
 }
 
