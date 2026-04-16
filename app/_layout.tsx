@@ -42,17 +42,18 @@ export default function RootLayout() {
   const isProto = pathname.startsWith('/proto');
   const showChrome = !NO_CHROME_PREFIXES.some(p => pathname.startsWith(p));
 
-  const { isLoggedIn, user, fetchMe } = useAuthStore();
+  const { isLoggedIn, user, loading, fetchMe } = useAuthStore();
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); fetchMe(); }, []);
 
   // Redirect to login if accessing private route without auth
+  // Wait for fetchMe to complete (loading=false) before deciding
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || loading) return;
     if (!isLoggedIn && isPrivate(pathname)) {
       router.replace('/auth/email' as any);
     }
-  }, [mounted, isLoggedIn, pathname]);
+  }, [mounted, loading, isLoggedIn, pathname]);
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
