@@ -23,6 +23,7 @@ const PRIVATE_PREFIXES = [
   '/dashboard',
   '/listings/create',
   '/payment',
+  '/admin',
 ];
 const PRIVATE_EXACT = ['/listings/create'];
 
@@ -53,7 +54,11 @@ export default function RootLayout() {
     if (!isLoggedIn && isPrivate(pathname)) {
       router.replace('/auth/email' as any);
     }
-  }, [mounted, loading, isLoggedIn, pathname]);
+    // Redirect non-admin users away from admin routes
+    if (isLoggedIn && user && pathname.startsWith('/admin') && user.role !== 'admin') {
+      router.replace('/' as any);
+    }
+  }, [mounted, loading, isLoggedIn, user, pathname]);
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
