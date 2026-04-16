@@ -14,7 +14,7 @@ export default function ListingDetailPage() {
   useEffect(() => {
     if (!id) return;
     apiFetch(`/listings/${id}`)
-      .then(r => setListing(r.listing))
+      .then(r => setListing(r.listing ?? r))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [id]);
