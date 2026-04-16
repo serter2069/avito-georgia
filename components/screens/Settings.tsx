@@ -143,20 +143,25 @@ function SecuritySection() {
 
 type Lang = 'ru' | 'ka' | 'en';
 
-function LanguageSection() {
-  const [lang, setLang] = useState<Lang>('ru');
+function LanguageSection({ currentLang, onChangeLang }: { currentLang?: string; onChangeLang?: (lang: string) => void }) {
+  const [lang, setLang] = useState<Lang>((currentLang as Lang) || 'ru');
   const langs: { id: Lang; label: string }[] = [
     { id: 'ru', label: 'Русский' },
     { id: 'ka', label: 'Georgian / \u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8' },
     { id: 'en', label: 'English' },
   ];
 
+  const handleSelect = (id: Lang) => {
+    setLang(id);
+    onChangeLang?.(id);
+  };
+
   return (
     <View style={{ paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
       {langs.map(l => (
         <Pressable
           key={l.id}
-          onPress={() => setLang(l.id)}
+          onPress={() => handleSelect(l.id)}
           style={{
             paddingHorizontal: 16,
             paddingVertical: 9,
@@ -207,18 +212,27 @@ interface SettingsProps {
   prefs?: Record<string, boolean>;
   onToggle?: (type: string, enabled: boolean) => void;
   onLogout?: () => void;
+  onDeleteAccount?: () => void;
+  onChangeLang?: (lang: string) => void;
+  currentLang?: string;
 }
 
-function renderSection(id: SectionId, prefs?: Record<string, boolean>, onToggle?: (type: string, enabled: boolean) => void) {
+function renderSection(
+  id: SectionId,
+  prefs?: Record<string, boolean>,
+  onToggle?: (type: string, enabled: boolean) => void,
+  currentLang?: string,
+  onChangeLang?: (lang: string) => void,
+) {
   if (id === 'notifications') return <NotificationsSection prefs={prefs} onToggle={onToggle} />;
   if (id === 'security') return <SecuritySection />;
-  if (id === 'language') return <LanguageSection />;
+  if (id === 'language') return <LanguageSection currentLang={currentLang} onChangeLang={onChangeLang} />;
   return <AboutSection />;
 }
 
 // -- State 1: Settings (interactive) --
 
-export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogout }: SettingsProps) {
+export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogout, onDeleteAccount, onChangeLang, currentLang }: SettingsProps) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   const [activeSection, setActiveSection] = useState<SectionId>('notifications');
@@ -239,9 +253,11 @@ export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogou
                   <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Выйти</Text>
                 </Pressable>
               )}
-              <Pressable style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 }}>
-                <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
-              </Pressable>
+              {onDeleteAccount && (
+                <Pressable onPress={onDeleteAccount} style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 }}>
+                  <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
+                </Pressable>
+              )}
             </View>
           </View>
 
@@ -250,7 +266,7 @@ export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogou
             <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, padding: 16, borderBottomWidth: 1, borderBottomColor: C.border }}>
               {SECTIONS.find(s => s.id === activeSection)?.label}
             </Text>
-            {renderSection(activeSection, prefs, onToggle)}
+            {renderSection(activeSection, prefs, onToggle, currentLang, onChangeLang)}
           </View>
         </View>
       </View>
@@ -281,7 +297,7 @@ export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogou
           {/* Language */}
           <SectionLabel text="Язык" />
           <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-            <LanguageSection />
+            <LanguageSection currentLang={currentLang} onChangeLang={onChangeLang} />
           </View>
 
           {/* About */}
@@ -298,10 +314,12 @@ export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogou
                 <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Выйти</Text>
               </Pressable>
             )}
-            {onLogout && <Divider indent={16} />}
-            <Pressable style={{ paddingVertical: 14, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
-            </Pressable>
+            {onLogout && onDeleteAccount && <Divider indent={16} />}
+            {onDeleteAccount && (
+              <Pressable onPress={onDeleteAccount} style={{ paddingVertical: 14, paddingHorizontal: 16 }}>
+                <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
+              </Pressable>
+            )}
           </View>
 
           <View style={{ height: 8 }} />

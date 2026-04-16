@@ -37,4 +37,4 @@ cd api && npm run dev
 ```
 
 ## Database
-No local DB. Remote PostgreSQL on 91.98.205.156.
+No local DB. Remote PostgreSQL on 95.217.84.161.
