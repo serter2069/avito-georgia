@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Modal, Image } from 'react-native';
+import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
 
@@ -244,10 +245,32 @@ function ListingInfo({ listing }: { listing?: any }) {
 }
 
 // ─── CTA Buttons ──────────────────────────────────────────────────────────────
-function CTAButtons({ loading }: { loading: boolean }) {
+function CTAButtons({ loading, listingId, isOwner }: { loading: boolean; listingId?: string; isOwner?: boolean }) {
+  const router = useRouter();
+  if (isOwner) {
+    return (
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+        <Pressable
+          onPress={() => router.push(`/payment?listingId=${listingId}` as any)}
+          style={{ flex: 1, backgroundColor: C.green, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Продвинуть</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push(`/listings/${listingId}/edit` as any)}
+          style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: C.green, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Редактировать</Text>
+        </Pressable>
+      </View>
+    );
+  }
   return (
     <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-      <Pressable style={{ flex: 1, backgroundColor: C.green, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}>
+      <Pressable
+        onPress={() => listingId && router.push(`/listings/${listingId}/contact` as any)}
+        style={{ flex: 1, backgroundColor: C.green, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+      >
         {loading ? (
           <ActivityIndicator color={C.white} size="small" />
         ) : (
@@ -262,12 +285,13 @@ function CTAButtons({ loading }: { loading: boolean }) {
 }
 
 // ─── Default View ─────────────────────────────────────────────────────────────
-export function DefaultView({ listing }: { listing?: any }) {
+export function DefaultView({ listing, isOwner }: { listing?: any; isOwner?: boolean }) {
   const [fav, setFav] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);
   const { isMobile, isDesktop } = useLayout();
   const horizontalPadding = isDesktop ? 32 : 16;
+  const router = useRouter();
 
   const openLightbox = (idx: number) => { setLightboxIdx(idx); setLightboxOpen(true); };
 
@@ -280,7 +304,7 @@ export function DefaultView({ listing }: { listing?: any }) {
     <View style={{ flex: 1, backgroundColor: C.white }}>
       {/* Back bar */}
       <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
-        <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <Pressable onPress={() => router.back()} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <Text style={{ fontSize: 20, color: C.text }}>←</Text>
           <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>Назад</Text>
         </Pressable>
@@ -304,7 +328,7 @@ export function DefaultView({ listing }: { listing?: any }) {
               {/* Right: info */}
               <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 24 }}>
                 <ListingInfo listing={listing} />
-                <CTAButtons loading={false} />
+                <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} />
                 <View style={{ marginTop: 24 }}>
                   <SimilarListings />
                 </View>
@@ -318,7 +342,7 @@ export function DefaultView({ listing }: { listing?: any }) {
             </View>
             <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
               <ListingInfo listing={listing} />
-              <CTAButtons loading={false} />
+              <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} />
               <View style={{ marginTop: 24 }}><FakeMap /></View>
               <SimilarListings />
             </View>
@@ -413,6 +437,6 @@ function ContactLoadingView() {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export default function ListingDetail({ listing }: { listing?: any }) {
-  return <DefaultView listing={listing} />;
+export default function ListingDetail({ listing, isOwner }: { listing?: any; isOwner?: boolean }) {
+  return <DefaultView listing={listing} isOwner={isOwner} />;
 }
