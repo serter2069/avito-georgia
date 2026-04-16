@@ -219,7 +219,7 @@ router.get('/me/sessions', requireAuth, async (req: Request, res: Response) => {
 router.delete('/me/sessions/:id', requireAuth, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const sessionId = req.params.id;
+    const sessionId = String(req.params.id);
     await prisma.session.deleteMany({ where: { id: sessionId, userId } });
     res.json({ ok: true });
   } catch (err) {
