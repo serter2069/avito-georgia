@@ -6,7 +6,10 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "check": "bash scripts/codecheck",
+    "check:fast": "bash scripts/codecheck --fast",
+    "check:full": "bash scripts/codecheck --full"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -42,6 +45,12 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
+    "eslint": "^10.2.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "knip": "^6.4.1",
     "prisma": "^5.22.0",
     "typescript": "~5.9.2"
   },

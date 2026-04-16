@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# codecheck — unified code quality report for avito-georgia
+# Usage: scripts/codecheck [--fast] [--full]
+#   --fast  TypeScript only (used by Claude hook after edits)
+#   --full  TypeScript + ESLint + Dead code (manual run)
+#   default = TypeScript + ESLint
+
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+MODE="${1:-}"
+
+RED='\033[0;31m'
+YEL='\033[0;33m'
+GRN='\033[0;32m'
+BLU='\033[0;34m'
+DIM='\033[2m'
+NC='\033[0m'
+BOLD='\033[1m'
+
+TOTAL_ERRORS=0
+TOTAL_WARNINGS=0
+
+section() { echo -e "\n${BLU}${BOLD}▶ $1${NC}"; }
+ok()      { echo -e "${GRN}  ✓ $1${NC}"; }
+warn()    { echo -e "${YEL}  ⚠ $1${NC}"; TOTAL_WARNINGS=$((TOTAL_WARNINGS+1)); }
+fail()    { echo -e "${RED}  ✗ $1${NC}"; TOTAL_ERRORS=$((TOTAL_ERRORS+1)); }
+
+echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BOLD}  AVITO GEORGIA — CODE CHECK${NC}"
+echo -e "${DIM}  $(date '+%H:%M:%S') | mode: ${MODE:-default}${NC}"
+echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+# ─── 1. TypeScript: Frontend ─────────────────────────────────────────────────
+section "TypeScript — Frontend"
+TSF_OUT=$(npx tsc --noEmit 2>&1 | grep -v "^$" | grep -v "Help.tsx" || true)
+if [ -z "$TSF_OUT" ]; then
+  ok "0 errors"
+else
+  ERR_COUNT=$(echo "$TSF_OUT" | grep -c "error TS" || true)
+  fail "$ERR_COUNT errors"
+  echo "$TSF_OUT" | head -20 | sed 's/^/    /'
+  TOTAL_ERRORS=$((TOTAL_ERRORS+ERR_COUNT))
+fi
+
+# ─── 2. TypeScript: API ──────────────────────────────────────────────────────
+section "TypeScript — API"
+TSA_OUT=$(cd api && npx tsc --noEmit 2>&1 | grep -v "^$" || true)
+if [ -z "$TSA_OUT" ]; then
+  ok "0 errors"
+else
+  ERR_COUNT=$(echo "$TSA_OUT" | grep -c "error TS" || true)
+  fail "$ERR_COUNT errors"
+  echo "$TSA_OUT" | head -20 | sed 's/^/    /'
+  TOTAL_ERRORS=$((TOTAL_ERRORS+ERR_COUNT))
+fi
+
+if [ "$MODE" = "--fast" ]; then
+  echo -e "\n${DIM}  (fast mode: skipping ESLint + dead code)${NC}"
+  [ $TOTAL_ERRORS -eq 0 ] && echo -e "\n${GRN}${BOLD}  ✓ TypeScript clean${NC}" || echo -e "\n${RED}${BOLD}  ✗ $TOTAL_ERRORS error(s)${NC}"
+  exit $TOTAL_ERRORS
+fi
+
+# ─── 3. ESLint: Frontend ─────────────────────────────────────────────────────
+section "ESLint — Frontend"
+ESLF_OUT=$(npx eslint . --ext .ts,.tsx --format compact 2>&1 | grep -v "^$" | grep -v "node_modules" || true)
+if [ -z "$ESLF_OUT" ]; then
+  ok "0 problems"
+else
+  ERRORS=$(echo "$ESLF_OUT" | grep -c " error " || true)
+  WARNS=$(echo "$ESLF_OUT" | grep -c " warning " || true)
+  [ $ERRORS -gt 0 ] && fail "$ERRORS errors, $WARNS warnings" || warn "$WARNS warnings"
+  echo "$ESLF_OUT" | head -25 | sed 's/^/    /'
+  TOTAL_ERRORS=$((TOTAL_ERRORS+ERRORS))
+  TOTAL_WARNINGS=$((TOTAL_WARNINGS+WARNS))
+fi
+
+# ─── 4. ESLint: API ──────────────────────────────────────────────────────────
+section "ESLint — API"
+ESLA_OUT=$(cd api && npx eslint src --ext .ts --format compact 2>&1 | grep -v "^$" | grep -v "node_modules" || true)
+if [ -z "$ESLA_OUT" ]; then
+  ok "0 problems"
+else
+  ERRORS=$(echo "$ESLA_OUT" | grep -c " error " || true)
+  WARNS=$(echo "$ESLA_OUT" | grep -c " warning " || true)
+  [ $ERRORS -gt 0 ] && fail "$ERRORS errors, $WARNS warnings" || warn "$WARNS warnings"
+  echo "$ESLA_OUT" | head -25 | sed 's/^/    /'
+  TOTAL_ERRORS=$((TOTAL_ERRORS+ERRORS))
+  TOTAL_WARNINGS=$((TOTAL_WARNINGS+WARNS))
+fi
+
+# ─── 5. Dead code (only --full) ──────────────────────────────────────────────
+if [ "$MODE" = "--full" ]; then
+  section "Dead code — Knip"
+  KNIP_OUT=$(npx knip --reporter compact 2>&1 | grep -v "^$" || true)
+  if [ -z "$KNIP_OUT" ]; then
+    ok "No unused files/exports found"
+  else
+    COUNT=$(echo "$KNIP_OUT" | wc -l | tr -d ' ')
+    warn "$COUNT unused items found"
+    echo "$KNIP_OUT" | head -30 | sed 's/^/    /'
+  fi
+fi
+
+# ─── Summary ─────────────────────────────────────────────────────────────────
+echo -e "\n${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+if [ $TOTAL_ERRORS -eq 0 ] && [ $TOTAL_WARNINGS -eq 0 ]; then
+  echo -e "${GRN}${BOLD}  ✓ All clean — 0 errors, 0 warnings${NC}"
+elif [ $TOTAL_ERRORS -eq 0 ]; then
+  echo -e "${YEL}${BOLD}  ⚠ $TOTAL_WARNINGS warning(s), 0 errors${NC}"
+else
+  echo -e "${RED}${BOLD}  ✗ $TOTAL_ERRORS error(s), $TOTAL_WARNINGS warning(s)${NC}"
+fi
+echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+exit $TOTAL_ERRORS
