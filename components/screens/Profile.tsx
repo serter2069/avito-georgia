@@ -18,70 +18,17 @@ const C = {
   starEmpty: '#D0D0D0',
 };
 
-// ---- Data ----
+// ---- Types ----
 
-const USER = {
-  name: 'Георгий Мелашвили',
-  initials: 'ГМ',
-  city: 'Тбилиси',
-  memberSince: 'На сайте с 2022',
-  rating: '4.8',
-  reviewCount: 23,
-  listingCount: 7,
-};
-
-const LISTINGS = [
-  { id: 1, title: 'Toyota Camry 2019', price: '45 000 ₾', seed: 'camry19' },
-  { id: 2, title: 'iPhone 14 Pro Max', price: '2 400 ₾', seed: 'iphone14' },
-  { id: 3, title: 'Квартира 3-ком, Батуми', price: '85 000 ₾', seed: 'batumi3' },
-  { id: 4, title: 'MacBook Pro 14" M2', price: '3 800 ₾', seed: 'macm2' },
-  { id: 5, title: 'Диван угловой', price: '1 200 ₾', seed: 'sofa5' },
-  { id: 6, title: 'Honda CBR 600RR', price: '18 500 ₾', seed: 'cbr600' },
-  { id: 7, title: 'Холодильник Samsung', price: '950 ₾', seed: 'fridge7' },
-];
-
-const REVIEWS = [
-  {
-    id: 1,
-    name: 'Нино Беридзе',
-    initials: 'НБ',
-    rating: 5,
-    date: '12 апреля 2025',
-    text: 'Отличный продавец! Машина полностью соответствует описанию, документы в порядке. Очень рекомендую.',
-  },
-  {
-    id: 2,
-    name: 'Михаил Робакидзе',
-    initials: 'МР',
-    rating: 5,
-    date: '3 апреля 2025',
-    text: 'Быстрая сделка, Георгий всё объяснил и помог с оформлением. Честный человек.',
-  },
-  {
-    id: 3,
-    name: 'Тамара Чиковани',
-    initials: 'ТЧ',
-    rating: 4,
-    date: '28 марта 2025',
-    text: 'Всё хорошо, телефон как новый. Немного задержался с ответом, но в целом доволен.',
-  },
-  {
-    id: 4,
-    name: 'Давид Кварацхелия',
-    initials: 'ДК',
-    rating: 5,
-    date: '15 марта 2025',
-    text: 'Купил квартиру через Георгия. Профессионал! Помог оформить все документы, ответил на все вопросы.',
-  },
-  {
-    id: 5,
-    name: 'Анна Гогиашвили',
-    initials: 'АГ',
-    rating: 4,
-    date: '2 марта 2025',
-    text: 'Хороший продавец, MacBook в отличном состоянии. Цена немного завышена, но качество того стоит.',
-  },
-];
+interface ProfileProps {
+  realUser?: AuthUser | null;
+  listings?: any[];
+  reviews?: any[];
+  onSave?: (data: { name: string; phone?: string; city?: string }) => Promise<void>;
+  showBottomNav?: boolean;
+  // legacy prop kept for backwards compat
+  user?: AuthUser | null;
+}
 
 // ---- Sub-components ----
 
@@ -126,15 +73,20 @@ function UserHeader({
   showEditButton,
   onEdit,
   realUser,
+  listingCount,
+  reviewCount,
 }: {
   showEditButton?: boolean;
   onEdit?: () => void;
   realUser?: AuthUser | null;
+  listingCount?: number;
+  reviewCount?: number;
 }) {
-  const displayName = realUser?.name || USER.name;
+  const displayName = realUser?.name || realUser?.email || 'Пользователь';
   const displayInitials = realUser
     ? (realUser.name ?? realUser.email ?? '?')[0].toUpperCase()
-    : USER.initials;
+    : '?';
+  const displayCity = realUser?.city || '';
 
   return (
     <View className="bg-white rounded-xl overflow-hidden">
@@ -159,16 +111,15 @@ function UserHeader({
           )}
         </View>
 
-        {/* Name + city + since */}
+        {/* Name + city */}
         <View className="mt-3 gap-1">
           <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>{displayName}</Text>
-          <View className="flex-row items-center gap-1">
-            <Ionicons name="location-outline" size={14} color={C.muted} />
-            <Text style={{ fontSize: 13, color: C.muted }}>{USER.city}</Text>
-            <Text style={{ fontSize: 13, color: C.muted }}>·</Text>
-            <Ionicons name="calendar-outline" size={14} color={C.muted} />
-            <Text style={{ fontSize: 13, color: C.muted }}>{USER.memberSince}</Text>
-          </View>
+          {displayCity ? (
+            <View className="flex-row items-center gap-1">
+              <Ionicons name="location-outline" size={14} color={C.muted} />
+              <Text style={{ fontSize: 13, color: C.muted }}>{displayCity}</Text>
+            </View>
+          ) : null}
         </View>
 
         {/* Stats row */}
@@ -177,25 +128,24 @@ function UserHeader({
           style={{ backgroundColor: C.page }}
         >
           <View className="items-center flex-1">
-            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{USER.listingCount}</Text>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{listingCount ?? 0}</Text>
             <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>объявлений</Text>
           </View>
           <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
           <View className="items-center flex-1">
             <View className="flex-row items-center gap-1">
-              <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{USER.rating}</Text>
-              <Ionicons name="star" size={14} color={C.amber} />
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>—</Text>
             </View>
             <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>рейтинг</Text>
           </View>
           <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
           <View className="items-center flex-1">
-            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{USER.reviewCount}</Text>
-            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>отзыва</Text>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{reviewCount ?? 0}</Text>
+            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>отзывов</Text>
           </View>
         </View>
 
-        {/* Action buttons */}
+        {/* Action buttons — only for other user view */}
         {!showEditButton && (
           <View className="flex-row gap-3 mt-4">
             <Pressable
@@ -218,7 +168,20 @@ function UserHeader({
   );
 }
 
-function ListingsSection({ listings }: { listings: typeof LISTINGS }) {
+function ListingsSection({ listings }: { listings: any[] }) {
+  if (!listings || listings.length === 0) {
+    return (
+      <View className="rounded-xl overflow-hidden px-4 py-5" style={{ backgroundColor: C.white }}>
+        <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, marginBottom: 12 }}>
+          Активные объявления
+        </Text>
+        <Text style={{ fontSize: 14, color: C.muted, textAlign: 'center', paddingVertical: 16 }}>
+          Нет объявлений
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View className="rounded-xl overflow-hidden" style={{ backgroundColor: C.white }}>
       {/* Header */}
@@ -226,7 +189,7 @@ function ListingsSection({ listings }: { listings: typeof LISTINGS }) {
         <Text style={{ fontSize: 15, fontWeight: '700', color: C.text }}>Активные объявления</Text>
         <Pressable>
           <Text style={{ fontSize: 13, color: C.green, fontWeight: '600' }}>
-            Смотреть все ({USER.listingCount})
+            Смотреть все ({listings.length})
           </Text>
         </Pressable>
       </View>
@@ -243,12 +206,18 @@ function ListingsSection({ listings }: { listings: typeof LISTINGS }) {
             className="rounded-xl overflow-hidden"
             style={{ width: 130, borderWidth: 1, borderColor: C.border }}
           >
-            <ProtoImage seed={item.seed} width={130} height={90} />
+            {item.seed ? (
+              <ProtoImage seed={item.seed} width={130} height={90} />
+            ) : (
+              <View style={{ width: 130, height: 90, backgroundColor: C.page }} />
+            )}
             <View className="p-2 gap-0.5">
               <Text style={{ fontSize: 12, color: C.text, fontWeight: '600' }} numberOfLines={2}>
                 {item.title}
               </Text>
-              <Text style={{ fontSize: 13, color: C.green, fontWeight: '700' }}>{item.price}</Text>
+              <Text style={{ fontSize: 13, color: C.green, fontWeight: '700' }}>
+                {item.price ? `${item.price} ₾` : ''}
+              </Text>
             </View>
           </Pressable>
         ))}
@@ -257,19 +226,28 @@ function ListingsSection({ listings }: { listings: typeof LISTINGS }) {
   );
 }
 
-function ReviewsSection() {
+function ReviewsSection({ reviews }: { reviews: any[] }) {
+  if (!reviews || reviews.length === 0) {
+    return (
+      <View className="rounded-xl overflow-hidden px-4 py-5" style={{ backgroundColor: C.white }}>
+        <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, marginBottom: 12 }}>Отзывы</Text>
+        <Text style={{ fontSize: 14, color: C.muted, textAlign: 'center', paddingVertical: 16 }}>
+          Нет отзывов
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View className="rounded-xl overflow-hidden" style={{ backgroundColor: C.white }}>
-      {/* Header with rating badge */}
+      {/* Header */}
       <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
         <Text style={{ fontSize: 15, fontWeight: '700', color: C.text }}>Отзывы</Text>
         <View
           className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-full"
           style={{ backgroundColor: C.greenBg }}
         >
-          <Text style={{ fontSize: 16, fontWeight: '800', color: C.green }}>{USER.rating}</Text>
-          <Text style={{ fontSize: 13, color: C.muted }}>/</Text>
-          <Text style={{ fontSize: 13, color: C.muted }}>5</Text>
+          <Text style={{ fontSize: 13, color: C.muted }}>{reviews.length} отзывов</Text>
           <Ionicons name="star" size={14} color={C.amber} />
         </View>
       </View>
@@ -277,41 +255,64 @@ function ReviewsSection() {
       <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 16 }} />
 
       {/* Review items */}
-      {REVIEWS.map((r, i) => (
-        <View key={r.id}>
-          <View className="px-4 py-3 gap-2">
-            <View className="flex-row items-center gap-3">
-              <ReviewerAvatar initials={r.initials} />
-              <View className="flex-1">
-                <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{r.name}</Text>
-                <View className="flex-row items-center gap-2 mt-0.5">
-                  <StarRow rating={r.rating} size={12} />
-                  <Text style={{ fontSize: 12, color: C.muted }}>{r.date}</Text>
+      {reviews.map((r, i) => {
+        const initials = r.initials ?? (r.name ? r.name[0].toUpperCase() : '?');
+        return (
+          <View key={r.id}>
+            <View className="px-4 py-3 gap-2">
+              <View className="flex-row items-center gap-3">
+                <ReviewerAvatar initials={initials} />
+                <View className="flex-1">
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{r.name}</Text>
+                  <View className="flex-row items-center gap-2 mt-0.5">
+                    <StarRow rating={r.rating ?? 5} size={12} />
+                    <Text style={{ fontSize: 12, color: C.muted }}>{r.date ?? r.createdAt ?? ''}</Text>
+                  </View>
                 </View>
               </View>
+              <Text style={{ fontSize: 14, color: C.text, lineHeight: 20 }}>{r.text ?? r.comment ?? ''}</Text>
             </View>
-            <Text style={{ fontSize: 14, color: C.text, lineHeight: 20 }}>{r.text}</Text>
+            {i < reviews.length - 1 && (
+              <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 16 }} />
+            )}
           </View>
-          {i < REVIEWS.length - 1 && (
-            <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 16 }} />
-          )}
-        </View>
-      ))}
+        );
+      })}
       <View style={{ height: 8 }} />
     </View>
   );
 }
 
-function EditProfileForm() {
-  const [name, setName] = useState(USER.name);
-  const [phone, setPhone] = useState('+995 555 987 654');
-  const [city, setCity] = useState(USER.city);
+function EditProfileForm({
+  realUser,
+  onSave,
+  onCancel,
+}: {
+  realUser?: AuthUser | null;
+  onSave?: (data: { name: string; phone?: string; city?: string }) => Promise<void>;
+  onCancel?: () => void;
+}) {
+  const [name, setName] = useState(realUser?.name ?? '');
+  const [phone, setPhone] = useState(realUser?.phone ?? '');
+  const [city, setCity] = useState(realUser?.city ?? '');
+  const [saving, setSaving] = useState(false);
 
   const fields = [
     { label: 'Имя', value: name, setter: setName, placeholder: 'Ваше имя', keyboard: 'default' as const },
     { label: 'Телефон', value: phone, setter: setPhone, placeholder: '+995 5XX XXX XXX', keyboard: 'phone-pad' as const },
     { label: 'Город', value: city, setter: setCity, placeholder: 'Тбилиси', keyboard: 'default' as const },
   ];
+
+  const handleSave = async () => {
+    if (!onSave) return;
+    setSaving(true);
+    try {
+      await onSave({ name, phone: phone || undefined, city: city || undefined });
+      onCancel?.();
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <View className="rounded-xl overflow-hidden px-4 py-4 gap-4" style={{ backgroundColor: C.white }}>
@@ -344,12 +345,17 @@ function EditProfileForm() {
       {/* Save / Cancel */}
       <View className="flex-row gap-3 mt-1">
         <Pressable
+          onPress={handleSave}
+          disabled={saving}
           className="flex-1 items-center justify-center rounded-xl py-3"
-          style={{ backgroundColor: C.green }}
+          style={{ backgroundColor: saving ? C.muted : C.green }}
         >
-          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Сохранить</Text>
+          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>
+            {saving ? 'Сохраняем...' : 'Сохранить'}
+          </Text>
         </Pressable>
         <Pressable
+          onPress={onCancel}
           className="flex-1 items-center justify-center rounded-xl py-3"
           style={{ borderWidth: 1, borderColor: C.border }}
         >
@@ -360,20 +366,44 @@ function EditProfileForm() {
   );
 }
 
-// ---- State 1: Own Profile ----
+// ---- Main Export (Own Profile) ----
 
-export function OwnProfileState({ showBottomNav = true, user }: { showBottomNav?: boolean; user?: AuthUser | null }) {
+export default function Profile({
+  realUser,
+  listings = [],
+  reviews = [],
+  onSave,
+  showBottomNav = true,
+  // legacy prop
+  user,
+}: ProfileProps) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
+  const [editing, setEditing] = useState(false);
+
+  // Support legacy `user` prop
+  const effectiveUser = realUser ?? user ?? null;
 
   return (
     <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
-          <UserHeader showEditButton realUser={user} />
-          <EditProfileForm />
-          <ListingsSection listings={LISTINGS.slice(0, 4)} />
-          <ReviewsSection />
+          <UserHeader
+            showEditButton
+            onEdit={() => setEditing((v) => !v)}
+            realUser={effectiveUser}
+            listingCount={listings.length}
+            reviewCount={reviews.length}
+          />
+          {editing && (
+            <EditProfileForm
+              realUser={effectiveUser}
+              onSave={onSave}
+              onCancel={() => setEditing(false)}
+            />
+          )}
+          <ListingsSection listings={listings} />
+          <ReviewsSection reviews={reviews} />
           <View style={{ height: isDesktop ? 0 : 80 }} />
         </View>
       </ScrollView>
@@ -382,35 +412,8 @@ export function OwnProfileState({ showBottomNav = true, user }: { showBottomNav?
   );
 }
 
-// ---- State 2: Other User ----
+// ---- Named export for OtherUser context (legacy) ----
 
-function OtherUserState({ showBottomNav = true }: { showBottomNav?: boolean }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-
-  return (
-      <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ padding: isDesktop ? 20 : 12, gap: 12 }}>
-            {/* Back bar */}
-            <View className="flex-row items-center gap-2 pb-1">
-              <Pressable className="flex-row items-center gap-1">
-                <Ionicons name="chevron-back" size={24} color={C.text} />
-                <Text style={{ fontSize: 15, color: C.text }}>Назад</Text>
-              </Pressable>
-            </View>
-
-            <UserHeader showEditButton={false} />
-            <ListingsSection listings={LISTINGS.slice(0, 4)} />
-            <ReviewsSection />
-            <View style={{ height: isDesktop ? 0 : 80 }} />
-          </View>
-        </ScrollView>
-        {showBottomNav && !isDesktop && <BottomNav active="profile" />}
-      </View>
-  );
+export function OwnProfileState({ showBottomNav = true, user }: { showBottomNav?: boolean; user?: AuthUser | null }) {
+  return <Profile showBottomNav={showBottomNav} user={user} />;
 }
-
-// ---- Main Export ----
-
-export default OwnProfileState;

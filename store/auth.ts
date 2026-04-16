@@ -5,7 +5,8 @@ export interface AuthUser {
   id: string;
   name: string | null;
   email: string;
-  phone?: string;
+  phone?: string | null;
+  city?: string | null;
   avatarUrl: string | null;
   role?: string;
   isOnboarded: boolean;
