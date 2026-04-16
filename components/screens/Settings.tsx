@@ -73,29 +73,51 @@ function DesktopNavItem({ label, active, onPress }: NavItemProps) {
   );
 }
 
-// Section content renderers
+// Notification pref type -> UI label mapping
+const NOTIF_ITEMS: { type: string; label: string }[] = [
+  { type: 'new_message', label: 'Новые сообщения' },
+  { type: 'listing_expired', label: 'Статус объявлений' },
+  { type: 'promo', label: 'Акции и предложения' },
+];
 
-function NotificationsSection() {
-  const [msgs, setMsgs] = useState(true);
-  const [listings, setListings] = useState(true);
-  const [promos, setPromos] = useState(false);
+interface NotificationsSectionProps {
+  prefs?: Record<string, boolean>;
+  onToggle?: (type: string, enabled: boolean) => void;
+}
+
+function NotificationsSection({ prefs, onToggle }: NotificationsSectionProps) {
+  // Local state fallback when no real prefs provided
+  const [localPrefs, setLocalPrefs] = useState<Record<string, boolean>>({
+    new_message: true,
+    listing_expired: true,
+    promo: false,
+  });
+
+  const getValue = (type: string) => {
+    if (prefs) return prefs[type] ?? false;
+    return localPrefs[type] ?? false;
+  };
+
+  const handleToggle = (type: string) => {
+    const newVal = !getValue(type);
+    if (onToggle) {
+      onToggle(type, newVal);
+    } else {
+      setLocalPrefs(prev => ({ ...prev, [type]: newVal }));
+    }
+  };
 
   return (
     <View style={{ gap: 0 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
-        <Text style={{ fontSize: 15, color: C.text }}>Новые сообщения</Text>
-        <Toggle value={msgs} onToggle={() => setMsgs(v => !v)} />
-      </View>
-      <Divider indent={16} />
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
-        <Text style={{ fontSize: 15, color: C.text }}>Статус объявлений</Text>
-        <Toggle value={listings} onToggle={() => setListings(v => !v)} />
-      </View>
-      <Divider indent={16} />
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
-        <Text style={{ fontSize: 15, color: C.text }}>Акции и предложения</Text>
-        <Toggle value={promos} onToggle={() => setPromos(v => !v)} />
-      </View>
+      {NOTIF_ITEMS.map((item, i) => (
+        <View key={item.type}>
+          {i > 0 && <Divider indent={16} />}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+            <Text style={{ fontSize: 15, color: C.text }}>{item.label}</Text>
+            <Toggle value={getValue(item.type)} onToggle={() => handleToggle(item.type)} />
+          </View>
+        </View>
+      ))}
       <Text style={{ fontSize: 12, color: C.muted, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>
         Уведомления отправляются на email
       </Text>
@@ -180,8 +202,15 @@ const SECTIONS: { id: SectionId; label: string }[] = [
   { id: 'about', label: 'О приложении' },
 ];
 
-function renderSection(id: SectionId) {
-  if (id === 'notifications') return <NotificationsSection />;
+interface SettingsProps {
+  showBottomNav?: boolean;
+  prefs?: Record<string, boolean>;
+  onToggle?: (type: string, enabled: boolean) => void;
+  onLogout?: () => void;
+}
+
+function renderSection(id: SectionId, prefs?: Record<string, boolean>, onToggle?: (type: string, enabled: boolean) => void) {
+  if (id === 'notifications') return <NotificationsSection prefs={prefs} onToggle={onToggle} />;
   if (id === 'security') return <SecuritySection />;
   if (id === 'language') return <LanguageSection />;
   return <AboutSection />;
@@ -189,7 +218,7 @@ function renderSection(id: SectionId) {
 
 // -- State 1: Settings (interactive) --
 
-export function SettingsDefault({ showBottomNav = true }: { showBottomNav?: boolean }) {
+export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogout }: SettingsProps) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   const [activeSection, setActiveSection] = useState<SectionId>('notifications');
@@ -205,6 +234,11 @@ export function SettingsDefault({ showBottomNav = true }: { showBottomNav?: bool
               <DesktopNavItem key={s.id} label={s.label} active={activeSection === s.id} onPress={() => setActiveSection(s.id)} />
             ))}
             <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 8 }}>
+              {onLogout && (
+                <Pressable onPress={onLogout} style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 }}>
+                  <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Выйти</Text>
+                </Pressable>
+              )}
               <Pressable style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 }}>
                 <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
               </Pressable>
@@ -216,7 +250,7 @@ export function SettingsDefault({ showBottomNav = true }: { showBottomNav?: bool
             <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, padding: 16, borderBottomWidth: 1, borderBottomColor: C.border }}>
               {SECTIONS.find(s => s.id === activeSection)?.label}
             </Text>
-            {renderSection(activeSection)}
+            {renderSection(activeSection, prefs, onToggle)}
           </View>
         </View>
       </View>
@@ -235,7 +269,7 @@ export function SettingsDefault({ showBottomNav = true }: { showBottomNav?: bool
           {/* Notifications */}
           <SectionLabel text="Уведомления" />
           <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
-            <NotificationsSection />
+            <NotificationsSection prefs={prefs} onToggle={onToggle} />
           </View>
 
           {/* Security */}
@@ -259,6 +293,12 @@ export function SettingsDefault({ showBottomNav = true }: { showBottomNav?: bool
           {/* Danger zone */}
           <SectionLabel text="Аккаунт" />
           <View style={{ backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+            {onLogout && (
+              <Pressable onPress={onLogout} style={{ paddingVertical: 14, paddingHorizontal: 16 }}>
+                <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Выйти</Text>
+              </Pressable>
+            )}
+            {onLogout && <Divider indent={16} />}
             <Pressable style={{ paddingVertical: 14, paddingHorizontal: 16 }}>
               <Text style={{ fontSize: 15, color: C.error, fontWeight: '500' }}>Удалить аккаунт</Text>
             </Pressable>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TextInput, Pressable, useWindowDimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Pressable, ActivityIndicator, useWindowDimensions } from 'react-native';
 
 // ─── Core Design Tokens ───────────────────────────────────────────────────────
 const C = { green:'#00AA6C', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F', bg:'#F5F5F5' };
@@ -18,7 +18,7 @@ function ResponsiveWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-function InputField({ label, placeholder, value, required }: { label: string; placeholder: string; value?: string; required?: boolean }) {
+function InputField({ label, placeholder, value, onChangeText, required }: { label: string; placeholder: string; value?: string; onChangeText?: (v: string) => void; required?: boolean }) {
   return (
     <View>
       <View className="flex-row items-center mb-1.5" style={{ gap: 4 }}>
@@ -39,6 +39,7 @@ function InputField({ label, placeholder, value, required }: { label: string; pl
           placeholder={placeholder}
           placeholderTextColor={C.muted}
           value={value}
+          onChangeText={onChangeText}
         />
       </View>
     </View>
@@ -68,25 +69,45 @@ function SelectField({ label, value }: { label: string; value?: string }) {
   );
 }
 
-function PrimaryButton({ label, disabled }: { label: string; disabled?: boolean }) {
+function PrimaryButton({ label, disabled, loading, onPress }: { label: string; disabled?: boolean; loading?: boolean; onPress?: () => void }) {
   return (
-    <View
+    <Pressable
+      onPress={onPress}
+      disabled={disabled || loading}
       className="rounded-lg items-center justify-center"
       style={{
         backgroundColor: C.green,
         paddingVertical: 14,
         borderRadius: 8,
-        opacity: disabled ? 0.5 : 1,
+        opacity: (disabled || loading) ? 0.5 : 1,
       }}
     >
-      <Text className="text-white font-bold" style={{ fontSize: 16 }}>{label}</Text>
-    </View>
+      {loading
+        ? <ActivityIndicator color={C.white} />
+        : <Text className="text-white font-bold" style={{ fontSize: 16 }}>{label}</Text>
+      }
+    </Pressable>
   );
 }
 
 // ─── States ─────────────────────────────────────────────────────────────────────
 
-export function OnboardingDefault() {
+interface OnboardingProps {
+  onSubmit?: (data: { name: string; city?: string }) => void;
+  loading?: boolean;
+  error?: string;
+}
+
+export function OnboardingDefault({ onSubmit, loading, error }: OnboardingProps) {
+  const [name, setName] = useState('');
+  const [city, setCity] = useState('');
+
+  const handleSubmit = () => {
+    if (onSubmit && name.trim()) {
+      onSubmit({ name: name.trim(), city: city.trim() || undefined });
+    }
+  };
+
   return (
     <ResponsiveWrapper>
       <View className="bg-white" style={{ paddingHorizontal: 24, paddingTop: 48, paddingBottom: 40, gap: 28 }}>
@@ -100,12 +121,15 @@ export function OnboardingDefault() {
         </View>
 
         <View style={{ gap: 16 }}>
-          <InputField label="Имя *" placeholder="Введите ваше имя" />
-          <InputField label="Телефон" placeholder="+995 XXX XX-XX-XX" />
-          <SelectField label="Город" />
+          <InputField label="Имя *" placeholder="Введите ваше имя" value={name} onChangeText={setName} required />
+          <SelectField label="Город" value={city || undefined} />
         </View>
 
-        <PrimaryButton label="Продолжить" disabled />
+        {!!error && (
+          <Text style={{ fontSize: 14, color: C.error, textAlign: 'center' }}>{error}</Text>
+        )}
+
+        <PrimaryButton label="Продолжить" disabled={!name.trim()} loading={loading} onPress={handleSubmit} />
       </View>
     </ResponsiveWrapper>
   );
