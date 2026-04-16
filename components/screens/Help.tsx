@@ -1,51 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { StateSection } from '../StateSection';
 
 const C = { green: '#00AA6C', white: '#FFFFFF', text: '#1A1A1A', muted: '#737373', border: '#E0E0E0' };
-
-function PageHeader({ title }: { title: string }) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, paddingHorizontal: 16, paddingVertical: 13 }}>
-      <Text style={{ fontSize: 18, color: C.muted }}>‹</Text>
-      <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>{title}</Text>
-    </View>
-  );
-}
-
-function DocSection({ heading, body }: { heading: string; body: string }) {
-  return (
-    <View style={{ marginBottom: 20 }}>
-      <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, marginBottom: 6 }}>{heading}</Text>
-      <Text style={{ fontSize: 14, color: C.muted, lineHeight: 21 }}>{body}</Text>
-    </View>
-  );
-}
-
-function AvitoLogo() {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-      <View style={{ width: 36, height: 36, borderRadius: 9, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: '#fff', fontWeight: '800', fontSize: 20 }}>A</Text>
-      </View>
-      <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 1 }}>
-        <Text style={{ fontWeight: '700', fontSize: 20, color: C.text }}>avito</Text>
-        <Text style={{ fontWeight: '600', fontSize: 14, color: C.green }}>.ge</Text>
-      </View>
-    </View>
-  );
-}
-
-function PageWrapper({ children }: { children: React.ReactNode }) {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 640;
-  return (
-    <View style={{ backgroundColor: C.white, maxWidth: isDesktop ? 700 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined }}>
-      {children}
-    </View>
-  );
-}
-
-// ─── About ───────────────────────────────────────────────────────────────────
 
 function PageHeader({ title }: { title: string }) {
   return (
