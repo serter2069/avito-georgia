@@ -1,9 +1,29 @@
 import { useState, useEffect, useCallback } from 'react';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Favorites from '../../components/screens/Favorites';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
+import { SkeletonBox } from '../../components/SkeletonBox';
 import { apiFetch } from '../../lib/api';
+
+function FavoritesSkeleton() {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#F5F5F5', padding: 16 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        {[0, 1, 2, 3].map(i => (
+          <View key={i} style={{ width: '47%', borderRadius: 10, overflow: 'hidden', backgroundColor: '#fff' }}>
+            <SkeletonBox width="100%" height={120} borderRadius={0} />
+            <View style={{ padding: 10, gap: 6 }}>
+              <SkeletonBox width="90%" height={12} />
+              <SkeletonBox width="60%" height={14} />
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -31,8 +51,9 @@ export default function FavoritesPage() {
     setItems(prev => prev.filter(f => f.listing.id !== listingId));
   };
 
+  if (loading) return <FavoritesSkeleton />;
   if (error) return <ErrorState message="Не удалось загрузить избранное" onRetry={load} />;
-  if (!loading && items.length === 0) return (
+  if (items.length === 0) return (
     <EmptyState
       icon="heart-outline"
       title="Нет избранного"

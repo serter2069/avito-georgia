@@ -1,10 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import MessagesList from '../../../components/screens/MessagesList';
 import { ErrorState } from '../../../components/ErrorState';
 import { EmptyState } from '../../../components/EmptyState';
+import { SkeletonBox } from '../../../components/SkeletonBox';
 import { apiFetch } from '../../../lib/api';
+
+function ChatSkeleton() {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      {[0, 1, 2, 3].map(i => (
+        <View key={i} style={{ flexDirection: 'row', gap: 12, padding: 16, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' }}>
+          <SkeletonBox width={48} height={48} borderRadius={24} />
+          <View style={{ flex: 1, gap: 8, justifyContent: 'center' }}>
+            <SkeletonBox width="60%" height={14} />
+            <SkeletonBox width="85%" height={12} />
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 export default function MessagesPage() {
   const router = useRouter();
@@ -27,11 +44,7 @@ export default function MessagesPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <ActivityIndicator />
-    </View>
-  );
+  if (loading) return <ChatSkeleton />;
   if (error) return <ErrorState message="Не удалось загрузить чаты" onRetry={load} />;
   if (threads.length === 0) return (
     <EmptyState

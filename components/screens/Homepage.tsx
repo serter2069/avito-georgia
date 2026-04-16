@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -115,6 +115,9 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
   const [cities, setCities] = useState<any[]>([]);
   const [apiCategories, setApiCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Debounce timer ref for text inputs
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -153,28 +156,59 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
     try { localStorage.setItem('search_history', JSON.stringify(updated)); } catch {}
   };
 
-  // Fetch listings when filters change (debounced for text inputs)
+  const buildParams = useCallback((pageNum: number) => {
+    const sortParam = sort === 'date' ? 'createdAt_desc' : sort === 'price_asc' ? 'price_asc' : 'price_desc';
+    const params = new URLSearchParams();
+    if (categoryId) params.set('categoryId', categoryId);
+    if (cityId) params.set('cityId', cityId);
+    if (query) params.set('q', query);
+    if (priceFrom) params.set('priceMin', priceFrom);
+    if (priceTo) params.set('priceMax', priceTo);
+    params.set('sort', sortParam);
+    params.set('page', String(pageNum));
+    params.set('limit', '20');
+    return params;
+  }, [categoryId, cityId, query, priceFrom, priceTo, sort]);
+
+  // Fetch listings when filters change (debounced for text inputs) — resets to page 1
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      const sortParam = sort === 'date' ? 'createdAt_desc' : sort === 'price_asc' ? 'price_asc' : 'price_desc';
-      const params = new URLSearchParams();
-      if (categoryId) params.set('categoryId', categoryId);
-      if (cityId) params.set('cityId', cityId);
-      if (query) params.set('q', query);
-      if (priceFrom) params.set('priceMin', priceFrom);
-      if (priceTo) params.set('priceMax', priceTo);
-      params.set('sort', sortParam);
-      params.set('page', '1');
-      params.set('limit', '20');
+      setPage(1);
       setLoading(true);
-      apiFetch(`/listings?${params.toString()}`)
-        .then(r => setListings(r.listings ?? []))
+      apiFetch(`/listings?${buildParams(1).toString()}`)
+        .then(r => {
+          const fetched = r.listings ?? [];
+          setListings(fetched);
+          const total = r.total ?? 0;
+          setHasMore(fetched.length < total);
+        })
         .catch(console.error)
         .finally(() => setLoading(false));
     }, 400);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [categoryId, cityId, query, priceFrom, priceTo, sort]);
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    setLoadingMore(true);
+    try {
+      const r = await apiFetch(`/listings?${buildParams(nextPage).toString()}`);
+      const fetched = r.listings ?? [];
+      setListings(prev => {
+        const combined = [...prev, ...fetched];
+        const total = r.total ?? 0;
+        setHasMore(combined.length < total);
+        return combined;
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // Build city list for pills: "Все города" + API cities
   const cityPills = [{ id: '', name: 'Все города' }, ...cities];
@@ -363,12 +397,34 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
               <Text style={{ fontSize: 15, color: C.muted }}>Ничего не найдено</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-              {listings.map((l, i) => (
-                <View key={l.id ?? i} style={{ width: `${(100 / cols) - (cols === 2 ? 2 : cols === 3 ? 1.5 : 1)}%` as any }}>
-                  <ListingCard listing={l} colorIdx={i} />
-                </View>
-              ))}
+            <View>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                {listings.map((l, i) => (
+                  <View key={l.id ?? i} style={{ width: `${(100 / cols) - (cols === 2 ? 2 : cols === 3 ? 1.5 : 1)}%` as any }}>
+                    <ListingCard listing={l} colorIdx={i} />
+                  </View>
+                ))}
+              </View>
+              {hasMore && !loading && (
+                <Pressable
+                  onPress={loadMore}
+                  disabled={loadingMore}
+                  style={{
+                    marginTop: 16,
+                    paddingVertical: 14,
+                    borderRadius: 10,
+                    borderWidth: 1.5,
+                    borderColor: '#00AA6C',
+                    alignItems: 'center',
+                  }}
+                >
+                  {loadingMore ? (
+                    <ActivityIndicator color="#00AA6C" size="small" />
+                  ) : (
+                    <Text style={{ color: '#00AA6C', fontWeight: '700', fontSize: 15 }}>Показать ещё</Text>
+                  )}
+                </Pressable>
+              )}
             </View>
           )
         )}
