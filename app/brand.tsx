@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Platform } from 'react-native';
 import { Button, Card, Input, Avatar, Badge, EmptyState, ErrorState, LoadingState } from '../components/ui';
 import { colors, spacing, typography, radius } from '../lib/theme';
 
@@ -17,7 +17,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function ColorSwatch({ name, hex }: { name: string; hex: string }) {
   return (
     <View className="flex-row items-center" style={{ gap: spacing.sm, marginBottom: spacing.sm }}>
-      <View className="rounded-lg" style={{ width: 40, height: 40, backgroundColor: hex, borderWidth: 1, borderColor: '#E0E0E0' }} />
+      <View className="rounded-lg" style={{ width: 36, height: 36, backgroundColor: hex, borderWidth: 1, borderColor: '#E5E5E5' }} />
       <View>
         <Text className="text-sm font-semibold" style={{ color: colors.text }}>{name}</Text>
         <Text className="text-xs" style={{ color: colors.textSecondary }}>{hex}</Text>
@@ -29,20 +29,22 @@ function ColorSwatch({ name, hex }: { name: string; hex: string }) {
 export default function BrandPage() {
   const [inputVal, setInputVal] = useState('');
   return (
-    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={{ padding: spacing.md, maxWidth: 480, alignSelf: 'center' }}>
-      {/* Header */}
-      <Text className="text-2xl font-bold mb-1" style={{ color: colors.text }}>Avito Georgia — Design System</Text>
-      <Text className="text-sm mb-6" style={{ color: colors.textSecondary }}>Teal Batumi marketplace theme</Text>
+    <ScrollView
+      style={{ backgroundColor: colors.background }}
+      contentContainerStyle={{ padding: spacing.md, maxWidth: 430, alignSelf: 'center', width: '100%' }}
+    >
+      <Text className="text-xl font-bold mb-0.5" style={{ color: colors.text }}>Avito Georgia</Text>
+      <Text className="text-sm mb-6" style={{ color: colors.textSecondary }}>Design System</Text>
 
-      {/* Colors — Brand */}
-      <Section title="Brand Colors (6)">
+      {/* Brand Colors */}
+      <Section title="Brand (6)">
         <View className="flex-row flex-wrap" style={{ gap: spacing.md }}>
-          <View style={{ flex: 1, minWidth: 140 }}>
+          <View style={{ flex: 1, minWidth: 130 }}>
             <ColorSwatch name="Primary" hex={colors.primary} />
             <ColorSwatch name="Accent" hex={colors.accent} />
             <ColorSwatch name="Background" hex={colors.background} />
           </View>
-          <View style={{ flex: 1, minWidth: 140 }}>
+          <View style={{ flex: 1, minWidth: 130 }}>
             <ColorSwatch name="Surface" hex={colors.surface} />
             <ColorSwatch name="Text" hex={colors.text} />
             <ColorSwatch name="Text Secondary" hex={colors.textSecondary} />
@@ -50,8 +52,8 @@ export default function BrandPage() {
         </View>
       </Section>
 
-      {/* Colors — Semantic */}
-      <Section title="Semantic Colors (3)">
+      {/* Semantic Colors */}
+      <Section title="Semantic (3)">
         <View className="flex-row flex-wrap" style={{ gap: spacing.md }}>
           <ColorSwatch name="Error" hex={colors.error} />
           <ColorSwatch name="Success" hex={colors.success} />
@@ -65,9 +67,9 @@ export default function BrandPage() {
           <Text className={typography.h1} style={{ color: colors.text }}>Heading 1</Text>
           <Text className={typography.h2} style={{ color: colors.text }}>Heading 2</Text>
           <Text className={typography.h3} style={{ color: colors.text }}>Heading 3</Text>
-          <Text className={typography.body} style={{ color: colors.text }}>Body text — regular paragraph</Text>
-          <Text className={typography.caption}>Caption — secondary info</Text>
-          <Text className={typography.small}>Small — subtle hints</Text>
+          <Text className={typography.body} style={{ color: colors.text }}>Body text</Text>
+          <Text className={typography.caption}>Caption</Text>
+          <Text className={typography.small}>Small</Text>
         </View>
       </Section>
 
@@ -75,7 +77,7 @@ export default function BrandPage() {
       <Section title="Spacing">
         {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(key => (
           <View key={key} className="flex-row items-center" style={{ gap: spacing.sm, marginBottom: spacing.xs }}>
-            <View className="rounded-sm" style={{ width: spacing[key], height: 16, backgroundColor: colors.primary }} />
+            <View className="rounded-sm" style={{ width: spacing[key], height: 14, backgroundColor: colors.primary }} />
             <Text className="text-sm" style={{ color: colors.text }}>{key}: {spacing[key]}px</Text>
           </View>
         ))}
@@ -84,12 +86,11 @@ export default function BrandPage() {
       {/* Buttons */}
       <Section title="Buttons">
         <View style={{ gap: spacing.sm }}>
-          <Button variant="primary" label="Primary Action" onPress={() => {}} />
+          <Button variant="primary" label="Primary" onPress={() => {}} />
           <Button variant="secondary" label="Secondary" onPress={() => {}} />
           <Button variant="destructive" label="Delete" onPress={() => {}} />
-          <Button variant="primary" label="Loading..." onPress={() => {}} loading />
+          <Button variant="primary" label="Loading" onPress={() => {}} loading />
           <Button variant="primary" label="Disabled" onPress={() => {}} disabled />
-          <Button variant="primary" label="Full Width" onPress={() => {}} fullWidth />
         </View>
       </Section>
 
@@ -97,23 +98,19 @@ export default function BrandPage() {
       <Section title="Card">
         <View style={{ gap: spacing.sm }}>
           <Card>
-            <Text className="font-semibold" style={{ color: colors.text }}>Default Card</Text>
-            <Text className="text-sm" style={{ color: colors.textSecondary }}>With shadow and border</Text>
+            <Text className="font-semibold" style={{ color: colors.text }}>Default</Text>
+            <Text className="text-sm" style={{ color: colors.textSecondary }}>Shadow + border</Text>
           </Card>
           <Card variant="outlined">
-            <Text className="font-semibold" style={{ color: colors.text }}>Outlined Card</Text>
-            <Text className="text-sm" style={{ color: colors.textSecondary }}>Border only, no shadow</Text>
+            <Text className="font-semibold" style={{ color: colors.text }}>Outlined</Text>
+            <Text className="text-sm" style={{ color: colors.textSecondary }}>Border only</Text>
           </Card>
         </View>
       </Section>
 
       {/* Input */}
       <Section title="Input">
-        <View style={{ gap: spacing.md }}>
-          <Input label="Email" placeholder="Enter email..." value={inputVal} onChangeText={setInputVal} />
-          <Input label="With Error" placeholder="..." value="" onChangeText={() => {}} error="This field is required" />
-          <Input label="Password" placeholder="..." value="" onChangeText={() => {}} secureTextEntry />
-        </View>
+        <Input label="Email" placeholder="Enter email..." value={inputVal} onChangeText={setInputVal} />
       </Section>
 
       {/* Avatar */}
@@ -132,28 +129,23 @@ export default function BrandPage() {
           <Badge variant="error" label="Sold" />
           <Badge variant="warning" label="Pending" />
           <Badge variant="info" label="New" />
-          <Badge variant="success" label="Large" size="md" />
         </View>
       </Section>
 
       {/* States */}
-      <Section title="States">
-        <View style={{ gap: spacing.md }}>
-          <EmptyState icon="📦" title="No listings yet" subtitle="Create your first listing to get started" actionLabel="Create" onAction={() => {}} />
-          <ErrorState message="Network error" onRetry={() => {}} />
-          <LoadingState variant="spinner" />
-          <Card>
-            <Text className="text-sm font-semibold mb-2" style={{ color: colors.text }}>Skeleton</Text>
-            <LoadingState variant="skeleton" lines={4} />
-          </Card>
-        </View>
+      <Section title="Empty State">
+        <EmptyState title="No listings yet" subtitle="Create your first listing to get started" actionLabel="Create" onAction={() => {}} />
+      </Section>
+
+      <Section title="Loading">
+        <LoadingState variant="skeleton" lines={3} />
       </Section>
 
       {/* Radius */}
       <Section title="Radius">
         <View className="flex-row flex-wrap" style={{ gap: spacing.sm }}>
           {(['sm', 'md', 'lg', 'xl', 'full'] as const).map(key => (
-            <View key={key} className={`${radius[key]} items-center justify-center`} style={{ width: 56, height: 56, backgroundColor: colors.surface, borderWidth: 1, borderColor: '#C8E0E8' }}>
+            <View key={key} className={`${radius[key]} items-center justify-center`} style={{ width: 48, height: 48, backgroundColor: colors.surface, borderWidth: 1, borderColor: '#E5E5E5' }}>
               <Text className="text-xs" style={{ color: colors.textSecondary }}>{key}</Text>
             </View>
           ))}

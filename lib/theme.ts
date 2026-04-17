@@ -2,16 +2,16 @@
 // All colors, spacing, typography — ONLY from here
 
 export const colors = {
-  // Brand (6)
-  primary: '#0A7B8A',
-  accent: '#1A9BAA',
+  // Brand (6) — Avito-inspired green
+  primary: '#00AA6C',
+  accent: '#008F5D',
   background: '#FFFFFF',
-  surface: '#F2F8FA',
-  text: '#0A2840',
-  textSecondary: '#6A8898',
+  surface: '#F5F5F5',
+  text: '#1A1A1A',
+  textSecondary: '#737373',
   // Semantic (3)
   error: '#C0392B',
-  success: '#2E7D30',
+  success: '#00AA6C',
   warning: '#f59e0b',
 } as const;
 
@@ -23,7 +23,7 @@ export const tw = {
   accent: 'bg-accent',
   accentText: 'text-accent',
   background: 'bg-white',
-  surface: 'bg-bg-primary',
+  surface: 'bg-bg-muted',
   text: 'text-text-primary',
   textSecondary: 'text-text-secondary',
   error: 'text-error',
@@ -51,7 +51,7 @@ export const typography = {
   h3: 'text-lg font-semibold',
   body: 'text-base',
   caption: 'text-sm text-text-secondary',
-  small: 'text-xs text-text-muted',
+  small: 'text-xs text-text-disabled',
 } as const;
 
 export const radius = {

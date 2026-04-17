@@ -10,13 +10,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Brand: Avito Georgia — Teal Batumi (lun.ua-inspired clean marketplace)
-        // Token values must stay in sync with lib/colors.ts and components/proto/states/BrandStates.tsx
-        primary: '#0A7B8A',
-        'primary-dark': '#0A2840',
-        'primary-light': '#1A9BAA',
+        // Brand: Avito Georgia — Avito-inspired green marketplace
+        // Token values must stay in sync with lib/theme.ts
+        primary: '#00AA6C',
+        'primary-dark': '#008F5D',
+        'primary-light': '#00CC80',
         secondary: '#f59e0b',
-        accent: '#1A9BAA',
+        accent: '#008F5D',
         // Backgrounds
         surface: '#E8F4F8',
         'surface-card': '#FFFFFF',

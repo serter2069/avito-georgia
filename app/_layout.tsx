@@ -16,7 +16,7 @@ function useResponsiveMaxWidth() {
   return 1200;
 }
 
-const NO_CHROME_PREFIXES = ['/auth/', '/proto'];
+const NO_CHROME_PREFIXES = ['/auth/', '/proto', '/brand'];
 
 // Routes that require auth — redirect to /auth/email if not logged in
 const PRIVATE_PREFIXES = [
