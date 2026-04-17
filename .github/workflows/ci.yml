@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, development]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install API dependencies
+        run: cd api && npm ci
+
+      - name: TypeScript check (frontend)
+        run: npx tsc --noEmit
+
+      - name: TypeScript check (API)
+        run: cd api && npx tsc --noEmit
+
+      - name: Expo export check
+        run: npx expo export --platform web --output-dir dist-test
+        env:
+          EXPO_PUBLIC_API_URL: "https://avito-georgia.smartlaunchhub.com/api"
+
+      - name: Verify build output
+        run: |
+          test -f dist-test/index.html || (echo "ERROR: index.html missing" && exit 1)
+          echo "Build OK"
