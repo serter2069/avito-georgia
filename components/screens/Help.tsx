@@ -3,6 +3,14 @@ import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } fro
 
 const C = { green: '#00AA6C', white: '#FFFFFF', text: '#1A1A1A', muted: '#737373', border: '#E0E0E0' };
 
+const FAQ: { q: string; a: string }[] = [
+  { q: 'Как разместить объявление?', a: 'Нажмите кнопку "+" на главной странице, выберите категорию, заполните форму и нажмите "Опубликовать".' },
+  { q: 'Как оплатить продвижение?', a: 'Откройте "Мои объявления", выберите объявление и нажмите "Продвинуть". Оплата картой или Apple Pay.' },
+  { q: 'Как написать продавцу?', a: 'Откройте объявление и нажмите кнопку "Написать". Чат доступен в разделе "Сообщения".' },
+  { q: 'Как изменить профиль?', a: 'Перейдите в "Настройки" → "Редактировать профиль". Можно изменить имя, фото и контакты.' },
+  { q: 'Как удалить объявление?', a: 'Откройте "Мои объявления", нажмите на объявление и выберите "Удалить".' },
+];
+
 function PageHeader({ title }: { title: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, paddingHorizontal: 16, paddingVertical: 13 }}>
