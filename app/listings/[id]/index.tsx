@@ -5,6 +5,7 @@ import ListingDetail from '../../../components/screens/ListingDetail';
 import { ErrorState } from '../../../components/ErrorState';
 import { apiFetch } from '../../../lib/api';
 import { useAuthStore } from '../../../store/auth';
+import { colors } from '../../../lib/theme';
 
 export default function ListingDetailPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -36,17 +37,18 @@ export default function ListingDetailPage() {
 
   if (loading) return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <ActivityIndicator size="large" color="#00AA6C" />
+      <ActivityIndicator size="large" color={colors.primary} />
     </View>
   );
 
   if (error === 'not_found') return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 }}>
-      <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1A1A', textAlign: 'center' }}>Объявление не найдено</Text>
-      <Text style={{ fontSize: 14, color: '#9E9E9E', textAlign: 'center' }}>Возможно, оно было удалено или перемещено</Text>
+      <Text style={{ fontSize: 18, fontWeight: '700', color: colors.text, textAlign: 'center' }}>Объявление не найдено</Text>
+      <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>Возможно, оно было удалено или перемещено</Text>
       <Pressable
         onPress={() => router.back()}
-        style={{ backgroundColor: '#00AA6C', borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12 }}
+        accessibilityLabel="Назад"
+        style={{ backgroundColor: colors.primary, borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12 }}
       >
         <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Назад</Text>
       </Pressable>

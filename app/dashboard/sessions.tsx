@@ -2,11 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
-
-const C = {
-  green: '#00AA6C', white: '#FFFFFF', text: '#1A1A1A',
-  muted: '#9E9E9E', border: '#E8E8E8', page: '#F5F5F5', error: '#D32F2F',
-};
+import { colors } from '../../lib/theme';
 
 export default function SessionsPage() {
   const router = useRouter();
@@ -34,36 +30,37 @@ export default function SessionsPage() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.page }}>
+    <View style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Header */}
-      <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={{ fontSize: 22, color: C.text }}>←</Text>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад">
+          <Text style={{ fontSize: 22, color: colors.text }}>←</Text>
         </Pressable>
-        <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>Активные сессии</Text>
+        <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }}>Активные сессии</Text>
       </View>
 
       {loading ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator color={C.green} />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16, gap: 10 }}>
           {sessions.length === 0 ? (
-            <Text style={{ textAlign: 'center', color: C.muted, paddingTop: 40 }}>Нет активных сессий</Text>
+            <Text style={{ textAlign: 'center', color: colors.textSecondary, paddingTop: 40 }}>Нет активных сессий</Text>
           ) : sessions.map((s) => (
-            <View key={s.id} style={{ backgroundColor: C.white, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: C.border }}>
-              <Text style={{ fontSize: 13, color: C.muted }}>
+            <View key={s.id} style={{ backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8' }}>
+              <Text style={{ fontSize: 13, color: colors.textSecondary }}>
                 Создана: {new Date(s.createdAt).toLocaleDateString('ru-RU')}
               </Text>
-              <Text style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>
                 Истекает: {new Date(s.expiresAt).toLocaleDateString('ru-RU')}
               </Text>
               <Pressable
                 onPress={() => handleRevoke(s.id)}
-                style={{ marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: C.error }}
+                accessibilityLabel="Завершить сессию"
+                style={{ marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.error }}
               >
-                <Text style={{ color: C.error, fontSize: 13, fontWeight: '600' }}>Завершить</Text>
+                <Text style={{ color: colors.error, fontSize: 13, fontWeight: '600' }}>Завершить</Text>
               </Pressable>
             </View>
           ))}

@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
-
-const C = {
-  green: '#00AA6C',
-  greenBg: '#E8F9F2',
-  white: '#FFFFFF',
-  text: '#1A1A1A',
-  muted: '#9E9E9E',
-  border: '#E8E8E8',
-};
+import { colors } from '../../lib/theme';
 const IMG_COLORS = ['#C8E6C9', '#B2DFDB', '#BBDEFB', '#D7CCC8', '#F8BBD0', '#E1BEE7', '#FFF9C4', '#FFCCBC'];
 
 interface FavItem {
@@ -52,9 +44,9 @@ function FavCard({
       style={{
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: C.border,
+        borderColor: '#E8E8E8',
         overflow: 'hidden',
-        backgroundColor: C.white,
+        backgroundColor: colors.background,
       }}
     >
       {/* Image area */}
@@ -63,6 +55,7 @@ function FavCard({
         {/* Heart button — filled red since in favorites */}
         <Pressable
           onPress={handleHeart}
+          accessibilityLabel="Убрать из избранного"
           style={{
             position: 'absolute',
             top: 6,
@@ -75,7 +68,7 @@ function FavCard({
             justifyContent: 'center',
           }}
         >
-          <Text style={{ fontSize: 15, color: liked ? '#E53935' : C.muted }}>{liked ? '\u2665' : '\u2661'}</Text>
+          <Text style={{ fontSize: 15, color: liked ? '#E53935' : colors.textSecondary }}>{liked ? '\u2665' : '\u2661'}</Text>
         </Pressable>
         {/* Photo count badge */}
         <View
@@ -89,17 +82,17 @@ function FavCard({
             paddingVertical: 2,
           }}
         >
-          <Text style={{ color: C.white, fontSize: 10, fontWeight: '600' }}>{item.photos} фото</Text>
+          <Text style={{ color: colors.background, fontSize: 10, fontWeight: '600' }}>{item.photos} фото</Text>
         </View>
       </View>
 
       {/* Info */}
       <View style={{ padding: 10, gap: 3 }}>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: C.green }}>{item.price}</Text>
-        <Text style={{ fontSize: 13, fontWeight: '500', color: C.text }} numberOfLines={2}>
+        <Text style={{ fontSize: 14, fontWeight: '700', color: colors.primary }}>{item.price}</Text>
+        <Text style={{ fontSize: 13, fontWeight: '500', color: colors.text }} numberOfLines={2}>
           {item.title}
         </Text>
-        <Text style={{ fontSize: 11, color: C.muted }}>{item.city}</Text>
+        <Text style={{ fontSize: 11, color: colors.textSecondary }}>{item.city}</Text>
       </View>
     </View>
   );
@@ -119,16 +112,17 @@ function FavoritesGrid({ items, onRemove }: { items: FavItem[]; onRemove: (id: n
   if (items.length === 0) {
     return (
       <View style={{ alignItems: 'center', paddingVertical: 64, paddingHorizontal: 24 }}>
-        <Text style={{ fontSize: 16, fontWeight: '600', color: C.text, textAlign: 'center', marginBottom: 8 }}>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text, textAlign: 'center', marginBottom: 8 }}>
           Нет избранных объявлений
         </Text>
-        <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', marginBottom: 20 }}>
+        <Text style={{ fontSize: 13, color: colors.textSecondary, textAlign: 'center', marginBottom: 20 }}>
           Нажимайте на сердечко, чтобы сохранять объявления
         </Text>
         <Pressable
-          style={{ backgroundColor: C.green, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 12 }}
+          accessibilityLabel="Перейти к объявлениям"
+          style={{ backgroundColor: colors.primary, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 12 }}
         >
-          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Перейти к объявлениям</Text>
+          <Text style={{ color: colors.background, fontWeight: '700', fontSize: 15 }}>Перейти к объявлениям</Text>
         </Pressable>
       </View>
     );
@@ -216,10 +210,10 @@ export function FavoritesInteractive({
           paddingHorizontal: 16,
           paddingVertical: 12,
           borderBottomWidth: 1,
-          borderBottomColor: C.border,
+          borderBottomColor: '#E8E8E8',
         }}
       >
-        <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: colors.text }}>
           Избранное{items.length > 0 ? ` · ${items.length}` : ''}
         </Text>
       </View>

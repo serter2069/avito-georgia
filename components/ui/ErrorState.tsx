@@ -17,6 +17,7 @@ export function ErrorState({ message = 'Something went wrong', onRetry }: ErrorS
       {onRetry && (
         <Pressable
           onPress={onRetry}
+          accessibilityLabel="Попробовать снова"
           className="mt-4 rounded-lg"
           style={{ backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 11 }}
         >
