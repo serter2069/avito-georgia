@@ -2,17 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
-
-const C = {
-  green: '#00AA6C',
-  greenBg: '#E8F9F2',
-  white: '#FFFFFF',
-  text: '#1A1A1A',
-  muted: '#9E9E9E',
-  border: '#E8E8E8',
-  page: '#F5F5F5',
-  error: '#D32F2F',
-};
+import { colors } from '../../lib/theme';
 
 const AVATAR_COLORS = ['#5C6BC0', '#E65100', '#2E7D32', '#7B1FA2', '#C62828', '#00838F'];
 
@@ -39,31 +29,32 @@ function AvatarCircle({ initials, colorIdx, size = 46 }: { initials: string; col
         flexShrink: 0,
       }}
     >
-      <Text style={{ color: C.white, fontWeight: '700', fontSize: size * 0.28 }}>{initials}</Text>
+      <Text style={{ color: colors.background, fontWeight: '700', fontSize: size * 0.28 }}>{initials}</Text>
     </View>
   );
 }
 
 function ConversationRow({ conv, isLast, isSelected, onPress }: { conv: Conversation; isLast: boolean; isSelected?: boolean; onPress?: () => void }) {
   return (
-    <View style={{ backgroundColor: isSelected ? C.greenBg : C.white }}>
+    <View style={{ backgroundColor: isSelected ? '#E8F9F2' : colors.background }}>
       <Pressable
         onPress={onPress}
+        accessibilityLabel={`Открыть чат с ${conv.name}`}
         style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 12 }}
       >
         <AvatarCircle initials={conv.initials} colorIdx={conv.colorIdx} />
         <View style={{ flex: 1, gap: 3 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={{ fontSize: 15, fontWeight: conv.unread ? '700' : '600', color: C.text, flex: 1, marginRight: 8 }} numberOfLines={1}>
+            <Text style={{ fontSize: 15, fontWeight: conv.unread ? '700' : '600', color: colors.text, flex: 1, marginRight: 8 }} numberOfLines={1}>
               {conv.name}
             </Text>
-            <Text style={{ fontSize: 12, color: conv.unread ? C.green : C.muted, flexShrink: 0 }}>
+            <Text style={{ fontSize: 12, color: conv.unread ? colors.primary : colors.textSecondary, flexShrink: 0 }}>
               {conv.time}
             </Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <Text
-              style={{ fontSize: 13, color: conv.unread ? C.text : C.muted, flex: 1 }}
+              style={{ fontSize: 13, color: conv.unread ? colors.text : colors.textSecondary, flex: 1 }}
               numberOfLines={1}
             >
               {conv.lastMessage}
@@ -73,19 +64,19 @@ function ConversationRow({ conv, isLast, isSelected, onPress }: { conv: Conversa
                 minWidth: 20,
                 height: 20,
                 borderRadius: 10,
-                backgroundColor: C.green,
+                backgroundColor: colors.primary,
                 alignItems: 'center',
                 justifyContent: 'center',
                 paddingHorizontal: 5,
                 flexShrink: 0,
               }}>
-                <Text style={{ color: C.white, fontSize: 11, fontWeight: '700' }}>{conv.unread}</Text>
+                <Text style={{ color: colors.background, fontSize: 11, fontWeight: '700' }}>{conv.unread}</Text>
               </View>
             ) : null}
           </View>
         </View>
       </Pressable>
-      {!isLast && <View style={{ height: 1, backgroundColor: C.border, marginLeft: 74 }} />}
+      {!isLast && <View style={{ height: 1, backgroundColor: '#E8E8E8', marginLeft: 74 }} />}
     </View>
   );
 }
@@ -95,23 +86,23 @@ function SearchBar({ value, onChangeText }: { value: string; onChangeText: (t: s
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: C.white,
+      backgroundColor: colors.background,
       borderRadius: 10,
       paddingHorizontal: 12,
       marginHorizontal: 16,
       marginBottom: 8,
     }}>
-      <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: C.muted, marginRight: 8 }} />
+      <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: colors.textSecondary, marginRight: 8 }} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder="Поиск по чатам"
-        placeholderTextColor={C.muted}
-        style={{ flex: 1, fontSize: 15, color: C.text, paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
+        placeholderTextColor={colors.textSecondary}
+        style={{ flex: 1, fontSize: 15, color: colors.text, paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
       />
       {value.length > 0 && (
-        <Pressable onPress={() => onChangeText('')} style={{ padding: 4 }}>
-          <Text style={{ fontSize: 16, color: C.muted, lineHeight: 18 }}>×</Text>
+        <Pressable onPress={() => onChangeText('')} accessibilityLabel="Очистить поиск" style={{ padding: 4 }}>
+          <Text style={{ fontSize: 16, color: colors.textSecondary, lineHeight: 18 }}>×</Text>
         </Pressable>
       )}
     </View>
@@ -121,8 +112,8 @@ function SearchBar({ value, onChangeText }: { value: string; onChangeText: (t: s
 function EmptySearch() {
   return (
     <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-      <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>Ничего не найдено</Text>
-      <Text style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>Попробуйте другой запрос</Text>
+      <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text }}>Ничего не найдено</Text>
+      <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>Попробуйте другой запрос</Text>
     </View>
   );
 }
@@ -130,8 +121,8 @@ function EmptySearch() {
 function EmptyThreads() {
   return (
     <View style={{ alignItems: 'center', paddingVertical: 60 }}>
-      <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>Нет сообщений</Text>
-      <Text style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>Начните общение с продавцом</Text>
+      <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text }}>Нет сообщений</Text>
+      <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>Начните общение с продавцом</Text>
     </View>
   );
 }
@@ -211,10 +202,10 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
   };
 
   const listPanel = (
-    <View style={{ flex: isDesktop ? undefined : 1, width: isDesktop ? 320 : undefined, backgroundColor: C.white, borderRightWidth: isDesktop ? 1 : 0, borderRightColor: C.border }}>
+    <View style={{ flex: isDesktop ? undefined : 1, width: isDesktop ? 320 : undefined, backgroundColor: colors.background, borderRightWidth: isDesktop ? 1 : 0, borderRightColor: '#E8E8E8' }}>
       {/* Header */}
       <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
-        <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Сообщения</Text>
+        <Text style={{ fontSize: 20, fontWeight: '700', color: colors.text }}>Сообщения</Text>
       </View>
       {/* Search */}
       <SearchBar value={query} onChangeText={setQuery} />
@@ -226,24 +217,24 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
   );
 
   const chatPlaceholder = (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: C.white }}>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
       {selectedConv ? (
         <View style={{ alignItems: 'center', gap: 8 }}>
           <AvatarCircle initials={selectedConv.initials} colorIdx={selectedConv.colorIdx} size={56} />
-          <Text style={{ fontSize: 16, fontWeight: '600', color: C.text }}>{selectedConv.name}</Text>
-          <Text style={{ fontSize: 13, color: C.muted }}>Откройте чат</Text>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text }}>{selectedConv.name}</Text>
+          <Text style={{ fontSize: 13, color: colors.textSecondary }}>Откройте чат</Text>
         </View>
       ) : (
         <View style={{ alignItems: 'center', gap: 8 }}>
-          <View style={{ width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: C.border, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ flexDirection: 'row', gap: 3 }}>
               {[0, 1, 2].map(i => (
-                <View key={i} style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: C.muted }} />
+                <View key={i} style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: colors.textSecondary }} />
               ))}
             </View>
           </View>
-          <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>Выберите чат</Text>
-          <Text style={{ fontSize: 13, color: C.muted }}>Нажмите на диалог слева</Text>
+          <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text }}>Выберите чат</Text>
+          <Text style={{ fontSize: 13, color: colors.textSecondary }}>Нажмите на диалог слева</Text>
         </View>
       )}
     </View>
@@ -251,7 +242,7 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
 
   if (isDesktop) {
     return (
-      <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden', flexDirection: 'row', height: 520 }}>
+      <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, overflow: 'hidden', flexDirection: 'row', height: 520 }}>
         {listPanel}
         {chatPlaceholder}
       </View>
@@ -259,9 +250,9 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, overflow: 'hidden' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, overflow: 'hidden' }}>
       <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
-        <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>Сообщения</Text>
+        <Text style={{ fontSize: 20, fontWeight: '700', color: colors.text }}>Сообщения</Text>
       </View>
       <SearchBar value={query} onChangeText={setQuery} />
       {listContent()}

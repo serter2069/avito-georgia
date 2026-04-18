@@ -24,6 +24,7 @@ export function EmptyState({ title, subtitle, actionLabel, onAction }: EmptyStat
       {actionLabel && onAction && (
         <Pressable
           onPress={onAction}
+          accessibilityLabel={actionLabel}
           className="mt-4 rounded-lg"
           style={{ backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 11 }}
         >

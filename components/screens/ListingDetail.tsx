@@ -5,8 +5,7 @@ import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
 import { apiFetch } from '../../lib/api';
 import { useAuthStore } from '../../store/auth';
-
-const C = { green: '#00AA6C', greenBg: '#E8F9F2', white: '#FFFFFF', text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8' };
+import { colors } from '../../lib/theme';
 
 const FALLBACK_SEEDS = [30, 31, 32, 33, 34]; // used when listing has no photos
 
@@ -36,15 +35,16 @@ function PhotoGallery({ photos, onFavPress, fav, onPhotoPress }: {
   return (
     <View>
       {/* Main photo */}
-      <Pressable onPress={() => onPhotoPress(active)} style={{ position: 'relative' }}>
+      <Pressable onPress={() => onPhotoPress(active)} accessibilityLabel="Открыть фото" style={{ position: 'relative' }}>
         {renderPhoto(photos[active] ?? {}, '100%', mainH)}
 
         {/* Heart */}
         <Pressable
           onPress={onFavPress}
+          accessibilityLabel="Добавить в избранное"
           style={{ position: 'absolute', top: 12, right: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' }}
         >
-          <Text style={{ fontSize: 18, color: fav ? '#E53935' : C.muted }}>{fav ? '♥' : '♡'}</Text>
+          <Text style={{ fontSize: 18, color: fav ? '#E53935' : colors.textSecondary }}>{fav ? '♥' : '♡'}</Text>
         </Pressable>
 
         {/* Counter */}
@@ -64,9 +64,10 @@ function PhotoGallery({ photos, onFavPress, fav, onPhotoPress }: {
           <Pressable
             key={i}
             onPress={() => setActive(i)}
+            accessibilityLabel={`Фото ${i + 1}`}
             style={{
               flex: 1, height: 56, borderRadius: 6, overflow: 'hidden',
-              borderWidth: 2, borderColor: i === active ? C.green : 'transparent',
+              borderWidth: 2, borderColor: i === active ? colors.primary : 'transparent',
             }}
           >
             {renderPhoto(photo, '100%', 56)}
@@ -99,7 +100,7 @@ function PhotoLightbox({ photos, visible, initialIndex, onClose }: {
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', justifyContent: 'center', alignItems: 'center' }}>
         {/* Close */}
-        <Pressable onPress={onClose} style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable onPress={onClose} accessibilityLabel="Закрыть" style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: 20, lineHeight: 22 }}>×</Text>
         </Pressable>
 
@@ -115,12 +116,12 @@ function PhotoLightbox({ photos, visible, initialIndex, onClose }: {
 
         {/* Prev / Next */}
         {idx > 0 && (
-          <Pressable onPress={() => setIdx(idx - 1)} style={{ position: 'absolute', left: 16, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+          <Pressable onPress={() => setIdx(idx - 1)} accessibilityLabel="Предыдущее фото" style={{ position: 'absolute', left: 16, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: '#fff', fontSize: 22 }}>‹</Text>
           </Pressable>
         )}
         {idx < photos.length - 1 && (
-          <Pressable onPress={() => setIdx(idx + 1)} style={{ position: 'absolute', right: 16, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+          <Pressable onPress={() => setIdx(idx + 1)} accessibilityLabel="Следующее фото" style={{ position: 'absolute', right: 16, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: '#fff', fontSize: 22 }}>›</Text>
           </Pressable>
         )}
@@ -128,7 +129,7 @@ function PhotoLightbox({ photos, visible, initialIndex, onClose }: {
         {/* Thumbnail strip */}
         <View style={{ position: 'absolute', bottom: 20, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 8, paddingHorizontal: 24 }}>
           {photos.map((photo, i) => (
-            <Pressable key={i} onPress={() => setIdx(i)} style={{ width: 52, height: 38, borderRadius: 5, overflow: 'hidden', borderWidth: 2, borderColor: i === idx ? C.green : 'rgba(255,255,255,0.3)' }}>
+            <Pressable key={i} onPress={() => setIdx(i)} accessibilityLabel={`Фото ${i + 1}`} style={{ width: 52, height: 38, borderRadius: 5, overflow: 'hidden', borderWidth: 2, borderColor: i === idx ? colors.primary : 'rgba(255,255,255,0.3)' }}>
               {renderPhoto(photo, 52, 38)}
             </Pressable>
           ))}
@@ -142,8 +143,8 @@ function PhotoLightbox({ photos, visible, initialIndex, onClose }: {
 function FakeMap() {
   return (
     <View>
-      <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, marginBottom: 10 }}>Местоположение</Text>
-      <View style={{ height: 160, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: C.border, backgroundColor: '#E8EDF0', position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+      <Text style={{ fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 10 }}>Местоположение</Text>
+      <View style={{ height: 160, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#E8E8E8', backgroundColor: '#E8EDF0', position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
         {/* Grid lines to simulate map */}
         {[40, 80, 120].map(y => (
           <View key={y} style={{ position: 'absolute', left: 0, right: 0, top: y, height: 1, backgroundColor: '#D0D8DC' }} />
@@ -157,16 +158,16 @@ function FakeMap() {
 
         {/* Pin marker */}
         <View style={{ alignItems: 'center' }}>
-          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 6 }}>
+          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 6 }}>
             <Text style={{ color: '#fff', fontSize: 16 }}>◉</Text>
           </View>
-          <View style={{ width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 8, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: C.green, marginTop: -1 }} />
+          <View style={{ width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 8, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: colors.primary, marginTop: -1 }} />
         </View>
 
         {/* Address label */}
         <View style={{ position: 'absolute', bottom: 10, left: 10, right: 10, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6 }}>
-          <Text style={{ fontSize: 12, color: C.text, fontWeight: '600' }}>Батуми, ул. Горгиладзе</Text>
-          <Text style={{ fontSize: 11, color: C.muted }}>Аджара · 500м от центра</Text>
+          <Text style={{ fontSize: 12, color: colors.text, fontWeight: '600' }}>Батуми, ул. Горгиладзе</Text>
+          <Text style={{ fontSize: 11, color: colors.textSecondary }}>Аджара · 500м от центра</Text>
         </View>
       </View>
     </View>
@@ -184,15 +185,15 @@ function SimilarListings() {
   const { isDesktop } = useLayout();
   return (
     <View style={{ marginTop: 24 }}>
-      <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, marginBottom: 12 }}>Похожие объявления</Text>
+      <Text style={{ fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12 }}>Похожие объявления</Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         {SIMILAR.map((item, i) => (
-          <View key={i} style={{ flex: 1, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: C.border, backgroundColor: C.white }}>
+          <View key={i} style={{ flex: 1, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#E8E8E8', backgroundColor: colors.background }}>
             <ProtoImage seed={item.seed} width="100%" height={90} />
             <View style={{ padding: 8 }}>
-              <Text style={{ fontSize: 12, color: C.text, lineHeight: 16 }} numberOfLines={2}>{item.title}</Text>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: C.text, marginTop: 4 }}>{item.price}</Text>
-              <Text style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{item.loc}</Text>
+              <Text style={{ fontSize: 12, color: colors.text, lineHeight: 16 }} numberOfLines={2}>{item.title}</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text, marginTop: 4 }}>{item.price}</Text>
+              <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>{item.loc}</Text>
             </View>
           </View>
         ))}
@@ -206,7 +207,7 @@ function SellerRow({ user }: { user?: { name?: string; avatarUrl?: string | null
   const name = user?.name ?? 'Продавец';
   const initials = name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderTopWidth: 1, borderTopColor: C.border, marginTop: 4 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#E8E8E8', marginTop: 4 }}>
       <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#B2DFDB', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         {user?.avatarUrl
           ? <Image source={{ uri: user.avatarUrl }} style={{ width: 44, height: 44 }} />
@@ -214,9 +215,9 @@ function SellerRow({ user }: { user?: { name?: string; avatarUrl?: string | null
         }
       </View>
       <View style={{ flex: 1, marginLeft: 12 }}>
-        <Text style={{ fontSize: 15, fontWeight: '600', color: C.text }}>{name}</Text>
+        <Text style={{ fontSize: 15, fontWeight: '600', color: colors.text }}>{name}</Text>
       </View>
-      <Text style={{ fontSize: 18, color: C.muted }}>›</Text>
+      <Text style={{ fontSize: 18, color: colors.textSecondary }}>›</Text>
     </View>
   );
 }
@@ -233,14 +234,14 @@ function ListingInfo({ listing }: { listing?: any }) {
 
   return (
     <View>
-      <Text style={{ fontSize: 22, fontWeight: '700', color: C.text, lineHeight: 30 }}>{title}</Text>
-      <Text style={{ fontSize: 26, fontWeight: '800', color: C.text, marginTop: 10 }}>{price}</Text>
+      <Text style={{ fontSize: 22, fontWeight: '700', color: colors.text, lineHeight: 30 }}>{title}</Text>
+      <Text style={{ fontSize: 26, fontWeight: '800', color: colors.text, marginTop: 10 }}>{price}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 }}>
-        <Text style={{ fontSize: 13, color: C.muted }}>{cityName}{listing?.address ? `, ${listing.address}` : ''}</Text>
+        <Text style={{ fontSize: 13, color: colors.textSecondary }}>{cityName}{listing?.address ? `, ${listing.address}` : ''}</Text>
       </View>
       <SellerRow user={listing?.user} />
       {description ? (
-        <Text style={{ fontSize: 15, color: C.text, lineHeight: 24 }}>{description}</Text>
+        <Text style={{ fontSize: 15, color: colors.text, lineHeight: 24 }}>{description}</Text>
       ) : null}
     </View>
   );
@@ -289,15 +290,17 @@ function CTAButtons({ loading, listingId, isOwner, listing }: { loading: boolean
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
         <Pressable
           onPress={() => router.push(`/payment?listingId=${listingId}` as any)}
-          style={{ flex: 1, backgroundColor: C.green, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+          accessibilityLabel="Продвинуть объявление"
+          style={{ flex: 1, backgroundColor: colors.primary, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Продвинуть</Text>
+          <Text style={{ color: colors.background, fontWeight: '700', fontSize: 15 }}>Продвинуть</Text>
         </Pressable>
         <Pressable
           onPress={() => router.push(`/listings/${listingId}/edit` as any)}
-          style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: C.green, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+          accessibilityLabel="Редактировать объявление"
+          style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: colors.primary, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Редактировать</Text>
+          <Text style={{ color: colors.primary, fontWeight: '700', fontSize: 15 }}>Редактировать</Text>
         </Pressable>
       </View>
     );
@@ -306,23 +309,25 @@ function CTAButtons({ loading, listingId, isOwner, listing }: { loading: boolean
     <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
       <Pressable
         onPress={() => listingId && router.push(`/listings/${listingId}/contact` as any)}
-        style={{ flex: 1, backgroundColor: C.green, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+        accessibilityLabel="Написать продавцу"
+        style={{ flex: 1, backgroundColor: colors.primary, borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
       >
         {loading ? (
-          <ActivityIndicator color={C.white} size="small" />
+          <ActivityIndicator color={colors.background} size="small" />
         ) : (
-          <Text style={{ color: C.white, fontWeight: '700', fontSize: 15 }}>Написать продавцу</Text>
+          <Text style={{ color: colors.background, fontWeight: '700', fontSize: 15 }}>Написать продавцу</Text>
         )}
       </Pressable>
       <Pressable
         onPress={handleCall}
         disabled={phoneLoading}
-        style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: C.green, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+        accessibilityLabel="Позвонить продавцу"
+        style={{ flex: 1, borderRadius: 10, borderWidth: 1.5, borderColor: colors.primary, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
       >
         {phoneLoading ? (
-          <ActivityIndicator color={C.green} size="small" />
+          <ActivityIndicator color={colors.primary} size="small" />
         ) : (
-          <Text style={{ color: C.green, fontWeight: '700', fontSize: 15 }}>Позвонить</Text>
+          <Text style={{ color: colors.primary, fontWeight: '700', fontSize: 15 }}>Позвонить</Text>
         )}
       </Pressable>
     </View>
@@ -346,15 +351,15 @@ export function DefaultView({ listing, isOwner }: { listing?: any; isOwner?: boo
     : FALLBACK_SEEDS.map(seed => ({ seed }));
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.white }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Back bar */}
-      <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
-        <Pressable onPress={() => router.back()} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text style={{ fontSize: 20, color: C.text }}>←</Text>
-          <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>Назад</Text>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={{ fontSize: 20, color: colors.text }}>←</Text>
+          <Text style={{ fontSize: 15, fontWeight: '500', color: colors.text }}>Назад</Text>
         </Pressable>
         <View style={{ flex: 1 }} />
-        <Text style={{ fontSize: 13, color: C.muted }}>Поделиться</Text>
+        <Text style={{ fontSize: 13, color: colors.textSecondary }}>Поделиться</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: isMobile ? 80 : 32 }}>
@@ -363,7 +368,7 @@ export function DefaultView({ listing, isOwner }: { listing?: any; isOwner?: boo
             <View style={{ flexDirection: 'row', gap: 28, alignItems: 'flex-start' }}>
               {/* Left: gallery */}
               <View style={{ width: '55%' }}>
-                <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: C.border, padding: 12, gap: 8, backgroundColor: C.white }}>
+                <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#E8E8E8', padding: 12, gap: 8, backgroundColor: colors.background }}>
                   <PhotoGallery photos={photos} onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={openLightbox} />
                 </View>
                 <View style={{ marginTop: 20 }}>
@@ -371,7 +376,7 @@ export function DefaultView({ listing, isOwner }: { listing?: any; isOwner?: boo
                 </View>
               </View>
               {/* Right: info */}
-              <View style={{ flex: 1, backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 24 }}>
+              <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, borderWidth: 1, borderColor: '#E8E8E8', padding: 24 }}>
                 <ListingInfo listing={listing} />
                 <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} listing={listing} />
                 <View style={{ marginTop: 24 }}>
@@ -385,7 +390,7 @@ export function DefaultView({ listing, isOwner }: { listing?: any; isOwner?: boo
             <View style={{ padding: 10, paddingBottom: 0 }}>
               <PhotoGallery photos={photos} onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={openLightbox} />
             </View>
-            <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
+            <View style={{ backgroundColor: colors.background, padding: horizontalPadding, marginTop: 8 }}>
               <ListingInfo listing={listing} />
               <CTAButtons loading={false} listingId={listing?.id} isOwner={isOwner} listing={listing} />
               <View style={{ marginTop: 24 }}><FakeMap /></View>
@@ -426,17 +431,17 @@ function LightboxPreview() {
         </View>
 
         {/* Arrows */}
-        <Pressable onPress={() => setIdx(Math.max(0, idx - 1))} style={{ position: 'absolute', left: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable onPress={() => setIdx(Math.max(0, idx - 1))} accessibilityLabel="Предыдущее фото" style={{ position: 'absolute', left: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: 26 }}>‹</Text>
         </Pressable>
-        <Pressable onPress={() => setIdx(Math.min(photos.length - 1, idx + 1))} style={{ position: 'absolute', right: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable onPress={() => setIdx(Math.min(photos.length - 1, idx + 1))} accessibilityLabel="Следующее фото" style={{ position: 'absolute', right: 12, top: '50%', transform: [{ translateY: -24 }], width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: 26 }}>›</Text>
         </Pressable>
 
         {/* Thumbnail strip */}
         <View style={{ position: 'absolute', bottom: 16, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
           {photos.map((photo, i) => (
-            <Pressable key={i} onPress={() => setIdx(i)} style={{ width: 52, height: 38, borderRadius: 5, overflow: 'hidden', borderWidth: 2, borderColor: i === idx ? C.green : 'rgba(255,255,255,0.3)' }}>
+            <Pressable key={i} onPress={() => setIdx(i)} accessibilityLabel={`Фото ${i + 1}`} style={{ width: 52, height: 38, borderRadius: 5, overflow: 'hidden', borderWidth: 2, borderColor: i === idx ? colors.primary : 'rgba(255,255,255,0.3)' }}>
               <ProtoImage seed={photo.seed} width={52} height={38} />
             </Pressable>
           ))}
@@ -452,11 +457,11 @@ function ContactLoadingView() {
   const horizontalPadding = isDesktop ? 32 : 16;
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.white }}>
-      <View style={{ backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
         <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text style={{ fontSize: 20, color: C.text }}>←</Text>
-          <Text style={{ fontSize: 15, fontWeight: '500', color: C.text }}>Назад</Text>
+          <Text style={{ fontSize: 20, color: colors.text }}>←</Text>
+          <Text style={{ fontSize: 15, fontWeight: '500', color: colors.text }}>Назад</Text>
         </Pressable>
       </View>
 
@@ -465,11 +470,11 @@ function ContactLoadingView() {
           <View style={{ padding: 10, paddingBottom: 0 }}>
             <PhotoGallery photos={FALLBACK_SEEDS.map(seed => ({ seed }))} onFavPress={() => setFav(!fav)} fav={fav} onPhotoPress={() => {}} />
           </View>
-          <View style={{ backgroundColor: C.white, padding: horizontalPadding, marginTop: 8 }}>
+          <View style={{ backgroundColor: colors.background, padding: horizontalPadding, marginTop: 8 }}>
             <ListingInfo />
             <CTAButtons loading />
-            <View style={{ marginTop: 12, padding: 14, backgroundColor: C.greenBg, borderRadius: 8, alignItems: 'center' }}>
-              <Text style={{ fontSize: 13, color: C.green, fontWeight: '500' }}>Открываем чат с продавцом...</Text>
+            <View style={{ marginTop: 12, padding: 14, backgroundColor: '#E8F9F2', borderRadius: 8, alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, color: colors.primary, fontWeight: '500' }}>Открываем чат с продавцом...</Text>
             </View>
           </View>
         </View>

@@ -1,5 +1,6 @@
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../lib/theme';
 
 export function EmptyState({
   icon,
@@ -17,12 +18,13 @@ export function EmptyState({
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 }}>
       <Ionicons name={icon as any} size={56} color="#D0D0D0" />
-      <Text style={{ fontSize: 17, fontWeight: '700', color: '#1A1A1A', textAlign: 'center' }}>{title}</Text>
-      {subtitle && <Text style={{ fontSize: 14, color: '#9E9E9E', textAlign: 'center', lineHeight: 20 }}>{subtitle}</Text>}
+      <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text, textAlign: 'center' }}>{title}</Text>
+      {subtitle && <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center', lineHeight: 20 }}>{subtitle}</Text>}
       {ctaLabel && onCta && (
         <Pressable
           onPress={onCta}
-          style={{ marginTop: 8, backgroundColor: '#00AA6C', borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12 }}
+          accessibilityLabel={ctaLabel}
+          style={{ marginTop: 8, backgroundColor: colors.primary, borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12 }}
         >
           <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{ctaLabel}</Text>
         </Pressable>

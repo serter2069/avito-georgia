@@ -6,16 +6,11 @@ import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
 import Header from '../Header';
 import { apiFetch } from '../../lib/api';
-
-const C = {
-  green: '#00AA6C', greenBg: '#E8F9F2',
-  white: '#FFFFFF',
-  text: '#1A1A1A', muted: '#9E9E9E', border: '#E8E8E8',
-};
+import { colors } from '../../lib/theme';
 
 // ─── Category definitions (local icons/colors, mapped by name to API categories) ──
 const CATEGORY_META: { id: string; label: string; bg: string; color: string; icon: string }[] = [
-  { id: 'all',      label: 'Все',      bg: '#E8F9F2', color: '#00AA6C', icon: 'grid-outline' },
+  { id: 'all',      label: 'Все',      bg: '#E8F9F2', color: colors.primary, icon: 'grid-outline' },
   { id: 'auto',     label: 'Авто',     bg: '#E3F2FD', color: '#1976D2', icon: 'car-outline' },
   { id: 'realty',   label: 'Жильё',    bg: '#E8F5E9', color: '#388E3C', icon: 'home-outline' },
   { id: 'tech',     label: 'Техника',  bg: '#EDE7F6', color: '#7B1FA2', icon: 'phone-portrait-outline' },
@@ -60,7 +55,8 @@ function ListingCard({ listing, colorIdx }: {
   return (
     <Pressable
       onPress={() => router.push(`/listings/${listing.id}` as any)}
-      style={{ borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: C.border, backgroundColor: C.white }}
+      accessibilityLabel="Открыть объявление"
+      style={{ borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#E8E8E8', backgroundColor: colors.background }}
     >
       <View style={{ position: 'relative' }}>
         {photoUrl ? (
@@ -68,8 +64,8 @@ function ListingCard({ listing, colorIdx }: {
         ) : (
           <ProtoImage seed={colorIdx + 10} width="100%" height={130} />
         )}
-        <Pressable onPress={(e) => { e.stopPropagation(); setFav(!fav); }} style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 14, color: fav ? '#E53935' : C.muted }}>{fav ? '♥' : '♡'}</Text>
+        <Pressable onPress={(e) => { e.stopPropagation(); setFav(!fav); }} accessibilityLabel="Добавить в избранное" style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 14, color: fav ? '#E53935' : colors.textSecondary }}>{fav ? '♥' : '♡'}</Text>
         </Pressable>
         {photoCount > 0 && (
           <View style={{ position: 'absolute', bottom: 6, right: 6, backgroundColor: 'rgba(0,0,0,0.52)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2 }}>
@@ -78,9 +74,9 @@ function ListingCard({ listing, colorIdx }: {
         )}
       </View>
       <View style={{ padding: 10 }}>
-        <Text style={{ fontSize: 13, color: C.text, lineHeight: 18 }} numberOfLines={2}>{listing.title}</Text>
-        <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, marginTop: 4 }}>{price}</Text>
-        <Text style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{loc}{age ? ` · ${age}` : ''}</Text>
+        <Text style={{ fontSize: 13, color: colors.text, lineHeight: 18 }} numberOfLines={2}>{listing.title}</Text>
+        <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text, marginTop: 4 }}>{price}</Text>
+        <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>{loc}{age ? ` · ${age}` : ''}</Text>
       </View>
     </Pressable>
   );
@@ -223,7 +219,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
       : <>{children}</>;
 
   return (
-    <View style={{ backgroundColor: C.white }}>
+    <View style={{ backgroundColor: colors.background }}>
 
       {/* ─── Header ──────────────────────────────────────────────────────────── */}
       {showHeader && (
@@ -250,12 +246,12 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
           {/* History header */}
           {query.length < 2 && searchHistory.length > 0 && (
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 }}>
-              <Text style={{ fontSize: 12, color: '#9E9E9E', fontWeight: '600' }}>ИСТОРИЯ</Text>
-              <Pressable onPress={() => {
+              <Text style={{ fontSize: 12, color: colors.textSecondary, fontWeight: '600' }}>ИСТОРИЯ</Text>
+              <Pressable accessibilityLabel="Очистить историю поиска" onPress={() => {
                 setSearchHistory([]);
                 try { localStorage.removeItem('search_history'); } catch {}
               }}>
-                <Text style={{ fontSize: 12, color: '#00AA6C' }}>Очистить</Text>
+                <Text style={{ fontSize: 12, color: colors.primary }}>Очистить</Text>
               </Pressable>
             </View>
           )}
@@ -268,6 +264,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
                 setSearchFocused(false);
                 setSuggestions([]);
               }}
+              accessibilityLabel={`Искать ${item}`}
               style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 12 }}
             >
               <Ionicons
@@ -275,9 +272,9 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
                 size={16}
                 color="#9E9E9E"
               />
-              <Text style={{ fontSize: 15, color: '#1A1A1A', flex: 1 }}>{item}</Text>
+              <Text style={{ fontSize: 15, color: colors.text, flex: 1 }}>{item}</Text>
               {query.length < 2 && (
-                <Pressable onPress={(e) => {
+                <Pressable accessibilityLabel="Удалить из истории" onPress={(e) => {
                   e.stopPropagation();
                   const updated = searchHistory.filter((_, idx) => idx !== i);
                   setSearchHistory(updated);
@@ -292,22 +289,23 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
       )}
 
       {/* ─── City pills ──────────────────────────────────────────────────────── */}
-      <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }}>
+      <View style={{ borderBottomWidth: 1, borderBottomColor: '#E8E8E8' }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: hPad, paddingVertical: 9, gap: 7 }}>
           {(cities.length > 0 ? cityPills : [{ id: '', name: 'Все города' }, ...DEFAULT_CITIES.slice(1).map(n => ({ id: n, name: n }))]).map((c) => (
             <Pressable
               key={c.id}
               onPress={() => setCityId(c.id)}
-              style={{ borderRadius: 20, paddingHorizontal: 13, paddingVertical: 5, backgroundColor: cityId === c.id ? C.green : C.white, borderWidth: 1, borderColor: cityId === c.id ? C.green : C.border }}
+              accessibilityLabel={`Выбрать город ${c.name}`}
+              style={{ borderRadius: 20, paddingHorizontal: 13, paddingVertical: 5, backgroundColor: cityId === c.id ? colors.primary : colors.background, borderWidth: 1, borderColor: cityId === c.id ? colors.primary : '#E8E8E8' }}
             >
-              <Text style={{ fontSize: 13, fontWeight: cityId === c.id ? '600' : '400', color: cityId === c.id ? '#fff' : C.text }}>{c.name}</Text>
+              <Text style={{ fontSize: 13, fontWeight: cityId === c.id ? '600' : '400', color: cityId === c.id ? '#fff' : colors.text }}>{c.name}</Text>
             </Pressable>
           ))}
         </ScrollView>
       </View>
 
       {/* ─── Category icons ───────────────────────────────────────────────────── */}
-      <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }}>
+      <View style={{ borderBottomWidth: 1, borderBottomColor: '#E8E8E8' }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: hPad, paddingVertical: 10, gap: 10 }}>
           {CATEGORIES.map((cat) => {
             // Match local meta category to API category by label (case-insensitive)
@@ -315,11 +313,11 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
             const resolvedId = cat.id === 'all' ? '' : (apiCat?.id ?? cat.id);
             const active = categoryId === resolvedId;
             return (
-              <Pressable key={cat.id} onPress={() => setCategoryId(resolvedId)} style={{ alignItems: 'center', gap: 5, minWidth: 52 }}>
-                <View style={{ width: 48, height: 48, borderRadius: 13, backgroundColor: active ? cat.color : cat.bg, alignItems: 'center', justifyContent: 'center', borderWidth: active ? 0 : 1, borderColor: C.border }}>
+              <Pressable key={cat.id} onPress={() => setCategoryId(resolvedId)} accessibilityLabel={`Выбрать категорию ${cat.label}`} style={{ alignItems: 'center', gap: 5, minWidth: 52 }}>
+                <View style={{ width: 48, height: 48, borderRadius: 13, backgroundColor: active ? cat.color : cat.bg, alignItems: 'center', justifyContent: 'center', borderWidth: active ? 0 : 1, borderColor: '#E8E8E8' }}>
                   <Ionicons name={cat.icon as any} size={22} color={active ? '#fff' : cat.color} />
                 </View>
-                <Text style={{ fontSize: 10, color: active ? cat.color : C.muted, fontWeight: active ? '700' : '400', textAlign: 'center' }} numberOfLines={1}>
+                <Text style={{ fontSize: 10, color: active ? cat.color : colors.textSecondary, fontWeight: active ? '700' : '400', textAlign: 'center' }} numberOfLines={1}>
                   {cat.label}
                 </Text>
               </Pressable>
@@ -329,28 +327,28 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
       </View>
 
       {/* ─── Inline filters ───────────────────────────────────────────────────── */}
-      <View style={{ borderBottomWidth: 1, borderBottomColor: C.border, paddingHorizontal: hPad, paddingVertical: 10 }}>
+      <View style={{ borderBottomWidth: 1, borderBottomColor: '#E8E8E8', paddingHorizontal: hPad, paddingVertical: 10 }}>
         <View style={{ flexDirection: isTablet ? 'row' : 'column', gap: 10, alignItems: isTablet ? 'center' : 'stretch', maxWidth: maxW, alignSelf: isDesktop ? 'center' : undefined, width: '100%' }}>
 
           {/* Price range */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: isTablet ? 0 : undefined }}>
-            <Text style={{ fontSize: 13, color: C.muted, flexShrink: 0 }}>Цена ₾</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 5, minWidth: 70 }}>
+            <Text style={{ fontSize: 13, color: colors.textSecondary, flexShrink: 0 }}>Цена ₾</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 7, paddingHorizontal: 8, paddingVertical: 5, minWidth: 70 }}>
               <TextInput
-                style={{ fontSize: 13, color: C.text, width: 55, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
+                style={{ fontSize: 13, color: colors.text, width: 55, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
                 placeholder="от"
-                placeholderTextColor={C.muted}
+                placeholderTextColor={colors.textSecondary}
                 value={priceFrom}
                 onChangeText={setPriceFrom}
                 keyboardType="numeric"
               />
             </View>
-            <Text style={{ color: C.muted, fontSize: 13 }}>—</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 5, minWidth: 70 }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 13 }}>—</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 7, paddingHorizontal: 8, paddingVertical: 5, minWidth: 70 }}>
               <TextInput
-                style={{ fontSize: 13, color: C.text, width: 55, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
+                style={{ fontSize: 13, color: colors.text, width: 55, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0, paddingVertical: 0 } as any}
                 placeholder="до"
-                placeholderTextColor={C.muted}
+                placeholderTextColor={colors.textSecondary}
                 value={priceTo}
                 onChangeText={setPriceTo}
                 keyboardType="numeric"
@@ -364,13 +362,13 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
           {/* Sort select */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             {/* Native select — works in Expo web */}
-            <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 0, backgroundColor: C.white, flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 7, paddingHorizontal: 8, paddingVertical: 0, backgroundColor: colors.background, flexDirection: 'row', alignItems: 'center' }}>
               {/* @ts-ignore — select is valid HTML element in RN web */}
               <select
                 value={sort}
                 onChange={(e: any) => setSort(e.target.value)}
                 style={{
-                  fontSize: 13, color: '#1A1A1A', backgroundColor: 'transparent',
+                  fontSize: 13, color: colors.text, backgroundColor: 'transparent',
                   border: 'none', outline: 'none', paddingTop: 5, paddingBottom: 5,
                   cursor: 'pointer', appearance: 'none', paddingRight: 18,
                 }}
@@ -379,7 +377,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
                 <option value="price_asc">Дешевле</option>
                 <option value="price_desc">Дороже</option>
               </select>
-              <Text style={{ fontSize: 10, color: C.muted, marginLeft: -16, pointerEvents: 'none' as any }}>▾</Text>
+              <Text style={{ fontSize: 10, color: colors.textSecondary, marginLeft: -16, pointerEvents: 'none' as any }}>▾</Text>
             </View>
           </View>
         </View>
@@ -390,11 +388,11 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
         {wrap(
           loading ? (
             <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-              <ActivityIndicator size="large" color={C.green} />
+              <ActivityIndicator size="large" color={colors.primary} />
             </View>
           ) : listings.length === 0 ? (
             <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-              <Text style={{ fontSize: 15, color: C.muted }}>Ничего не найдено</Text>
+              <Text style={{ fontSize: 15, color: colors.textSecondary }}>Ничего не найдено</Text>
             </View>
           ) : (
             <View>
@@ -409,19 +407,20 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
                 <Pressable
                   onPress={loadMore}
                   disabled={loadingMore}
+                  accessibilityLabel="Показать ещё объявления"
                   style={{
                     marginTop: 16,
                     paddingVertical: 14,
                     borderRadius: 10,
                     borderWidth: 1.5,
-                    borderColor: '#00AA6C',
+                    borderColor: colors.primary,
                     alignItems: 'center',
                   }}
                 >
                   {loadingMore ? (
-                    <ActivityIndicator color="#00AA6C" size="small" />
+                    <ActivityIndicator color={colors.primary} size="small" />
                   ) : (
-                    <Text style={{ color: '#00AA6C', fontWeight: '700', fontSize: 15 }}>Показать ещё</Text>
+                    <Text style={{ color: colors.primary, fontWeight: '700', fontSize: 15 }}>Показать ещё</Text>
                   )}
                 </Pressable>
               )}
