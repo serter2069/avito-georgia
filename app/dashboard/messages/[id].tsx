@@ -22,7 +22,7 @@ export default function ChatThreadPage() {
       if (threadRes.thread?.otherUser) setOtherUser(threadRes.thread.otherUser);
       // Mark as seen
       apiFetch(`/chat/threads/${id}/seen`, { method: 'POST' }).catch(() => {});
-    } catch {}
+    } catch (e) { console.error('Failed to load chat thread', e); }
     setLoading(false);
   };
 

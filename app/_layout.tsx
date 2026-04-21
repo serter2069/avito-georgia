@@ -85,7 +85,39 @@ export default function RootLayout() {
         )}
 
         <View style={{ flex: 1 }}>
-          <Stack screenOptions={{ headerShown: false }} />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="admin/categories" />
+            <Stack.Screen name="admin/finance" />
+            <Stack.Screen name="admin" />
+            <Stack.Screen name="admin/moderation" />
+            <Stack.Screen name="admin/users" />
+            <Stack.Screen name="auth/email" />
+            <Stack.Screen name="auth/onboarding" />
+            <Stack.Screen name="auth/otp" />
+            <Stack.Screen name="brand" />
+            <Stack.Screen name="dashboard/favorites" />
+            <Stack.Screen name="dashboard/listings" />
+            <Stack.Screen name="dashboard/messages/[id]" />
+            <Stack.Screen name="dashboard/messages" />
+            <Stack.Screen name="dashboard/payment-history" />
+            <Stack.Screen name="dashboard/profile" />
+            <Stack.Screen name="dashboard/sessions" />
+            <Stack.Screen name="dashboard/settings" />
+            <Stack.Screen name="legal/about" />
+            <Stack.Screen name="legal/help" />
+            <Stack.Screen name="legal/privacy" />
+            <Stack.Screen name="legal/terms" />
+            <Stack.Screen name="listings/[id]/contact" />
+            <Stack.Screen name="listings/[id]/edit" />
+            <Stack.Screen name="listings/[id]/expired" />
+            <Stack.Screen name="listings/[id]" />
+            <Stack.Screen name="listings/create" />
+            <Stack.Screen name="map" />
+            <Stack.Screen name="payment" />
+            <Stack.Screen name="proto/states/[page]" />
+            <Stack.Screen name="users/[id]" />
+            <Stack.Screen name="users/[id]/reviews" />
+          </Stack>
         </View>
 
         {showChrome && !isTablet && <BottomNav />}

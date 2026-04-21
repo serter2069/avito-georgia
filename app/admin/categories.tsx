@@ -49,7 +49,7 @@ export default function AdminCategories() {
           paidListingPrice: parseFloat(cat._price) || 0,
         }),
       });
-    } catch {}
+    } catch (e) { console.error('Failed to save category', e); }
     setSaving(null);
   };
 
