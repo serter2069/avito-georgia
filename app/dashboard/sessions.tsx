@@ -13,7 +13,7 @@ export default function SessionsPage() {
     try {
       const r = await apiFetch('/users/me/sessions');
       setSessions(r.sessions || []);
-    } catch {}
+    } catch (e) { console.error('Failed to load sessions', e); }
     setLoading(false);
   };
 

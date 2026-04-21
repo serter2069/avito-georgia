@@ -39,7 +39,7 @@ export default function AdminUsers() {
     try {
       await apiFetch(`/admin/users/${user.id}/role`, { method: 'PATCH', body: JSON.stringify({ role: newRole }) });
       setUsers(prev => prev.map(u => u.id === user.id ? { ...u, role: newRole } : u));
-    } catch {}
+    } catch (e) { console.error('Failed to toggle user block', e); }
   };
 
   return (
