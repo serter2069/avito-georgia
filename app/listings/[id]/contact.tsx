@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { apiFetch } from '../../../lib/api';
 import { colors } from '../../../lib/theme';
@@ -27,14 +28,15 @@ export default function ContactSellerPage() {
         body: JSON.stringify({ text: message.trim() }),
       });
       router.replace(`/dashboard/messages/${r.threadId}` as any);
-    } catch (e: any) {
-      setError(e?.message || 'Не удалось отправить сообщение');
+    } catch (e: unknown) {
+      setError((e as { message?: string })?.message || 'Не удалось отправить сообщение');
       setSending(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.surface }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       {/* Header */}
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
         <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -91,5 +93,6 @@ export default function ContactSellerPage() {
         </Pressable>
       </View>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

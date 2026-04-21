@@ -1,5 +1,6 @@
 import { Linking } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiFetch } from '../lib/api';
 import Payment from '../components/screens/Payment';
 
@@ -14,5 +15,5 @@ export default function PaymentPage() {
     if (res.url) await Linking.openURL(res.url);
   };
 
-  return <Payment listingId={listingId} promotionType={type} onPay={handlePay} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Payment listingId={listingId} promotionType={type} onPay={handlePay} /></SafeAreaView>;
 }

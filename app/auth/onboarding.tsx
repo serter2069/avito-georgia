@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Onboarding from '../../components/screens/Onboarding';
 import { apiFetch } from '../../lib/api';
 import { useAuthStore } from '../../store/auth';
@@ -20,11 +21,11 @@ export default function OnboardingPage() {
       });
       await fetchMe();
       router.replace('/' as any);
-    } catch (e: any) {
-      setError(e.error || 'Ошибка сохранения');
+    } catch (e: unknown) {
+      setError((e as { error?: string })?.error || 'Ошибка сохранения');
       setLoading(false);
     }
   };
 
-  return <Onboarding onSubmit={handleSubmit} loading={loading} error={error} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Onboarding onSubmit={handleSubmit} loading={loading} error={error} /></SafeAreaView>;
 }

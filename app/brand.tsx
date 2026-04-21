@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Card, Input, Avatar, Badge, EmptyState, ErrorState, LoadingState } from '../components/ui';
 import { colors, spacing, typography, radius } from '../lib/theme';
 
@@ -29,6 +30,7 @@ function ColorSwatch({ name, hex }: { name: string; hex: string }) {
 export default function BrandPage() {
   const [inputVal, setInputVal] = useState('');
   return (
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.background }}>
     <ScrollView
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={{ padding: spacing.md, maxWidth: 430, alignSelf: 'center', width: '100%' }}
@@ -152,5 +154,6 @@ export default function BrandPage() {
         </View>
       </Section>
     </ScrollView>
+    </SafeAreaView>
   );
 }

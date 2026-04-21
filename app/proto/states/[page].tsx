@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 
 import DesignSystemStates from '../../../components/proto/states/DesignSystemStates';
@@ -70,15 +71,19 @@ export default function ProtoStatesPage() {
 
   if (!Component) {
     return (
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ color: '#e03131', fontSize: 16 }}>Not found: {page}</Text>
       </View>
+      </SafeAreaView>
     );
   }
 
   return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <ScrollView contentContainerStyle={{ padding: 16 }}>
       <Component />
     </ScrollView>
+    </SafeAreaView>
   );
 }

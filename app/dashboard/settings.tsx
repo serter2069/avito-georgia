@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, ActivityIndicator, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Settings from '../../components/screens/Settings';
 import { apiFetch } from '../../lib/api';
 import { useAuthStore } from '../../store/auth';
@@ -13,7 +14,7 @@ export default function SettingsPage() {
     apiFetch('/users/me/notification-prefs')
       .then(r => {
         const map: Record<string, boolean> = {};
-        (r.prefs || []).forEach((p: any) => { map[p.type] = p.enabled; });
+        (r.prefs || []).forEach((p: { type: string; enabled: boolean }) => { map[p.type] = p.enabled; });
         setPrefs(map);
       })
       .catch(console.error)
@@ -60,8 +61,9 @@ export default function SettingsPage() {
     );
   };
 
-  if (loading) return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View>;
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View></SafeAreaView>;
   return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <Settings
       showBottomNav={false}
       prefs={prefs}
@@ -71,5 +73,6 @@ export default function SettingsPage() {
       onChangeLang={handleChangeLang}
       currentLang={(user as any)?.locale || 'ru'}
     />
+    </SafeAreaView>
   );
 }

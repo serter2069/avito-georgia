@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AuthEmail from '../../components/screens/AuthEmail';
 import { apiFetch } from '../../lib/api';
 
@@ -17,12 +18,12 @@ export default function AuthEmailPage() {
         body: JSON.stringify({ email }),
       });
       router.push({ pathname: '/auth/otp', params: { email } } as any);
-    } catch (e: any) {
-      setError(e.error || 'Ошибка отправки кода');
+    } catch (e: unknown) {
+      setError((e as { error?: string })?.error || 'Ошибка отправки кода');
     } finally {
       setLoading(false);
     }
   };
 
-  return <AuthEmail onSubmit={handleSubmit} loading={loading} error={error} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><AuthEmail onSubmit={handleSubmit} loading={loading} error={error} /></SafeAreaView>;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/auth';
 import AuthOtp from '../../components/screens/AuthOtp';
 import { apiFetch } from '../../lib/api';
@@ -26,12 +27,12 @@ export default function AuthOtpPage() {
       } else {
         router.replace('/' as any);
       }
-    } catch (e: any) {
-      setError(e.error || 'Неверный код');
+    } catch (e: unknown) {
+      setError((e as { error?: string })?.error || 'Неверный к��д');
     } finally {
       setLoading(false);
     }
   };
 
-  return <AuthOtp email={email || ''} onConfirm={handleConfirm} loading={loading} error={error} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><AuthOtp email={email || ''} onConfirm={handleConfirm} loading={loading} error={error} /></SafeAreaView>;
 }

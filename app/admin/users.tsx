@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
 import { ErrorState } from '../../components/ErrorState';
@@ -34,7 +35,7 @@ export default function AdminUsers() {
     };
   }, [search]);
 
-  const toggleBlock = async (user: any) => {
+  const toggleBlock = async (user: { id: string; role: string }) => {
     const newRole = user.role === 'blocked' ? 'user' : 'blocked';
     try {
       await apiFetch(`/admin/users/${user.id}/role`, { method: 'PATCH', body: JSON.stringify({ role: newRole }) });
@@ -43,8 +44,8 @@ export default function AdminUsers() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.surface }}>
-      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', paddingTop: 52, paddingBottom: 8, paddingHorizontal: 16, gap: 10 }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', paddingBottom: 8, paddingHorizontal: 16, gap: 10 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
           <Text style={{ fontSize: 17, fontWeight: '700' }}>Пользователи</Text>
@@ -89,6 +90,6 @@ export default function AdminUsers() {
           ))}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import Reviews from '../../../components/screens/Reviews';
 import { apiFetch } from '../../../lib/api';
@@ -25,11 +26,13 @@ export default function ReviewsPage() {
 
   if (loading) {
     return (
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator />
       </View>
+      </SafeAreaView>
     );
   }
 
-  return <Reviews reviews={reviews} avgRating={avgRating} total={total} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Reviews reviews={reviews} avgRating={avgRating} total={total} /></SafeAreaView>;
 }
