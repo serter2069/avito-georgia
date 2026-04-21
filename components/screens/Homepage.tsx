@@ -85,6 +85,7 @@ function ListingCard({ listing, colorIdx }: {
 // ─── Main content ─────────────────────────────────────────────────────────────
 
 export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = true }: { loggedIn?: boolean; showHeader?: boolean; showBottomNav?: boolean }) {
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
   const isTablet = width >= 640;
@@ -359,8 +360,17 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
           {/* Spacer */}
           {isTablet && <View style={{ flex: 1 }} />}
 
-          {/* Sort select */}
+          {/* Sort select + Map button */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            {/* Map button */}
+            <Pressable
+              onPress={() => router.push('/map' as any)}
+              accessibilityLabel="Открыть карту"
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 7, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: colors.background }}
+            >
+              <Ionicons name="map-outline" size={16} color={colors.primary} />
+              <Text style={{ fontSize: 13, color: colors.text }}>Карта</Text>
+            </Pressable>
             {/* Native select — works in Expo web */}
             <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 7, paddingHorizontal: 8, paddingVertical: 0, backgroundColor: colors.background, flexDirection: 'row', alignItems: 'center' }}>
               {/* @ts-ignore — select is valid HTML element in RN web */}
