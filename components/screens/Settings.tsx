@@ -189,19 +189,27 @@ function LanguageSection({ currentLang, onChangeLang }: { currentLang?: string; 
 }
 
 function AboutSection() {
+  const router = useRouter();
+  const items: { label: string; value: string; route?: string }[] = [
+    { label: 'Версия приложения', value: '1.4.2' },
+    { label: 'О проекте', value: '\u203A', route: '/legal/about' },
+    { label: 'Помощь', value: '\u203A', route: '/legal/help' },
+    { label: 'Условия использования', value: '\u203A', route: '/legal/terms' },
+    { label: 'Политика конфиденциальности', value: '\u203A', route: '/legal/privacy' },
+  ];
   return (
     <View>
-      {[
-        { label: 'Версия приложения', value: '1.4.2' },
-        { label: 'Условия использования', value: '\u203A' },
-        { label: 'Политика конфиденциальности', value: '\u203A' },
-      ].map((row, i) => (
+      {items.map((row, i) => (
         <View key={i}>
           {i > 0 && <Divider indent={16} />}
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}>
+          <Pressable
+            onPress={row.route ? () => router.push(row.route as any) : undefined}
+            disabled={!row.route}
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 16 }}
+          >
             <Text style={{ fontSize: 15, color: C.text }}>{row.label}</Text>
             <Text style={{ fontSize: row.value === '\u203A' ? 18 : 14, color: C.muted }}>{row.value}</Text>
-          </View>
+          </Pressable>
         </View>
       ))}
     </View>
