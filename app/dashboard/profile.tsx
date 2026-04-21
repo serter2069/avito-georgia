@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/auth';
 import { apiFetch } from '../../lib/api';
 import Profile from '../../components/screens/Profile';
@@ -14,7 +15,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!user) return;
-    apiFetch('/listings/my').then((r: any) => setListings(r.listings ?? [])).catch(() => {});
+    apiFetch('/listings/my').then((r) => setListings(r.listings ?? [])).catch(() => {});
     // No reviews endpoint yet — will show empty state
     setReviews([]);
   }, [user?.id]);
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   };
 
   return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <Profile
       showBottomNav={false}
       realUser={user}
@@ -32,5 +34,6 @@ export default function ProfilePage() {
       reviews={reviews}
       onSave={handleSave}
     />
+    </SafeAreaView>
   );
 }

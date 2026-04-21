@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import MessagesList from '../../../components/screens/MessagesList';
 import { ErrorState } from '../../../components/ErrorState';
@@ -44,9 +45,10 @@ export default function MessagesPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <ChatSkeleton />;
-  if (error) return <ErrorState message="Не удалось загрузить чаты" onRetry={load} />;
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ChatSkeleton /></SafeAreaView>;
+  if (error) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ErrorState message="Не удалось загрузить чаты" onRetry={load} /></SafeAreaView>;
   if (threads.length === 0) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <EmptyState
       icon="chatbubbles-outline"
       title="Нет сообщений"
@@ -54,6 +56,7 @@ export default function MessagesPage() {
       ctaLabel="Перейти к объявлениям"
       onCta={() => router.push('/' as any)}
     />
+    </SafeAreaView>
   );
-  return <MessagesList showHeader={false} showBottomNav={false} threads={threads} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><MessagesList showHeader={false} showBottomNav={false} threads={threads} /></SafeAreaView>;
 }

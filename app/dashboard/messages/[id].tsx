@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import ChatThread from '../../../components/screens/ChatThread';
 import { apiFetch } from '../../../lib/api';
@@ -39,9 +40,11 @@ export default function ChatThreadPage() {
   };
 
   if (loading) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <ActivityIndicator />
     </View>
+    </SafeAreaView>
   );
-  return <ChatThread messages={messages} currentUserId={user?.id} onSend={handleSend} otherUser={otherUser} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ChatThread messages={messages} currentUserId={user?.id} onSend={handleSend} otherUser={otherUser} /></SafeAreaView>;
 }

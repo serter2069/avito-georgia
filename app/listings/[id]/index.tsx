@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 import { View, ActivityIndicator, Pressable, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ListingDetail from '../../../components/screens/ListingDetail';
 import { ErrorState } from '../../../components/ErrorState';
 import { apiFetch } from '../../../lib/api';
@@ -22,8 +23,8 @@ export default function ListingDetailPage() {
     try {
       const r = await apiFetch(`/listings/${id}`);
       setListing(r.listing ?? r);
-    } catch (err: any) {
-      if (err?.statusCode === 404 || err?.status === 404) {
+    } catch (err: unknown) {
+      if ((err as { statusCode?: number })?.statusCode === 404 || (err as { status?: number })?.status === 404) {
         setError('not_found');
       } else {
         setError('other');
@@ -36,12 +37,15 @@ export default function ListingDetailPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <ActivityIndicator size="large" color={colors.primary} />
     </View>
+    </SafeAreaView>
   );
 
   if (error === 'not_found') return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 }}>
       <Text style={{ fontSize: 18, fontWeight: '700', color: colors.text, textAlign: 'center' }}>Объявление не найдено</Text>
       <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>Возможно, оно было удалено или перемещено</Text>
@@ -53,10 +57,11 @@ export default function ListingDetailPage() {
         <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Назад</Text>
       </Pressable>
     </View>
+    </SafeAreaView>
   );
 
-  if (error === 'other') return <ErrorState message="Не удалось загрузить объявление" onRetry={load} />;
+  if (error === 'other') return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ErrorState message="Не удалось загрузить объявление" onRetry={load} /></SafeAreaView>;
 
   const isOwner = !!user && listing?.userId === user.id;
-  return <ListingDetail listing={listing} isOwner={isOwner} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ListingDetail listing={listing} isOwner={isOwner} /></SafeAreaView>;
 }

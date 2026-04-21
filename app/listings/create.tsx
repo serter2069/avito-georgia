@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CreateListing from '../../components/screens/CreateListing';
 import { apiFetch } from '../../lib/api';
 
@@ -47,11 +48,11 @@ export default function CreateListingPage() {
       }
 
       router.replace(`/listings/${listingId}` as any);
-    } catch (e: any) {
-      setError(e.error || 'Ошибка создания объявления');
+    } catch (e: unknown) {
+      setError((e as { error?: string })?.error || 'Ошибка создания объявления');
       setLoading(false);
     }
   };
 
-  return <CreateListing onSubmit={handleSubmit} loading={loading} error={error} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><CreateListing onSubmit={handleSubmit} loading={loading} error={error} /></SafeAreaView>;
 }

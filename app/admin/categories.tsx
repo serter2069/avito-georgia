@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
 import { ErrorState } from '../../components/ErrorState';
@@ -27,8 +28,8 @@ export default function AdminCategories() {
     try {
       const r = await apiFetch('/admin/categories');
       // API returns plain array
-      const list: any[] = Array.isArray(r) ? r : (r.categories ?? []);
-      setCategories(list.map((c: any) => ({
+      const list: Array<{ id: string; name: string; freeListingQuota: number; paidListingPrice: number }> = Array.isArray(r) ? r : (r.categories ?? []);
+      setCategories(list.map((c) => ({
         ...c,
         _quota: String(c.freeListingQuota ?? 0),
         _price: String(c.paidListingPrice ?? 0),
@@ -61,8 +62,8 @@ export default function AdminCategories() {
   if (error) return <ErrorState message="Не удалось загрузить категории" onRetry={load} />;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.surface }}>
-      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 52, paddingBottom: 14, gap: 12 }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
         <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
         <Text style={{ fontSize: 17, fontWeight: '700' }}>Категории</Text>
       </View>
@@ -105,6 +106,6 @@ export default function AdminCategories() {
           </View>
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

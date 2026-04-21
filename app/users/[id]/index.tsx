@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import SellerProfile from '../../../components/screens/SellerProfile';
 import { SkeletonBox } from '../../../components/SkeletonBox';
@@ -45,7 +46,7 @@ export default function SellerProfilePage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <SellerSkeleton />;
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><SellerSkeleton /></SafeAreaView>;
 
-  return <SellerProfile seller={seller} listings={listings} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><SellerProfile seller={seller} listings={listings} /></SafeAreaView>;
 }

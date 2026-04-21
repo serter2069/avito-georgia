@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
 import { ErrorState } from '../../components/ErrorState';
@@ -51,8 +52,8 @@ export default function AdminModeration() {
   if (error) return <ErrorState message="Не удалось загрузить очередь" onRetry={load} />;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.surface }}>
-      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 52, paddingBottom: 14, gap: 12 }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
         <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
         <Text style={{ fontSize: 17, fontWeight: '700' }}>Модерация ({listings.length})</Text>
       </View>
@@ -83,6 +84,6 @@ export default function AdminModeration() {
           ))}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

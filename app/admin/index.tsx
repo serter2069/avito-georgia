@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
 import { ErrorState } from '../../components/ErrorState';
@@ -47,9 +48,9 @@ export default function AdminDashboard() {
   if (error) return <ErrorState message="Не удалось загрузить статистику" onRetry={load} />;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.surface }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Header */}
-      <View style={{ backgroundColor: colors.primary, paddingTop: 56, paddingBottom: 20, paddingHorizontal: 20 }}>
+      <View style={{ backgroundColor: colors.primary, paddingBottom: 20, paddingHorizontal: 20 }}>
         <Text style={{ fontSize: 22, fontWeight: '800', color: colors.background }}>Администрирование</Text>
         <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>Avito Georgia</Text>
       </View>
@@ -91,6 +92,6 @@ export default function AdminDashboard() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

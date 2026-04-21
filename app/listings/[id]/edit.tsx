@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import EditListing from '../../../components/screens/EditListing';
 import { apiFetch } from '../../../lib/api';
@@ -40,11 +41,13 @@ export default function EditListingPage() {
 
   if (loading) {
     return (
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator />
       </View>
+      </SafeAreaView>
     );
   }
 
-  return <EditListing listing={listing} onSave={handleSave} onDelete={handleDelete} saving={saving} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><EditListing listing={listing} onSave={handleSave} onDelete={handleDelete} saving={saving} /></SafeAreaView>;
 }

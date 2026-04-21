@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Favorites from '../../components/screens/Favorites';
 import { ErrorState } from '../../components/ErrorState';
@@ -51,9 +52,10 @@ export default function FavoritesPage() {
     setItems(prev => prev.filter(f => f.listing.id !== listingId));
   };
 
-  if (loading) return <FavoritesSkeleton />;
-  if (error) return <ErrorState message="Не удалось загрузить избранное" onRetry={load} />;
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><FavoritesSkeleton /></SafeAreaView>;
+  if (error) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ErrorState message="Не удалось загрузить избранное" onRetry={load} /></SafeAreaView>;
   if (items.length === 0) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <EmptyState
       icon="heart-outline"
       title="Нет избранного"
@@ -61,6 +63,7 @@ export default function FavoritesPage() {
       ctaLabel="Смотреть объявления"
       onCta={() => router.push('/' as any)}
     />
+    </SafeAreaView>
   );
-  return <Favorites showHeader={false} showBottomNav={false} items={items} loading={loading} onRemove={handleRemove} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Favorites showHeader={false} showBottomNav={false} items={items} loading={loading} onRemove={handleRemove} /></SafeAreaView>;
 }

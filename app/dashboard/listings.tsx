@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import MyListings from '../../components/screens/MyListings';
 import { ErrorState } from '../../components/ErrorState';
@@ -45,9 +46,10 @@ export default function MyListingsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <ListingSkeleton />;
-  if (error) return <ErrorState message="Не удалось загрузить объявления" onRetry={load} />;
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ListingSkeleton /></SafeAreaView>;
+  if (error) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ErrorState message="Не удалось загрузить объявления" onRetry={load} /></SafeAreaView>;
   if (listings.length === 0) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <EmptyState
       icon="list-outline"
       title="Нет объявлений"
@@ -55,6 +57,7 @@ export default function MyListingsPage() {
       ctaLabel="Подать объявление"
       onCta={() => router.push('/listings/create' as any)}
     />
+    </SafeAreaView>
   );
-  return <MyListings showBottomNav={false} listings={listings} />;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><MyListings showBottomNav={false} listings={listings} /></SafeAreaView>;
 }
