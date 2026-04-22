@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Image, RefreshControl, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
@@ -84,7 +84,7 @@ function ListingCard({ listing, colorIdx }: {
 
 // ─── Main content ─────────────────────────────────────────────────────────────
 
-export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = true }: { loggedIn?: boolean; showHeader?: boolean; showBottomNav?: boolean }) {
+export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = true, onRefreshStateChange }: { loggedIn?: boolean; showHeader?: boolean; showBottomNav?: boolean; onRefreshStateChange?: (refreshing: boolean, handleRefresh: () => Promise<void>) => void }) {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
@@ -115,6 +115,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Debounce timer ref for text inputs
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -206,6 +207,27 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
       setLoadingMore(false);
     }
   };
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setPage(1);
+    try {
+      const r = await apiFetch(`/listings?${buildParams(1).toString()}`);
+      const fetched = r.listings ?? [];
+      setListings(fetched);
+      const total = r.total ?? 0;
+      setHasMore(fetched.length < total);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [buildParams]);
+
+  // Notify parent (e.g. ScrollView owner) of refresh state so it can wire RefreshControl
+  useEffect(() => {
+    onRefreshStateChange?.(refreshing, handleRefresh);
+  }, [refreshing, handleRefresh, onRefreshStateChange]);
 
   // Build city list for pills: "Все города" + API cities
   const cityPills = [{ id: '', name: 'Все города' }, ...cities];
@@ -362,6 +384,22 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
 
           {/* Sort select + Map button */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            {/* Refresh button — web only (native uses pull-to-refresh via RefreshControl) */}
+            {Platform.OS === 'web' && (
+              <Pressable
+                onPress={handleRefresh}
+                disabled={refreshing || loading}
+                accessibilityLabel="Обновить список объявлений"
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 7, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: colors.background, opacity: (refreshing || loading) ? 0.5 : 1 }}
+              >
+                {refreshing ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                ) : (
+                  <Ionicons name="refresh-outline" size={16} color={colors.primary} />
+                )}
+                <Text style={{ fontSize: 13, color: colors.text }}>Обновить</Text>
+              </Pressable>
+            )}
             {/* Map button */}
             <Pressable
               onPress={() => router.push('/map' as any)}
