@@ -50,7 +50,6 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
 function Privacy() {
   return (
     <PageWrapper>
-      <PageHeader title="Политика конфиденциальности" />
       <View style={{ padding: 24 }}>
         <Text style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Обновлено: 01.01.2026</Text>
         <DocSection heading="1. Какие данные мы собираем" body="Email-адрес для аутентификации, данные объявлений (текст, фото, цена), геолокацию города и технические данные устройства для улучшения работы сервиса." />

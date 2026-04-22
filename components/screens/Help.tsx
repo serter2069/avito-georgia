@@ -62,7 +62,6 @@ function Help() {
 
   return (
       <PageWrapper>
-        <PageHeader title="Помощь" />
         <View style={{ padding: 16, gap: 14 }}>
           {/* Search */}
           <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, gap: 8, backgroundColor: C.white }}>
