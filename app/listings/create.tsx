@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CreateListing from '../../components/screens/CreateListing';
 import { apiFetch } from '../../lib/api';
@@ -54,5 +54,5 @@ export default function CreateListingPage() {
     }
   };
 
-  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><CreateListing onSubmit={handleSubmit} loading={loading} error={error} /></SafeAreaView>;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: true, title: 'Новое объявление' }} /><CreateListing onSubmit={handleSubmit} loading={loading} error={error} /></SafeAreaView>;
 }

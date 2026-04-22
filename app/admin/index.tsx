@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
@@ -17,6 +17,8 @@ function StatCard({ label, value, color = colors.primary }: { label: string; val
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
   const [stats, setStats] = useState<any>(null);
   const [activity, setActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +57,7 @@ export default function AdminDashboard() {
         <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>Avito Georgia</Text>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 16, maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
         {/* Stats */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <StatCard label="Всего объявлений" value={stats?.totalListings ?? 0} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -49,6 +49,8 @@ function QuickLinks({ isAdmin }: { isAdmin: boolean }) {
 
 export default function ProfilePage() {
   const { user, fetchMe } = useAuthStore();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
   const [listings, setListings] = useState([]);
   const [reviews, setReviews] = useState([]);
 
@@ -70,7 +72,7 @@ export default function ProfilePage() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
         <Profile
           showBottomNav={false}
           realUser={user}

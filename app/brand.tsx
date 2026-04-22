@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Stack } from 'expo-router';
 import { Button, Card, Input, Avatar, Badge, EmptyState, ErrorState, LoadingState } from '../components/ui';
 import { colors, spacing, typography, radius } from '../lib/theme';
 
@@ -31,6 +32,7 @@ export default function BrandPage() {
   const [inputVal, setInputVal] = useState('');
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.background }}>
+    <Stack.Screen options={{ headerShown: true, title: 'Design System' }} />
     <ScrollView
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={{ padding: spacing.md, maxWidth: 430, alignSelf: 'center', width: '100%' }}

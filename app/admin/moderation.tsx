@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
@@ -8,6 +8,8 @@ import { colors } from '../../lib/theme';
 
 export default function AdminModeration() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -63,7 +65,7 @@ export default function AdminModeration() {
           <Text style={{ fontSize: 16, color: colors.textSecondary }}>Очередь пуста</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 12, maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
           {listings.map(l => (
             <View key={l.id} style={{ backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8', gap: 10 }}>
               <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{l.title}</Text>
