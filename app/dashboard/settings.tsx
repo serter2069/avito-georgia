@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Stack } from 'expo-router';
 import Settings from '../../components/screens/Settings';
 import { apiFetch } from '../../lib/api';
 import { useAuthStore } from '../../store/auth';
@@ -61,9 +62,10 @@ export default function SettingsPage() {
     );
   };
 
-  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View></SafeAreaView>;
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: true, title: 'Настройки' }} /><View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View></SafeAreaView>;
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+    <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
     <Settings
       showBottomNav={false}
       prefs={prefs}

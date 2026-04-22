@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiFetch } from '../../lib/api';
@@ -18,6 +18,8 @@ interface Category {
 
 export default function AdminCategories() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -67,7 +69,7 @@ export default function AdminCategories() {
         <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
         <Text style={{ fontSize: 17, fontWeight: '700' }}>Категории</Text>
       </View>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 10 }}>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 10, maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
         {categories.map(cat => (
           <View key={cat.id} style={{ backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8', gap: 12 }}>
             <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{cat.name}</Text>
