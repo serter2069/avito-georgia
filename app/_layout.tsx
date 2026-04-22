@@ -8,6 +8,7 @@ import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import { useAuthStore } from '../store/auth';
 
+import MetroBridge from "../components/MetroBridge";
 function useResponsiveMaxWidth() {
   const { width } = useWindowDimensions();
   if (Platform.OS !== 'web') return 430;

@@ -426,9 +426,6 @@ function CreateListingInteractive({ onSubmit, loading, error }: CreateListingPro
 
   return (
     <View style={{ flex: 1, backgroundColor: C.white }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border }}>
-        <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>Новое объявление</Text>
-      </View>
       <StepIndicator step={step} />
       {step === 1 && (
         <Step1

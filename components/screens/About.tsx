@@ -50,7 +50,6 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
 function About() {
   return (
       <PageWrapper>
-        <PageHeader title="О нас" />
         <View style={{ padding: 24, gap: 24 }}>
           <View style={{ alignItems: 'center', gap: 12 }}>
             <AvitoLogo />
