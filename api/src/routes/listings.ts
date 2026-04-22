@@ -193,6 +193,127 @@ router.get('/', searchRateLimit, async (req: Request, res: Response) => {
     }
   }
 
+  // Full-text search path: when q is present and ≥ 2 chars, use tsvector/tsquery for
+  // relevance ranking across title + description. Fallback to Prisma if FTS unavailable.
+  if (q && q.trim().length >= 2) {
+    const tsQuery = q.trim().split(/\s+/).map((w) => w.replace(/[^a-zA-Zа-яА-ЯёЁa-zA-Z0-9\u10D0-\u10FF]/g, '') + ':*').filter(Boolean).join(' & ');
+    if (tsQuery) {
+      try {
+        type FtsRow = {
+          id: string; title: string; description: string | null;
+          price: number | null; currency: string; status: string;
+          views: number; createdAt: Date; updatedAt: Date;
+          userId: string; categoryId: string; cityId: string;
+          districtId: string | null; lat: number | null; lng: number | null;
+          address: string | null; activatedAt: Date | null; expiresAt: Date | null;
+          lastRenewedAt: Date | null; rejectionReason: string | null;
+          rank: number;
+        };
+        type CountRow = { count: bigint };
+
+        const categoryFilter = categoryId ? Prisma.sql`AND l."categoryId" = ${categoryId}` : Prisma.empty;
+        const cityFilter = city ? Prisma.sql`AND l."cityId" = ${city}` : Prisma.empty;
+        const userFilter = userId ? Prisma.sql`AND l."userId" = ${userId}` : Prisma.empty;
+        const excludeFilter = exclude ? Prisma.sql`AND l.id <> ${exclude}` : Prisma.empty;
+        const priceMinFilter = price_min ? Prisma.sql`AND l.price >= ${parseFloat(price_min)}` : Prisma.empty;
+        const priceMaxFilter = price_max ? Prisma.sql`AND l.price <= ${parseFloat(price_max)}` : Prisma.empty;
+
+        // Sort by ts_rank relevance when q is present; ignore the sort param for FTS
+        const [ftsRows, countRows] = await Promise.all([
+          prisma.$queryRaw<FtsRow[]>`
+            SELECT l.*, ts_rank(l.search_vector, to_tsquery('simple', ${tsQuery})) AS rank
+            FROM "Listing" l
+            JOIN "User" u ON u.id = l."userId"
+            WHERE l.status = 'active'
+              AND u.role <> 'blocked'
+              AND (l."expiresAt" IS NULL OR l."expiresAt" > now())
+              AND l.search_vector @@ to_tsquery('simple', ${tsQuery})
+              ${categoryFilter}
+              ${cityFilter}
+              ${userFilter}
+              ${excludeFilter}
+              ${priceMinFilter}
+              ${priceMaxFilter}
+            ORDER BY rank DESC, l."createdAt" DESC
+            LIMIT ${take} OFFSET ${skip}
+          `,
+          prisma.$queryRaw<CountRow[]>`
+            SELECT count(*) AS count
+            FROM "Listing" l
+            JOIN "User" u ON u.id = l."userId"
+            WHERE l.status = 'active'
+              AND u.role <> 'blocked'
+              AND (l."expiresAt" IS NULL OR l."expiresAt" > now())
+              AND l.search_vector @@ to_tsquery('simple', ${tsQuery})
+              ${categoryFilter}
+              ${cityFilter}
+              ${userFilter}
+              ${excludeFilter}
+              ${priceMinFilter}
+              ${priceMaxFilter}
+          `,
+        ]);
+
+        const total = Number((countRows[0] as CountRow)?.count ?? 0);
+        const ids = ftsRows.map((r) => r.id);
+
+        if (ids.length === 0) {
+          res.json({ listings: [], total, page, limit: take });
+          return;
+        }
+
+        // Fetch full Prisma objects (with relations) for matched ids, preserving rank order
+        const fullListings = await prisma.listing.findMany({
+          where: { id: { in: ids } },
+          include: {
+            photos: { orderBy: { order: 'asc' }, take: 3 },
+            city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
+            category: { select: { id: true, name: true, nameKa: true, nameRu: true, nameEn: true, slug: true } },
+            promotions: { where: { isActive: true }, select: { promotionType: true, expiresAt: true } },
+            user: {
+              select: {
+                id: true, name: true,
+                promotions: {
+                  where: { promotionType: 'unlimited_sub', isActive: true, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+                  select: { id: true },
+                },
+              },
+            },
+          },
+        });
+
+        // Preserve ts_rank order from ftsRows
+        const rankMap = new Map(ftsRows.map((r) => [r.id, r.rank]));
+        fullListings.sort((a, b) => (rankMap.get(b.id) ?? 0) - (rankMap.get(a.id) ?? 0));
+
+        const TOP_TYPES_FTS = new Set(['top_1d', 'top_3d', 'top_7d']);
+        const enrichedFts = fullListings.map((l) => {
+          const activePromos = l.promotions || [];
+          const isTop = activePromos.some((p) => TOP_TYPES_FTS.has(p.promotionType));
+          const isHighlighted = activePromos.some((p) => p.promotionType === 'highlight');
+          const isPremium = (l.user?.promotions?.length ?? 0) > 0;
+          const { promotions: _up, ...userWithoutPromos } = l.user ?? { id: '', name: null };
+          return { ...l, user: userWithoutPromos, isPromoted: isTop, isHighlighted, isPremium };
+        });
+
+        // Promoted always first, then relevance order
+        enrichedFts.sort((a, b) => {
+          if (a.isPromoted && !b.isPromoted) return -1;
+          if (!a.isPromoted && b.isPromoted) return 1;
+          if (a.isPremium && !b.isPremium) return -1;
+          if (!a.isPremium && b.isPremium) return 1;
+          return (rankMap.get(b.id) ?? 0) - (rankMap.get(a.id) ?? 0);
+        });
+
+        res.json({ listings: enrichedFts, total, page, limit: take });
+        return;
+      } catch (ftsErr) {
+        // FTS column not yet available (migration pending) — fall through to ILIKE
+        console.warn('[FTS] tsvector query failed, falling back to ILIKE:', (ftsErr as Error).message);
+      }
+    }
+  }
+
   const where: Prisma.ListingWhereInput = {
     status: 'active',
     user: { role: { not: 'blocked' } },
