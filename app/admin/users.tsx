@@ -1,194 +1,97 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '../../lib/api';
-import { colors } from '../../lib/colors';
+import { useState, useEffect, useRef } from 'react';
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { apiFetch } from '../../lib/api';
+import { ErrorState } from '../../components/ErrorState';
+import { colors } from '../../lib/theme';
 
-interface UserItem {
-  id: string;
-  email: string;
-  name: string | null;
-  phone: string | null;
-  role: string;
-  createdAt: string;
-  _count: { listings: number };
-}
+const ROLE_COLORS: Record<string, string> = { admin: colors.primary, user: '#6B7280', blocked: colors.error };
 
 export default function AdminUsers() {
-  const { t } = useTranslation();
-  const [users, setUsers] = useState<UserItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
+  const [users, setUsers] = useState<any[]>([]);
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchUsers = useCallback(async (p: number, q: string) => {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(p), limit: '20' });
-    if (q.trim()) params.set('q', q.trim());
-    const res = await api.get<{ users: UserItem[]; total: number }>(
-      `/admin/users?${params.toString()}`
-    );
-    if (res.ok && res.data) {
-      setUsers(res.data.users);
-      setTotal(res.data.total);
-    }
-    setLoading(false);
-  }, []);
+  const load = async (q = search) => {
+    setLoading(true); setError(false);
+    try {
+      const r = await apiFetch(`/admin/users?q=${encodeURIComponent(q)}&limit=50`);
+      setUsers(r.users ?? []);
+    } catch { setError(true); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { load(); }, []);
 
   useEffect(() => {
-    fetchUsers(page, search);
-  }, [page, fetchUsers]);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => load(search), 400);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search]);
 
-  const handleSearch = () => {
-    setPage(1);
-    fetchUsers(1, search);
-  };
-
-  const toggleBlock = async (user: UserItem) => {
-    setActionLoading(user.id);
+  const toggleBlock = async (user: { id: string; role: string }) => {
     const newRole = user.role === 'blocked' ? 'user' : 'blocked';
-    const res = await api.patch<{ id: string; role: string }>(
-      `/admin/users/${user.id}/role`,
-      { role: newRole }
-    );
-    if (res.ok && res.data) {
-      setUsers((prev) =>
-        prev.map((u) => (u.id === user.id ? { ...u, role: res.data!.role } : u))
-      );
-    }
-    setActionLoading(null);
-  };
-
-  const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
-
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return { bg: 'bg-primary/20', text: 'text-primary', label: t('admin') };
-      case 'blocked':
-        return { bg: 'bg-error/20', text: 'text-error', label: t('blocked') };
-      default:
-        return { bg: 'bg-surface', text: 'text-text-secondary', label: t('user') };
-    }
+    try {
+      await apiFetch(`/admin/users/${user.id}/role`, { method: 'PATCH', body: JSON.stringify({ role: newRole }) });
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, role: newRole } : u));
+    } catch (e) { console.error('Failed to toggle user block', e); }
   };
 
   return (
-    <View className="flex-1">
-      {/* Search */}
-      <View className="px-4 pt-4 pb-2">
-        <View className="flex-row bg-surface border border-border rounded-lg overflow-hidden">
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', paddingBottom: 8, paddingHorizontal: 16, gap: 10 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
+          <Text style={{ fontSize: 17, fontWeight: '700' }}>Пользователи</Text>
+        </View>
+        <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#F9F9F9' }}>
           <TextInput
-            className="flex-1 px-4 py-2.5 text-text-primary text-sm"
-            placeholder={t('searchUsers')}
-            placeholderTextColor={colors.textMuted}
             value={search}
             onChangeText={setSearch}
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
+            placeholder="Поиск по email или имени..."
+            placeholderTextColor={colors.textSecondary}
+            style={{ fontSize: 14, color: colors.text } as any}
           />
-          <TouchableOpacity
-            className="px-4 items-center justify-center bg-primary"
-            onPress={handleSearch}
-          >
-            <Text className="text-white text-sm">&#x1F50D;</Text>
-          </TouchableOpacity>
         </View>
       </View>
-
       {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.brandPrimary} />
-        </View>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={colors.primary} /></View>
+      ) : error ? (
+        <ErrorState message="Не удалось загрузить пользователей" onRetry={() => load()} />
       ) : (
-        <ScrollView className="flex-1" contentContainerClassName="p-4 gap-3">
-          <Text className="text-text-muted text-xs mb-1">
-            {t('totalUsers')}: {total}
-          </Text>
-
-          {users.length === 0 ? (
-            <Text className="text-text-muted text-sm text-center py-8">{t('noUsers')}</Text>
-          ) : (
-            users.map((user) => {
-              const badge = getRoleBadge(user.role);
-              return (
-                <View key={user.id} className="bg-surface-card border border-border rounded-lg p-4">
-                  <View className="flex-row justify-between items-start mb-2">
-                    <View className="flex-1 mr-3">
-                      <Text className="text-text-primary text-sm font-bold">
-                        {user.name || user.email}
-                      </Text>
-                      {user.name && (
-                        <Text className="text-text-muted text-xs">{user.email}</Text>
-                      )}
-                    </View>
-                    <View className={`px-2 py-0.5 rounded ${badge.bg}`}>
-                      <Text className={`text-xs font-medium ${badge.text}`}>{badge.label}</Text>
-                    </View>
-                  </View>
-
-                  <View className="flex-row justify-between items-center mb-3">
-                    <Text className="text-text-muted text-xs">
-                      {t('registrationDate')}: {formatDate(user.createdAt)}
-                    </Text>
-                    <Text className="text-text-secondary text-xs">
-                      {t('listingsCount')}: {user._count.listings}
-                    </Text>
-                  </View>
-
-                  {user.role !== 'admin' && (
-                    <TouchableOpacity
-                      className={`py-2 rounded-lg items-center ${
-                        user.role === 'blocked'
-                          ? 'bg-success/20 border border-success/40'
-                          : 'bg-error/20 border border-error/40'
-                      }`}
-                      onPress={() => toggleBlock(user)}
-                      disabled={actionLoading === user.id}
-                    >
-                      {actionLoading === user.id ? (
-                        <ActivityIndicator size="small" color={colors.brandPrimary} />
-                      ) : (
-                        <Text
-                          className={`text-sm font-medium ${
-                            user.role === 'blocked' ? 'text-success' : 'text-error'
-                          }`}
-                        >
-                          {user.role === 'blocked' ? t('unblock') : t('block')}
-                        </Text>
-                      )}
-                    </TouchableOpacity>
-                  )}
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 8, maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
+          {users.map(u => (
+            <View key={u.id} style={{ backgroundColor: colors.background, borderRadius: 10, padding: 14, borderWidth: 1, borderColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{u.name ?? 'Без имени'}</Text>
+                <Text style={{ fontSize: 12, color: colors.textSecondary }}>{u.email}</Text>
+                <View style={{ marginTop: 4, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: (ROLE_COLORS[u.role] ?? colors.textSecondary) + '22' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: ROLE_COLORS[u.role] ?? colors.textSecondary }}>{u.role}</Text>
                 </View>
-              );
-            })
-          )}
-
-          {/* Pagination */}
-          {total > 20 && (
-            <View className="flex-row justify-center gap-3 py-4">
-              <TouchableOpacity
-                className={`px-4 py-2 rounded-lg ${page > 1 ? 'bg-primary' : 'bg-surface'}`}
-                onPress={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-              >
-                <Text className={page > 1 ? 'text-white' : 'text-text-muted'}>&larr;</Text>
-              </TouchableOpacity>
-              <Text className="text-text-secondary self-center text-sm">
-                {page} / {Math.ceil(total / 20)}
-              </Text>
-              <TouchableOpacity
-                className={`px-4 py-2 rounded-lg ${page < Math.ceil(total / 20) ? 'bg-primary' : 'bg-surface'}`}
-                onPress={() => setPage((p) => p + 1)}
-                disabled={page >= Math.ceil(total / 20)}
-              >
-                <Text className={page < Math.ceil(total / 20) ? 'text-white' : 'text-text-muted'}>&rarr;</Text>
-              </TouchableOpacity>
+              </View>
+              {u.role !== 'admin' && (
+                <Pressable
+                  onPress={() => toggleBlock(u)}
+                  accessibilityLabel={u.role === 'blocked' ? 'Разблокировать пользователя' : 'Заблокировать пользователя'}
+                  style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: u.role === 'blocked' ? colors.primary : colors.error }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: u.role === 'blocked' ? colors.primary : colors.error }}>
+                    {u.role === 'blocked' ? 'Разблокировать' : 'Заблокировать'}
+                  </Text>
+                </Pressable>
+              )}
             </View>
-          )}
+          ))}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

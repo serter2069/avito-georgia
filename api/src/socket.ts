@@ -1,11 +1,89 @@
 import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import xss from 'xss';
 import { prisma } from './lib/prisma';
+import { sendNewMessageEmail } from './lib/mail';
+import { ALLOWED_ORIGINS } from './lib/constants';
+
+// Throttle: minimum ms between emails per thread per recipient
+const EMAIL_THROTTLE_MS = 30 * 60 * 1000; // 30 minutes
+
+async function notifyOfflineRecipients(
+  io: Server,
+  threadId: string,
+  senderId: string,
+  message: { id: string; text: string; sender: { id: string; name: string | null; avatarUrl: string | null } }
+): Promise<void> {
+  // Get all participants except the sender
+  const participants = await prisma.threadParticipant.findMany({
+    where: { threadId, userId: { not: senderId } },
+    include: { user: { select: { id: true, email: true, name: true } } },
+  });
+
+  for (const p of participants) {
+    const recipientId = p.user.id;
+
+    // Check if this user has any active socket connections in the thread room
+    const socketsInRoom = await io.in(threadId).fetchSockets();
+    const isOnline = socketsInRoom.some((s) => s.data.userId === recipientId);
+    if (isOnline) continue;
+
+    // Create DB notification (fire and forget errors are caught by caller)
+    await prisma.notification.create({
+      data: {
+        userId: recipientId,
+        type: 'NEW_MESSAGE',
+        payload: {
+          threadId,
+          messageId: message.id,
+          senderName: message.sender.name || 'Someone',
+          preview: message.text.slice(0, 100),
+        },
+      },
+    });
+
+    // Throttle check: find last NEW_MESSAGE email notification for this thread + recipient
+    const throttleCutoff = new Date(Date.now() - EMAIL_THROTTLE_MS);
+    const recentEmailNotification = await prisma.notification.findFirst({
+      where: {
+        userId: recipientId,
+        type: 'NEW_MESSAGE_EMAIL_SENT',
+        createdAt: { gte: throttleCutoff },
+        payload: { path: ['threadId'], equals: threadId },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (recentEmailNotification) continue;
+
+    // Check notification preference — absence of row means enabled by default
+    const newMsgPref = await prisma.notificationPref.findUnique({
+      where: { userId_type: { userId: recipientId, type: 'new_message' } },
+    });
+    if (newMsgPref && !newMsgPref.enabled) continue;
+
+    // Record that we're sending an email (before sending, to prevent races)
+    await prisma.notification.create({
+      data: {
+        userId: recipientId,
+        type: 'NEW_MESSAGE_EMAIL_SENT',
+        payload: { threadId },
+      },
+    });
+
+    // Send the email (non-blocking — errors logged, won't crash send_message)
+    sendNewMessageEmail(
+      p.user.email,
+      message.sender.name || 'Someone',
+      message.text,
+      threadId
+    ).catch(err => console.error(`New message email error (thread ${threadId}):`, err));
+  }
+}
 
 export function setupSocket(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
-    cors: { origin: '*' },
+    cors: { origin: ALLOWED_ORIGINS, credentials: true },
     path: '/socket.io',
   });
 
@@ -76,7 +154,7 @@ export function setupSocket(httpServer: HttpServer): Server {
         // Save message
         const message = await prisma.message.create({
           data: {
-            text: text.trim(),
+            text: xss(text.trim()),
             threadId,
             senderId: socket.data.userId,
           },
@@ -89,7 +167,10 @@ export function setupSocket(httpServer: HttpServer): Server {
         // Emit to all participants in the room
         io.to(threadId).emit('message_received', message);
 
-        // TODO: Check if other participant is offline and send email notification
+        // Notify offline recipients: create DB notification + throttled email
+        notifyOfflineRecipients(io, threadId, socket.data.userId, message).catch(err =>
+          console.error('notifyOfflineRecipients error:', err)
+        );
       } catch (err) {
         console.error('send_message error:', err);
         socket.emit('error', { message: 'Failed to send message' });
@@ -97,12 +178,20 @@ export function setupSocket(httpServer: HttpServer): Server {
     });
 
     // Typing indicator
-    socket.on('typing', (data: { threadId: string }) => {
-      if (data.threadId) {
+    socket.on('typing', async (data: { threadId: string }) => {
+      if (!data.threadId) return;
+      try {
+        // Verify user is participant before broadcasting typing indicator (prevents IDOR)
+        const participant = await prisma.threadParticipant.findUnique({
+          where: { threadId_userId: { threadId: data.threadId, userId: socket.data.userId } },
+        });
+        if (!participant) return; // silently ignore — do not reveal thread existence
         socket.to(data.threadId).emit('typing', {
           threadId: data.threadId,
           userId: socket.data.userId,
         });
+      } catch (err) {
+        console.error('typing error:', err);
       }
     });
 

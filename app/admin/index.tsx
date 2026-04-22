@@ -1,142 +1,99 @@
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { api } from '../../lib/api';
-import { colors } from '../../lib/colors';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { apiFetch } from '../../lib/api';
+import { ErrorState } from '../../components/ErrorState';
+import { colors } from '../../lib/theme';
 
-interface Stats {
-  totalListings: number;
-  totalUsers: number;
-  pendingReports: number;
-  paymentsThisMonth: { count: number; sum: number };
-}
-
-interface ReportItem {
-  id: string;
-  reason: string;
-  status: string;
-  createdAt: string;
-  reporter?: { email: string };
-  listing?: { title: string } | null;
-  targetUser?: { email: string } | null;
-}
-
-interface PaymentItem {
-  id: string;
-  amount: number;
-  currency: string;
-  status: string;
-  createdAt: string;
-  user?: { email: string };
-}
-
-function StatCard({ label, value }: { label: string; value: string | number }) {
+function StatCard({ label, value, color = colors.primary }: { label: string; value: string | number; color?: string }) {
   return (
-    <View className="bg-surface-card border border-border rounded-lg p-4 flex-1 min-w-[140px]">
-      <Text className="text-text-muted text-xs mb-1">{label}</Text>
-      <Text className="text-text-primary text-2xl font-bold">{value}</Text>
+    <View style={{ flex: 1, minWidth: '45%', backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8' }}>
+      <Text style={{ fontSize: 24, fontWeight: '800', color }}>{value}</Text>
+      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>{label}</Text>
     </View>
   );
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString();
-}
-
 export default function AdminDashboard() {
-  const { t } = useTranslation();
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [reports, setReports] = useState<ReportItem[]>([]);
-  const [payments, setPayments] = useState<PaymentItem[]>([]);
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
+  const [stats, setStats] = useState<any>(null);
+  const [activity, setActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    Promise.all([
-      api.get<Stats>('/admin/stats'),
-      api.get<{ reports: ReportItem[] }>('/reports/admin?limit=5'),
-      api.get<{ payments: PaymentItem[] }>('/admin/payments?limit=5'),
-    ]).then(([statsRes, reportsRes, paymentsRes]) => {
-      if (statsRes.ok && statsRes.data) setStats(statsRes.data);
-      if (reportsRes.ok && reportsRes.data) setReports(reportsRes.data.reports);
-      if (paymentsRes.ok && paymentsRes.data) setPayments(paymentsRes.data.payments);
-    }).finally(() => setLoading(false));
-  }, []);
+  const load = async () => {
+    setLoading(true); setError(false);
+    try {
+      const [statsRes, logRes] = await Promise.all([
+        apiFetch('/admin/stats'),
+        apiFetch('/admin/audit-log?limit=10'),
+      ]);
+      setStats(statsRes);
+      setActivity(logRes.logs ?? []);
+    } catch { setError(true); }
+    finally { setLoading(false); }
+  };
 
-  if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color={colors.brandPrimary} />
-      </View>
-    );
-  }
+  useEffect(() => { load(); }, []);
+
+  const nav = [
+    { label: 'Модерация', icon: '📋', route: '/admin/moderation' },
+    { label: 'Пользователи', icon: '👥', route: '/admin/users' },
+    { label: 'Категории', icon: '📁', route: '/admin/categories' },
+    { label: 'Финансы', icon: '💰', route: '/admin/finance' },
+  ];
+
+  if (loading) return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={colors.primary} size="large" /></View>;
+  if (error) return <ErrorState message="Не удалось загрузить статистику" onRetry={load} />;
 
   return (
-    <ScrollView className="flex-1" contentContainerClassName="p-4 gap-4">
-      {/* Stats cards */}
-      <View className="flex-row flex-wrap gap-3">
-        <StatCard label={t('totalListings')} value={stats?.totalListings ?? 0} />
-        <StatCard label={t('totalUsers')} value={stats?.totalUsers ?? 0} />
-        <StatCard label={t('pendingReports')} value={stats?.pendingReports ?? 0} />
-        <StatCard
-          label={t('paymentsThisMonth')}
-          value={`${stats?.paymentsThisMonth.sum.toFixed(0) ?? 0} GEL`}
-        />
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+      {/* Header */}
+      <View style={{ backgroundColor: colors.primary, paddingBottom: 20, paddingHorizontal: 20 }}>
+        <Text style={{ fontSize: 22, fontWeight: '800', color: colors.background }}>Администрирование</Text>
+        <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>Avito Georgia</Text>
       </View>
 
-      {/* Recent reports */}
-      <View className="bg-surface-card border border-border rounded-lg p-4">
-        <Text className="text-text-primary text-base font-bold mb-3">{t('recentReports')}</Text>
-        {reports.length === 0 ? (
-          <Text className="text-text-muted text-sm">{t('noReports')}</Text>
-        ) : (
-          reports.map((r) => (
-            <View key={r.id} className="border-b border-border py-2 last:border-b-0">
-              <View className="flex-row justify-between items-center mb-1">
-                <Text className="text-text-primary text-sm font-medium" numberOfLines={1}>
-                  {r.reason}
-                </Text>
-                <View className={`px-2 py-0.5 rounded ${r.status === 'pending' ? 'bg-warning/20' : 'bg-success/20'}`}>
-                  <Text className={`text-xs ${r.status === 'pending' ? 'text-warning' : 'text-success'}`}>
-                    {t(r.status)}
-                  </Text>
-                </View>
-              </View>
-              <Text className="text-text-muted text-xs">
-                {r.reporter?.email ?? '—'} &rarr; {r.listing?.title ?? r.targetUser?.email ?? '—'} | {formatDate(r.createdAt)}
-              </Text>
-            </View>
-          ))
-        )}
-      </View>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 16, maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
+        {/* Stats */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <StatCard label="Всего объявлений" value={stats?.totalListings ?? 0} />
+          <StatCard label="Пользователей" value={stats?.totalUsers ?? 0} />
+          <StatCard label="На модерации" value={stats?.pendingModeration ?? 0} color="#F59E0B" />
+          <StatCard label="Выручка (мес.)" value={`₾${stats?.paymentsThisMonth?.sum ?? 0}`} />
+        </View>
 
-      {/* Recent payments */}
-      <View className="bg-surface-card border border-border rounded-lg p-4">
-        <Text className="text-text-primary text-base font-bold mb-3">{t('recentPayments')}</Text>
-        {payments.length === 0 ? (
-          <Text className="text-text-muted text-sm">{t('noPayments')}</Text>
-        ) : (
-          payments.map((p) => (
-            <View key={p.id} className="border-b border-border py-2 last:border-b-0">
-              <View className="flex-row justify-between items-center">
-                <Text className="text-text-primary text-sm">
-                  {p.user?.email ?? '—'}
-                </Text>
-                <Text className="text-text-primary text-sm font-bold">
-                  {p.amount} {p.currency}
-                </Text>
+        {/* Nav tiles */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          {nav.map(n => (
+            <Pressable
+              key={n.route}
+              onPress={() => router.push(n.route as any)}
+              accessibilityLabel={`Открыть ${n.label}`}
+              style={{ flex: 1, minWidth: '45%', backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8', alignItems: 'center', gap: 8 }}
+            >
+              <Text style={{ fontSize: 28 }}>{n.icon}</Text>
+              <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{n.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* Recent activity */}
+        {activity.length > 0 && (
+          <View style={{ backgroundColor: colors.background, borderRadius: 12, borderWidth: 1, borderColor: '#E8E8E8', overflow: 'hidden' }}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text, padding: 16, borderBottomWidth: 1, borderBottomColor: '#E8E8E8' }}>Последние действия</Text>
+            {activity.slice(0, 8).map((a, i) => (
+              <View key={i} style={{ padding: 14, borderBottomWidth: i < activity.length - 1 ? 1 : 0, borderBottomColor: '#E8E8E8' }}>
+                <Text style={{ fontSize: 13, color: colors.text }}>{a.action ?? JSON.stringify(a).slice(0, 60)}</Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>{a.createdAt ? new Date(a.createdAt).toLocaleString('ru-RU') : ''}</Text>
               </View>
-              <View className="flex-row justify-between items-center mt-1">
-                <Text className="text-text-muted text-xs">{formatDate(p.createdAt)}</Text>
-                <View className={`px-2 py-0.5 rounded ${p.status === 'completed' ? 'bg-success/20' : p.status === 'failed' ? 'bg-error/20' : 'bg-warning/20'}`}>
-                  <Text className={`text-xs ${p.status === 'completed' ? 'text-success' : p.status === 'failed' ? 'text-error' : 'text-warning'}`}>
-                    {t(p.status)}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          ))
+            ))}
+          </View>
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

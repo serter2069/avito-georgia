@@ -1,8 +1,47 @@
 import { Router, Request, Response } from 'express';
+import xss from 'xss';
 import { requireAuth } from '../middleware/auth';
+import { chatMessageRateLimit } from '../middleware/rateLimiter';
 import { prisma } from '../lib/prisma';
 
 const router = Router();
+
+// Create in-app NEW_MESSAGE notifications for all thread participants except the sender (UC-17)
+async function createNewMessageNotifications(
+  threadId: string,
+  listingId: string | null,
+  message: { id: string; text: string; senderId: string; sender: { id: string; name: string | null; avatarUrl: string | null } }
+): Promise<void> {
+  const senderId = message.senderId;
+
+  // Get all participants except sender
+  const participants = await prisma.threadParticipant.findMany({
+    where: { threadId, userId: { not: senderId } },
+    select: { userId: true },
+  });
+
+  for (const { userId: recipientId } of participants) {
+    // Check notification preference opt-out for new_message (absence = enabled by default)
+    const pref = await prisma.notificationPref.findUnique({
+      where: { userId_type: { userId: recipientId, type: 'new_message' } },
+    });
+    if (pref && !pref.enabled) continue;
+
+    await prisma.notification.create({
+      data: {
+        userId: recipientId,
+        type: 'NEW_MESSAGE',
+        ...(listingId ? { listingId } : {}),
+        payload: {
+          threadId,
+          messageId: message.id,
+          senderName: message.sender.name || 'Someone',
+          preview: message.text.slice(0, 100),
+        },
+      },
+    });
+  }
+}
 
 // GET /api/threads — list current user's threads
 router.get('/threads', requireAuth, async (req: Request, res: Response) => {
@@ -21,18 +60,128 @@ router.get('/threads', requireAuth, async (req: Request, res: Response) => {
       orderBy: { updatedAt: 'desc' },
     });
 
-    const result = threads.map((t) => ({
-      id: t.id,
-      listing: t.listing,
-      otherUser: t.participants.find((p) => p.userId !== userId)?.user || null,
-      lastMessage: t.messages[0] || null,
-      updatedAt: t.updatedAt,
+    // Compute unread count per thread: messages from others sent after our lastSeenAt
+    type ThreadWithIncludes = (typeof threads)[number];
+    const result = await Promise.all(threads.map(async (t: ThreadWithIncludes) => {
+      const myParticipant = t.participants.find((p: { userId: string }) => p.userId === userId);
+      const lastSeenAt = myParticipant?.lastSeenAt;
+
+      const unreadCount = await prisma.message.count({
+        where: {
+          threadId: t.id,
+          senderId: { not: userId },
+          ...(lastSeenAt ? { createdAt: { gt: lastSeenAt } } : {}),
+        },
+      });
+
+      return {
+        id: t.id,
+        listing: t.listing,
+        otherUser: t.participants.find((p: { userId: string }) => p.userId !== userId)?.user || null,
+        lastMessage: t.messages[0] || null,
+        updatedAt: t.updatedAt,
+        unreadCount,
+      };
     }));
 
     res.json(result);
   } catch (err) {
     console.error('GET /threads error:', err);
     res.status(500).json({ error: 'Failed to fetch threads' });
+  }
+});
+
+// GET /api/threads/unread-count — total unread messages across all threads
+router.get('/threads/unread-count', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+
+    // Get all thread participations for this user
+    const participations = await prisma.threadParticipant.findMany({
+      where: { userId },
+      select: { threadId: true, lastSeenAt: true },
+    });
+
+    if (participations.length === 0) {
+      res.json({ count: 0 });
+      return;
+    }
+
+    // Count unread per participation and sum
+    const counts = await Promise.all(participations.map(async (p: { threadId: string; lastSeenAt: Date | null }) => {
+      return prisma.message.count({
+        where: {
+          threadId: p.threadId,
+          senderId: { not: userId },
+          ...(p.lastSeenAt ? { createdAt: { gt: p.lastSeenAt } } : {}),
+        },
+      });
+    }));
+    const total = counts.reduce((sum, c) => sum + c, 0);
+
+    res.json({ count: total });
+  } catch (err) {
+    console.error('GET /threads/unread-count error:', err);
+    res.status(500).json({ error: 'Failed to fetch unread count' });
+  }
+});
+
+// POST /api/threads/:threadId/seen — mark thread as seen (update lastSeenAt)
+router.post('/threads/:threadId/seen', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const threadId = req.params.threadId as string;
+
+    const participant = await prisma.threadParticipant.findUnique({
+      where: { threadId_userId: { threadId, userId } },
+    });
+    if (!participant) {
+      res.status(403).json({ error: 'Not a participant of this thread' });
+      return;
+    }
+
+    await prisma.threadParticipant.update({
+      where: { threadId_userId: { threadId, userId } },
+      data: { lastSeenAt: new Date() },
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('POST /threads/:threadId/seen error:', err);
+    res.status(500).json({ error: 'Failed to mark thread as seen' });
+  }
+});
+
+// GET /api/threads/:id — single thread with otherUser (must be after /threads/unread-count)
+router.get('/threads/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const threadId = req.params.id as string;
+
+    const thread = await prisma.thread.findFirst({
+      where: { id: threadId, participants: { some: { userId } } },
+      include: {
+        listing: { select: { id: true, title: true, price: true, currency: true, photos: { take: 1, select: { url: true } } } },
+        participants: { include: { user: { select: { id: true, name: true, avatarUrl: true } } } },
+      },
+    });
+
+    if (!thread) {
+      res.status(404).json({ error: 'Thread not found' });
+      return;
+    }
+
+    res.json({
+      thread: {
+        id: thread.id,
+        listing: thread.listing,
+        otherUser: thread.participants.find((p: { userId: string }) => p.userId !== userId)?.user || null,
+        updatedAt: thread.updatedAt,
+      },
+    });
+  } catch (err) {
+    console.error('GET /threads/:id error:', err);
+    res.status(500).json({ error: 'Failed to fetch thread' });
   }
 });
 
@@ -87,10 +236,15 @@ router.post('/threads', requireAuth, async (req: Request, res: Response) => {
       return;
     }
 
-    // Verify the other user exists
-    const otherUser = await prisma.user.findUnique({ where: { id: otherUserId }, select: { id: true, name: true } });
+    // Verify the other user exists and is not blocked
+    const otherUser = await prisma.user.findUnique({ where: { id: otherUserId }, select: { id: true, name: true, role: true } });
     if (!otherUser) {
       res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    if (otherUser.role === 'blocked') {
+      res.status(403).json({ error: 'Cannot message this user' });
       return;
     }
 
@@ -122,7 +276,7 @@ router.post('/threads', requireAuth, async (req: Request, res: Response) => {
 });
 
 // POST /api/threads/:listingId/message — send message (creates thread on first message)
-router.post('/threads/:listingId/message', requireAuth, async (req: Request, res: Response) => {
+router.post('/threads/:listingId/message', requireAuth, chatMessageRateLimit, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
     const listingId = req.params.listingId as string;
@@ -170,7 +324,7 @@ router.post('/threads/:listingId/message', requireAuth, async (req: Request, res
     // Create message
     const message = await prisma.message.create({
       data: {
-        text: text.trim(),
+        text: xss(text.trim()),
         threadId: thread.id,
         senderId: userId,
       },
@@ -179,6 +333,11 @@ router.post('/threads/:listingId/message', requireAuth, async (req: Request, res
 
     // Touch thread updatedAt
     await prisma.thread.update({ where: { id: thread.id }, data: { updatedAt: new Date() } });
+
+    // Create in-app NEW_MESSAGE notifications for all recipients (UC-17)
+    createNewMessageNotifications(thread.id, listingId, message).catch(err =>
+      console.error('createNewMessageNotifications error:', err)
+    );
 
     res.status(201).json({ threadId: thread.id, message });
   } catch (err) {

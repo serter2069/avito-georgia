@@ -1,125 +1,80 @@
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'expo-router';
-import { useAuthStore } from '../../stores/authStore';
-import { colors } from '../../lib/colors';
+import { View, ActivityIndicator, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Stack } from 'expo-router';
+import Settings from '../../components/screens/Settings';
+import { apiFetch } from '../../lib/api';
+import { useAuthStore } from '../../store/auth';
 
-// AsyncStorage fallback for web
-async function getStoredValue(key: string): Promise<string | null> {
-  if (Platform.OS === 'web') {
-    return localStorage.getItem(key);
-  }
-  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-  return AsyncStorage.getItem(key);
-}
-
-async function setStoredValue(key: string, value: string): Promise<void> {
-  if (Platform.OS === 'web') {
-    localStorage.setItem(key, value);
-    return;
-  }
-  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-  await AsyncStorage.setItem(key, value);
-}
-
-const LANGUAGES = [
-  { code: 'ru', label: 'RU', name: 'Русский' },
-  { code: 'en', label: 'EN', name: 'English' },
-  { code: 'ka', label: 'KA', name: 'ქართული' },
-] as const;
-
-export default function SettingsScreen() {
-  const { t, i18n } = useTranslation();
-  const router = useRouter();
-  const logout = useAuthStore((s) => s.logout);
-
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+export default function SettingsPage() {
+  const [prefs, setPrefs] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
+  const { logout, user, fetchMe } = useAuthStore();
 
   useEffect(() => {
-    getStoredValue('notifications_enabled').then((val) => {
-      if (val !== null) setNotificationsEnabled(val === 'true');
-    });
+    apiFetch('/users/me/notification-prefs')
+      .then(r => {
+        const map: Record<string, boolean> = {};
+        (r.prefs || []).forEach((p: { type: string; enabled: boolean }) => { map[p.type] = p.enabled; });
+        setPrefs(map);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  const toggleNotifications = (value: boolean) => {
-    setNotificationsEnabled(value);
-    setStoredValue('notifications_enabled', String(value));
+  const handleToggle = async (type: string, enabled: boolean) => {
+    setPrefs(prev => ({ ...prev, [type]: enabled }));
+    apiFetch('/users/me/notification-prefs', {
+      method: 'PUT',
+      body: JSON.stringify({ type, enabled }),
+    }).catch(console.error);
   };
 
-  const switchLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
+  const handleChangeLang = async (lang: string) => {
+    try {
+      await apiFetch('/users/me', { method: 'PATCH', body: JSON.stringify({ locale: lang }) });
+      await fetchMe();
+    } catch (e) {
+      console.error('Failed to save language', e);
+    }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    router.replace('/(auth)');
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Удалить аккаунт',
+      'Аккаунт и все данные будут удалены безвозвратно через 30 дней. Продолжить?',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        {
+          text: 'Удалить',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await apiFetch('/users/me', { method: 'DELETE' });
+              logout();
+            } catch (e) {
+              console.error('Failed to delete account', e);
+              Alert.alert('Ошибка', 'Не удалось удалить аккаунт. Попробуйте позже.');
+            }
+          },
+        },
+      ]
+    );
   };
 
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: true, title: 'Настройки' }} /><View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View></SafeAreaView>;
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-bg-section border-b border-border px-4 py-3">
-        <Text className="text-text-primary text-lg font-bold">{t('settings')}</Text>
-      </View>
-
-      <ScrollView className="flex-1" contentContainerClassName="py-4">
-        {/* Notifications */}
-        <View className="px-4 mb-6">
-          <Text className="text-text-secondary text-xs font-semibold uppercase tracking-wider mb-3">
-            {t('notifications')}
-          </Text>
-          <View className="bg-surface-card rounded-lg border border-border px-4 py-3 flex-row items-center justify-between">
-            <View className="flex-1 mr-3">
-              <Text className="text-text-primary text-base">{t('notifications')}</Text>
-              <Text className="text-text-muted text-xs mt-0.5">
-                {notificationsEnabled ? t('notificationsEnabled') : t('notificationsDisabled')}
-              </Text>
-            </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={toggleNotifications}
-              trackColor={{ false: colors.borderDefault, true: colors.brandPrimary }}
-              thumbColor={colors.white}
-            />
-          </View>
-        </View>
-
-        {/* Language */}
-        <View className="px-4 mb-6">
-          <Text className="text-text-secondary text-xs font-semibold uppercase tracking-wider mb-3">
-            {t('language')}
-          </Text>
-          <View className="bg-surface-card rounded-lg border border-border overflow-hidden">
-            {LANGUAGES.map((lang, idx) => (
-              <TouchableOpacity
-                key={lang.code}
-                className={`px-4 py-3 flex-row items-center justify-between ${
-                  idx < LANGUAGES.length - 1 ? 'border-b border-border' : ''
-                }`}
-                onPress={() => switchLanguage(lang.code)}
-                activeOpacity={0.7}
-              >
-                <Text className="text-text-primary text-base">{lang.name}</Text>
-                {i18n.language === lang.code && (
-                  <Text className="text-primary text-base font-bold">{'\u2713'}</Text>
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Logout */}
-        <View className="px-4 mt-4">
-          <TouchableOpacity
-            className="bg-error/10 border border-error/30 rounded-lg px-4 py-3 items-center"
-            onPress={handleLogout}
-            activeOpacity={0.7}
-          >
-            <Text className="text-error text-base font-semibold">{t('logout')}</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+    <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
+    <Settings
+      showBottomNav={false}
+      prefs={prefs}
+      onToggle={handleToggle}
+      onLogout={logout}
+      onDeleteAccount={handleDeleteAccount}
+      onChangeLang={handleChangeLang}
+      currentLang={(user as any)?.locale || 'ru'}
+    />
+    </SafeAreaView>
   );
 }

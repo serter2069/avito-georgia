@@ -10,20 +10,38 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Brand: Avito Georgia — Teal Batumi (from brand.html)
-        primary: '#0A7B8A',
-        'primary-dark': '#0A2840',
-        secondary: '#0A2840',
-        accent: '#1A9BAA',
+        // Brand: Avito Georgia — Avito-inspired green marketplace
+        // Token values must stay in sync with lib/theme.ts
+        primary: '#00AA6C',
+        'primary-dark': '#008F5D',
+        'primary-light': '#00CC80',
+        secondary: '#f59e0b',
+        accent: '#008F5D',
+        // Backgrounds
         surface: '#E8F4F8',
         'surface-card': '#FFFFFF',
-        'bg-page': '#FFFFFF',
-        'bg-section': '#F2F8FA',
+        'bg-primary': '#F2F8FA',
+        'bg-subtle': '#F8FAFC',
+        'bg-muted': '#F3F4F6',
+        'bg-brand-subtle': '#F0FDFA',
+        // dark/dark-secondary = white card backgrounds (intentional naming for dark-on-light pattern)
+        dark: '#FFFFFF',
+        'dark-secondary': '#FFFFFF',
+        // Text
         'text-primary': '#0A2840',
         'text-secondary': '#1A4A6E',
         'text-muted': '#6A8898',
+        'text-subtle': '#64748B',
+        'text-disabled': '#94A3B8',
+        'text-accent': '#00AA6C',
+        // Borders
         border: '#C8E0E8',
-        'border-focus': '#0A7B8A',
+        'border-light': '#E2E8F0',
+        'border-soft': '#CBD5E1',
+        'border-focus': '#00AA6C',
+        'border-error': '#C0392B',
+        'border-divider': '#F1F5F9',
+        // Status
         success: '#2E7D30',
         warning: '#f59e0b',
         error: '#C0392B',
@@ -31,11 +49,6 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-      },
-      screens: {
-        sm: '430px',
-        md: '768px',
-        lg: '1280px',
       },
       borderRadius: {
         sm: '4px',

@@ -1,29 +1,23 @@
 import { Router, Request, Response } from 'express';
-import Stripe from 'stripe';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
+import { getStripe } from '../lib/stripe';
 
 const router = Router();
 
-// Lazy Stripe initialization — avoids crash on startup if key is missing
-let _stripe: Stripe | null = null;
-function getStripe(): Stripe {
-  if (!_stripe) {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
-    _stripe = new Stripe(key, { apiVersion: '2026-03-25.dahlia' });
-  }
-  return _stripe;
-}
-
 // Price config: amount in tetri (1 GEL = 100 tetri), Stripe uses smallest unit
+// UC-08 pricing: top_3d=5 GEL, top_7d=8 GEL, highlight=8 GEL, bundle=14 GEL
 const PRICES: Record<string, { amount: number; label: string; days: number | null; recurring: boolean }> = {
-  top_1d:        { amount: 500,  label: 'Top 1 day',           days: 1,    recurring: false },
-  top_3d:        { amount: 1200, label: 'Top 3 days',          days: 3,    recurring: false },
-  top_7d:        { amount: 2500, label: 'Top 7 days',          days: 7,    recurring: false },
-  highlight:     { amount: 300,  label: 'Highlight 7 days',    days: 7,    recurring: false },
-  unlimited_sub: { amount: 999,  label: 'Unlimited listings',  days: null, recurring: true  },
+  top_1d:        { amount: 500,  label: 'Top 1 day',                     days: 1,    recurring: false },
+  top_3d:        { amount: 500,  label: 'Top 3 days',                    days: 3,    recurring: false },
+  top_7d:        { amount: 800,  label: 'Top 7 days',                    days: 7,    recurring: false },
+  highlight:     { amount: 800,  label: 'Highlight 7 days',              days: 7,    recurring: false },
+  unlimited_sub: { amount: 999,  label: 'Unlimited listings',            days: null, recurring: true  },
+  bundle:        { amount: 1400, label: 'Top 7 days + Highlight Bundle', days: 7,    recurring: false },
 };
+
+// Bundle maps to two sub-promotion types created on webhook fulfillment
+const BUNDLE_TYPES = ['top_7d', 'highlight'] as const;
 
 // POST /api/promotions/purchase — create Stripe checkout
 router.post('/purchase', requireAuth, async (req: Request, res: Response) => {
@@ -55,12 +49,24 @@ router.post('/purchase', requireAuth, async (req: Request, res: Response) => {
     }
 
     // Check for active promotion of same type on this listing
-    const existing = await prisma.promotion.findFirst({
-      where: { listingId, promotionType: type, isActive: true },
-    });
-    if (existing) {
-      res.status(409).json({ error: 'Active promotion of this type already exists for this listing' });
-      return;
+    // For bundle: check both sub-types (top_7d + highlight) are not already active
+    if (type === 'bundle') {
+      const existingBundleParts = await prisma.promotion.findMany({
+        where: { listingId, promotionType: { in: BUNDLE_TYPES as unknown as any[] }, isActive: true },
+        select: { promotionType: true },
+      });
+      if (existingBundleParts.length === BUNDLE_TYPES.length) {
+        res.status(409).json({ error: 'Active bundle promotion already exists for this listing (both top_7d and highlight are active)' });
+        return;
+      }
+    } else {
+      const existing = await prisma.promotion.findFirst({
+        where: { listingId, promotionType: type, isActive: true },
+      });
+      if (existing) {
+        res.status(409).json({ error: 'Active promotion of this type already exists for this listing' });
+        return;
+      }
     }
   }
 
@@ -140,6 +146,84 @@ router.get('/prices', (_req: Request, res: Response) => {
     recurring: val.recurring,
   }));
   res.json({ prices });
+});
+
+// POST /api/promotions/purchase-listing-slot — create Stripe Checkout for a per-listing slot
+// Called when user has exceeded free quota and category has paidListingPrice > 0.
+// Creates a one-time Checkout Session. On success, frontend re-submits listing creation with paymentId.
+router.post('/purchase-listing-slot', requireAuth, async (req: Request, res: Response) => {
+  const { categoryId } = req.body;
+  const userId = req.user!.userId;
+
+  if (!categoryId || typeof categoryId !== 'string') {
+    res.status(400).json({ error: 'categoryId required' });
+    return;
+  }
+
+  // Load category with parent for price inheritance (same logic as listings.ts quota check)
+  const cat = await prisma.category.findUnique({
+    where: { id: categoryId },
+    include: { parent: { select: { freeListingQuota: true, paidListingPrice: true } } },
+  });
+  if (!cat) {
+    res.status(404).json({ error: 'Category not found' });
+    return;
+  }
+
+  // Subcategory inherits price from parent if own freeListingQuota is 0
+  const paidPrice = (cat.freeListingQuota === 0 && cat.parent)
+    ? cat.parent.paidListingPrice
+    : cat.paidListingPrice;
+
+  if (!paidPrice || paidPrice <= 0) {
+    res.status(400).json({ error: 'This category does not allow paid listings' });
+    return;
+  }
+
+  const amountTetri = Math.round(paidPrice * 100); // GEL → tetri (Stripe smallest unit)
+  const categoryName = cat.nameEn || cat.nameRu || cat.name;
+
+  try {
+    // Create a pending Payment record first to get its ID for the success URL
+    const payment = await prisma.payment.create({
+      data: {
+        userId,
+        amount: paidPrice,
+        currency: 'GEL',
+        status: 'pending',
+        provider: 'stripe',
+        promotionType: null, // listing_slot is not a PromotionType enum value
+      },
+    });
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8081';
+    const session = await getStripe().checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'gel',
+          product_data: { name: `Listing slot — ${categoryName}` },
+          unit_amount: amountTetri,
+        },
+        quantity: 1,
+      }],
+      metadata: { userId, categoryId, paymentId: payment.id, type: 'listing_slot' },
+      success_url: `${frontendUrl}/listings/slot-success?paymentId=${payment.id}`,
+      cancel_url: `${frontendUrl}/listings/create`,
+    });
+
+    // Store externalId now that we have the session id
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: { externalId: session.id },
+    });
+
+    res.json({ url: session.url, paymentId: payment.id });
+  } catch (err: any) {
+    console.error('[promotions] listing-slot Stripe error:', err.message);
+    res.status(500).json({ error: 'Payment creation failed' });
+  }
 });
 
 // GET /api/promotions/my — list user's active promotions

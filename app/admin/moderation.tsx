@@ -1,209 +1,91 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, Alert } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '../../lib/api';
-import { colors } from '../../lib/colors';
-
-interface ListingItem {
-  id: string;
-  title: string;
-  description: string | null;
-  price: number | null;
-  currency: string;
-  status: string;
-  createdAt: string;
-  views: number;
-  photos?: { url: string }[];
-  city?: { nameRu: string };
-  category?: { name: string };
-  user?: { id: string; name: string | null; email: string };
-}
+import { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { apiFetch } from '../../lib/api';
+import { ErrorState } from '../../components/ErrorState';
+import { colors } from '../../lib/theme';
 
 export default function AdminModeration() {
-  const { t } = useTranslation();
-  const [listings, setListings] = useState<ListingItem[]>([]);
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
+  const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [rejectId, setRejectId] = useState<string | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  const [error, setError] = useState(false);
 
-  const fetchListings = useCallback(async (p: number) => {
-    setLoading(true);
-    const res = await api.get<{ listings: ListingItem[]; total: number }>(
-      `/listings?sort=createdAt_desc&limit=20&page=${p}`
-    );
-    if (res.ok && res.data) {
-      setListings(res.data.listings);
-      setTotal(res.data.total);
+  const load = async () => {
+    setLoading(true); setError(false);
+    try {
+      const r = await apiFetch('/admin/listings/pending');
+      setListings(r.listings ?? []);
+    } catch { setError(true); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const approve = async (id: string) => {
+    try {
+      await apiFetch(`/admin/listings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status: 'active' }) });
+      setListings(prev => prev.filter(l => l.id !== id));
+    } catch {
+      Alert.alert('Ошибка', 'Не удалось одобрить объявление');
     }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchListings(page);
-  }, [page, fetchListings]);
-
-  const handleApprove = async (id: string) => {
-    setActionLoading(id);
-    await api.patch(`/admin/listings/${id}/status`, { status: 'active' });
-    setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: 'active' } : l)));
-    setActionLoading(null);
   };
 
-  const handleReject = async (id: string) => {
-    if (!rejectReason.trim()) return;
-    setActionLoading(id);
-    await api.patch(`/admin/listings/${id}/status`, { status: 'removed' });
-    setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: 'removed' } : l)));
-    setRejectId(null);
-    setRejectReason('');
-    setActionLoading(null);
+  const reject = (id: string) => {
+    Alert.prompt('Причина отказа', 'Укажите причину', [
+      { text: 'Отмена', style: 'cancel' },
+      {
+        text: 'Отклонить', style: 'destructive', onPress: async (reason: string | undefined) => {
+          try {
+            await apiFetch(`/admin/listings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected', rejectReason: reason }) });
+            setListings(prev => prev.filter(l => l.id !== id));
+          } catch {
+            Alert.alert('Ошибка', 'Не удалось отклонить объявление');
+          }
+        },
+      },
+    ]);
   };
 
-  const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
-
-  if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color={colors.brandPrimary} />
-      </View>
-    );
-  }
+  if (loading) return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={colors.primary} /></View>;
+  if (error) return <ErrorState message="Не удалось загрузить очередь" onRetry={load} />;
 
   return (
-    <ScrollView className="flex-1" contentContainerClassName="p-4 gap-3">
-      <Text className="text-text-muted text-xs mb-2">
-        {t('totalListings')}: {total}
-      </Text>
-
-      {listings.map((listing) => (
-        <View key={listing.id} className="bg-surface-card border border-border rounded-lg p-4">
-          {/* Header */}
-          <View className="flex-row justify-between items-start mb-2">
-            <View className="flex-1 mr-3">
-              <Text className="text-text-primary text-base font-bold" numberOfLines={2}>
-                {listing.title}
-              </Text>
-              <Text className="text-text-muted text-xs mt-1">
-                {listing.category?.name} | {listing.city?.nameRu} | {formatDate(listing.createdAt)}
-              </Text>
-            </View>
-            <View className={`px-2 py-1 rounded ${
-              listing.status === 'active' ? 'bg-success/20' :
-              listing.status === 'removed' ? 'bg-error/20' : 'bg-warning/20'
-            }`}>
-              <Text className={`text-xs font-medium ${
-                listing.status === 'active' ? 'text-success' :
-                listing.status === 'removed' ? 'text-error' : 'text-warning'
-              }`}>
-                {listing.status}
-              </Text>
-            </View>
-          </View>
-
-          {/* Description */}
-          {listing.description && (
-            <Text className="text-text-secondary text-sm mb-2" numberOfLines={3}>
-              {listing.description}
-            </Text>
-          )}
-
-          {/* Price + seller */}
-          <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-primary text-base font-bold">
-              {listing.price != null ? `${listing.price} ${listing.currency}` : t('negotiable')}
-            </Text>
-            <Text className="text-text-muted text-xs">
-              {listing.user?.name || listing.user?.email || '—'}
-            </Text>
-          </View>
-
-          {/* Actions */}
-          {listing.status === 'active' && (
-            <View className="flex-row gap-2">
-              <TouchableOpacity
-                className="flex-1 bg-error/20 border border-error/40 py-2 rounded-lg items-center"
-                onPress={() => {
-                  if (rejectId === listing.id) {
-                    setRejectId(null);
-                  } else {
-                    setRejectId(listing.id);
-                    setRejectReason('');
-                  }
-                }}
-                disabled={actionLoading === listing.id}
-              >
-                <Text className="text-error text-sm font-medium">{t('reject')}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {listing.status === 'removed' && (
-            <View className="flex-row gap-2">
-              <TouchableOpacity
-                className="flex-1 bg-success/20 border border-success/40 py-2 rounded-lg items-center"
-                onPress={() => handleApprove(listing.id)}
-                disabled={actionLoading === listing.id}
-              >
-                {actionLoading === listing.id ? (
-                  <ActivityIndicator size="small" color={colors.statusSuccess} />
-                ) : (
-                  <Text className="text-success text-sm font-medium">{t('approve')}</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Reject reason input */}
-          {rejectId === listing.id && (
-            <View className="mt-2 gap-2">
-              <TextInput
-                className="bg-surface border border-border rounded-lg px-3 py-2 text-text-primary text-sm"
-                placeholder={t('rejectReason')}
-                placeholderTextColor={colors.textMuted}
-                value={rejectReason}
-                onChangeText={setRejectReason}
-              />
-              <TouchableOpacity
-                className="bg-error py-2 rounded-lg items-center"
-                onPress={() => handleReject(listing.id)}
-                disabled={!rejectReason.trim() || actionLoading === listing.id}
-              >
-                {actionLoading === listing.id ? (
-                  <ActivityIndicator size="small" color={colors.white} />
-                ) : (
-                  <Text className="text-white text-sm font-medium">{t('reject')}</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          )}
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
+        <Text style={{ fontSize: 17, fontWeight: '700' }}>Модерация ({listings.length})</Text>
+      </View>
+      {listings.length === 0 ? (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <Text style={{ fontSize: 40 }}>✅</Text>
+          <Text style={{ fontSize: 16, color: colors.textSecondary }}>Очередь пуста</Text>
         </View>
-      ))}
-
-      {/* Pagination */}
-      {total > 20 && (
-        <View className="flex-row justify-center gap-3 py-4">
-          <TouchableOpacity
-            className={`px-4 py-2 rounded-lg ${page > 1 ? 'bg-primary' : 'bg-surface'}`}
-            onPress={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-          >
-            <Text className={page > 1 ? 'text-white' : 'text-text-muted'}>&larr;</Text>
-          </TouchableOpacity>
-          <Text className="text-text-secondary self-center text-sm">
-            {page} / {Math.ceil(total / 20)}
-          </Text>
-          <TouchableOpacity
-            className={`px-4 py-2 rounded-lg ${page < Math.ceil(total / 20) ? 'bg-primary' : 'bg-surface'}`}
-            onPress={() => setPage((p) => p + 1)}
-            disabled={page >= Math.ceil(total / 20)}
-          >
-            <Text className={page < Math.ceil(total / 20) ? 'text-white' : 'text-text-muted'}>&rarr;</Text>
-          </TouchableOpacity>
-        </View>
+      ) : (
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 12, maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
+          {listings.map(l => (
+            <View key={l.id} style={{ backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8', gap: 10 }}>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{l.title}</Text>
+              <Text style={{ fontSize: 14, color: colors.textSecondary }}>{l.price} {l.currency} · {l.city?.nameRu ?? l.city?.nameEn}</Text>
+              {l.description && <Text style={{ fontSize: 13, color: colors.text }} numberOfLines={3}>{l.description}</Text>}
+              <Text style={{ fontSize: 11, color: colors.textSecondary }}>
+                от {l.user?.name ?? l.user?.email} · {l.createdAt ? new Date(l.createdAt).toLocaleDateString('ru-RU') : ''}
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Pressable onPress={() => approve(l.id)} accessibilityLabel="Одобрить объявление" style={{ flex: 1, backgroundColor: colors.primary, borderRadius: 8, paddingVertical: 10, alignItems: 'center' }}>
+                  <Text style={{ color: colors.background, fontWeight: '700' }}>Одобрить</Text>
+                </Pressable>
+                <Pressable onPress={() => reject(l.id)} accessibilityLabel="Отклонить объявление" style={{ flex: 1, borderWidth: 1.5, borderColor: colors.error, borderRadius: 8, paddingVertical: 10, alignItems: 'center' }}>
+                  <Text style={{ color: colors.error, fontWeight: '700' }}>Отклонить</Text>
+                </Pressable>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
       )}
-    </ScrollView>
+    </SafeAreaView>
   );
 }

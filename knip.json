@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "app/**/*.tsx",
+    "app/**/*.ts",
+    "components/**/*.tsx",
+    "lib/**/*.ts",
+    "store/**/*.ts"
+  ],
+  "project": [
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    "lib/**/*.ts",
+    "store/**/*.ts"
+  ],
+  "ignore": [
+    "app/proto/**",
+    "worktrees/**",
+    ".expo/**"
+  ],
+  "ignoreDependencies": [
+    "expo-*",
+    "@expo/*",
+    "react-native-*",
+    "@react-native*",
+    "tailwindcss",
+    "nativewind"
+  ]
+}

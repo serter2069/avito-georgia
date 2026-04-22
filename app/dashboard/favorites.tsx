@@ -1,128 +1,69 @@
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { api } from '../../lib/api';
-import { colors } from '../../lib/colors';
-import { ListingCard, Listing } from '../../components/listing/ListingCard';
-import { Badge } from '../../components/ui/Badge';
+import Favorites from '../../components/screens/Favorites';
+import { ErrorState } from '../../components/ErrorState';
+import { EmptyState } from '../../components/EmptyState';
+import { SkeletonBox } from '../../components/SkeletonBox';
+import { apiFetch } from '../../lib/api';
 
-interface FavoriteListing {
-  id: string;
-  title: string;
-  price: number | null;
-  currency: string;
-  status: string;
-  photos: { url: string }[];
-  city?: { id: string; nameRu: string };
-  category?: { id: string; name: string };
+function FavoritesSkeleton() {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#F5F5F5', padding: 16 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        {[0, 1, 2, 3].map(i => (
+          <View key={i} style={{ width: '47%', borderRadius: 10, overflow: 'hidden', backgroundColor: '#fff' }}>
+            <SkeletonBox width="100%" height={120} borderRadius={0} />
+            <View style={{ padding: 10, gap: 6 }}>
+              <SkeletonBox width="90%" height={12} />
+              <SkeletonBox width="60%" height={14} />
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
 }
 
-interface FavoriteItem {
-  id: string;
-  listingId: string;
-  listing: FavoriteListing;
-  createdAt: string;
-}
-
-interface FavoritesResponse {
-  favorites: FavoriteItem[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-function mapFavToListing(fav: FavoriteItem): Listing {
-  return {
-    id: fav.listing.id,
-    title: fav.listing.title,
-    price: fav.listing.price,
-    currency: fav.listing.currency,
-    imageUrl: fav.listing.photos?.[0]?.url,
-    city: fav.listing.city?.nameRu,
-    category: fav.listing.category?.name,
-  };
-}
-
-export default function FavoritesScreen() {
-  const { t } = useTranslation();
+export default function FavoritesPage() {
   const router = useRouter();
-  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(false);
 
-  const fetchFavorites = useCallback(async (p: number) => {
-    const res = await api.get<FavoritesResponse>(`/favorites?page=${p}`);
-    if (res.ok && res.data) {
-      if (p === 1) {
-        setFavorites(res.data.favorites);
-      } else {
-        setFavorites((prev) => [...prev, ...res.data!.favorites]);
-      }
-      setTotal(res.data.total);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const r = await apiFetch('/favorites');
+      setItems(r.favorites || []);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    setLoading(true);
-    fetchFavorites(1).finally(() => setLoading(false));
-  }, [fetchFavorites]);
+  useEffect(() => { load(); }, [load]);
 
-  const handleLoadMore = () => {
-    if (loadingMore || favorites.length >= total) return;
-    setLoadingMore(true);
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchFavorites(nextPage).finally(() => setLoadingMore(false));
+  const handleRemove = async (listingId: string) => {
+    await apiFetch(`/favorites/${listingId}`, { method: 'DELETE' });
+    setItems(prev => prev.filter(f => f.listing.id !== listingId));
   };
 
-  const handleListingPress = (id: string) => {
-    // Navigate to listing detail when route is ready
-  };
-
-  const renderItem = ({ item }: { item: FavoriteItem }) => (
-    <View className="px-4 mb-3">
-      <ListingCard listing={mapFavToListing(item)} onPress={handleListingPress} />
-    </View>
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><FavoritesSkeleton /></SafeAreaView>;
+  if (error) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ErrorState message="Не удалось загрузить избранное" onRetry={load} /></SafeAreaView>;
+  if (items.length === 0) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+    <EmptyState
+      icon="heart-outline"
+      title="Нет избранного"
+      subtitle="Нажмите ♡ на объявлении чтобы сохранить его здесь"
+      ctaLabel="Смотреть объявления"
+      onCta={() => router.push('/' as any)}
+    />
+    </SafeAreaView>
   );
-
-  return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-bg-section border-b border-border px-4 py-3">
-        <Text className="text-text-primary text-lg font-bold">{t('favorites')}</Text>
-      </View>
-
-      {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.brandPrimary} />
-          <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
-        </View>
-      ) : favorites.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-4">
-          <Text className="text-text-muted text-4xl mb-3">{'\u2661'}</Text>
-          <Text className="text-text-primary text-base font-semibold">{t('noFavorites')}</Text>
-          <Text className="text-text-muted text-sm mt-1">{t('noFavoritesHint')}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingTop: 12 }}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3}
-          ListFooterComponent={
-            loadingMore ? (
-              <View className="py-4 items-center">
-                <ActivityIndicator size="small" color={colors.brandPrimary} />
-              </View>
-            ) : null
-          }
-        />
-      )}
-    </View>
-  );
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Favorites showHeader={false} showBottomNav={false} items={items} loading={loading} onRemove={handleRemove} /></SafeAreaView>;
 }

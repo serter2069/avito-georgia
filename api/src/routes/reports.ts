@@ -1,11 +1,13 @@
 import { Router, Request, Response } from 'express';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireAdmin } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
+import { Prisma } from '@prisma/client';
+import { reportCreateRateLimit } from '../middleware/rateLimiter';
 
 const router = Router();
 
 // POST /api/reports — create a report
-router.post('/', requireAuth, async (req: Request, res: Response) => {
+router.post('/', requireAuth, reportCreateRateLimit, async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
     const { listingId, targetUserId, reason, description } = req.body;
@@ -20,11 +22,22 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
       return;
     }
 
+    // Prevent self-reporting
+    if (targetUserId === userId) {
+      res.status(400).json({ error: 'Cannot report yourself' });
+      return;
+    }
+
     // Verify listing exists if provided
     if (listingId) {
       const listing = await prisma.listing.findUnique({ where: { id: listingId } });
       if (!listing) {
         res.status(404).json({ error: 'Listing not found' });
+        return;
+      }
+      // Prevent reporting own listing
+      if (listing.userId === userId) {
+        res.status(400).json({ error: 'Cannot report your own listing' });
         return;
       }
     }
@@ -49,19 +62,19 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
     });
 
     res.status(201).json(report);
-  } catch (err) {
+  } catch (err: unknown) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      res.status(409).json({ error: 'You have already reported this listing' });
+      return;
+    }
     console.error('POST /reports error:', err);
     res.status(500).json({ error: 'Failed to create report' });
   }
 });
 
-// GET /api/admin/reports — list all reports (admin only)
-router.get('/admin', requireAuth, async (req: Request, res: Response) => {
+// GET /api/reports/admin — list all reports (admin only)
+router.get('/admin', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
-    if (req.user!.role !== 'admin') {
-      res.status(403).json({ error: 'Admin access required' });
-      return;
-    }
 
     const status = req.query.status as string | undefined;
     const page = Math.max(parseInt(req.query.page as string) || 1, 1);

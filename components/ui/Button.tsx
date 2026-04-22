@@ -1,63 +1,43 @@
-import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
-import { colors } from '../../lib/colors';
+import React from 'react';
+import { Text, Pressable, ActivityIndicator } from 'react-native';
+import { colors, radius } from '../../lib/theme';
 
 interface ButtonProps {
+  variant: 'primary' | 'secondary' | 'destructive';
+  label: string;
   onPress: () => void;
-  title: string;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
   loading?: boolean;
+  disabled?: boolean;
+  fullWidth?: boolean;
 }
 
-const sizeClasses = {
-  sm: 'px-3 py-2 rounded-md',
-  md: 'px-4 py-3 rounded-lg',
-  lg: 'px-6 py-4 rounded-xl',
+const variantStyles = {
+  primary: { bg: colors.primary, text: '#FFFFFF', border: 'transparent' as const },
+  secondary: { bg: 'transparent', text: colors.primary, border: colors.primary },
+  destructive: { bg: colors.error, text: '#FFFFFF', border: 'transparent' as const },
 };
 
-const textSizeClasses = {
-  sm: 'text-sm',
-  md: 'text-base',
-  lg: 'text-lg',
-};
-
-const variantClasses = {
-  primary: 'bg-primary',
-  secondary: 'border-2 border-secondary bg-transparent',
-  ghost: 'border-2 border-border bg-transparent',
-  danger: 'bg-error',
-};
-
-const textVariantClasses = {
-  primary: 'text-white font-semibold',
-  secondary: 'text-secondary font-bold',
-  ghost: 'text-text-muted font-bold',
-  danger: 'text-white font-semibold',
-};
-
-export function Button({
-  onPress,
-  title,
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  loading = false,
-}: ButtonProps) {
+export function Button({ variant, label, onPress, loading, disabled, fullWidth }: ButtonProps) {
+  const s = variantStyles[variant];
   return (
-    <TouchableOpacity
-      className={`${sizeClasses[size]} ${variantClasses[variant]} items-center justify-center ${disabled || loading ? 'opacity-50' : ''}`}
-      onPress={onPress}
-      disabled={disabled || loading}
-      activeOpacity={0.7}
+    <Pressable
+      onPress={disabled || loading ? undefined : onPress}
+      className={`${radius.md} flex-row items-center justify-center`}
+      style={{
+        backgroundColor: s.bg,
+        borderWidth: 1,
+        borderColor: s.border,
+        height: 48,
+        opacity: disabled ? 0.5 : 1,
+        width: fullWidth ? '100%' : undefined,
+        paddingHorizontal: 24,
+      }}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'ghost' ? colors.brandPrimary : colors.white} />
+        <ActivityIndicator color={s.text} size="small" />
       ) : (
-        <Text className={`${textVariantClasses[variant]} ${textSizeClasses[size]}`}>
-          {title}
-        </Text>
+        <Text style={{ color: s.text, fontSize: 16, fontWeight: '700' }}>{label}</Text>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }

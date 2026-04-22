@@ -2,10 +2,17 @@ import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import { Prisma } from '@prisma/client';
 import { z, ZodError } from 'zod';
+import { ListingStatus } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { uploadFile, deleteFile } from '../lib/storage';
 import { requireAuth } from '../middleware/auth';
+import { listingCreateRateLimit, searchRateLimit, phoneRevealRateLimit } from '../middleware/rateLimiter';
+import { geocodeCity, geocodeAddress } from '../lib/geocoder';
+import { isValidOwnerTransition, getOwnerAllowedTransitions, ALL_LISTING_STATUSES } from '../lib/listing-state-machine';
 import xss from 'xss';
+import { LISTING_EXPIRY_DAYS } from '../lib/constants';
+import { validateImageMagicBytes } from '../lib/magic-bytes';
+import { redis } from '../lib/redis';
 
 const router = Router();
 
@@ -13,21 +20,41 @@ function stripHtml(str: string): string {
   return str.replace(/<[^>]*>/g, '').trim();
 }
 
-const createListingSchema = z.object({
+// Prisma uses cuid() for IDs — validate as non-empty string with min length
+const cuid = z.string().min(1);
+
+const listingBaseSchema = z.object({
   title: z.string().min(5).max(100).transform(stripHtml),
   description: z.string().min(20).max(5000).transform(stripHtml).optional(),
   price: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(0)).optional().nullable(),
   currency: z.enum(['GEL', 'USD', 'EUR']).default('GEL'),
-  categoryId: z.string().uuid(),
-  cityId: z.string().uuid(),
-  districtId: z.string().uuid().optional(),
+  categoryId: cuid,
+  cityId: cuid,
+  districtId: cuid.optional(),
+  address: z.string().max(200).optional(),
+  isNegotiable: z.boolean().optional(),
 });
 
-const updateListingSchema = createListingSchema.partial();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+const createListingSchema = listingBaseSchema.refine(
+  (data) => data.isNegotiable || (data.price !== undefined && data.price !== null && data.price > 0),
+  { message: 'Price must be greater than 0 or mark as negotiable', path: ['price'] }
+);
 
-const ACTIVE_LISTING_LIMIT = 10;
-const LISTING_EXPIRY_DAYS = 30;
+// Draft schema: categoryId + cityId required by DB, all other fields optional
+const createDraftSchema = z.object({
+  title: z.string().min(1).max(100).transform(stripHtml).optional(),
+  description: z.string().max(5000).transform(stripHtml).optional(),
+  price: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(0)).optional().nullable(),
+  currency: z.enum(['GEL', 'USD', 'EUR']).default('GEL'),
+  categoryId: cuid,
+  cityId: cuid,
+  districtId: cuid.optional(),
+  address: z.string().max(200).optional(),
+  status: z.literal('draft'),
+});
+
+const updateListingSchema = listingBaseSchema.partial();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 function qs(val: unknown): string | undefined {
   if (typeof val === 'string') return val;
@@ -56,8 +83,8 @@ router.get('/my', requireAuth, async (req: Request, res: Response) => {
       skip,
       include: {
         photos: { orderBy: { order: 'asc' }, take: 1 },
-        city: { select: { id: true, nameRu: true } },
-        category: { select: { id: true, name: true } },
+        city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
+        category: { select: { id: true, name: true, nameKa: true, nameRu: true, nameEn: true, slug: true } },
       },
     }),
     prisma.listing.count({ where }),
@@ -66,43 +93,87 @@ router.get('/my', requireAuth, async (req: Request, res: Response) => {
   res.json({ listings, total, page, limit });
 });
 
-// GET /api/listings/map?city= — MUST be before /:id
-// city param is optional: omit to get all cities
+// GET /api/listings/map?city=&category=&price_min=&price_max= — MUST be before /:id
+// Returns up to 500 pins; listings without own coords fall back to city-center coords.
 router.get('/map', async (req: Request, res: Response) => {
   const city = qs(req.query.city);
+  const category = qs(req.query.category);
+  const priceMin = qs(req.query.price_min);
+  const priceMax = qs(req.query.price_max);
+
+  const where: Prisma.ListingWhereInput = {
+    status: 'active',
+    user: { role: { not: 'blocked' } },
+    OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    ...(city ? { cityId: city } : {}),
+    ...(category ? { category: { slug: category } } : {}),
+    ...(priceMin || priceMax ? {
+      price: {
+        ...(priceMin ? { gte: parseFloat(priceMin) } : {}),
+        ...(priceMax ? { lte: parseFloat(priceMax) } : {}),
+      },
+    } : {}),
+  };
+
   const listings = await prisma.listing.findMany({
-    where: {
-      ...(city ? { cityId: city } : {}),
-      status: 'active',
-      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-    },
+    where,
     select: {
       id: true, title: true, price: true, currency: true,
+      lat: true, lng: true,
       city: { select: { lat: true, lng: true } },
       photos: { orderBy: { order: 'asc' }, take: 1, select: { url: true } },
     },
+    take: 500,
   });
   res.json(
     listings.map((l) => ({
       id: l.id, title: l.title, price: l.price, currency: l.currency,
-      lat: l.city.lat, lng: l.city.lng,
+      lat: l.lat ?? l.city.lat,
+      lng: l.lng ?? l.city.lng,
       photo: l.photos[0]?.url || null,
     }))
   );
 });
 
+// GET /api/listings/autocomplete?q= — top 5 title suggestions
+router.get('/autocomplete', searchRateLimit, async (req: Request, res: Response) => {
+  try {
+    const q = String(req.query.q ?? '').trim();
+    if (q.length < 2) {
+      res.json({ suggestions: [] });
+      return;
+    }
+    const listings = await prisma.listing.findMany({
+      where: {
+        status: 'active',
+        title: { contains: q, mode: 'insensitive' },
+      },
+      select: { title: true },
+      distinct: ['title'],
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({ suggestions: listings.map((l: { title: string }) => l.title) });
+  } catch (err) {
+    console.error('GET /listings/autocomplete error:', err);
+    res.status(500).json({ error: 'Failed to get suggestions' });
+  }
+});
+
 // GET /api/listings
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', searchRateLimit, async (req: Request, res: Response) => {
   const q = qs(req.query.q);
   const category = qs(req.query.category);
   const city = qs(req.query.city);
+  const exclude = qs(req.query.exclude);
   const price_min = qs(req.query.price_min);
   const price_max = qs(req.query.price_max);
   const sort = qs(req.query.sort);
   const limit = Math.min(parseInt(qs(req.query.limit) || '20', 10), 50);
-  const page = parseInt(qs(req.query.page) || '1', 10);
+  const page = parseInt(req.query.page as string || '1', 10);
+  const offsetParam = req.query.offset !== undefined ? parseInt(req.query.offset as string, 10) : null;
   const take = limit;
-  const skip = (page - 1) * take;
+  const skip = offsetParam !== null && !isNaN(offsetParam) ? offsetParam : (page - 1) * take;
   const userId = qs(req.query.userId);
 
   // Resolve category: accept either a cuid (starts with 'c', 25+ chars) or a slug
@@ -122,24 +193,147 @@ router.get('/', async (req: Request, res: Response) => {
     }
   }
 
+  // Full-text search path: when q is present and ≥ 2 chars, use tsvector/tsquery for
+  // relevance ranking across title + description. Fallback to Prisma if FTS unavailable.
+  if (q && q.trim().length >= 2) {
+    const tsQuery = q.trim().split(/\s+/).map((w) => w.replace(/[^a-zA-Zа-яА-ЯёЁa-zA-Z0-9\u10D0-\u10FF]/g, '') + ':*').filter(Boolean).join(' & ');
+    if (tsQuery) {
+      try {
+        type FtsRow = {
+          id: string; title: string; description: string | null;
+          price: number | null; currency: string; status: string;
+          views: number; createdAt: Date; updatedAt: Date;
+          userId: string; categoryId: string; cityId: string;
+          districtId: string | null; lat: number | null; lng: number | null;
+          address: string | null; activatedAt: Date | null; expiresAt: Date | null;
+          lastRenewedAt: Date | null; rejectionReason: string | null;
+          rank: number;
+        };
+        type CountRow = { count: bigint };
+
+        const categoryFilter = categoryId ? Prisma.sql`AND l."categoryId" = ${categoryId}` : Prisma.empty;
+        const cityFilter = city ? Prisma.sql`AND l."cityId" = ${city}` : Prisma.empty;
+        const userFilter = userId ? Prisma.sql`AND l."userId" = ${userId}` : Prisma.empty;
+        const excludeFilter = exclude ? Prisma.sql`AND l.id <> ${exclude}` : Prisma.empty;
+        const priceMinFilter = price_min ? Prisma.sql`AND l.price >= ${parseFloat(price_min)}` : Prisma.empty;
+        const priceMaxFilter = price_max ? Prisma.sql`AND l.price <= ${parseFloat(price_max)}` : Prisma.empty;
+
+        // Sort by ts_rank relevance when q is present; ignore the sort param for FTS
+        const [ftsRows, countRows] = await Promise.all([
+          prisma.$queryRaw<FtsRow[]>`
+            SELECT l.*, ts_rank(l.search_vector, to_tsquery('simple', ${tsQuery})) AS rank
+            FROM "Listing" l
+            JOIN "User" u ON u.id = l."userId"
+            WHERE l.status = 'active'
+              AND u.role <> 'blocked'
+              AND (l."expiresAt" IS NULL OR l."expiresAt" > now())
+              AND l.search_vector @@ to_tsquery('simple', ${tsQuery})
+              ${categoryFilter}
+              ${cityFilter}
+              ${userFilter}
+              ${excludeFilter}
+              ${priceMinFilter}
+              ${priceMaxFilter}
+            ORDER BY rank DESC, l."createdAt" DESC
+            LIMIT ${take} OFFSET ${skip}
+          `,
+          prisma.$queryRaw<CountRow[]>`
+            SELECT count(*) AS count
+            FROM "Listing" l
+            JOIN "User" u ON u.id = l."userId"
+            WHERE l.status = 'active'
+              AND u.role <> 'blocked'
+              AND (l."expiresAt" IS NULL OR l."expiresAt" > now())
+              AND l.search_vector @@ to_tsquery('simple', ${tsQuery})
+              ${categoryFilter}
+              ${cityFilter}
+              ${userFilter}
+              ${excludeFilter}
+              ${priceMinFilter}
+              ${priceMaxFilter}
+          `,
+        ]);
+
+        const total = Number((countRows[0] as CountRow)?.count ?? 0);
+        const ids = ftsRows.map((r) => r.id);
+
+        if (ids.length === 0) {
+          res.json({ listings: [], total, page, limit: take });
+          return;
+        }
+
+        // Fetch full Prisma objects (with relations) for matched ids, preserving rank order
+        const fullListings = await prisma.listing.findMany({
+          where: { id: { in: ids } },
+          include: {
+            photos: { orderBy: { order: 'asc' }, take: 3 },
+            city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
+            category: { select: { id: true, name: true, nameKa: true, nameRu: true, nameEn: true, slug: true } },
+            promotions: { where: { isActive: true }, select: { promotionType: true, expiresAt: true } },
+            user: {
+              select: {
+                id: true, name: true,
+                promotions: {
+                  where: { promotionType: 'unlimited_sub', isActive: true, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+                  select: { id: true },
+                },
+              },
+            },
+          },
+        });
+
+        // Preserve ts_rank order from ftsRows
+        const rankMap = new Map(ftsRows.map((r) => [r.id, r.rank]));
+        fullListings.sort((a, b) => (rankMap.get(b.id) ?? 0) - (rankMap.get(a.id) ?? 0));
+
+        const TOP_TYPES_FTS = new Set(['top_1d', 'top_3d', 'top_7d']);
+        const enrichedFts = fullListings.map((l) => {
+          const activePromos = l.promotions || [];
+          const isTop = activePromos.some((p) => TOP_TYPES_FTS.has(p.promotionType));
+          const isHighlighted = activePromos.some((p) => p.promotionType === 'highlight');
+          const isPremium = (l.user?.promotions?.length ?? 0) > 0;
+          const { promotions: _up, ...userWithoutPromos } = l.user ?? { id: '', name: null };
+          return { ...l, user: userWithoutPromos, isPromoted: isTop, isHighlighted, isPremium };
+        });
+
+        // Promoted always first, then relevance order
+        enrichedFts.sort((a, b) => {
+          if (a.isPromoted && !b.isPromoted) return -1;
+          if (!a.isPromoted && b.isPromoted) return 1;
+          if (a.isPremium && !b.isPremium) return -1;
+          if (!a.isPremium && b.isPremium) return 1;
+          return (rankMap.get(b.id) ?? 0) - (rankMap.get(a.id) ?? 0);
+        });
+
+        res.json({ listings: enrichedFts, total, page, limit: take });
+        return;
+      } catch (ftsErr) {
+        // FTS column not yet available (migration pending) — fall through to ILIKE
+        console.warn('[FTS] tsvector query failed, falling back to ILIKE:', (ftsErr as Error).message);
+      }
+    }
+  }
+
   const where: Prisma.ListingWhereInput = {
     status: 'active',
-    OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-    ...(q
-      ? {
-          AND: [
+    user: { role: { not: 'blocked' } },
+    AND: [
+      { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+      ...(q
+        ? [
             {
               OR: [
                 { title: { contains: q, mode: 'insensitive' as const } },
                 { description: { contains: q, mode: 'insensitive' as const } },
               ],
             },
-          ],
-        }
-      : {}),
+          ]
+        : []),
+    ],
     ...(categoryId ? { categoryId } : {}),
     ...(city ? { cityId: city } : {}),
     ...(userId ? { userId } : {}),
+    ...(exclude ? { id: { not: exclude } } : {}),
     ...(price_min || price_max
       ? {
           price: {
@@ -162,30 +356,48 @@ router.get('/', async (req: Request, res: Response) => {
       where, orderBy, take, skip,
       include: {
         photos: { orderBy: { order: 'asc' }, take: 3 },
-        city: { select: { id: true, nameRu: true } },
-        category: { select: { id: true, name: true } },
+        city: { select: { id: true, nameRu: true, nameEn: true, nameKa: true } },
+        category: { select: { id: true, name: true, nameKa: true, nameRu: true, nameEn: true, slug: true } },
         promotions: {
           where: { isActive: true },
           select: { promotionType: true, expiresAt: true },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            promotions: {
+              where: {
+                promotionType: 'unlimited_sub',
+                isActive: true,
+                OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+              },
+              select: { id: true },
+            },
+          },
         },
       },
     }),
     prisma.listing.count({ where }),
   ]);
 
-  // Sort: promoted (top_*) listings first, then by original sort order
+  // Sort: promoted (top_*) listings first, then premium (unlimited_sub), then original order
   const TOP_TYPES = new Set(['top_1d', 'top_3d', 'top_7d']);
   const enriched = listings.map((l) => {
     const activePromos = l.promotions || [];
     const isTop = activePromos.some((p) => TOP_TYPES.has(p.promotionType));
     const isHighlighted = activePromos.some((p) => p.promotionType === 'highlight');
-    return { ...l, isPromoted: isTop, isHighlighted };
+    const isPremium = (l.user?.promotions?.length ?? 0) > 0;
+    const { promotions: _userPromos, ...userWithoutPromos } = l.user ?? { id: '', name: null };
+    return { ...l, user: userWithoutPromos, isPromoted: isTop, isHighlighted, isPremium };
   });
 
-  // Stable sort: promoted first, then original order preserved
+  // Stable sort: top_* first, then premium, then original order preserved
   enriched.sort((a, b) => {
     if (a.isPromoted && !b.isPromoted) return -1;
     if (!a.isPromoted && b.isPromoted) return 1;
+    if (a.isPremium && !b.isPremium) return -1;
+    if (!a.isPremium && b.isPremium) return 1;
     return 0;
   });
 
@@ -201,48 +413,262 @@ router.get('/:id', async (req: Request, res: Response) => {
       photos: { orderBy: { order: 'asc' } },
       city: true, district: true, category: true,
       // phone intentionally excluded — contact via chat only
-      user: { select: { id: true, name: true, createdAt: true } },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+          promotions: {
+            where: {
+              promotionType: 'unlimited_sub',
+              isActive: true,
+              OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+            },
+            select: { id: true },
+          },
+        },
+      },
     },
   });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
-  // Atomic view increment
-  await prisma.listing.update({ where: { id }, data: { views: { increment: 1 } } });
-  res.json({ ...listing, views: listing.views + 1 });
+
+  // UC-05: increment views only once per IP per listing per day.
+  // Stored in Redis/Valkey with 24h TTL — survives server restarts.
+  const today = new Date().toISOString().slice(0, 10);
+  const viewKey = `view:${id}:${req.ip || 'unknown'}:${today}`;
+  let updatedViews = listing.views;
+  try {
+    // NX = set only if not exists; returns 'OK' if set, null if already exists
+    const isNew = await redis.set(viewKey, '1', 'EX', 24 * 60 * 60, 'NX');
+    if (isNew === 'OK') {
+      await prisma.listing.update({ where: { id }, data: { views: { increment: 1 } } });
+      updatedViews = listing.views + 1;
+    }
+  } catch (redisErr) {
+    // Redis unavailable: fall back to always incrementing (better than breaking the page)
+    console.error('[Redis] view dedup failed, skipping increment:', (redisErr as Error).message);
+  }
+
+  // UC-16: compute isPremium — seller has active unlimited_sub promotion
+  const { promotions: _sellerPromos, ...sellerInfo } = listing.user ?? { id: '', name: null, createdAt: new Date() };
+  const isPremium = (_sellerPromos?.length ?? 0) > 0;
+  res.json({ ...listing, user: sellerInfo, isPremium, views: updatedViews });
+});
+
+// GET /api/listings/:id/phone — reveal seller phone (auth required, rate limited)
+router.get('/:id/phone', requireAuth, phoneRevealRateLimit, async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    select: { id: true, status: true, user: { select: { phone: true } } },
+  });
+  if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
+  if (listing.status !== 'active') { res.status(410).json({ error: 'Listing is not active' }); return; }
+  res.json({ phone: listing.user.phone || null });
 });
 
 // POST /api/listings
-router.post('/', requireAuth, async (req: Request, res: Response) => {
-  let data;
+router.post('/', requireAuth, listingCreateRateLimit, async (req: Request, res: Response) => {
+  // Normalize isDraft flag to status field before schema parsing
+  if (req.body.isDraft === true || req.body.isDraft === 'true') {
+    req.body.status = 'draft';
+  }
+  const isDraft = req.body.status === 'draft';
+  let data: z.infer<typeof createListingSchema> | z.infer<typeof createDraftSchema>;
   try {
-    data = createListingSchema.parse(req.body);
+    data = isDraft ? createDraftSchema.parse(req.body) : createListingSchema.parse(req.body);
   } catch (err) {
     if (err instanceof ZodError) {
       res.status(400).json({ error: err.errors[0]?.message || 'Validation failed' }); return;
     }
     throw err;
   }
-  const { title, description, price, currency, categoryId, cityId, districtId } = data;
+  const { title, description, price, currency, categoryId, cityId, districtId, address } = data;
   // Sanitize text fields to strip HTML tags (XSS prevention) — defense in depth
-  const safeTitle = xss(title);
+  const safeTitle = title ? xss(title) : 'Draft';
   const safeDescription = description ? xss(description) : description;
   const userId = req.user!.userId;
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (user?.role !== 'admin') {
-    const activeCount = await prisma.listing.count({
-      where: {
-        userId, status: 'active',
-        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-      },
-    });
-    if (activeCount >= ACTIVE_LISTING_LIMIT) {
-      res.status(403).json({ error: `Active listing limit reached (${ACTIVE_LISTING_LIMIT})` }); return;
+
+  // Per-category free listing quota check (only for non-draft listings)
+  if (!isDraft) {
+    const userRecord = await prisma.user.findUnique({ where: { id: userId } });
+    if (userRecord?.role !== 'admin') {
+      // Check if user has an active unlimited_sub promotion — bypasses quota
+      const hasUnlimited = await prisma.promotion.findFirst({
+        where: {
+          userId,
+          promotionType: 'unlimited_sub',
+          isActive: true,
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+      });
+      if (!hasUnlimited) {
+        // Load category with parent for inheritance
+        const cat = await prisma.category.findUnique({
+          where: { id: categoryId },
+          include: { parent: { select: { freeListingQuota: true, paidListingPrice: true } } },
+        });
+        // Subcategory inherits from parent if own freeListingQuota is 0
+        const freeQuota = (cat && cat.freeListingQuota === 0 && cat.parent)
+          ? cat.parent.freeListingQuota
+          : (cat?.freeListingQuota ?? 10);
+        const paidPrice = (cat && cat.freeListingQuota === 0 && cat.parent)
+          ? cat.parent.paidListingPrice
+          : (cat?.paidListingPrice ?? 0);
+
+        // Count active + pending_moderation listings in THIS category
+        const usedCount = await prisma.listing.count({
+          where: {
+            userId,
+            categoryId,
+            status: { in: ['active', 'pending_moderation'] },
+          },
+        });
+
+        if (usedCount >= freeQuota) {
+          if (paidPrice === 0) {
+            // Extra listings are blocked (not purchasable)
+            res.status(402).json({
+              error: 'quota_exceeded',
+              allowPaid: false,
+              freeQuota,
+              used: usedCount,
+            });
+            return;
+          }
+          // Paid listing flow: require paymentId
+          const paymentId = req.body.paymentId as string | undefined;
+          if (!paymentId) {
+            res.status(402).json({
+              error: 'quota_exceeded',
+              allowPaid: true,
+              price: paidPrice,
+              freeQuota,
+              used: usedCount,
+            });
+            return;
+          }
+          // Verify payment: must be completed, belong to user, not yet consumed
+          const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
+          if (!payment || payment.status !== 'completed' || payment.userId !== userId || payment.listingId !== null) {
+            res.status(400).json({ error: 'Invalid or already used payment' });
+            return;
+          }
+          // Atomically mark payment as consumed (set listingId after listing creation below)
+          // We store paymentId to link after creation
+          (req as any)._quotaPaymentId = paymentId;
+        }
+      }
     }
   }
-  const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+
+  // Duplicate listing protection: block same user + category + title within 24h (skip for drafts and admins)
+  if (!isDraft && req.user!.role !== 'admin') {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const dupe = await prisma.listing.findFirst({
+      where: {
+        userId,
+        categoryId,
+        status: { in: ['active', 'pending_moderation'] },
+        createdAt: { gte: since },
+        title: { equals: safeTitle, mode: 'insensitive' },
+      },
+      select: { id: true },
+    });
+    if (dupe) {
+      res.status(409).json({ error: 'duplicate_listing', existingId: dupe.id });
+      return;
+    }
+  }
+
+  // Determine initial status based on admin settings (skip for drafts)
+  let initialStatus: ListingStatus = isDraft ? 'draft' : 'pending_moderation';
+  let autoRejectionReason: string | null = null;
+  let autoActivatedAt: Date | null = null;
+  let autoExpiresAt: Date | null = null;
+
+  if (!isDraft) {
+    // Load admin settings: auto-moderation toggle + banned words
+    const settingsRows = await prisma.appSettings.findMany({
+      where: { key: { in: ['autoModerationEnabled', 'bannedWords'] } },
+    });
+    const settingsByKey: Record<string, string> = {};
+    for (const row of settingsRows) settingsByKey[row.key] = row.value;
+
+    const autoModerationEnabled = settingsByKey['autoModerationEnabled'] === 'true';
+    const bannedWords: string[] = settingsByKey['bannedWords']
+      ? (JSON.parse(settingsByKey['bannedWords']) as string[])
+      : [];
+
+    if (bannedWords.length > 0) {
+      const textToCheck = `${safeTitle} ${safeDescription ?? ''}`.toLowerCase();
+      const matchedWord = bannedWords.find((w) => textToCheck.includes(w));
+      if (matchedWord) {
+        // Auto-reject: listing contains a banned word
+        initialStatus = 'rejected';
+        autoRejectionReason = `Auto-rejected: contains banned word`;
+      }
+    }
+
+    // Only auto-approve if not already auto-rejected
+    if (initialStatus === 'pending_moderation' && autoModerationEnabled) {
+      initialStatus = 'active';
+      const now = new Date();
+      autoActivatedAt = now;
+      autoExpiresAt = new Date(now.getTime() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+    }
+  }
+
+  // Geocode coordinates — best-effort, never blocks listing creation
+  // If address is provided: try address-level first, fall back to city-level
+  let lat: number | null = null;
+  let lng: number | null = null;
+  if (cityId) {
+    const cityRecord = await prisma.city.findUnique({ where: { id: cityId }, select: { nameEn: true } });
+    if (cityRecord?.nameEn) {
+      if (address) {
+        const addrCoords = await geocodeAddress(address, cityRecord.nameEn);
+        if (addrCoords) {
+          lat = addrCoords.lat;
+          lng = addrCoords.lng;
+        }
+      }
+      if (lat === null) {
+        const cityCoords = await geocodeCity(cityRecord.nameEn);
+        if (cityCoords) { lat = cityCoords.lat; lng = cityCoords.lng; }
+      }
+    }
+  }
   try {
     const listing = await prisma.listing.create({
-      data: { title: safeTitle, description: safeDescription, price: price ?? null, currency, categoryId, cityId, districtId, userId, expiresAt },
+      data: {
+        title: safeTitle,
+        description: safeDescription,
+        price: price ?? null,
+        currency: currency || 'GEL',
+        categoryId,
+        cityId,
+        districtId,
+        address: address ?? null,
+        userId,
+        status: initialStatus,
+        ...(autoRejectionReason ? { rejectionReason: autoRejectionReason } : {}),
+        ...(autoActivatedAt ? { activatedAt: autoActivatedAt } : {}),
+        ...(autoExpiresAt ? { expiresAt: autoExpiresAt } : {}),
+        lat,
+        lng,
+      },
     });
+
+    // Atomically link payment to listing if quota was exceeded and payment was provided
+    const quotaPaymentId = (req as any)._quotaPaymentId as string | undefined;
+    if (quotaPaymentId) {
+      await prisma.payment.update({
+        where: { id: quotaPaymentId },
+        data: { listingId: listing.id },
+      });
+    }
+
     res.status(201).json(listing);
   } catch (err: any) {
     if (err?.code === 'P2003' || err?.code === 'P2025') {
@@ -270,17 +696,41 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
     }
     throw err;
   }
-  const { title, description, price, currency, categoryId, cityId, districtId } = updateData;
+  const { title, description, price, currency, categoryId, cityId, districtId, address } = updateData;
   const newPrice = price;
   // Sanitize only fields present in the request body to strip HTML tags (XSS prevention)
   const safeTitle = title !== undefined ? xss(title) : title;
   const safeDescription = description !== undefined ? xss(description) : description;
+  // Re-geocode when address or cityId changes
+  let coordsUpdate: { lat?: number | null; lng?: number | null } = {};
+  const newAddress = address !== undefined ? address : undefined;
+  const effectiveCityId = cityId ?? listing.cityId;
+  if (address !== undefined || cityId !== undefined) {
+    const city = await prisma.city.findUnique({ where: { id: effectiveCityId }, select: { nameEn: true } });
+    if (city?.nameEn) {
+      const addrToGeocode = address !== undefined ? address : listing.address;
+      if (addrToGeocode) {
+        const addrCoords = await geocodeAddress(addrToGeocode, city.nameEn);
+        if (addrCoords) {
+          coordsUpdate = { lat: addrCoords.lat, lng: addrCoords.lng };
+        }
+      }
+      if (coordsUpdate.lat === undefined) {
+        const cityCoords = await geocodeCity(city.nameEn);
+        coordsUpdate = { lat: cityCoords?.lat ?? null, lng: cityCoords?.lng ?? null };
+      }
+    } else {
+      coordsUpdate = { lat: null, lng: null };
+    }
+  }
   const updated = await prisma.listing.update({
     where: { id },
     data: {
       title: safeTitle, description: safeDescription,
       price: newPrice,
       currency, categoryId, cityId, districtId,
+      ...(newAddress !== undefined ? { address: newAddress || null } : {}),
+      ...coordsUpdate,
     },
   });
 
@@ -301,6 +751,11 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
       });
       const { sendPriceDropNotification } = await import('../lib/mail');
       for (const fav of favorites) {
+        // Check notification preference — absence of row means enabled by default
+        const pref = await prisma.notificationPref.findUnique({
+          where: { userId_type: { userId: fav.user.id, type: 'price_drop' } },
+        });
+        if (pref && !pref.enabled) continue;
         sendPriceDropNotification(fav.user.email, updated.title, oldPrice, newPrice)
           .catch(err => console.error('Price drop email error:', err));
       }
@@ -310,20 +765,63 @@ router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   res.json(updated);
 });
 
-// PATCH /api/listings/:id/status
+// DELETE /api/listings/:id
+router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    include: { photos: { select: { key: true } } },
+  });
+  if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
+  if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
+  if (listing.status === 'removed') { res.status(400).json({ error: 'Listing is already removed' }); return; }
+
+  // Delete photos from MinIO — best-effort, never blocks DB deletion
+  if (listing.photos.length > 0) {
+    await Promise.allSettled(
+      listing.photos.map((p) => (p.key ? deleteFile(p.key) : Promise.resolve()))
+    );
+  }
+
+  await prisma.listing.delete({ where: { id } });
+  res.json({ ok: true });
+});
+
+// PATCH /api/listings/:id/status — owner status transitions (state machine)
 router.patch('/:id/status', requireAuth, async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const listing = await prisma.listing.findUnique({ where: { id } });
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
   if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
+
   const { status } = req.body;
-  if (!['sold', 'removed'].includes(status)) {
-    res.status(400).json({ error: 'status must be sold or removed' }); return;
+  if (!status || !ALL_LISTING_STATUSES.includes(status)) {
+    res.status(400).json({ error: `Invalid status. Must be one of: ${ALL_LISTING_STATUSES.join(', ')}` }); return;
   }
-  const updated = await prisma.listing.update({ where: { id }, data: { status } });
+
+  const currentStatus = listing.status as ListingStatus;
+  const targetStatus = status as ListingStatus;
+
+  // Validate transition using state machine
+  if (!isValidOwnerTransition(currentStatus, targetStatus)) {
+    const allowed = getOwnerAllowedTransitions(currentStatus);
+    res.status(400).json({
+      error: `Invalid status transition from '${currentStatus}' to '${targetStatus}'`,
+      allowedTransitions: allowed,
+    }); return;
+  }
+
+  // Submitting for moderation: validate required fields
+  if (targetStatus === 'pending_moderation' && (currentStatus === 'draft' || currentStatus === 'rejected' || currentStatus === 'expired')) {
+    if (!listing.title || listing.title === 'Draft' || !listing.categoryId || !listing.cityId) {
+      res.status(400).json({ error: 'Listing is missing required fields (title, category, city)' }); return;
+    }
+  }
+
+  const updated = await prisma.listing.update({ where: { id }, data: { status: targetStatus } });
 
   // Notify favoriters when listing is removed
-  if (status === 'removed') {
+  if (targetStatus === 'removed') {
     const favorites = await prisma.favorite.findMany({
       where: { listingId: id },
       include: { user: { select: { id: true, email: true } } },
@@ -339,6 +837,11 @@ router.patch('/:id/status', requireAuth, async (req: Request, res: Response) => 
       });
       const { sendListingRemovedNotification } = await import('../lib/mail');
       for (const fav of favorites) {
+        // Check notification preference — price_drop covers all listing-change alerts for favoriters
+        const pref = await prisma.notificationPref.findUnique({
+          where: { userId_type: { userId: fav.user.id, type: 'price_drop' } },
+        });
+        if (pref && !pref.enabled) continue;
         sendListingRemovedNotification(fav.user.email, listing.title)
           .catch(err => console.error('Listing removed email error:', err));
       }
@@ -355,8 +858,13 @@ router.post('/:id/renew', requireAuth, async (req: Request, res: Response) => {
   if (!listing) { res.status(404).json({ error: 'Not found' }); return; }
   if (listing.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
   if (listing.status !== 'active') { res.status(400).json({ error: 'Can only renew active listings' }); return; }
+  // 30-day cooldown: free renewal is allowed once per 30 days
+  const RENEWAL_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+  if (listing.lastRenewedAt && (Date.now() - listing.lastRenewedAt.getTime()) < RENEWAL_COOLDOWN_MS) {
+    res.status(403).json({ error: 'Free renewal available once per 30 days' }); return;
+  }
   const expiresAt = new Date(Date.now() + LISTING_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-  const updated = await prisma.listing.update({ where: { id }, data: { expiresAt } });
+  const updated = await prisma.listing.update({ where: { id }, data: { expiresAt, lastRenewedAt: new Date() } });
   res.json(updated);
 });
 
@@ -376,18 +884,36 @@ router.post('/:id/photos', requireAuth, upload.array('photos', 10), async (req: 
   if (listingWithPhotos.userId !== req.user!.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
   const files = req.files as Express.Multer.File[];
   if (!files?.length) { res.status(400).json({ error: 'No files uploaded' }); return; }
+  // Validate real file content via magic bytes (prevents MIME type spoofing)
+  for (const file of files) {
+    try {
+      validateImageMagicBytes(file.buffer);
+    } catch {
+      res.status(400).json({ error: 'Invalid file content. Only JPEG, PNG, WebP, GIF images are allowed.' }); return;
+    }
+  }
   const currentCount = listingWithPhotos.photos.length;
   if (currentCount + files.length > 10) {
     res.status(400).json({ error: `Max 10 photos. Currently ${currentCount}, uploading ${files.length}` }); return;
   }
-  const uploaded = await Promise.all(
-    files.map(async (file, i) => {
-      const { url, key } = await uploadFile(file.buffer, file.mimetype);
-      return prisma.listingPhoto.create({
-        data: { listingId: id, url, key, order: currentCount + i },
-      });
-    })
-  );
+  let uploaded;
+  try {
+    uploaded = await Promise.all(
+      files.map(async (file, i) => {
+        const detectedMime = validateImageMagicBytes(file.buffer);
+        const { url, key } = await uploadFile(file.buffer, detectedMime);
+        return prisma.listingPhoto.create({
+          data: { listingId: id, url, key, order: currentCount + i },
+        });
+      })
+    );
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes('Storage service unavailable') || msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND') || msg.includes('connect')) {
+      res.status(503).json({ error: 'Photo storage unavailable, try again later' }); return;
+    }
+    throw err;
+  }
   res.status(201).json(uploaded);
 });
 

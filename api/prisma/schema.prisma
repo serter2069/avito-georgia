@@ -23,6 +23,7 @@ enum PromotionType {
   top_7d
   highlight
   unlimited_sub
+  bundle
 }
 
 enum PaymentStatus {
@@ -38,22 +39,28 @@ model User {
   name      String?
   phone     String?
   avatarUrl String?
-  role      String   @default("user")
-  locale    String   @default("ru")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role        String   @default("user")
+  locale      String   @default("ru")
+  city        String?
+  isOnboarded Boolean   @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  otpCodes      OtpCode[]
-  sessions      Session[]
-  listings      Listing[]
-  favorites     Favorite[]
-  notifications Notification[]
-  sentMessages  Message[]           @relation("MessageSender")
-  threads       ThreadParticipant[]
-  payments      Payment[]
-  promotions    Promotion[]
-  reports       Report[]             @relation("Reports")
-  reportedBy    Report[]             @relation("ReportedUser")
+  otpCodes             OtpCode[]
+  sessions             Session[]
+  listings             Listing[]
+  favorites            Favorite[]
+  notifications        Notification[]
+  sentMessages         Message[]           @relation("MessageSender")
+  threads              ThreadParticipant[]
+  payments             Payment[]
+  promotions           Promotion[]
+  reports              Report[]             @relation("Reports")
+  reportedBy           Report[]             @relation("ReportedUser")
+  reviewsWritten       Review[]             @relation("ReviewAuthor")
+  reviewsReceived      Review[]             @relation("ReviewSeller")
+  notificationPrefs    NotificationPref[]
 }
 
 // Auth: OTP only — no password field on User
@@ -85,14 +92,19 @@ model Session {
 }
 
 model Category {
-  id           String     @id @default(cuid())
-  name         String
-  slug         String     @unique
-  customFields Json?
-  parentId     String?
-  parent       Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
-  children     Category[] @relation("CategoryChildren")
-  listings     Listing[]
+  id               String     @id @default(cuid())
+  name             String
+  nameKa           String     @default("")
+  nameRu           String     @default("")
+  nameEn           String     @default("")
+  slug             String     @unique
+  customFields     Json?
+  freeListingQuota Int        @default(10)
+  paidListingPrice Float      @default(0.0)
+  parentId         String?
+  parent           Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children         Category[] @relation("CategoryChildren")
+  listings         Listing[]
 }
 
 model City {
@@ -123,9 +135,12 @@ model Listing {
   currency    String        @default("GEL")
   status      ListingStatus @default(active)
   views       Int           @default(0)
-  expiresAt   DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  activatedAt     DateTime?
+  expiresAt       DateTime?
+  lastRenewedAt   DateTime?
+  rejectionReason String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   userId     String
   user       User      @relation(fields: [userId], references: [id])
@@ -135,6 +150,9 @@ model Listing {
   city       City      @relation(fields: [cityId], references: [id])
   districtId String?
   district   District? @relation(fields: [districtId], references: [id])
+  lat        Float?
+  lng        Float?
+  address    String?
 
   photos        ListingPhoto[]
   favorites     Favorite[]
@@ -142,6 +160,7 @@ model Listing {
   promotions    Promotion[]
   threads       Thread[]
   reports       Report[]
+  reviews       Review[]
 
   @@index([status])
   @@index([expiresAt])
@@ -176,11 +195,12 @@ model Thread {
 }
 
 model ThreadParticipant {
-  id       String @id @default(cuid())
-  threadId String
-  thread   Thread @relation(fields: [threadId], references: [id])
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  id         String    @id @default(cuid())
+  threadId   String
+  thread     Thread    @relation(fields: [threadId], references: [id])
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  lastSeenAt DateTime?
 
   @@unique([threadId, userId])
 }
@@ -212,8 +232,8 @@ model Promotion {
   isActive      Boolean       @default(true)
   expiresAt     DateTime?
   createdAt     DateTime      @default(now())
-  listingId     String
-  listing       Listing       @relation(fields: [listingId], references: [id])
+  listingId     String?
+  listing       Listing?      @relation(fields: [listingId], references: [id])
   userId        String
   user          User          @relation(fields: [userId], references: [id])
 
@@ -226,11 +246,15 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   type      String
-  listingId String
-  listing   Listing  @relation(fields: [listingId], references: [id])
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id])
   payload   Json
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  // UC-40: dedup guard — partial unique index enforced via @@unique
+  // Partial filtering (excluding NEW_MESSAGE) is handled in migration SQL
+  @@unique([userId, listingId, type])
 }
 
 model Payment {
@@ -262,6 +286,70 @@ model Report {
   status       String   @default("pending")
   createdAt    DateTime @default(now())
 
+  @@unique([reporterId, listingId])
+  @@unique([reporterId, targetUserId])
   @@index([reporterId])
   @@index([status])
+}
+
+// Audit log — append-only record of moderator/admin actions.
+// adminId/adminEmail stored as plain strings (no FK) so records survive user deletion.
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  adminEmail String
+  action     String   // e.g. "listing.status_change", "user.role_change", "report.status_change", "category.update"
+  targetType String   // "listing" | "user" | "report" | "category"
+  targetId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+// Review — left by a buyer (thread participant) after listing is sold
+model Review {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  sellerId  String
+  seller    User     @relation("ReviewSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  rating    Int      // 1–5, enforced at application level
+  text      String?
+  createdAt DateTime @default(now())
+
+  @@unique([authorId, listingId])
+  @@index([sellerId])
+  @@index([listingId])
+}
+
+enum NotificationPrefType {
+  new_message
+  price_drop
+  moderation_update
+}
+
+// UC-30: per-user notification opt-in/opt-out preferences
+model NotificationPref {
+  id        String               @id @default(cuid())
+  userId    String
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationPrefType
+  enabled   Boolean              @default(true)
+  createdAt DateTime             @default(now())
+
+  @@unique([userId, type])
+  @@index([userId])
+}
+
+// Global admin-configurable settings stored as key-value pairs
+model AppSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 }

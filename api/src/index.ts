@@ -1,11 +1,13 @@
 import express from 'express';
+import multer from 'multer';
 import http from 'http';
 import cors from 'cors';
-import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
+import { otpRateLimit, otpVerifyRateLimit } from './middleware/rateLimiter';
 import dotenv from 'dotenv';
 import { startCleanupCron } from './cron/cleanup';
 import { setupSocket } from './socket';
+import { ALLOWED_ORIGINS } from './lib/constants';
 import authRouter from './routes/auth';
 import listingsRouter from './routes/listings';
 import favoritesRouter from './routes/favorites';
@@ -18,6 +20,10 @@ import stripeWebhookRouter from './routes/stripe-webhook';
 import adminPaymentsRouter from './routes/admin-payments';
 import usersRouter from './routes/users';
 import adminRouter from './routes/admin';
+import notificationsRouter from './routes/notifications';
+import paymentsRouter from './routes/payments';
+import reviewsRouter from './routes/reviews';
+import protoRouter from './routes/proto';
 
 dotenv.config();
 
@@ -28,25 +34,26 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your-jwt-secret') {
 if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET === 'your-jwt-refresh-secret') {
   throw new Error('JWT_REFRESH_SECRET is not configured or is using the placeholder value');
 }
+if (!process.env.STRIPE_WEBHOOK_SECRET) {
+  throw new Error('STRIPE_WEBHOOK_SECRET is not configured');
+}
 
 const app = express();
 const httpServer = http.createServer(app);
 const PORT = parseInt(process.env.PORT || '3813', 10);
 
 app.use(cors({
-  origin: [
-    'https://avito-georgia.smartlaunchhub.com',
-    'http://localhost:8081',
-    'http://localhost:19006',
-  ],
+  origin: ALLOWED_ORIGINS,
   credentials: true,
 }));
 app.use(cookieParser());
 
-const otpLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: { error: 'Too many requests, try again later' } });
-const verifyLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many attempts' } });
-app.use('/api/auth/request-otp', otpLimiter);
-app.use('/api/auth/verify-otp', verifyLimiter);
+// Trust proxy headers when behind nginx/reverse proxy (required for correct IP-based rate limiting)
+app.set('trust proxy', 1);
+
+// Rate limiting — OTP endpoints (applied before body parser to protect against abuse)
+app.use('/api/auth/request-otp', otpRateLimit);
+app.use('/api/auth/verify-otp', otpVerifyRateLimit);
 
 // Stripe webhook needs raw body — MUST be before express.json()
 app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhookRouter);
@@ -64,12 +71,19 @@ app.use('/api/promotions', promotionsRouter);
 app.use('/api/admin/payments', adminPaymentsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/payments', paymentsRouter);
+app.use('/api/reviews', reviewsRouter);
+app.use('/api/proto', protoRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: err.message });
+  }
   console.error('Unhandled error:', err.message);
   res.status(500).json({ error: 'Internal server error' });
 });

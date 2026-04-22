@@ -1,17 +1,16 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireAdmin } from '../middleware/auth';
 
 const router = Router();
 
-// GET /api/admin/payments — list all payments (admin only)
-router.get('/', requireAuth, async (req: Request, res: Response) => {
-  if (req.user!.role !== 'admin') {
-    res.status(403).json({ error: 'Forbidden' });
-    return;
-  }
+// All admin payment routes require authentication and admin role
+router.use(requireAuth, requireAdmin);
 
-  const page = parseInt(String(req.query.page) || '1', 10);
+// GET /api/admin/payments — list all payments (admin only)
+router.get('/', async (req: Request, res: Response) => {
+
+  const page = parseInt(String(req.query.page ?? '1'), 10) || 1;
   const take = 50;
   const skip = (page - 1) * take;
   const status = req.query.status as string | undefined;
@@ -35,11 +34,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
 });
 
 // GET /api/admin/promotions — list all active promotions (admin only)
-router.get('/promotions', requireAuth, async (req: Request, res: Response) => {
-  if (req.user!.role !== 'admin') {
-    res.status(403).json({ error: 'Forbidden' });
-    return;
-  }
+router.get('/promotions', async (req: Request, res: Response) => {
 
   const promotions = await prisma.promotion.findMany({
     where: { isActive: true },

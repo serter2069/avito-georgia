@@ -29,14 +29,25 @@ export async function uploadFile(
   const key = `${folder}/${randomUUID()}.${ext}`;
 
   if (s3) {
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: process.env.MINIO_BUCKET!,
-        Key: key,
-        Body: buffer,
-        ContentType: mimetype,
-      })
-    );
+    try {
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.MINIO_BUCKET!,
+          Key: key,
+          Body: buffer,
+          ContentType: mimetype,
+        })
+      );
+    } catch (err: unknown) {
+      // AWS SDK v3 errors may be non-standard objects
+      let errMsg = 'connection failed';
+      if (err instanceof Error) {
+        errMsg = err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        errMsg = (err as any).message || (err as any).code || JSON.stringify(err).slice(0, 200);
+      }
+      throw new Error(`Storage service unavailable: ${errMsg}`);
+    }
     const url = `${process.env.MINIO_PUBLIC_URL}/${key}`;
     return { url, key };
   }

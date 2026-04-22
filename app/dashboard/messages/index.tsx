@@ -1,166 +1,62 @@
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from 'react';
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { api } from '../../../lib/api';
-import { colors } from '../../../lib/colors';
+import MessagesList from '../../../components/screens/MessagesList';
+import { ErrorState } from '../../../components/ErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { SkeletonBox } from '../../../components/SkeletonBox';
+import { apiFetch } from '../../../lib/api';
 
-interface ThreadUser {
-  id: string;
-  name: string | null;
-  avatarUrl: string | null;
+function ChatSkeleton() {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      {[0, 1, 2, 3].map(i => (
+        <View key={i} style={{ flexDirection: 'row', gap: 12, padding: 16, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' }}>
+          <SkeletonBox width={48} height={48} borderRadius={24} />
+          <View style={{ flex: 1, gap: 8, justifyContent: 'center' }}>
+            <SkeletonBox width="60%" height={14} />
+            <SkeletonBox width="85%" height={12} />
+          </View>
+        </View>
+      ))}
+    </View>
+  );
 }
 
-interface ThreadListing {
-  id: string;
-  title: string;
-  price: number | null;
-  currency: string;
-  photos: { url: string }[];
-}
-
-interface ThreadMessage {
-  id: string;
-  text: string;
-  createdAt: string;
-  senderId: string;
-}
-
-interface Thread {
-  id: string;
-  listing: ThreadListing | null;
-  otherUser: ThreadUser | null;
-  lastMessage: ThreadMessage | null;
-  updatedAt: string;
-}
-
-function getInitials(name: string | null | undefined): string {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function formatTime(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-  if (diffDays === 1) return '1d';
-  if (diffDays < 7) return `${diffDays}d`;
-  return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-}
-
-export default function ThreadListScreen() {
-  const { t } = useTranslation();
+export default function MessagesPage() {
   const router = useRouter();
-  const [threads, setThreads] = useState<Thread[]>([]);
+  const [threads, setThreads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
-  const fetchThreads = useCallback(async () => {
-    setError(null);
-    const res = await api.get<Thread[]>('/threads');
-    if (res.ok && res.data) {
-      setThreads(res.data);
-    } else {
-      setError(res.error || 'Failed to load');
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const r = await apiFetch('/chat/threads');
+      setThreads(Array.isArray(r) ? r : []);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    setLoading(true);
-    fetchThreads().finally(() => setLoading(false));
-  }, [fetchThreads]);
+  useEffect(() => { load(); }, [load]);
 
-  const handleThreadPress = (threadId: string) => {
-    router.push(`/dashboard/messages/${threadId}`);
-  };
-
-  const renderThread = ({ item }: { item: Thread }) => (
-    <TouchableOpacity
-      className="flex-row items-center px-4 py-3 border-b border-border"
-      onPress={() => handleThreadPress(item.id)}
-      activeOpacity={0.7}
-    >
-      {/* Avatar */}
-      <View className="w-12 h-12 rounded-full bg-primary/20 items-center justify-center mr-3">
-        <Text className="text-primary font-bold text-base">
-          {getInitials(item.otherUser?.name)}
-        </Text>
-      </View>
-
-      {/* Content */}
-      <View className="flex-1 min-w-0">
-        <View className="flex-row items-center justify-between mb-1">
-          <Text className="text-text-primary font-semibold text-base flex-1 mr-2" numberOfLines={1}>
-            {item.otherUser?.name || item.listing?.title || '\u2014'}
-          </Text>
-          {item.lastMessage && (
-            <Text className="text-text-muted text-xs">
-              {formatTime(item.lastMessage.createdAt)}
-            </Text>
-          )}
-        </View>
-        {item.listing && (
-          <Text className="text-text-secondary text-sm" numberOfLines={1}>
-            {item.listing.title}
-          </Text>
-        )}
-        {item.lastMessage && (
-          <Text className="text-text-muted text-xs mt-0.5" numberOfLines={1}>
-            {item.lastMessage.text}
-          </Text>
-        )}
-      </View>
-    </TouchableOpacity>
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ChatSkeleton /></SafeAreaView>;
+  if (error) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><ErrorState message="Не удалось загрузить чаты" onRetry={load} /></SafeAreaView>;
+  if (threads.length === 0) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+    <EmptyState
+      icon="chatbubbles-outline"
+      title="Нет сообщений"
+      subtitle="Напишите продавцу о понравившемся объявлении"
+      ctaLabel="Перейти к объявлениям"
+      onCta={() => router.push('/' as any)}
+    />
+    </SafeAreaView>
   );
-
-  return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-bg-section border-b border-border px-4 py-3">
-        <Text className="text-text-primary text-lg font-bold">{t('messages')}</Text>
-      </View>
-
-      {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.brandPrimary} />
-          <Text className="text-text-muted mt-2 text-sm">{t('loading')}</Text>
-        </View>
-      ) : error ? (
-        <View className="flex-1 items-center justify-center px-4">
-          <Text className="text-error text-base mb-3">{error}</Text>
-          <TouchableOpacity
-            className="bg-primary px-4 py-2 rounded-lg"
-            onPress={() => {
-              setLoading(true);
-              fetchThreads().finally(() => setLoading(false));
-            }}
-          >
-            <Text className="text-white font-semibold">{t('retry')}</Text>
-          </TouchableOpacity>
-        </View>
-      ) : threads.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-4">
-          <Text className="text-text-muted text-4xl mb-3">{'\u2709'}</Text>
-          <Text className="text-text-primary text-base font-semibold">{t('noMessages')}</Text>
-          <Text className="text-text-muted text-sm mt-1">{t('noMessagesHint')}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={threads}
-          keyExtractor={(item) => item.id}
-          renderItem={renderThread}
-        />
-      )}
-    </View>
-  );
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><MessagesList showHeader={false} showBottomNav={false} threads={threads} /></SafeAreaView>;
 }

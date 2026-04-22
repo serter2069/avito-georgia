@@ -11,8 +11,7 @@
 ## URLs
 - Staging: https://avito-georgia.smartlaunchhub.com
 - API: https://avito-georgia.smartlaunchhub.com/api
-- Local frontend: http://localhost:8081
-- Local API: http://localhost:3813
+- Local ports → see `~/.claude/guides/projects.md`
 
 ## Local Development
 
@@ -38,4 +37,4 @@ cd api && npm run dev
 ```
 
 ## Database
-No local DB. Remote PostgreSQL on 91.98.205.156.
+No local DB. Remote PostgreSQL on 95.217.84.161.

@@ -1,66 +1,45 @@
-import { View, TextInput, Text, Platform } from 'react-native';
-import { useState } from 'react';
-import { colors } from '../../lib/colors';
+import React from 'react';
+import { View, Text, TextInput, KeyboardTypeOptions } from 'react-native';
+import { colors, spacing } from '../../lib/theme';
 
 interface InputProps {
+  label?: string;
+  placeholder?: string;
   value: string;
   onChangeText: (text: string) => void;
-  placeholder?: string;
-  label?: string;
   error?: string;
   secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   multiline?: boolean;
-  numberOfLines?: number;
-  editable?: boolean;
+  keyboardType?: KeyboardTypeOptions;
 }
 
-export function Input({
-  value,
-  onChangeText,
-  placeholder,
-  label,
-  error,
-  secureTextEntry,
-  keyboardType = 'default',
-  autoCapitalize = 'none',
-  multiline = false,
-  numberOfLines = 1,
-  editable = true,
-}: InputProps) {
-  const [focused, setFocused] = useState(false);
-
-  const borderClass = error
-    ? 'border-error'
-    : focused
-      ? 'border-border-focus'
-      : 'border-border';
-
+export function Input({ label, placeholder, value, onChangeText, error, secureTextEntry, multiline, keyboardType }: InputProps) {
   return (
-    <View className="w-full">
-      {label && (
-        <Text className="text-text-secondary text-sm mb-1 font-medium">{label}</Text>
-      )}
+    <View style={{ gap: spacing.xs }}>
+      {label && <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{label}</Text>}
       <TextInput
-        className={`bg-surface border ${borderClass} rounded-lg px-4 py-3 text-text-primary text-base ${!editable ? 'opacity-50' : ''}`}
-        style={focused && Platform.OS === 'web' ? { boxShadow: '0 0 0 3px rgba(10,123,138,0.12)' } : undefined}
+        placeholder={placeholder}
+        placeholderTextColor={colors.textSecondary}
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textMuted}
         secureTextEntry={secureTextEntry}
-        keyboardType={keyboardType}
-        autoCapitalize={autoCapitalize}
         multiline={multiline}
-        numberOfLines={numberOfLines}
-        editable={editable}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        keyboardType={keyboardType}
+        style={{
+          fontSize: 16,
+          color: colors.text,
+          borderWidth: 1,
+          borderColor: error ? colors.error : '#C8E0E8',
+          borderRadius: 10,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          backgroundColor: colors.background,
+          minHeight: multiline ? 100 : 48,
+          textAlignVertical: multiline ? 'top' : 'center',
+          outlineWidth: 0,
+        }}
       />
-      {error && (
-        <Text className="text-error text-xs mt-1">{error}</Text>
-      )}
+      {error && <Text style={{ fontSize: 12, color: colors.error }}>{error}</Text>}
     </View>
   );
 }

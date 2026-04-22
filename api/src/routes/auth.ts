@@ -70,6 +70,16 @@ router.post('/request-otp', async (req: Request, res: Response) => {
     return;
   }
 
+  // GDPR: block OTP for soft-deleted accounts (check before upsert to avoid re-creating user)
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, deletedAt: true },
+  });
+  if (existingUser && existingUser.deletedAt !== null) {
+    res.status(401).json({ error: 'Account deleted' });
+    return;
+  }
+
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -90,13 +100,28 @@ router.post('/request-otp', async (req: Request, res: Response) => {
     data: { email, code: otp, expiresAt, userId: user.id },
   });
 
-  await sendOtpEmail(email, otp, getLocale(req));
+  if (process.env.DEV_AUTH !== 'true') {
+    await sendOtpEmail(email, otp, getLocale(req));
+  }
   res.json({ ok: true });
 });
 
+// Verify Cloudflare Turnstile token
+async function verifyTurnstile(token: string): Promise<boolean> {
+  const formData = new FormData();
+  formData.append('secret', process.env.TURNSTILE_SECRET_KEY!);
+  formData.append('response', token);
+  const cfRes = await fetch('https://challenges.cloudflare.com/turnstile/v1/siteverify', {
+    method: 'POST',
+    body: formData,
+  });
+  const cfData = await cfRes.json() as { success: boolean };
+  return cfData.success === true;
+}
+
 // POST /api/auth/verify-otp
 router.post('/verify-otp', async (req: Request, res: Response) => {
-  const { email, code } = req.body;
+  const { email, code, captchaToken } = req.body;
   if (!email || !code) {
     res.status(400).json({ error: 'Email and code required' });
     return;
@@ -113,10 +138,19 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     return;
   }
 
-  // Brute-force protection: block after MAX_OTP_ATTEMPTS wrong codes
+  // Brute-force protection: after MAX_OTP_ATTEMPTS wrong codes require CAPTCHA
   if (otpRecord.attempts >= MAX_OTP_ATTEMPTS) {
-    res.status(429).json({ error: 'Too many attempts. Request a new OTP.' });
-    return;
+    // If CAPTCHA not provided, ask frontend to show it
+    if (!captchaToken) {
+      res.status(400).json({ error: 'CAPTCHA required', captchaRequired: true });
+      return;
+    }
+    // Verify CAPTCHA token
+    const captchaOk = await verifyTurnstile(captchaToken);
+    if (!captchaOk) {
+      res.status(400).json({ error: 'CAPTCHA verification failed', captchaRequired: true });
+      return;
+    }
   }
 
   // Wrong code: increment attempts counter
@@ -125,8 +159,11 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
       where: { id: otpRecord.id },
       data: { attempts: { increment: 1 } },
     });
-    const attemptsLeft = MAX_OTP_ATTEMPTS - (otpRecord.attempts + 1);
-    res.status(400).json({ error: 'Invalid code', attemptsLeft });
+    const newAttempts = otpRecord.attempts + 1;
+    const attemptsLeft = Math.max(0, MAX_OTP_ATTEMPTS - newAttempts);
+    // After this wrong attempt hits MAX_OTP_ATTEMPTS, tell frontend CAPTCHA is needed next time
+    const captchaRequired = newAttempts >= MAX_OTP_ATTEMPTS;
+    res.status(400).json({ error: 'Invalid code', attemptsLeft, captchaRequired });
     return;
   }
 
@@ -142,6 +179,18 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
     return;
   }
 
+  // GDPR: soft-deleted accounts cannot obtain new tokens
+  if (user.deletedAt !== null) {
+    res.status(401).json({ error: 'Account deleted' });
+    return;
+  }
+
+  // Security: blocked accounts cannot obtain new tokens
+  if (user.role === 'blocked') {
+    res.status(403).json({ error: 'Account suspended' });
+    return;
+  }
+
   const tokens = signTokens(user.id, user.email, user.role);
 
   // Persist session in DB for sliding window refresh and server-side revocation
@@ -154,7 +203,7 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
   setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
 
   // Also return tokens in body — native clients (iOS/Android) read from here
-  res.json({ ...tokens, user: { id: user.id, email: user.email, role: user.role } });
+  res.json({ ...tokens, user: { id: user.id, email: user.email, role: user.role, isOnboarded: user.isOnboarded } });
 });
 
 // POST /api/auth/refresh
@@ -186,10 +235,18 @@ router.post('/refresh', async (req: Request, res: Response) => {
       return;
     }
 
-    // Verify user still exists
+    // Verify user still exists and hasn't been soft-deleted
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
     if (!user) {
       res.status(401).json({ error: 'User not found' });
+      return;
+    }
+    if (user.deletedAt !== null) {
+      res.status(401).json({ error: 'Account deleted' });
+      return;
+    }
+    if (user.role === 'blocked') {
+      res.status(403).json({ error: 'Account suspended' });
       return;
     }
 
@@ -235,7 +292,7 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.userId },
-      select: { id: true, email: true, name: true, phone: true, avatarUrl: true, role: true, locale: true, createdAt: true },
+      select: { id: true, email: true, name: true, phone: true, city: true, avatarUrl: true, role: true, locale: true, isOnboarded: true, createdAt: true },
     });
     if (!user) {
       res.status(404).json({ error: 'User not found' });

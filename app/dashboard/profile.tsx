@@ -1,108 +1,88 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '../../stores/authStore';
-import { api } from '../../lib/api';
-import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
+import { useEffect, useState } from 'react';
+import { View, Text, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuthStore } from '../../store/auth';
+import { apiFetch } from '../../lib/api';
+import Profile from '../../components/screens/Profile';
 
-export default function ProfileScreen() {
-  const { t } = useTranslation();
-  const user = useAuthStore((s) => s.user);
+function QuickLinks({ isAdmin }: { isAdmin: boolean }) {
+  const router = useRouter();
+  const links: { label: string; icon: keyof typeof Ionicons.glyphMap; route: string; adminOnly?: boolean }[] = [
+    { label: 'Избранное', icon: 'heart-outline', route: '/dashboard/favorites' },
+    { label: 'Настройки', icon: 'settings-outline', route: '/dashboard/settings' },
+    { label: 'История оплат', icon: 'receipt-outline', route: '/dashboard/payment-history' },
+    { label: 'Карта', icon: 'map-outline', route: '/map' },
+    { label: 'Админ-панель', icon: 'shield-outline', route: '/admin', adminOnly: true },
+  ];
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  return (
+    <View style={{ paddingHorizontal: 12, gap: 6 }}>
+      {links
+        .filter(l => !l.adminOnly || isAdmin)
+        .map(l => (
+          <Pressable
+            key={l.route}
+            onPress={() => router.push(l.route as any)}
+            accessibilityLabel={l.label}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 12,
+              paddingVertical: 14,
+              paddingHorizontal: 16,
+              borderWidth: 1,
+              borderColor: '#E8E8E8',
+            }}
+          >
+            <Ionicons name={l.icon} size={20} color="#00AA6C" />
+            <Text style={{ flex: 1, fontSize: 15, color: '#1A1A1A' }}>{l.label}</Text>
+            <Text style={{ fontSize: 18, color: '#9E9E9E' }}>{'\u203A'}</Text>
+          </Pressable>
+        ))}
+    </View>
+  );
+}
+
+export default function ProfilePage() {
+  const { user, fetchMe } = useAuthStore();
+  const { width } = useWindowDimensions();
+  const contentWidth = Math.min(width, width >= 1024 ? 960 : width);
+  const [listings, setListings] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    // User fields from authStore only have id, email, role
-    // Name and phone are on the DB user but not returned by verify-otp
-    // Try to load full profile if /auth/me endpoint exists
-    const loadProfile = async () => {
-      const res = await api.get<{ user: { id: string; email: string; name: string | null; phone: string | null } }>('/auth/me');
-      if (res.ok && res.data) {
-        setName(res.data.user.name || '');
-        setPhone(res.data.user.phone || '');
-      }
-    };
-    loadProfile();
+    fetchMe();
   }, []);
 
-  const handleSave = async () => {
-    setSaving(true);
-    setSaved(false);
-    const res = await api.patch('/users/me', { name: name.trim() || null, phone: phone.trim() || null });
-    if (res.ok) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    }
-    setSaving(false);
-  };
+  useEffect(() => {
+    if (!user) return;
+    apiFetch('/listings/my').then((r) => setListings(r.listings ?? [])).catch(() => {});
+    // No reviews endpoint yet — will show empty state
+    setReviews([]);
+  }, [user?.id]);
 
-  const getInitials = () => {
-    if (name) {
-      return name
-        .split(' ')
-        .map((w) => w[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-    }
-    if (user?.email) return user.email[0].toUpperCase();
-    return '?';
+  const handleSave = async (data: { name: string; phone?: string; city?: string }) => {
+    await apiFetch('/users/me', { method: 'PATCH', body: JSON.stringify(data) });
+    await fetchMe();
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-bg-section border-b border-border px-4 py-3">
-        <Text className="text-text-primary text-lg font-bold">{t('profile')}</Text>
-      </View>
-
-      <ScrollView className="flex-1" contentContainerClassName="p-4 gap-5">
-        {/* Avatar */}
-        <View className="items-center py-4">
-          <View className="w-20 h-20 rounded-full bg-primary/20 items-center justify-center mb-3">
-            <Text className="text-primary text-2xl font-bold">{getInitials()}</Text>
-          </View>
-          <Text className="text-text-secondary text-sm">{user?.email}</Text>
-        </View>
-
-        {/* Name */}
-        <Input
-          label={t('nickname')}
-          value={name}
-          onChangeText={setName}
-          placeholder={t('nickname')}
-          autoCapitalize="words"
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
+        <Profile
+          showBottomNav={false}
+          realUser={user}
+          listings={listings}
+          reviews={reviews}
+          onSave={handleSave}
         />
-
-        {/* Phone */}
-        <Input
-          label={t('phone')}
-          value={phone}
-          onChangeText={setPhone}
-          placeholder="+995..."
-          keyboardType="phone-pad"
-        />
-
-        {/* Email (read-only) */}
-        <Input
-          label={t('email')}
-          value={user?.email || ''}
-          onChangeText={() => {}}
-          editable={false}
-        />
-
-        {/* Save button */}
-        <Button
-          title={saved ? t('done') : t('save')}
-          onPress={handleSave}
-          loading={saving}
-          variant={saved ? 'secondary' : 'primary'}
-        />
+        <QuickLinks isAdmin={user?.role === 'admin'} />
+        <View style={{ height: 24 }} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

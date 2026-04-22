@@ -1,30 +1,29 @@
+import React from 'react';
 import { View, Text } from 'react-native';
+import { colors, spacing } from '../../lib/theme';
 
 interface BadgeProps {
+  variant: 'error' | 'success' | 'warning' | 'info';
   label: string;
-  variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
+  size?: 'sm' | 'md';
 }
 
-const variantClasses = {
-  default: 'bg-primary/20',
-  success: 'bg-success/20',
-  warning: 'bg-warning/20',
-  error: 'bg-error/20',
-  info: 'bg-info/20',
-};
+const bgMap = { error: colors.error, success: colors.success, warning: colors.warning, info: colors.primary };
+const textMap = { error: '#FFFFFF', success: '#FFFFFF', warning: '#FFFFFF', info: '#FFFFFF' };
 
-const textClasses = {
-  default: 'text-primary',
-  success: 'text-success',
-  warning: 'text-warning',
-  error: 'text-error',
-  info: 'text-info',
-};
-
-export function Badge({ label, variant = 'default' }: BadgeProps) {
+export function Badge({ variant, label, size = 'sm' }: BadgeProps) {
   return (
-    <View className={`${variantClasses[variant]} px-2 py-1 rounded-full self-start`}>
-      <Text className={`${textClasses[variant]} text-xs font-medium`}>{label}</Text>
+    <View
+      className="rounded-full"
+      style={{
+        backgroundColor: bgMap[variant],
+        paddingHorizontal: size === 'sm' ? spacing.sm : spacing.md,
+        paddingVertical: size === 'sm' ? 2 : spacing.xs,
+      }}
+    >
+      <Text style={{ color: textMap[variant], fontSize: size === 'sm' ? 11 : 13, fontWeight: '600' }}>
+        {label}
+      </Text>
     </View>
   );
 }

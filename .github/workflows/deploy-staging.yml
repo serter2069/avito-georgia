@@ -3,10 +3,21 @@ name: Deploy Staging
 on:
   push:
     branches: [development]
+  pull_request:
+    branches: [development]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEPLOY_DIR: /var/www/avito-georgia
+  STAGING_URL: https://avito-georgia.smartlaunchhub.com
+  DOPPLER_TOKEN_FILE: /etc/doppler/avito-georgia-stg.token
 
 jobs:
-  deploy-frontend:
-    runs-on: self-hosted
+  validate:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -14,62 +25,170 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build web
-        run: npx expo export --platform web --output-dir dist
+      - name: Install API dependencies
+        run: cd api && npm ci
+
+      - name: TypeScript check (API)
+        run: cd api && npx tsc --noEmit
+
+      - name: Test Expo export
+        run: npx expo export --platform web --output-dir dist-test
+
+      - name: Verify build output
+        run: |
+          test -f dist-test/index.html || (echo "ERROR: index.html missing" && exit 1)
+          echo "Build output OK"
+
+  deploy:
+    runs-on: [self-hosted, Linux]
+    needs: [validate]
+    if: github.event_name == 'push'
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    steps:
+      - name: Save current commit for rollback
+        run: |
+          cd ${{ env.DEPLOY_DIR }}
+          echo "ROLLBACK_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Git pull latest code
+        run: |
+          cd ${{ env.DEPLOY_DIR }}
+          git fetch origin development
+          git reset --hard origin/development
+
+      - name: Install frontend dependencies
+        run: |
+          cd ${{ env.DEPLOY_DIR }}
+          npm ci
+
+      - name: Build frontend (Expo web)
+        run: |
+          cd ${{ env.DEPLOY_DIR }}
+          export DOPPLER_TOKEN=$(cat ${{ env.DOPPLER_TOKEN_FILE }})
+          doppler run -- npx expo export --platform web
+          # Ensure nginx root (dist/) is always up to date
+          # expo export outputs to dist/ — nginx serves from dist/
+
+      - name: Install API dependencies
+        run: |
+          cd ${{ env.DEPLOY_DIR }}/api
+          npm ci
+
+      - name: Build API
+        run: |
+          cd ${{ env.DEPLOY_DIR }}/api
+          export DOPPLER_TOKEN=$(cat ${{ env.DOPPLER_TOKEN_FILE }})
+          doppler run -- npx prisma generate
+          npx tsc
+
+      - name: Run database migrations
+        run: |
+          cd ${{ env.DEPLOY_DIR }}/api
+          export DOPPLER_TOKEN=$(cat ${{ env.DOPPLER_TOKEN_FILE }})
+          doppler run -- npx prisma migrate deploy || echo "WARNING: migrate deploy failed, trying db push"
+          doppler run -- npx prisma db push --accept-data-loss 2>/dev/null || true
 
       - name: Generate version.json
         run: |
+          cd ${{ env.DEPLOY_DIR }}
           cat > dist/version.json << EOF
           {
             "version": "$(git rev-parse --short HEAD)",
             "commit": "$(git rev-parse HEAD)",
-            "branch": "${{ github.ref_name }}",
+            "branch": "development",
             "deployed": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "message": "$(git log -1 --pretty=%s | head -c 100)"
           }
           EOF
 
-      - name: Deploy frontend
+      - name: Fix permissions
         run: |
-          rsync -av --delete dist/ /var/www/avito-georgia/web/
-          sudo chown -R github-runner:www-data /var/www/avito-georgia/web/
-          sudo chmod -R g+rw /var/www/avito-georgia/web/
+          chown -R deployer:www-data ${{ env.DEPLOY_DIR }}
+          chmod -R u+rwX,g+rX,o-rwx ${{ env.DEPLOY_DIR }}
 
-  deploy-api:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Doppler CLI
+      - name: Restart API
         run: |
-          if ! command -v doppler &> /dev/null; then
-            curl -sLf --retry 3 --tlsv1.2 --proto "=https" \
-              'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | \
-              sudo apt-key add - 2>/dev/null || true
-            echo "deb https://packages.doppler.com/public/cli/deb/debian any-version main" | \
-              sudo tee /etc/apt/sources.list.d/doppler-cli.list
-            sudo apt-get update -qq && sudo apt-get install -y doppler
+          pm2 restart avito-georgia-api --update-env || pm2 start ${{ env.DEPLOY_DIR }}/start.sh --name avito-georgia-api
+          pm2 save
+          sleep 3
+
+      - name: Verify deployment
+        run: |
+          # Check version.json matches this commit
+          EXPECTED=$(git -C ${{ env.DEPLOY_DIR }} rev-parse --short HEAD)
+          ACTUAL=$(curl -sf ${{ env.STAGING_URL }}/version.json | python3 -c "import sys,json; print(json.load(sys.stdin)['version'])")
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "ERROR: version mismatch. Expected=$EXPECTED Actual=$ACTUAL"
+            exit 1
           fi
-          doppler --version
-        env:
-          DEBIAN_FRONTEND: noninteractive
+          echo "Frontend OK: version=$ACTUAL"
 
-      - name: Deploy API
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_STG }}
+          # Check API health
+          API_STATUS=$(curl -sf ${{ env.STAGING_URL }}/api/health | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+          if [ "$API_STATUS" != "ok" ]; then
+            echo "ERROR: API health check failed"
+            exit 1
+          fi
+          echo "API OK: status=$API_STATUS"
+
+      - name: Rollback on failure
+        if: failure() && env.ROLLBACK_COMMIT != ''
         run: |
-          sudo chown -R github-runner:www-data /var/www/avito-georgia/api/ || true
-          rsync -av --delete --exclude 'node_modules' --exclude '.env' --exclude '.git' \
-            api/ /var/www/avito-georgia/api/
-          cd /var/www/avito-georgia/api && npm ci && doppler run -- npm run build
-          sudo chmod -R g+rw /var/www/avito-georgia/api/
-          doppler secrets download --no-file --format env > /var/www/avito-georgia/api/.env
-          chmod 600 /var/www/avito-georgia/api/.env
-          sudo pm2 delete avito-georgia-api 2>/dev/null || true
-          sudo pm2 start /var/www/avito-georgia/api/dist/index.js \
-            --name avito-georgia-api \
-            --cwd /var/www/avito-georgia/api
+          echo "ROLLING BACK to ${{ env.ROLLBACK_COMMIT }}"
+          cd ${{ env.DEPLOY_DIR }}
+          git reset --hard ${{ env.ROLLBACK_COMMIT }}
+          npm ci
+          export DOPPLER_TOKEN=$(cat ${{ env.DOPPLER_TOKEN_FILE }})
+          doppler run -- npx expo export --platform web
+          cd api && npm ci
+          doppler run -- npx prisma generate
+          npx tsc
+          cd ..
+          chown -R deployer:www-data ${{ env.DEPLOY_DIR }}
+          chmod -R u+rwX,g+rX,o-rwx ${{ env.DEPLOY_DIR }}
+          pm2 restart avito-georgia-api
+          echo "Rollback complete"
+
+      - name: Sync canvas.json to proto-canvas
+        if: success()
+        env:
+          PROTO_CANVAS_API_KEY: ${{ secrets.PROTO_CANVAS_API_KEY }}
+          PROTO_CANVAS_PROJECT_ID: 1bea57a8-c011-4583-8257-02d41fe8a100
+          PROTO_CANVAS_CANVAS_ID: 6e272bbe-3cb0-4698-8167-f4663202083a
+        run: |
+          cd ${{ env.DEPLOY_DIR }}
+          if [ -f public/proto/canvas.json ]; then
+            node -e "
+            const fs = require('fs');
+            const https = require('https');
+            const pages = JSON.parse(fs.readFileSync('public/proto/canvas.json')).pages;
+            const screens = pages.map((p, i) => ({
+              id: p.id, html: true, name: p.title,
+              size: { width: p.w, height: p.h }, children: [],
+              position: { x: i * (p.w + 120), y: 60 }
+            }));
+            const schemaJson = {
+              meta: { name: 'avito-georgia', stagingDomain: '${{ env.STAGING_URL }}'.replace('https://','') },
+              tokens: {}, screens
+            };
+            const body = JSON.stringify({ schemaJson });
+            const req = https.request({
+              hostname: 'proto.smartlaunchhub.com',
+              path: '/api/projects/' + process.env.PROTO_CANVAS_PROJECT_ID + '/canvases/' + process.env.PROTO_CANVAS_CANVAS_ID,
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.PROTO_CANVAS_API_KEY, 'Content-Length': Buffer.byteLength(body) }
+            }, res => { let d=''; res.on('data', c => d+=c); res.on('end', () => console.log('proto-canvas sync:', res.statusCode, d.slice(0,100))); });
+            req.on('error', e => { console.error('proto-canvas sync failed:', e.message); });
+            req.write(body); req.end();
+            "
+          fi
