@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import BottomNav from '../BottomNav';
 import ProtoImage from '../proto/ProtoPlaceholderImage';
 import Header from '../Header';
+import { ErrorState } from '../ErrorState';
 import { apiFetch } from '../../lib/api';
 import { colors } from '../../lib/theme';
 
@@ -112,6 +113,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
   const [cities, setCities] = useState<any[]>([]);
   const [apiCategories, setApiCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listingsError, setListingsError] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -173,6 +175,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
     debounceRef.current = setTimeout(() => {
       setPage(1);
       setLoading(true);
+      setListingsError(false);
       apiFetch(`/listings?${buildParams(1).toString()}`)
         .then(r => {
           const fetched = r.listings ?? [];
@@ -180,7 +183,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
           const total = r.total ?? 0;
           setHasMore(fetched.length < total);
         })
-        .catch(console.error)
+        .catch(() => setListingsError(true))
         .finally(() => setLoading(false));
     }, 400);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
@@ -400,9 +403,34 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
             <View style={{ alignItems: 'center', paddingVertical: 40 }}>
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
+          ) : listingsError ? (
+            <ErrorState
+              message="Не удалось загрузить объявления"
+              onRetry={() => {
+                setListingsError(false);
+                setLoading(true);
+                apiFetch(`/listings?${buildParams(1).toString()}`)
+                  .then(r => {
+                    setListings(r.listings ?? []);
+                    setHasMore((r.listings ?? []).length < (r.total ?? 0));
+                  })
+                  .catch(() => setListingsError(true))
+                  .finally(() => setLoading(false));
+              }}
+            />
           ) : listings.length === 0 ? (
-            <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-              <Text style={{ fontSize: 15, color: colors.textSecondary }}>Ничего не найдено</Text>
+            <View style={{ alignItems: 'center', paddingVertical: 40, gap: 12 }}>
+              <Ionicons name="search-outline" size={48} color="#D0D0D0" />
+              <Text style={{ fontSize: 15, color: colors.textSecondary }}>Нет объявлений по вашим фильтрам</Text>
+              {(categoryId || cityId || query || priceFrom || priceTo) && (
+                <Pressable
+                  onPress={() => { setCategoryId(''); setCityId(''); setQuery(''); setPriceFrom(''); setPriceTo(''); }}
+                  accessibilityLabel="Сбросить фильтры"
+                  style={{ backgroundColor: colors.primary, borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12 }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Сбросить фильтры</Text>
+                </Pressable>
+              )}
             </View>
           ) : (
             <View>

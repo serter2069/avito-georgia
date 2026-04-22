@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import SellerProfile from '../../../components/screens/SellerProfile';
+import { ErrorState } from '../../../components/ErrorState';
 import { SkeletonBox } from '../../../components/SkeletonBox';
 import { apiFetch } from '../../../lib/api';
 
@@ -28,25 +29,49 @@ function SellerSkeleton() {
 
 export default function SellerProfilePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const [seller, setSeller] = useState<any>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<'not_found' | 'other' | null>(null);
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!id) return;
-    Promise.all([
-      apiFetch(`/users/${id}`),
-      apiFetch(`/listings?userId=${id}&status=active&limit=20`),
-    ])
-      .then(([userRes, listingsRes]) => {
-        setSeller(userRes.user);
-        setListings(listingsRes.listings || []);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    setLoading(true);
+    setError(null);
+    try {
+      const [userRes, listingsRes] = await Promise.all([
+        apiFetch(`/users/${id}`),
+        apiFetch(`/listings?userId=${id}&status=active&limit=20`),
+      ]);
+      setSeller(userRes.user);
+      setListings(listingsRes.listings || []);
+    } catch (err: unknown) {
+      if ((err as { statusCode?: number })?.statusCode === 404 || (err as { status?: number })?.status === 404) {
+        setError('not_found');
+      } else {
+        setError('other');
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
+  useEffect(() => { load(); }, [load]);
+
   if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><SellerSkeleton /></SafeAreaView>;
+
+  if (error === 'not_found') return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <ErrorState message="Пользователь не найден" onRetry={() => router.back()} />
+    </SafeAreaView>
+  );
+
+  if (error === 'other') return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <ErrorState message="Не удалось загрузить профиль" onRetry={load} />
+    </SafeAreaView>
+  );
 
   return <SafeAreaView edges={['top']} style={{ flex: 1 }}><SellerProfile seller={seller} listings={listings} /></SafeAreaView>;
 }
