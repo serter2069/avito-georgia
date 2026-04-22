@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -67,6 +67,8 @@ const stateComponents: Record<string, React.ComponentType> = {
 
 export default function ProtoStatesPage() {
   const { page } = useLocalSearchParams<{ page: string }>();
+  const { width } = useWindowDimensions();
+  const maxWidth = width >= 1024 ? 960 : width >= 640 ? 700 : 430;
   const Component = stateComponents[page];
 
   if (!Component) {
@@ -81,7 +83,7 @@ export default function ProtoStatesPage() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-    <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScrollView contentContainerStyle={{ padding: 16, maxWidth, alignSelf: 'center', width: '100%' }}>
       <Component />
     </ScrollView>
     </SafeAreaView>
