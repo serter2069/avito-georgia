@@ -33,12 +33,12 @@ module.exports = {
         'text-muted': '#6A8898',
         'text-subtle': '#64748B',
         'text-disabled': '#94A3B8',
-        'text-accent': '#0A7B8A',
+        'text-accent': '#00AA6C',
         // Borders
         border: '#C8E0E8',
         'border-light': '#E2E8F0',
         'border-soft': '#CBD5E1',
-        'border-focus': '#0A7B8A',
+        'border-focus': '#00AA6C',
         'border-error': '#C0392B',
         'border-divider': '#F1F5F9',
         // Status

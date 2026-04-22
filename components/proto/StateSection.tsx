@@ -35,7 +35,7 @@ export function StateSection({ title, children }: StateSectionProps) {
         paddingVertical: 6,
       }}>
         <Text style={{
-          color: '#0A7B8A',
+          color: '#00AA6C',
           fontSize: 12,
           fontWeight: '600',
         }}>
