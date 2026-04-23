@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
-import { colors } from '../lib/theme';
+import { colors, fontSize } from '../lib/theme';
 
 type TabId = 'home' | 'browse' | 'post' | 'messages' | 'profile';
 
@@ -55,12 +55,14 @@ export default function BottomNav({ active }: BottomNavProps) {
               key={tab.id}
               onPress={() => router.push(tab.route as any)}
               accessibilityLabel={`Вкладка ${tab.label}`}
-              style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+              accessibilityRole="button"
+              role="button"
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 44 }}
             >
               <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: -10 }}>
                 <Ionicons name="add" size={26} color="#FFFFFF" />
               </View>
-              <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>{tab.label}</Text>
+              <Text style={{ fontSize: fontSize.xs, color: colors.textSecondary, marginTop: 2 }}>{tab.label}</Text>
             </Pressable>
           );
         }
@@ -70,14 +72,16 @@ export default function BottomNav({ active }: BottomNavProps) {
             key={tab.id}
             onPress={() => router.push(tab.route as any)}
             accessibilityLabel={`Вкладка ${tab.label}`}
-            style={{ flex: 1, alignItems: 'center', gap: 3, paddingTop: 2 }}
+            accessibilityRole="button"
+            role="button"
+            style={{ flex: 1, alignItems: 'center', gap: 3, paddingTop: 2, minHeight: 44, justifyContent: 'center' }}
           >
             <Ionicons
               name={isActive ? tab.iconActive : tab.icon}
               size={22}
               color={isActive ? colors.primary : colors.textSecondary}
             />
-            <Text style={{ fontSize: 10, color: isActive ? colors.primary : colors.textSecondary, fontWeight: isActive ? '600' : '400' }}>
+            <Text style={{ fontSize: fontSize.xs, color: isActive ? colors.primaryDark : colors.textSecondary, fontWeight: isActive ? '600' : '400' }}>
               {tab.label}
             </Text>
             {isActive && <View style={{ position: 'absolute', bottom: -6, width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary }} />}
