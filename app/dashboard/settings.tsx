@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, ActivityIndicator, Alert } from 'react-native';
+import { View, ActivityIndicator, Alert, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import Settings from '../../components/screens/Settings';
@@ -10,6 +10,8 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const { logout, user, fetchMe } = useAuthStore();
+  const { width } = useWindowDimensions();
+  const maxWidth = width >= 1024 ? 960 : width >= 640 ? 720 : undefined;
 
   useEffect(() => {
     apiFetch('/users/me/notification-prefs')
@@ -62,19 +64,28 @@ export default function SettingsPage() {
     );
   };
 
-  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: true, title: 'Настройки' }} /><View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View></SafeAreaView>;
+  if (loading) return (
+    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    </SafeAreaView>
+  );
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-    <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
-    <Settings
-      showBottomNav={false}
-      prefs={prefs}
-      onToggle={handleToggle}
-      onLogout={logout}
-      onDeleteAccount={handleDeleteAccount}
-      onChangeLang={handleChangeLang}
-      currentLang={(user as any)?.locale || 'ru'}
-    />
+      <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
+      <View style={{ flex: 1, maxWidth, alignSelf: maxWidth ? 'center' : undefined, width: '100%' }}>
+        <Settings
+          showBottomNav={false}
+          prefs={prefs}
+          onToggle={handleToggle}
+          onLogout={logout}
+          onDeleteAccount={handleDeleteAccount}
+          onChangeLang={handleChangeLang}
+          currentLang={(user as any)?.locale || 'ru'}
+        />
+      </View>
     </SafeAreaView>
   );
 }
