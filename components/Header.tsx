@@ -181,7 +181,7 @@ export default function Header({
                   backgroundColor: 'transparent',
                   outlineWidth: 0,
                   paddingVertical: 4,
-                  minHeight: 28,
+                  minHeight: 44,
                 } as any
               }
               placeholder="Что ищете?"
