@@ -7,12 +7,13 @@ import { ErrorState } from '../../../components/ErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { SkeletonBox } from '../../../components/SkeletonBox';
 import { apiFetch } from '../../../lib/api';
+import { colors } from '../../../lib/theme';
 
 function ChatSkeleton() {
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {[0, 1, 2, 3].map(i => (
-        <View key={i} style={{ flexDirection: 'row', gap: 12, padding: 16, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' }}>
+        <View key={i} style={{ flexDirection: 'row', gap: 12, padding: 16, borderBottomWidth: 1, borderBottomColor: colors.borderLight }}>
           <SkeletonBox width={48} height={48} borderRadius={24} />
           <View style={{ flex: 1, gap: 8, justifyContent: 'center' }}>
             <SkeletonBox width="60%" height={14} />

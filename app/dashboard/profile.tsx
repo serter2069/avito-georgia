@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/auth';
 import { apiFetch } from '../../lib/api';
 import Profile from '../../components/screens/Profile';
+import { colors } from '../../lib/theme';
 
 function QuickLinks({ isAdmin }: { isAdmin: boolean }) {
   const router = useRouter();
@@ -14,7 +15,7 @@ function QuickLinks({ isAdmin }: { isAdmin: boolean }) {
     { label: 'Настройки', icon: 'settings-outline', route: '/dashboard/settings' },
     { label: 'История оплат', icon: 'receipt-outline', route: '/dashboard/payment-history' },
     { label: 'Карта', icon: 'map-outline', route: '/map' },
-    { label: 'Админ-панель', icon: 'shield-outline', route: '/admin', adminOnly: true },
+    { label: 'Админ-панель', icon: 'shield-checkmark-outline', route: '/admin', adminOnly: true },
   ];
 
   return (
@@ -30,17 +31,17 @@ function QuickLinks({ isAdmin }: { isAdmin: boolean }) {
               flexDirection: 'row',
               alignItems: 'center',
               gap: 12,
-              backgroundColor: '#FFFFFF',
+              backgroundColor: colors.background,
               borderRadius: 12,
               paddingVertical: 14,
               paddingHorizontal: 16,
               borderWidth: 1,
-              borderColor: '#E8E8E8',
+              borderColor: colors.border,
             }}
           >
-            <Ionicons name={l.icon} size={20} color="#00AA6C" />
-            <Text style={{ flex: 1, fontSize: 15, color: '#1A1A1A' }}>{l.label}</Text>
-            <Text style={{ fontSize: 18, color: '#9E9E9E' }}>{'\u203A'}</Text>
+            <Ionicons name={l.icon} size={20} color={colors.primary} />
+            <Text style={{ flex: 1, fontSize: 15, color: colors.text }}>{l.label}</Text>
+            <Text style={{ fontSize: 18, color: colors.textSecondary }}>{'›'}</Text>
           </Pressable>
         ))}
     </View>
