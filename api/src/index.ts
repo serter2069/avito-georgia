@@ -51,14 +51,14 @@ app.use(cookieParser());
 // Trust proxy headers when behind nginx/reverse proxy (required for correct IP-based rate limiting)
 app.set('trust proxy', 1);
 
-// Rate limiting — OTP endpoints (applied before body parser to protect against abuse)
-app.use('/api/auth/request-otp', otpRateLimit);
-app.use('/api/auth/verify-otp', otpVerifyRateLimit);
-
 // Stripe webhook needs raw body — MUST be before express.json()
 app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhookRouter);
 
 app.use(express.json({ limit: '10mb' }));
+
+// Rate limiting — OTP endpoints (applied after body parser so keyGenerator can read req.body.email)
+app.use('/api/auth/request-otp', otpRateLimit);
+app.use('/api/auth/verify-otp', otpVerifyRateLimit);
 
 app.use('/api/auth', authRouter);
 app.use('/api/listings', listingsRouter);

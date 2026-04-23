@@ -58,7 +58,7 @@ export default function AdminUsers() {
             onChangeText={setSearch}
             placeholder="Поиск по email или имени..."
             placeholderTextColor={colors.textSecondary}
-            style={{ fontSize: 14, color: colors.text } as any}
+            style={{ fontSize: 14, color: colors.text, outlineWidth: 0 } as any}
           />
         </View>
       </View>

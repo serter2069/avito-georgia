@@ -321,15 +321,17 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
 // ─── Desktop ──────────────────────────────────────────────────────────────────
 export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
   const [activeId, setActiveId] = useState<string|null>(null);
+  const { height: winHeight } = useWindowDimensions();
 
   const PINS = apiPins && apiPins.length > 0 ? apiPinsToML(apiPins) : FALLBACK_PINS;
   const clusters      = buildClusters(PINS);
   const activeCluster = activeId ? clusters.find(c => c.clusterId === activeId) : null;
   const toggle        = (id: string) => setActiveId(prev => prev === id ? null : id);
+  const mapHeight     = Math.max(400, Math.min(700, Math.round(winHeight * 0.65)));
 
   return (
     <View className="flex-row bg-white rounded-xl overflow-hidden border border-[#EFEFEF]"
-      style={{ height:580 }}>
+      style={{ height: mapHeight }}>
 
       <View className="border-r border-[#EFEFEF]" style={{ width:320 }}>
         <View className="px-4 py-3 border-b border-[#EFEFEF]">

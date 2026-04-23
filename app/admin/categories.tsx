@@ -81,7 +81,7 @@ export default function AdminCategories() {
                     value={cat._quota}
                     onChangeText={v => update(cat.id, '_quota', v)}
                     keyboardType="numeric"
-                    style={{ fontSize: 14, color: colors.text } as any}
+                    style={{ fontSize: 14, color: colors.text, outlineWidth: 0 } as any}
                   />
                 </View>
               </View>
@@ -92,7 +92,7 @@ export default function AdminCategories() {
                     value={cat._price}
                     onChangeText={v => update(cat.id, '_price', v)}
                     keyboardType="numeric"
-                    style={{ fontSize: 14, color: colors.text } as any}
+                    style={{ fontSize: 14, color: colors.text, outlineWidth: 0 } as any}
                   />
                 </View>
               </View>
