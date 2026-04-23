@@ -33,7 +33,7 @@ export default function SessionsPage() {
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Header */}
-      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
+      <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
         <Pressable onPress={() => router.back()} accessibilityLabel="Назад">
           <Text style={{ fontSize: 22, color: colors.text }}>←</Text>
         </Pressable>
@@ -49,7 +49,7 @@ export default function SessionsPage() {
           {sessions.length === 0 ? (
             <Text style={{ textAlign: 'center', color: colors.textSecondary, paddingTop: 40 }}>Нет активных сессий</Text>
           ) : sessions.map((s) => (
-            <View key={s.id} style={{ backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8' }}>
+            <View key={s.id} style={{ backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: colors.border }}>
               <Text style={{ fontSize: 13, color: colors.textSecondary }}>
                 Создана: {new Date(s.createdAt).toLocaleDateString('ru-RU')}
               </Text>

@@ -13,6 +13,9 @@ export const colors = {
   error: '#C0392B',
   success: '#00AA6C',
   warning: '#f59e0b',
+  // Borders
+  border: '#C8E0E8',
+  borderLight: '#E2E8F0',
 } as const;
 
 // Tailwind mapping — for className usage

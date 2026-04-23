@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, ActivityIndicator, Alert } from 'react-native';
+import { View, ActivityIndicator, Alert, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import Settings from '../../components/screens/Settings';
@@ -7,6 +7,8 @@ import { apiFetch } from '../../lib/api';
 import { useAuthStore } from '../../store/auth';
 
 export default function SettingsPage() {
+  const { width } = useWindowDimensions();
+  const maxWidth = width >= 640 ? 520 : undefined;
   const [prefs, setPrefs] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const { logout, user, fetchMe } = useAuthStore();
@@ -66,15 +68,17 @@ export default function SettingsPage() {
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1 }}>
     <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
-    <Settings
-      showBottomNav={false}
-      prefs={prefs}
-      onToggle={handleToggle}
-      onLogout={logout}
-      onDeleteAccount={handleDeleteAccount}
-      onChangeLang={handleChangeLang}
-      currentLang={(user as any)?.locale || 'ru'}
-    />
+    <View style={{ flex: 1, maxWidth, width: '100%', alignSelf: 'center' }}>
+      <Settings
+        showBottomNav={false}
+        prefs={prefs}
+        onToggle={handleToggle}
+        onLogout={logout}
+        onDeleteAccount={handleDeleteAccount}
+        onChangeLang={handleChangeLang}
+        currentLang={(user as any)?.locale || 'ru'}
+      />
+    </View>
     </SafeAreaView>
   );
 }
