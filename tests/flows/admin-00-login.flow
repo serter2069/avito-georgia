@@ -1,0 +1,7 @@
+# AUTH: email submit → OTP screen navigation (admin)
+# OTP fill skipped: TextInput opacity:0/width:1 prevents Playwright fill
+goto http://localhost:8082/auth/email
+wait-for input
+fill input serter2069@gmail.com
+click [role="button"]
+wait 2000
