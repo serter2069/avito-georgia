@@ -23,7 +23,7 @@ export const colors = {
 
 // Font sizes — unified scale (7 sizes)
 export const fontSize = {
-  xs: 11,    // labels, nav text (min 11px for readability)
+  xs: 12,    // labels, nav text (min 12px for WCAG tiny-text compliance)
   sm: 12,    // captions, small text
   md: 14,    // body text
   base: 15,  // default UI text
