@@ -23,7 +23,7 @@ jobs:
             api/package-lock.json
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Install API dependencies
         run: cd api && npm ci
