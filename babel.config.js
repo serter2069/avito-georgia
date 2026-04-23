@@ -10,7 +10,7 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: [
-      [babelPresetExpo, { jsxImportSource: "nativewind" }],
+      [babelPresetExpo, { jsxImportSource: "nativewind", worklets: false }],
       "nativewind/babel",
     ],
   };
