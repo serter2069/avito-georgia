@@ -4,6 +4,7 @@
 export const colors = {
   // Brand (6) — Avito-inspired green
   primary: '#00AA6C',
+  primaryDark: '#006B44',  // WCAG AA contrast 6.7:1 on white — for text on light bg
   accent: '#008F5D',
   background: '#FFFFFF',
   surface: '#F5F5F5',
@@ -22,7 +23,7 @@ export const colors = {
 
 // Font sizes — unified scale (7 sizes)
 export const fontSize = {
-  xs: 10,    // labels, nav text
+  xs: 11,    // labels, nav text (min 11px for readability)
   sm: 12,    // captions, small text
   md: 14,    // body text
   base: 15,  // default UI text
