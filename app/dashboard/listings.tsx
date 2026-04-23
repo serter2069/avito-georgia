@@ -7,12 +7,13 @@ import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
 import { SkeletonBox } from '../../components/SkeletonBox';
 import { apiFetch } from '../../lib/api';
+import { colors } from '../../lib/theme';
 
 function ListingSkeleton() {
   return (
-    <View style={{ flex: 1, backgroundColor: '#F7F7F7', padding: 16, gap: 12 }}>
+    <View style={{ flex: 1, backgroundColor: colors.surface, padding: 16, gap: 12 }}>
       {[0, 1, 2].map(i => (
-        <View key={i} style={{ flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 14 }}>
+        <View key={i} style={{ flexDirection: 'row', gap: 12, backgroundColor: colors.background, borderRadius: 12, padding: 14 }}>
           <SkeletonBox width={72} height={72} borderRadius={8} />
           <View style={{ flex: 1, gap: 8, justifyContent: 'center' }}>
             <SkeletonBox width="80%" height={14} />

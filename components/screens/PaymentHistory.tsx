@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, useWindowDimensions } from 'react-native';
 import BottomNav from '../BottomNav';
 import { apiFetch } from '../../lib/api';
+import { colors } from '../../lib/theme';
 
-const C = { green:'#00AA6C', greenBg:'#E8F9F2', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F' };
+const C = { green: colors.primary, greenBg: '#E8F9F2', white: colors.background, text: colors.text, muted: colors.textSecondary, border: colors.border, error: colors.error };
 
 interface ApiPayment {
   id: string;
