@@ -62,7 +62,7 @@ export default function ContactSellerPage() {
         {/* Message input */}
         <View style={{ backgroundColor: colors.background, borderRadius: 10, borderWidth: 1, borderColor: '#E8E8E8', padding: 12, flex: 1, maxHeight: 200 }}>
           <TextInput
-            style={{ flex: 1, fontSize: 15, color: colors.text, textAlignVertical: 'top', minHeight: 120 }}
+            style={{ flex: 1, fontSize: 15, color: colors.text, textAlignVertical: 'top', minHeight: 120, outlineWidth: 0 } as any}
             multiline
             placeholder="Ваше сообщение продавцу..."
             placeholderTextColor={colors.textSecondary}

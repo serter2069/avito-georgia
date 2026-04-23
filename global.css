@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* React Native Web: remove default browser outline from TextInput elements to prevent double border */
+input, textarea {
+  outline: none;
+}

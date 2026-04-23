@@ -242,7 +242,7 @@ export function MessagesDefault({ showHeader = true, showBottomNav = true, threa
 
   if (isDesktop) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, overflow: 'hidden', flexDirection: 'row', height: 520 }}>
+      <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, overflow: 'hidden', flexDirection: 'row', minHeight: 400 }}>
         {listPanel}
         {chatPlaceholder}
       </View>

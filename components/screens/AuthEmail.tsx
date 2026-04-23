@@ -143,6 +143,9 @@ export function AuthEmailDefault({
           <Pressable
             onPress={() => email.length > 0 && !loading && onSubmit?.(email)}
             style={{ opacity: email.length > 0 && !loading ? 1 : 0.5 }}
+            accessibilityRole="button"
+            role="button"
+            accessibilityLabel="Получить код"
           >
             <PrimaryButton label="Получить код" disabled={email.length === 0 || loading} loading={loading} />
           </Pressable>
