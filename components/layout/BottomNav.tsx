@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBreakpoint, isDesktop } from '../../lib/responsive';
+import { colors, fontSize } from '../../lib/theme';
 
 type IoniconsName = keyof typeof Ionicons.glyphMap;
 
@@ -42,9 +43,9 @@ export function BottomNav() {
     <View
       style={{
         flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.background,
         borderTopWidth: 1,
-        borderTopColor: '#C8E0E8',
+        borderTopColor: colors.border,
         paddingBottom: insets.bottom,
       }}
     >
@@ -63,12 +64,12 @@ export function BottomNav() {
             <Ionicons
               name={active ? tab.iconActive : tab.iconDefault}
               size={24}
-              color={active ? '#0A7B8A' : '#6A8898'}
+              color={active ? colors.primary : colors.iconInactive}
             />
             <Text
               style={{
-                fontSize: 10,
-                color: active ? '#0A7B8A' : '#6A8898',
+                fontSize: fontSize.xs,
+                color: active ? colors.primary : colors.iconInactive,
                 marginTop: 2,
               }}
             >
