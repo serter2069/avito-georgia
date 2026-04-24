@@ -71,7 +71,10 @@ export default function RootLayout() {
     el.style.maxWidth = isProto ? '' : rawMaxWidth + 'px';
   }, [isProto, rawMaxWidth]);
 
-  const containerStyle = isProto ? undefined : { maxWidth: rawMaxWidth };
+  const containerStyle = {
+    ...(isProto ? {} : { maxWidth: rawMaxWidth }),
+    ...(Platform.OS === 'web' ? { minHeight: '100vh' as any, overflow: 'visible' as any } : {}),
+  };
 
   return (
     <SafeAreaProvider>
@@ -88,7 +91,7 @@ export default function RootLayout() {
           />
         )}
 
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, ...(Platform.OS === 'web' ? { overflow: 'visible' as any } : {}) }}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="admin/categories" />
             <Stack.Screen name="admin/finance" />

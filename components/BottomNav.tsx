@@ -43,8 +43,9 @@ export default function BottomNav({ active }: BottomNavProps) {
       borderTopWidth: 1,
       borderTopColor: '#E0E0E0',
       backgroundColor: '#FFFFFF',
-      paddingBottom: 8,
+      paddingBottom: 12,
       paddingTop: 6,
+      overflow: 'visible',
     }}>
       {TABS.map((tab) => {
         const isActive = isTabActive(tab.id, pathname, active);
@@ -57,7 +58,7 @@ export default function BottomNav({ active }: BottomNavProps) {
               accessibilityLabel={`Вкладка ${tab.label}`}
               accessibilityRole="button"
               role="button"
-              style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 44 }}
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 44, overflow: 'visible' }}
             >
               <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: -10 }}>
                 <Ionicons name="add" size={26} color="#FFFFFF" />
@@ -74,7 +75,7 @@ export default function BottomNav({ active }: BottomNavProps) {
             accessibilityLabel={`Вкладка ${tab.label}`}
             accessibilityRole="button"
             role="button"
-            style={{ flex: 1, alignItems: 'center', gap: 3, paddingTop: 2, minHeight: 44, justifyContent: 'center' }}
+            style={{ flex: 1, alignItems: 'center', gap: 3, paddingTop: 2, minHeight: 44, justifyContent: 'center', overflow: 'visible' }}
           >
             <Ionicons
               name={isActive ? tab.iconActive : tab.icon}
