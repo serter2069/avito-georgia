@@ -21,8 +21,11 @@ function LangSelect({ value, onChange }: { value: Lang; onChange: (v: Lang) => v
           paddingVertical: 5,
           flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: 3,
           backgroundColor: colors.background,
+          minHeight: 44,
+          minWidth: 44,
         }}
       >
         <Text style={{ fontSize: fontSize.sm, fontWeight: '600', color: colors.textSecondary }}>{value}</Text>
