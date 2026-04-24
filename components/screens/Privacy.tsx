@@ -41,7 +41,7 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: C.white }}
-      contentContainerStyle={{ maxWidth: isDesktop ? 700 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined, paddingBottom: 80 }}
+      contentContainerStyle={{ maxWidth: isDesktop ? 700 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined, paddingBottom: 120 }}
     >
       {children}
     </ScrollView>
