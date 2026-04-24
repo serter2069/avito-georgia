@@ -15,5 +15,5 @@ export default function PaymentPage() {
     if (res.url) await Linking.openURL(res.url);
   };
 
-  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: true, title: 'Оплата' }} /><Payment listingId={listingId} promotionType={type} onPay={handlePay} /></SafeAreaView>;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: false }} /><Payment listingId={listingId} promotionType={type} onPay={handlePay} /></SafeAreaView>;
 }

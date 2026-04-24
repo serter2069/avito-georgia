@@ -11,5 +11,5 @@ export default function MapPage() {
     apiFetch('/listings/map').then(r => setPins(r.pins || [])).catch(console.error);
   }, []);
 
-  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: true, title: 'Карта' }} /><MapView pins={pins} /></SafeAreaView>;
+  return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: false }} /><MapView pins={pins} /></SafeAreaView>;
 }
