@@ -16,13 +16,13 @@ export default function ChatThreadPage() {
   const load = async () => {
     try {
       const [msgRes, threadRes] = await Promise.all([
-        apiFetch(`/chat/threads/${id}/messages`),
-        apiFetch(`/chat/threads/${id}`),
+        apiFetch(`/threads/${id}/messages`),
+        apiFetch(`/threads/${id}`),
       ]);
       setMessages(msgRes.messages || []);
       if (threadRes.thread?.otherUser) setOtherUser(threadRes.thread.otherUser);
       // Mark as seen
-      apiFetch(`/chat/threads/${id}/seen`, { method: 'POST' }).catch(() => {});
+      apiFetch(`/threads/${id}/seen`, { method: 'POST' }).catch(() => {});
     } catch (e) { console.error('Failed to load chat thread', e); }
     setLoading(false);
   };
@@ -31,7 +31,7 @@ export default function ChatThreadPage() {
 
   const handleSend = async (text: string) => {
     try {
-      const r = await apiFetch(`/chat/threads/${id}/message`, {
+      const r = await apiFetch(`/threads/${id}/message`, {
         method: 'POST',
         body: JSON.stringify({ text }),
       });

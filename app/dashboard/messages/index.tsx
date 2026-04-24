@@ -35,7 +35,7 @@ export default function MessagesPage() {
     setLoading(true);
     setError(false);
     try {
-      const r = await apiFetch('/chat/threads');
+      const r = await apiFetch('/threads');
       setThreads(Array.isArray(r) ? r : []);
     } catch {
       setError(true);

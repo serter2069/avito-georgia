@@ -23,7 +23,7 @@ export default function ContactSellerPage() {
     setSending(true);
     setError('');
     try {
-      const r = await apiFetch(`/chat/threads/${id}/message`, {
+      const r = await apiFetch(`/threads/${id}/message`, {
         method: 'POST',
         body: JSON.stringify({ text: message.trim() }),
       });
