@@ -19,6 +19,9 @@ function useResponsiveMaxWidth() {
 
 const NO_CHROME_PREFIXES = ['/auth/', '/proto', '/brand'];
 
+// Routes where BottomNav should be hidden
+const NO_BOTTOM_NAV = ['/listings/create'];
+
 // Routes that require auth — redirect to /auth/email if not logged in
 const PRIVATE_PREFIXES = [
   '/dashboard',
@@ -121,7 +124,7 @@ export default function RootLayout() {
           </Stack>
         </View>
 
-        {showChrome && !isTablet && <BottomNav />}
+        {showChrome && !isTablet && !NO_BOTTOM_NAV.includes(pathname) && <BottomNav />}
       </View>
     </SafeAreaProvider>
   );
