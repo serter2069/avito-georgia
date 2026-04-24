@@ -106,6 +106,7 @@ export default function RootLayout() {
             <Stack.Screen name="dashboard/listings" />
             <Stack.Screen name="dashboard/messages/[id]" />
             <Stack.Screen name="dashboard/messages" />
+            <Stack.Screen name="dashboard/notifications" />
             <Stack.Screen name="dashboard/payment-history" />
             <Stack.Screen name="dashboard/profile" />
             <Stack.Screen name="dashboard/sessions" />
