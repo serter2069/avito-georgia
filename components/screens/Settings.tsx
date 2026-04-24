@@ -281,7 +281,7 @@ export function SettingsDefault({ showBottomNav = true, prefs, onToggle, onLogou
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, overflow: 'hidden' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
         <View style={{ padding: 12, gap: 4 }}>
           {/* Header */}
           <View style={{ backgroundColor: colors.background, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 }}>

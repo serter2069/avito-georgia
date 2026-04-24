@@ -39,9 +39,12 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   return (
-    <View style={{ backgroundColor: C.white, maxWidth: isDesktop ? 700 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined }}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: C.white }}
+      contentContainerStyle={{ maxWidth: isDesktop ? 700 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined, paddingBottom: 80 }}
+    >
       {children}
-    </View>
+    </ScrollView>
   );
 }
 
