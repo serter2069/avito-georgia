@@ -88,7 +88,7 @@ export default function AdminDashboard() {
             {activity.slice(0, 8).map((a, i) => (
               <View key={i} style={{ padding: 14, borderBottomWidth: i < activity.length - 1 ? 1 : 0, borderBottomColor: '#E8E8E8' }}>
                 <Text style={{ fontSize: 13, color: colors.text }}>{a.action ?? JSON.stringify(a).slice(0, 60)}</Text>
-                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>{a.createdAt ? new Date(a.createdAt).toLocaleString('ru-RU') : ''}</Text>
+                <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{a.createdAt ? new Date(a.createdAt).toLocaleString('ru-RU') : ''}</Text>
               </View>
             ))}
           </View>

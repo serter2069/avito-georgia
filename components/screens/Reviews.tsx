@@ -74,12 +74,12 @@ function RatingSummary({ avgRating, total, reviews }: { avgRating: number; total
         <View style={{ flex: 1, gap: 5 }}>
           {breakdown.map(({ stars, pct }) => (
             <View key={stars} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={{ fontSize: 11, color: C.muted, width: 8 }}>{stars}</Text>
-              <Text style={{ fontSize: 11, color: C.star }}>★</Text>
+              <Text style={{ fontSize: 12, color: C.muted, width: 8 }}>{stars}</Text>
+              <Text style={{ fontSize: 12, color: C.star }}>★</Text>
               <View style={{ flex: 1, height: 6, backgroundColor: C.border, borderRadius: 3 }}>
                 <View style={{ width: `${pct}%`, height: 6, backgroundColor: C.star, borderRadius: 3 }} />
               </View>
-              <Text style={{ fontSize: 11, color: C.muted, width: 28 }}>{pct}%</Text>
+              <Text style={{ fontSize: 12, color: C.muted, width: 28 }}>{pct}%</Text>
             </View>
           ))}
         </View>
@@ -99,7 +99,7 @@ function ReviewCard({ review, colorIdx }: { review: ApiReview; colorIdx: number 
           <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>{review.author?.name ?? 'Пользователь'}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Stars rating={review.rating} size={13} />
-            <Text style={{ fontSize: 11, color: C.muted }}>{date}</Text>
+            <Text style={{ fontSize: 12, color: C.muted }}>{date}</Text>
           </View>
         </View>
       </View>

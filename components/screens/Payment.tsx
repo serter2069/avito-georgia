@@ -178,7 +178,7 @@ function PaymentCheckout({ listingId, promotionType, onPay }: PaymentProps) {
               )}
             </Pressable>
 
-            <Text style={{ fontSize: 11, color: C.muted, textAlign: 'center' }}>
+            <Text style={{ fontSize: 12, color: C.muted, textAlign: 'center' }}>
               Вы будете перенаправлены на страницу оплаты Stripe.
             </Text>
           </View>

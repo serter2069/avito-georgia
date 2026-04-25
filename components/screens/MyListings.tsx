@@ -272,7 +272,7 @@ export function MyListingsInteractive({ showBottomNav = true, listings: apiListi
                 <Text style={{ fontSize: 13, color: active ? C_LOCAL.action : C_LOCAL.sub, fontWeight: active ? '600' : '400' }}>
                   {label}
                 </Text>
-                <Text style={{ fontSize: 11, color: C_LOCAL.muted, marginTop: 1 }}>{counts[key]} объявлений</Text>
+                <Text style={{ fontSize: 12, color: C_LOCAL.muted, marginTop: 1 }}>{counts[key]} объявлений</Text>
               </Pressable>
             );
           })}

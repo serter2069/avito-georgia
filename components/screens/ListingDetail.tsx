@@ -54,7 +54,7 @@ function PhotoGallery({ photos, onFavPress, fav, onPhotoPress }: {
 
         {/* Expand hint */}
         <View style={{ position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(0,0,0,0.45)', borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3 }}>
-          <Text style={{ color: '#fff', fontSize: 11 }}>нажмите для просмотра</Text>
+          <Text style={{ color: '#fff', fontSize: 12 }}>нажмите для просмотра</Text>
         </View>
       </Pressable>
 
@@ -167,7 +167,7 @@ function FakeMap() {
         {/* Address label */}
         <View style={{ position: 'absolute', bottom: 10, left: 10, right: 10, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6 }}>
           <Text style={{ fontSize: 12, color: colors.text, fontWeight: '600' }}>Батуми, ул. Горгиладзе</Text>
-          <Text style={{ fontSize: 11, color: colors.textSecondary }}>Аджара · 500м от центра</Text>
+          <Text style={{ fontSize: 12, color: colors.textSecondary }}>Аджара · 500м от центра</Text>
         </View>
       </View>
     </View>
@@ -193,7 +193,7 @@ function SimilarListings() {
             <View style={{ padding: 8 }}>
               <Text style={{ fontSize: 12, color: colors.text, lineHeight: 16 }} numberOfLines={2}>{item.title}</Text>
               <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text, marginTop: 4 }}>{item.price}</Text>
-              <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>{item.loc}</Text>
+              <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{item.loc}</Text>
             </View>
           </View>
         ))}
