@@ -57,7 +57,7 @@ function SectionHeader({ title }: { title: string }) {
   const router = useRouter();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, gap: 10 }}>
-      <Pressable onPress={() => router.back()}>
+      <Pressable onPress={() => router.back()} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ fontSize: 20, color: C.muted }}>{'<'}</Text>
       </Pressable>
       <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>{title}</Text>
@@ -178,7 +178,7 @@ function PaymentCheckout({ listingId, promotionType, onPay }: PaymentProps) {
               )}
             </Pressable>
 
-            <Text style={{ fontSize: 12, color: C.muted, textAlign: 'center' }}>
+            <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center' }}>
               Вы будете перенаправлены на страницу оплаты Stripe.
             </Text>
           </View>

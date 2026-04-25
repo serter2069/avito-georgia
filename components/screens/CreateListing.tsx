@@ -55,11 +55,11 @@ function StepIndicator({ step }: { step: number }) {
                   backgroundColor: done || active ? C.green : C.border,
                   alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <Text style={{ color: done || active ? C.white : C.muted, fontSize: 12, fontWeight: '700' }}>
+                  <Text style={{ color: done || active ? C.white : C.muted, fontSize: 13, fontWeight: '700' }}>
                     {done ? '✓' : String(num)}
                   </Text>
                 </View>
-                <Text style={{ fontSize: 12, color: active ? C.green : C.muted, marginTop: 3, fontWeight: active ? '600' : '400' }}>
+                <Text style={{ fontSize: 13, color: active ? C.green : C.muted, marginTop: 3, fontWeight: active ? '600' : '400' }}>
                   {label}
                 </Text>
               </View>
@@ -136,7 +136,7 @@ function Step1({ onNext, selectedFiles, onFilesChange }: {
         >
           <Text style={{ fontSize: 32, color: C.muted, marginBottom: 8 }}>+</Text>
           <Text style={{ fontSize: 15, fontWeight: '600', color: C.green }}>Добавить фото</Text>
-          <Text style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>до 10 фотографий</Text>
+          <Text style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>до 10 фотографий</Text>
         </Pressable>
       ) : (
         <View>
@@ -153,13 +153,13 @@ function Step1({ onNext, selectedFiles, onFilesChange }: {
                 <Pressable
                   onPress={() => removePhoto(i)}
                   style={{
-                    position: 'absolute', top: -6, right: -6,
-                    width: 24, height: 24, borderRadius: 12,
+                    position: 'absolute', top: -8, right: -8,
+                    width: 28, height: 28, borderRadius: 14,
                     backgroundColor: 'rgba(0,0,0,0.6)',
                     alignItems: 'center', justifyContent: 'center',
                   }}
                 >
-                  <Text style={{ color: C.white, fontSize: 12, fontWeight: '700', lineHeight: 16 }}>✕</Text>
+                  <Text style={{ color: C.white, fontSize: 13, fontWeight: '700', lineHeight: 16 }}>✕</Text>
                 </Pressable>
               </View>
             ))}
