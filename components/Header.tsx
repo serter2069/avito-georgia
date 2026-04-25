@@ -21,8 +21,11 @@ function LangSelect({ value, onChange }: { value: Lang; onChange: (v: Lang) => v
           paddingVertical: 5,
           flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: 3,
           backgroundColor: colors.background,
+          minHeight: 44,
+          minWidth: 44,
         }}
       >
         <Text style={{ fontSize: fontSize.sm, fontWeight: '600', color: colors.textSecondary }}>{value}</Text>
@@ -180,7 +183,8 @@ export default function Header({
                   borderStyle: 'solid',
                   backgroundColor: 'transparent',
                   outlineWidth: 0,
-                  paddingVertical: 0,
+                  paddingVertical: 4,
+                  minHeight: 44,
                 } as any
               }
               placeholder="Что ищете?"
@@ -205,7 +209,17 @@ export default function Header({
               <Pressable
                 onPress={onPostPress}
                 accessibilityLabel="Подать объявление"
-                style={{ backgroundColor: colors.primary, borderRadius: 7, paddingHorizontal: 12, paddingVertical: 7 }}
+                accessibilityRole="button"
+                role="button"
+                style={{
+                  backgroundColor: colors.primary,
+                  borderRadius: 7,
+                  paddingHorizontal: 12,
+                  paddingVertical: 11,
+                  minHeight: 44,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
               >
                 <Text style={{ color: colors.background, fontWeight: '700', fontSize: fontSize.sm }}>+ Подать</Text>
               </Pressable>
@@ -213,10 +227,12 @@ export default function Header({
             <Pressable
               onPress={onAvatarPress}
               accessibilityLabel="Профиль"
+              accessibilityRole="button"
+              role="button"
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
                 backgroundColor: colors.primary,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -231,7 +247,17 @@ export default function Header({
             <Pressable
               onPress={onLoginPress}
               accessibilityLabel="Войти"
-              style={{ backgroundColor: colors.primary, borderRadius: 7, paddingHorizontal: 12, paddingVertical: 7 }}
+              accessibilityRole="button"
+              role="button"
+              style={{
+                backgroundColor: colors.primary,
+                borderRadius: 7,
+                paddingHorizontal: 12,
+                paddingVertical: 11,
+                minHeight: 44,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
             >
               <Text style={{ color: colors.background, fontWeight: '700', fontSize: fontSize.sm }}>Войти</Text>
             </Pressable>

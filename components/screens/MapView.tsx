@@ -128,7 +128,7 @@ function PricePin({ pin, active, onPress }: { pin: ML; active: boolean; onPress(
         shadowColor:'#000', shadowOffset:{width:0,height:2},
         shadowOpacity: active ? 0.3 : 0.12, shadowRadius:4, elevation: active ? 8 : 3,
       }}>
-        <Text style={{ fontSize:11, fontWeight:'700', color: textColor }} numberOfLines={1}>
+        <Text style={{ fontSize:12, fontWeight:'700', color: textColor }} numberOfLines={1}>
           {pin.price}
         </Text>
       </View>
@@ -214,10 +214,10 @@ function ListingRow({ pin, onPress }: { pin: ML; onPress(): void }) {
         <Text className="text-[13px] text-[#1A1A1A]" numberOfLines={1}>{pin.title}</Text>
         <View className="flex-row items-center gap-1">
           <Ionicons name="location-outline" size={11} color="#9E9E9E"/>
-          <Text className="text-[11px] text-[#9E9E9E]">{pin.address}</Text>
+          <Text className="text-[12px] text-[#9E9E9E]">{pin.address}</Text>
           {pin.premium && (
             <View className="ml-1 bg-[#1A1A1A] rounded px-1.5 py-0.5">
-              <Text className="text-[9px] font-bold text-white">VIP</Text>
+              <Text className="text-[10px] font-bold text-white">VIP</Text>
             </View>
           )}
         </View>
@@ -242,11 +242,11 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
   return (
     <View className="bg-white">
       <View className="flex-row items-center px-4 py-3 border-b border-[#EFEFEF] gap-3">
-        <Pressable className="w-9 h-9 rounded-full bg-[#F5F5F5] items-center justify-center">
+        <Pressable className="w-11 h-11 rounded-full bg-[#F5F5F5] items-center justify-center">
           <Ionicons name="chevron-back" size={22} color="#1A1A1A"/>
         </Pressable>
         <Text className="flex-1 text-[17px] font-semibold text-[#1A1A1A]">Карта</Text>
-        <Pressable className="w-9 h-9 rounded-full bg-[#F5F5F5] items-center justify-center">
+        <Pressable className="w-11 h-11 rounded-full bg-[#F5F5F5] items-center justify-center">
           <Ionicons name="options-outline" size={20} color="#1A1A1A"/>
         </Pressable>
       </View>
@@ -256,15 +256,15 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
 
         <View className="absolute top-3 left-3 bg-white rounded-full px-3 py-1.5 border border-[#E0E0E0]"
           style={{ shadowColor:'#000', shadowOffset:{width:0,height:1}, shadowOpacity:0.1, shadowRadius:3, elevation:2 }}>
-          <Text className="text-[12px] font-semibold text-[#1A1A1A]">{PINS.length} объявлений</Text>
+          <Text className="text-[13px] font-semibold text-[#1A1A1A]">{PINS.length} объявлений</Text>
         </View>
 
         <View className="absolute right-3 bottom-3 bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
           style={{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.1, shadowRadius:4, elevation:3 }}>
-          <Pressable className="w-10 h-10 items-center justify-center border-b border-[#EFEFEF]">
+          <Pressable className="w-11 h-11 items-center justify-center border-b border-[#EFEFEF]">
             <Ionicons name="add" size={20} color="#1A1A1A"/>
           </Pressable>
-          <Pressable className="w-10 h-10 items-center justify-center">
+          <Pressable className="w-11 h-11 items-center justify-center">
             <Ionicons name="remove" size={20} color="#1A1A1A"/>
           </Pressable>
         </View>
@@ -283,7 +283,7 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
                 {activeCluster.isCluster && (
                   <View className="flex-row items-center gap-1 mt-0.5">
                     <Ionicons name="location-outline" size={11} color="#9E9E9E"/>
-                    <Text className="text-[11px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
+                    <Text className="text-[12px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
                   </View>
                 )}
               </View>
@@ -321,20 +321,22 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
 // ─── Desktop ──────────────────────────────────────────────────────────────────
 export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
   const [activeId, setActiveId] = useState<string|null>(null);
+  const { height: winHeight } = useWindowDimensions();
 
   const PINS = apiPins && apiPins.length > 0 ? apiPinsToML(apiPins) : FALLBACK_PINS;
   const clusters      = buildClusters(PINS);
   const activeCluster = activeId ? clusters.find(c => c.clusterId === activeId) : null;
   const toggle        = (id: string) => setActiveId(prev => prev === id ? null : id);
+  const mapHeight     = Math.max(400, Math.min(700, Math.round(winHeight * 0.65)));
 
   return (
     <View className="flex-row bg-white rounded-xl overflow-hidden border border-[#EFEFEF]"
-      style={{ height:580 }}>
+      style={{ height: mapHeight }}>
 
       <View className="border-r border-[#EFEFEF]" style={{ width:320 }}>
         <View className="px-4 py-3 border-b border-[#EFEFEF]">
           <Text className="text-[15px] font-semibold text-[#1A1A1A]">Карта объявлений</Text>
-          <Text className="text-[12px] text-[#9E9E9E] mt-0.5">{PINS.length} объявлений</Text>
+          <Text className="text-[13px] text-[#9E9E9E] mt-0.5">{PINS.length} объявлений</Text>
         </View>
         <ScrollView contentContainerStyle={{ padding:12, paddingBottom:24 }}>
           {PINS.map(p => (
@@ -350,10 +352,10 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
 
         <View className="absolute right-4 bottom-4 bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
           style={{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.1, shadowRadius:4, elevation:3 }}>
-          <Pressable className="w-10 h-10 items-center justify-center border-b border-[#EFEFEF]">
+          <Pressable className="w-11 h-11 items-center justify-center border-b border-[#EFEFEF]">
             <Ionicons name="add" size={20} color="#1A1A1A"/>
           </Pressable>
-          <Pressable className="w-10 h-10 items-center justify-center">
+          <Pressable className="w-11 h-11 items-center justify-center">
             <Ionicons name="remove" size={20} color="#1A1A1A"/>
           </Pressable>
         </View>
@@ -371,7 +373,7 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
                     </Text>
                     <View className="flex-row items-center gap-1 mt-0.5">
                       <Ionicons name="location-outline" size={11} color="#9E9E9E"/>
-                      <Text className="text-[11px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
+                      <Text className="text-[12px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
                     </View>
                   </View>
                   <Pressable onPress={() => setActiveId(null)}
@@ -391,14 +393,14 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
                   <Text className="text-[13px] text-[#1A1A1A] mt-0.5">{activeCluster.pins[0].title}</Text>
                   <View className="flex-row items-center gap-1 mt-1">
                     <Ionicons name="location-outline" size={12} color="#9E9E9E"/>
-                    <Text className="text-[11px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
+                    <Text className="text-[12px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
                   </View>
                   <View className="flex-row gap-2 mt-2.5">
                     <Pressable className="flex-1 bg-[#00AA6C] rounded-lg py-2 items-center">
                       <Text className="text-white text-[13px] font-semibold">Открыть</Text>
                     </Pressable>
                     <Pressable onPress={() => setActiveId(null)}
-                      className="w-9 h-9 rounded-lg bg-[#F5F5F5] items-center justify-center">
+                      className="w-11 h-11 rounded-lg bg-[#F5F5F5] items-center justify-center">
                       <Ionicons name="close" size={18} color="#6B6B6B"/>
                     </Pressable>
                   </View>

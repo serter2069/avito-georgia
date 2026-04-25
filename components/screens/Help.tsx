@@ -88,7 +88,7 @@ function Help() {
                     onPress={() => setExpanded(isOpen ? null : idx)}
                     style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 10 }}
                   >
-                    <Text style={{ fontSize: 12, color: isOpen ? C.green : C.muted, width: 12 }}>{isOpen ? '▼' : '▶'}</Text>
+                    <Text style={{ fontSize: 13, color: isOpen ? C.green : C.muted, width: 13 }}>{isOpen ? '▼' : '▶'}</Text>
                     <Text style={{ flex: 1, fontSize: 14, fontWeight: '600', color: isOpen ? C.green : C.text }}>{item.q}</Text>
                   </Pressable>
                   {isOpen && (

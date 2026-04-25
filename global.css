@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* React Native Web: remove default browser outline from TextInput elements to prevent double border */
+input, textarea {
+  outline: none;
+}
+
+/* Fix React Native Web: allow body to scroll on web so content below viewport is accessible */
+@media (min-width: 0px) {
+  html {
+    overflow-y: auto !important;
+  }
+  body {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+}

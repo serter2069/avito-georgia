@@ -49,7 +49,7 @@ export default function AdminUsers() {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', paddingBottom: 8, paddingHorizontal: 16, gap: 10 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
+          <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>←</Text></Pressable>
           <Text style={{ fontSize: 17, fontWeight: '700' }}>Пользователи</Text>
         </View>
         <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#F9F9F9' }}>
@@ -58,7 +58,7 @@ export default function AdminUsers() {
             onChangeText={setSearch}
             placeholder="Поиск по email или имени..."
             placeholderTextColor={colors.textSecondary}
-            style={{ fontSize: 14, color: colors.text } as any}
+            style={{ fontSize: 14, color: colors.text, outlineWidth: 0 } as any}
           />
         </View>
       </View>
@@ -72,18 +72,18 @@ export default function AdminUsers() {
             <View key={u.id} style={{ backgroundColor: colors.background, borderRadius: 10, padding: 14, borderWidth: 1, borderColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{u.name ?? 'Без имени'}</Text>
-                <Text style={{ fontSize: 12, color: colors.textSecondary }}>{u.email}</Text>
+                <Text style={{ fontSize: 13, color: colors.textSecondary }}>{u.email}</Text>
                 <View style={{ marginTop: 4, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: (ROLE_COLORS[u.role] ?? colors.textSecondary) + '22' }}>
-                  <Text style={{ fontSize: 11, fontWeight: '600', color: ROLE_COLORS[u.role] ?? colors.textSecondary }}>{u.role}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: ROLE_COLORS[u.role] ?? colors.textSecondary }}>{u.role}</Text>
                 </View>
               </View>
               {u.role !== 'admin' && (
                 <Pressable
                   onPress={() => toggleBlock(u)}
                   accessibilityLabel={u.role === 'blocked' ? 'Разблокировать пользователя' : 'Заблокировать пользователя'}
-                  style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: u.role === 'blocked' ? colors.primary : colors.error }}
+                  style={{ paddingHorizontal: 12, minHeight: 44, justifyContent: 'center', borderRadius: 8, borderWidth: 1, borderColor: u.role === 'blocked' ? colors.primary : colors.error }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: u.role === 'blocked' ? colors.primary : colors.error }}>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: u.role === 'blocked' ? colors.primary : colors.error }}>
                     {u.role === 'blocked' ? 'Разблокировать' : 'Заблокировать'}
                   </Text>
                 </Pressable>

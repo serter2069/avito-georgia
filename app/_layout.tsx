@@ -19,6 +19,9 @@ function useResponsiveMaxWidth() {
 
 const NO_CHROME_PREFIXES = ['/auth/', '/proto', '/brand'];
 
+// Routes where BottomNav should be hidden
+const NO_BOTTOM_NAV = ['/listings/create'];
+
 // Routes that require auth — redirect to /auth/email if not logged in
 const PRIVATE_PREFIXES = [
   '/dashboard',
@@ -68,7 +71,10 @@ export default function RootLayout() {
     el.style.maxWidth = isProto ? '' : rawMaxWidth + 'px';
   }, [isProto, rawMaxWidth]);
 
-  const containerStyle = isProto ? undefined : { maxWidth: rawMaxWidth };
+  const containerStyle = {
+    ...(isProto ? {} : { maxWidth: rawMaxWidth }),
+    ...(Platform.OS === 'web' ? { minHeight: '100vh' as any, overflow: 'visible' as any } : {}),
+  };
 
   return (
     <SafeAreaProvider>
@@ -85,7 +91,7 @@ export default function RootLayout() {
           />
         )}
 
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, ...(Platform.OS === 'web' ? { overflow: 'visible' as any } : {}) }}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="admin/categories" />
             <Stack.Screen name="admin/finance" />
@@ -100,6 +106,7 @@ export default function RootLayout() {
             <Stack.Screen name="dashboard/listings" />
             <Stack.Screen name="dashboard/messages/[id]" />
             <Stack.Screen name="dashboard/messages" />
+            <Stack.Screen name="dashboard/notifications" />
             <Stack.Screen name="dashboard/payment-history" />
             <Stack.Screen name="dashboard/profile" />
             <Stack.Screen name="dashboard/sessions" />
@@ -121,7 +128,7 @@ export default function RootLayout() {
           </Stack>
         </View>
 
-        {showChrome && !isTablet && <BottomNav />}
+        {showChrome && !isTablet && !NO_BOTTOM_NAV.includes(pathname) && <BottomNav />}
       </View>
     </SafeAreaProvider>
   );

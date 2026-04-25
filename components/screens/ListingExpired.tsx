@@ -17,7 +17,7 @@ function ExpiredListingCard({ title, price }: { title: string; price: string }) 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text style={{ fontSize: 15, fontWeight: '600', color: C.text, flex: 1 }} numberOfLines={1}>{title}</Text>
           <View style={{ backgroundColor: C.greenBg, borderRadius: 4, paddingHorizontal: 8, paddingVertical: 2 }}>
-            <Text style={{ fontSize: 11, fontWeight: '700', color: C.muted }}>Истёкло</Text>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: C.muted }}>Истёкло</Text>
           </View>
         </View>
         <Text style={{ fontSize: 18, fontWeight: '700', color: C.text }}>{price}</Text>

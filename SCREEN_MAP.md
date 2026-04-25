@@ -1,5 +1,88 @@
 # SCREEN_MAP.md — AvitoGeorgia
 
+## SDLC Status
+
+<!-- SDLC_STATE_BEGIN -->
+```yaml
+phase: 1-SA
+started_at: 2026-04-23
+updated_at: "2026-04-23T18:55:39Z"
+phases:
+  SA: {status: PENDING}
+  CICD: {status: PENDING}
+  BRAND: {status: PENDING}
+  LANDING: {status: PENDING}
+  SCREEN_MAP: {status: PENDING}
+  DEV: {status: PENDING}
+  TEST: {status: PENDING}
+screens:
+  total: 0
+  done: 0
+  in_progress: 0
+  todo: 0
+cycles:
+  audit:
+    run_count: 0
+    last_commit: null
+    last_run: null
+  audit_quality:
+    run_count: 0
+    last_run: null
+  test:
+    run_count: 0
+    last_run: null
+  verify:
+    total_runs: 0
+    escalations_to_opus: 0
+    stops: 0
+autopilot:
+  mode: semi-auto
+  paused: false
+  gate_grace_min: 10
+  last_event_at: null
+  last_gate_shown_at: null
+  last_gate_phase: null
+  tick_count_same_phase: 0
+  last_phase_seen: 1-SA
+  stops:
+    critical_bug: false
+    auth_broken: false
+    verify_3fail: null
+    blocker_issue: null
+    token_budget: false
+pyramid:
+  current_layer: 2
+  started_at: "2026-04-23T17:50:30Z"
+  layers:
+    "0":
+      status: PASS
+      findings: 0
+      fix_iterations: 0
+      last_run: "2026-04-23T18:17:25Z"
+    "1":
+      status: PASS
+      findings: 0
+      fix_iterations: 0
+      last_run: "2026-04-23T18:17:32Z"
+    "2":
+      status: PASS
+      findings: 0
+      fix_iterations: 0
+      last_run: "2026-04-23T18:18:00Z"
+    "3":
+      status: FAIL
+      findings: 1
+      fix_iterations: 0
+      last_run: "2026-04-23T18:31:31Z"
+    "4":
+      status: PENDING
+      findings: 0
+      fix_iterations: 0
+      last_run: null
+```
+<!-- SDLC_STATE_END -->
+
+
 > System Analysis: https://diagrams.love/canvas?schema=cmnw53bop000ezmerdh298uvt
 > All Tailwind classes use actual hex values from brand.
 

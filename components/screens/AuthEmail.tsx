@@ -2,19 +2,20 @@ import React from 'react';
 import { View, Text, TextInput, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
 
 // ─── Core Design Tokens ───────────────────────────────────────────────────────
-const C = { green:'#00AA6C', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F', bg:'#F5F5F5' };
+// #006B41 passes WCAG AA (4.5:1) for white text and on white bg (#00AA6C only gives 3.01:1)
+const C = { green:'#006B41', white:'#FFFFFF', text:'#1A1A1A', muted:'#737373', border:'#E0E0E0', error:'#D32F2F', bg:'#F5F5F5' };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
 function AvitoLogo() {
   return (
     <View style={{ flexDirection:'row', alignItems:'center', gap:10 }}>
-      <View style={{ width:40, height:40, borderRadius:10, backgroundColor:'#00AA6C', alignItems:'center', justifyContent:'center' }}>
+      <View style={{ width:40, height:40, borderRadius:10, backgroundColor:'#006B41', alignItems:'center', justifyContent:'center' }}>
         <Text style={{ color:'#fff', fontWeight:'800', fontSize:20 }}>A</Text>
       </View>
       <View style={{ flexDirection:'row', alignItems:'baseline', gap:1 }}>
         <Text style={{ fontWeight:'700', fontSize:22, color:'#1A1A1A' }}>avito</Text>
-        <Text style={{ fontWeight:'600', fontSize:16, color:'#00AA6C' }}>.ge</Text>
+        <Text style={{ fontWeight:'600', fontSize:16, color:C.green }}>.ge</Text>
       </View>
     </View>
   );
@@ -40,6 +41,8 @@ function EmailInput({ value, error, disabled }: { value?: string; error?: boolea
         borderColor: error ? C.error : C.border,
         borderRadius: 8,
         backgroundColor: disabled ? C.bg : C.white,
+        minHeight: 44,
+        justifyContent: 'center',
       }}>
       <TextInput
         style={{
@@ -116,6 +119,8 @@ export function AuthEmailDefault({
               borderColor: C.border,
               borderRadius: 8,
               backgroundColor: loading ? C.bg : C.white,
+              minHeight: 44,
+              justifyContent: 'center',
             }}>
               <TextInput
                 style={{
@@ -143,6 +148,9 @@ export function AuthEmailDefault({
           <Pressable
             onPress={() => email.length > 0 && !loading && onSubmit?.(email)}
             style={{ opacity: email.length > 0 && !loading ? 1 : 0.5 }}
+            accessibilityRole="button"
+            role="button"
+            accessibilityLabel="Получить код"
           >
             <PrimaryButton label="Получить код" disabled={email.length === 0 || loading} loading={loading} />
           </Pressable>

@@ -39,7 +39,7 @@ export function Input({ label, placeholder, value, onChangeText, error, secureTe
           outlineWidth: 0,
         }}
       />
-      {error && <Text style={{ fontSize: 12, color: colors.error }}>{error}</Text>}
+      {error && <Text style={{ fontSize: 13, color: colors.error }}>{error}</Text>}
     </View>
   );
 }

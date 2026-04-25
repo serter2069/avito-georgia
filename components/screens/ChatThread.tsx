@@ -212,7 +212,7 @@ function MessageBubble({ msg, onPhotoPress }: {
       <View className="items-end px-4 mb-1.5">
         {content}
         <View className="flex-row items-center mt-0.5" style={{ gap: 3 }}>
-          <Text className="text-[10px] text-[#9E9E9E]">{msg.time}</Text>
+          <Text className="text-[12px] text-[#9E9E9E]">{msg.time}</Text>
           <Ionicons
             name="checkmark-done"
             size={14}
@@ -226,7 +226,7 @@ function MessageBubble({ msg, onPhotoPress }: {
   return (
     <View className="items-start px-4 mb-1.5">
       {content}
-      <Text className="text-[10px] text-[#9E9E9E] mt-0.5">{msg.time}</Text>
+      <Text className="text-[12px] text-[#9E9E9E] mt-0.5">{msg.time}</Text>
     </View>
   );
 }
@@ -246,9 +246,9 @@ function AttachPreview({ seeds, onRemove }: { seeds: number[]; onRemove: (i: num
           </View>
           <Pressable
             onPress={() => onRemove(i)}
-            className="absolute -top-1.5 -right-1.5 items-center justify-center"
+            style={{ position: 'absolute', top: -8, right: -8, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}
           >
-            <Ionicons name="close-circle" size={18} color="#fff" />
+            <Ionicons name="close-circle" size={20} color="#555" />
           </Pressable>
         </View>
       ))}
@@ -404,8 +404,8 @@ function Header({ otherUser }: { otherUser?: { id: string; name: string; avatarU
 
   return (
     <View className="flex-row items-center px-4 py-3 border-b border-[#E8E8E8] bg-white" style={{ gap: 12 }}>
-      {/* Back button */}
-      <Pressable onPress={() => router.back()} className="w-8 h-8 items-center justify-center">
+      {/* Back button — min 44×44 tap target */}
+      <Pressable onPress={() => router.back()} className="w-11 h-11 items-center justify-center">
         <Ionicons name="chevron-back" size={26} color="#1A1A1A" />
       </Pressable>
 

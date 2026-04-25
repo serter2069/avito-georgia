@@ -7,13 +7,14 @@ import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
 import { SkeletonBox } from '../../components/SkeletonBox';
 import { apiFetch } from '../../lib/api';
+import { colors } from '../../lib/theme';
 
 function FavoritesSkeleton() {
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F5', padding: 16 }}>
+    <View style={{ flex: 1, backgroundColor: colors.surface, padding: 16 }}>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
         {[0, 1, 2, 3].map(i => (
-          <View key={i} style={{ width: '47%', borderRadius: 10, overflow: 'hidden', backgroundColor: '#fff' }}>
+          <View key={i} style={{ width: '47%', borderRadius: 10, overflow: 'hidden', backgroundColor: colors.background }}>
             <SkeletonBox width="100%" height={120} borderRadius={0} />
             <View style={{ padding: 10, gap: 6 }}>
               <SkeletonBox width="90%" height={12} />

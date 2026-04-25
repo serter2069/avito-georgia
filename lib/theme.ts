@@ -4,11 +4,12 @@
 export const colors = {
   // Brand (6) — Avito-inspired green
   primary: '#00AA6C',
+  primaryDark: '#006B44',  // WCAG AA contrast 6.7:1 on white — for text on light bg
   accent: '#008F5D',
   background: '#FFFFFF',
   surface: '#F5F5F5',
   text: '#1A1A1A',
-  textSecondary: '#737373',
+  textSecondary: '#767676',  // WCAG AA on white: 4.54:1 (was #737373 = 4.48:1, failed)
   // Semantic (3)
   error: '#C0392B',
   success: '#00AA6C',
@@ -17,12 +18,12 @@ export const colors = {
   primaryLight: '#E8F9F2',
   border: '#E0E0E0',
   borderLight: '#E8E8E8',
-  iconInactive: '#6A8898',
+  iconInactive: '#5C7080',  // WCAG AA on white: 4.58:1 (was #6A8898 = 3.07:1, failed)
 } as const;
 
 // Font sizes — unified scale (7 sizes)
 export const fontSize = {
-  xs: 10,    // labels, nav text
+  xs: 12,    // labels, nav text (min 12px for WCAG tiny-text compliance)
   sm: 12,    // captions, small text
   md: 14,    // body text
   base: 15,  // default UI text

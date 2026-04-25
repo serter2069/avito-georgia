@@ -16,11 +16,22 @@ const C = {
 };
 
 interface PriceItem {
-  key: string;
+  key: string;    // maps to API field "type"
   label: string;
-  price: number;
+  price: number;  // maps to API field "amountGEL"
   currency: string;
-  durationDays: number;
+  durationDays: number;  // maps to API field "days"
+}
+
+// Normalize API response fields to the PriceItem shape expected by this component
+function normalizePriceItem(p: any): PriceItem {
+  return {
+    key: p.type ?? p.key,
+    label: p.label,
+    price: p.amountGEL ?? p.price ?? 0,
+    currency: p.currency ?? 'GEL',
+    durationDays: p.days ?? p.durationDays ?? 0,
+  };
 }
 
 export interface PaymentProps {
@@ -46,7 +57,7 @@ function SectionHeader({ title }: { title: string }) {
   const router = useRouter();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, gap: 10 }}>
-      <Pressable onPress={() => router.back()}>
+      <Pressable onPress={() => router.back()} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ fontSize: 20, color: C.muted }}>{'<'}</Text>
       </Pressable>
       <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>{title}</Text>
@@ -66,10 +77,11 @@ function PaymentCheckout({ listingId, promotionType, onPay }: PaymentProps) {
   useEffect(() => {
     apiFetch('/promotions/prices')
       .then(r => {
-        setPrices(r.prices ?? []);
+        const normalized = (r.prices ?? []).map(normalizePriceItem);
+        setPrices(normalized);
         // Default to first item if promotionType not in list
-        if (r.prices?.length && !r.prices.find((p: PriceItem) => p.key === selectedType)) {
-          setSelectedType(r.prices[0].key);
+        if (normalized.length && !normalized.find((p: PriceItem) => p.key === selectedType)) {
+          setSelectedType(normalized[0].key);
         }
       })
       .catch(console.error)
@@ -166,7 +178,7 @@ function PaymentCheckout({ listingId, promotionType, onPay }: PaymentProps) {
               )}
             </Pressable>
 
-            <Text style={{ fontSize: 11, color: C.muted, textAlign: 'center' }}>
+            <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center' }}>
               Вы будете перенаправлены на страницу оплаты Stripe.
             </Text>
           </View>

@@ -56,7 +56,7 @@ export default function AdminModeration() {
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
-        <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>←</Text></Pressable>
         <Text style={{ fontSize: 17, fontWeight: '700' }}>Модерация ({listings.length})</Text>
       </View>
       {listings.length === 0 ? (
@@ -71,14 +71,14 @@ export default function AdminModeration() {
               <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{l.title}</Text>
               <Text style={{ fontSize: 14, color: colors.textSecondary }}>{l.price} {l.currency} · {l.city?.nameRu ?? l.city?.nameEn}</Text>
               {l.description && <Text style={{ fontSize: 13, color: colors.text }} numberOfLines={3}>{l.description}</Text>}
-              <Text style={{ fontSize: 11, color: colors.textSecondary }}>
+              <Text style={{ fontSize: 13, color: colors.textSecondary }}>
                 от {l.user?.name ?? l.user?.email} · {l.createdAt ? new Date(l.createdAt).toLocaleDateString('ru-RU') : ''}
               </Text>
               <View style={{ flexDirection: 'row', gap: 10 }}>
-                <Pressable onPress={() => approve(l.id)} accessibilityLabel="Одобрить объявление" style={{ flex: 1, backgroundColor: colors.primary, borderRadius: 8, paddingVertical: 10, alignItems: 'center' }}>
+                <Pressable onPress={() => approve(l.id)} accessibilityLabel="Одобрить объявление" style={{ flex: 1, backgroundColor: colors.primary, borderRadius: 8, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: colors.background, fontWeight: '700' }}>Одобрить</Text>
                 </Pressable>
-                <Pressable onPress={() => reject(l.id)} accessibilityLabel="Отклонить объявление" style={{ flex: 1, borderWidth: 1.5, borderColor: colors.error, borderRadius: 8, paddingVertical: 10, alignItems: 'center' }}>
+                <Pressable onPress={() => reject(l.id)} accessibilityLabel="Отклонить объявление" style={{ flex: 1, borderWidth: 1.5, borderColor: colors.error, borderRadius: 8, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{ color: colors.error, fontWeight: '700' }}>Отклонить</Text>
                 </Pressable>
               </View>

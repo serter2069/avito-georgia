@@ -39,9 +39,12 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 640;
   return (
-    <View style={{ backgroundColor: C.white, maxWidth: isDesktop ? 700 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined }}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: C.white }}
+      contentContainerStyle={{ maxWidth: isDesktop ? 700 : undefined, width: '100%', alignSelf: isDesktop ? 'center' : undefined, paddingBottom: 80 }}
+    >
       {children}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -51,7 +54,7 @@ function Privacy() {
   return (
     <PageWrapper>
       <View style={{ padding: 24 }}>
-        <Text style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Обновлено: 01.01.2026</Text>
+        <Text style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>Обновлено: 01.01.2026</Text>
         <DocSection heading="1. Какие данные мы собираем" body="Email-адрес для аутентификации, данные объявлений (текст, фото, цена), геолокацию города и технические данные устройства для улучшения работы сервиса." />
         <DocSection heading="2. Как мы используем данные" body="Данные используются для работы платформы: публикации объявлений, связи покупателей и продавцов, персонализации поиска и отправки уведомлений о статусе объявлений." />
         <DocSection heading="3. Передача данных третьим лицам" body="Мы не продаём и не передаём персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством Грузии, или с вашего явного согласия." />

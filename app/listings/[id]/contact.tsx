@@ -23,7 +23,7 @@ export default function ContactSellerPage() {
     setSending(true);
     setError('');
     try {
-      const r = await apiFetch(`/chat/threads/${id}/message`, {
+      const r = await apiFetch(`/threads/${id}/message`, {
         method: 'POST',
         body: JSON.stringify({ text: message.trim() }),
       });
@@ -39,7 +39,7 @@ export default function ContactSellerPage() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       {/* Header */}
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
-        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44 }}>
           <Text style={{ fontSize: 20, color: colors.text }}>←</Text>
           <Text style={{ fontSize: 15, fontWeight: '500', color: colors.text }}>Написать продавцу</Text>
         </Pressable>
@@ -62,7 +62,7 @@ export default function ContactSellerPage() {
         {/* Message input */}
         <View style={{ backgroundColor: colors.background, borderRadius: 10, borderWidth: 1, borderColor: '#E8E8E8', padding: 12, flex: 1, maxHeight: 200 }}>
           <TextInput
-            style={{ flex: 1, fontSize: 15, color: colors.text, textAlignVertical: 'top', minHeight: 120 }}
+            style={{ flex: 1, fontSize: 15, color: colors.text, textAlignVertical: 'top', minHeight: 120, outlineWidth: 0 } as any}
             multiline
             placeholder="Ваше сообщение продавцу..."
             placeholderTextColor={colors.textSecondary}

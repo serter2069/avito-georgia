@@ -59,17 +59,17 @@ function About() {
           </View>
           <View style={{ backgroundColor: C.white, borderRadius: 10, borderWidth: 1, borderColor: C.border, padding: 16, gap: 14 }}>
             <View style={{ gap: 3 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>Основано</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>Основано</Text>
               <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>2026, Тбилиси</Text>
             </View>
             <View style={{ height: 1, backgroundColor: C.border }} />
             <View style={{ gap: 3 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>Команда</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>Команда</Text>
               <Text style={{ fontSize: 14, color: C.text, lineHeight: 20 }}>Специалисты рынка недвижимости и технологий Грузии</Text>
             </View>
             <View style={{ height: 1, backgroundColor: C.border }} />
             <View style={{ gap: 3 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>Контакт</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 }}>Контакт</Text>
               <Text style={{ fontSize: 14, fontWeight: '600', color: C.green }}>support@avito.ge</Text>
             </View>
           </View>

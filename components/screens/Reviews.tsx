@@ -69,17 +69,17 @@ function RatingSummary({ avgRating, total, reviews }: { avgRating: number; total
         <View style={{ alignItems: 'center' }}>
           <Text style={{ fontSize: 52, fontWeight: '800', color: C.text, lineHeight: 58 }}>{avgRating.toFixed(1)}</Text>
           <Stars rating={avgRating} />
-          <Text style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>{total} отзывов</Text>
+          <Text style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>{total} отзывов</Text>
         </View>
         <View style={{ flex: 1, gap: 5 }}>
           {breakdown.map(({ stars, pct }) => (
             <View key={stars} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={{ fontSize: 11, color: C.muted, width: 8 }}>{stars}</Text>
-              <Text style={{ fontSize: 11, color: C.star }}>★</Text>
+              <Text style={{ fontSize: 13, color: C.muted, width: 9 }}>{stars}</Text>
+              <Text style={{ fontSize: 13, color: C.star }}>★</Text>
               <View style={{ flex: 1, height: 6, backgroundColor: C.border, borderRadius: 3 }}>
                 <View style={{ width: `${pct}%`, height: 6, backgroundColor: C.star, borderRadius: 3 }} />
               </View>
-              <Text style={{ fontSize: 11, color: C.muted, width: 28 }}>{pct}%</Text>
+              <Text style={{ fontSize: 13, color: C.muted, width: 28 }}>{pct}%</Text>
             </View>
           ))}
         </View>
@@ -99,7 +99,7 @@ function ReviewCard({ review, colorIdx }: { review: ApiReview; colorIdx: number 
           <Text style={{ fontSize: 14, fontWeight: '600', color: C.text }}>{review.author?.name ?? 'Пользователь'}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Stars rating={review.rating} size={13} />
-            <Text style={{ fontSize: 11, color: C.muted }}>{date}</Text>
+            <Text style={{ fontSize: 13, color: C.muted }}>{date}</Text>
           </View>
         </View>
       </View>
@@ -143,7 +143,7 @@ function Reviews({ reviews, avgRating, total }: ReviewsProps) {
         {header}
         <View style={{ alignItems: 'center', paddingVertical: 56, paddingHorizontal: 24 }}>
           <Text style={{ fontSize: 40, fontWeight: '800', color: C.text }}>0</Text>
-          <Text style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>отзывов</Text>
+          <Text style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>отзывов</Text>
           <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, marginTop: 20, marginBottom: 8 }}>Отзывов пока нет</Text>
           <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', lineHeight: 20 }}>
             Станьте первым — завершите сделку чтобы оставить отзыв

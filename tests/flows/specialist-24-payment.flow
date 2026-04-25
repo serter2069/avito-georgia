@@ -1,0 +1,4 @@
+# Payment screen smoke test — specialist
+# /payment shows empty state without listingId; just verifies page loads without crash
+goto http://localhost:8082/payment
+wait 2000

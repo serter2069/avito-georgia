@@ -123,6 +123,7 @@ export function AuthOtpDefault({
               }}
               autoFocus
               editable={!loading}
+              testID="otp-input"
             />
             {externalError ? (
               <Text className="text-center text-sm" style={{ color: C.error }}>{externalError}</Text>

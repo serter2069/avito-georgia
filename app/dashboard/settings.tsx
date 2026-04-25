@@ -7,11 +7,11 @@ import { apiFetch } from '../../lib/api';
 import { useAuthStore } from '../../store/auth';
 
 export default function SettingsPage() {
+  const { width } = useWindowDimensions();
+  const maxWidth = width >= 640 ? 520 : undefined;
   const [prefs, setPrefs] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const { logout, user, fetchMe } = useAuthStore();
-  const { width } = useWindowDimensions();
-  const maxWidth = width >= 1024 ? 960 : width >= 640 ? 720 : undefined;
 
   useEffect(() => {
     apiFetch('/users/me/notification-prefs')
@@ -64,28 +64,21 @@ export default function SettingsPage() {
     );
   };
 
-  if (loading) return (
-    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-      <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
-    </SafeAreaView>
-  );
+  if (loading) return <SafeAreaView edges={['top']} style={{ flex: 1 }}><Stack.Screen options={{ headerShown: true, title: 'Настройки' }} /><View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator /></View></SafeAreaView>;
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-      <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
-      <View style={{ flex: 1, maxWidth, alignSelf: maxWidth ? 'center' : undefined, width: '100%' }}>
-        <Settings
-          showBottomNav={false}
-          prefs={prefs}
-          onToggle={handleToggle}
-          onLogout={logout}
-          onDeleteAccount={handleDeleteAccount}
-          onChangeLang={handleChangeLang}
-          currentLang={(user as any)?.locale || 'ru'}
-        />
-      </View>
+    <Stack.Screen options={{ headerShown: true, title: 'Настройки' }} />
+    <View style={{ flex: 1, maxWidth, width: '100%', alignSelf: 'center' }}>
+      <Settings
+        showBottomNav={false}
+        prefs={prefs}
+        onToggle={handleToggle}
+        onLogout={logout}
+        onDeleteAccount={handleDeleteAccount}
+        onChangeLang={handleChangeLang}
+        currentLang={(user as any)?.locale || 'ru'}
+      />
+    </View>
     </SafeAreaView>
   );
 }

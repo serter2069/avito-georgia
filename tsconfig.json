@@ -3,5 +3,5 @@
   "compilerOptions": {
     "strict": true
   },
-  "exclude": ["api", "node_modules"]
+  "exclude": ["api", "node_modules", "worktrees"]
 }

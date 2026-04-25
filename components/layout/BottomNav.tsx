@@ -57,9 +57,13 @@ export function BottomNav() {
             style={{
               flex: 1,
               alignItems: 'center',
-              paddingVertical: 8,
+              paddingVertical: 10,
+              minHeight: 44,
+              justifyContent: 'center',
             }}
             onPress={() => router.push(tab.path as any)}
+            accessibilityRole="button"
+            accessibilityLabel={tab.label}
           >
             <Ionicons
               name={active ? tab.iconActive : tab.iconDefault}
@@ -69,7 +73,7 @@ export function BottomNav() {
             <Text
               style={{
                 fontSize: fontSize.xs,
-                color: active ? colors.primary : colors.iconInactive,
+                color: active ? colors.primaryDark : colors.iconInactive,
                 marginTop: 2,
               }}
             >
