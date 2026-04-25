@@ -212,7 +212,7 @@ function MessageBubble({ msg, onPhotoPress }: {
       <View className="items-end px-4 mb-1.5">
         {content}
         <View className="flex-row items-center mt-0.5" style={{ gap: 3 }}>
-          <Text className="text-[10px] text-[#9E9E9E]">{msg.time}</Text>
+          <Text className="text-[12px] text-[#9E9E9E]">{msg.time}</Text>
           <Ionicons
             name="checkmark-done"
             size={14}
@@ -226,7 +226,7 @@ function MessageBubble({ msg, onPhotoPress }: {
   return (
     <View className="items-start px-4 mb-1.5">
       {content}
-      <Text className="text-[10px] text-[#9E9E9E] mt-0.5">{msg.time}</Text>
+      <Text className="text-[12px] text-[#9E9E9E] mt-0.5">{msg.time}</Text>
     </View>
   );
 }

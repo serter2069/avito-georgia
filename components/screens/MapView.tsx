@@ -128,7 +128,7 @@ function PricePin({ pin, active, onPress }: { pin: ML; active: boolean; onPress(
         shadowColor:'#000', shadowOffset:{width:0,height:2},
         shadowOpacity: active ? 0.3 : 0.12, shadowRadius:4, elevation: active ? 8 : 3,
       }}>
-        <Text style={{ fontSize:11, fontWeight:'700', color: textColor }} numberOfLines={1}>
+        <Text style={{ fontSize:12, fontWeight:'700', color: textColor }} numberOfLines={1}>
           {pin.price}
         </Text>
       </View>
@@ -214,10 +214,10 @@ function ListingRow({ pin, onPress }: { pin: ML; onPress(): void }) {
         <Text className="text-[13px] text-[#1A1A1A]" numberOfLines={1}>{pin.title}</Text>
         <View className="flex-row items-center gap-1">
           <Ionicons name="location-outline" size={11} color="#9E9E9E"/>
-          <Text className="text-[11px] text-[#9E9E9E]">{pin.address}</Text>
+          <Text className="text-[12px] text-[#9E9E9E]">{pin.address}</Text>
           {pin.premium && (
             <View className="ml-1 bg-[#1A1A1A] rounded px-1.5 py-0.5">
-              <Text className="text-[9px] font-bold text-white">VIP</Text>
+              <Text className="text-[10px] font-bold text-white">VIP</Text>
             </View>
           )}
         </View>
@@ -283,7 +283,7 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
                 {activeCluster.isCluster && (
                   <View className="flex-row items-center gap-1 mt-0.5">
                     <Ionicons name="location-outline" size={11} color="#9E9E9E"/>
-                    <Text className="text-[11px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
+                    <Text className="text-[12px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
                   </View>
                 )}
               </View>
@@ -373,7 +373,7 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
                     </Text>
                     <View className="flex-row items-center gap-1 mt-0.5">
                       <Ionicons name="location-outline" size={11} color="#9E9E9E"/>
-                      <Text className="text-[11px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
+                      <Text className="text-[12px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
                     </View>
                   </View>
                   <Pressable onPress={() => setActiveId(null)}
@@ -393,7 +393,7 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
                   <Text className="text-[13px] text-[#1A1A1A] mt-0.5">{activeCluster.pins[0].title}</Text>
                   <View className="flex-row items-center gap-1 mt-1">
                     <Ionicons name="location-outline" size={12} color="#9E9E9E"/>
-                    <Text className="text-[11px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
+                    <Text className="text-[12px] text-[#9E9E9E]">{activeCluster.pins[0].address}</Text>
                   </View>
                   <View className="flex-row gap-2 mt-2.5">
                     <Pressable className="flex-1 bg-[#00AA6C] rounded-lg py-2 items-center">
