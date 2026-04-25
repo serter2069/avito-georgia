@@ -73,7 +73,7 @@ export default function NotificationsPage() {
                 </View>
               ))}
             </View>
-            <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 10, marginHorizontal: 4 }}>
+            <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10, marginHorizontal: 4 }}>
               Уведомления отправляются на email
             </Text>
           </>

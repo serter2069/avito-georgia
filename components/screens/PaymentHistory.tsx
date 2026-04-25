@@ -33,7 +33,7 @@ function StatusBadge({ status }: { status: string }) {
   const isPaid = status === 'succeeded' || status === 'paid';
   return (
     <View style={{ backgroundColor: isPaid ? C.greenBg : '#FFF3E0', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 2 }}>
-      <Text style={{ fontSize: 12, fontWeight: '700', color: isPaid ? C.green : '#E65100' }}>
+      <Text style={{ fontSize: 13, fontWeight: '700', color: isPaid ? C.green : '#E65100' }}>
         {isPaid ? 'Оплачено' : status}
       </Text>
     </View>

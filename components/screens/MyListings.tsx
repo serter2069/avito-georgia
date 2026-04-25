@@ -87,16 +87,16 @@ function ListingRow({
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{listing.price}</Text>
           {listing.views ? (
-            <Text style={{ fontSize: 12, color: C_LOCAL.muted }}>{listing.views}</Text>
+            <Text style={{ fontSize: 13, color: C_LOCAL.muted }}>{listing.views}</Text>
           ) : (
-            <Text style={{ fontSize: 12, color: C_LOCAL.muted }}>черновик</Text>
+            <Text style={{ fontSize: 13, color: C_LOCAL.muted }}>черновик</Text>
           )}
         </View>
 
         {/* Expiry line */}
         {tab === 'active' && listing.expiresDate && (
           <Text style={{
-            fontSize: 12,
+            fontSize: 13,
             color: urgent ? C_LOCAL.error : soon ? C_LOCAL.warnTxt : C_LOCAL.muted,
             fontWeight: (urgent || soon) ? '600' : '400',
           }}>
@@ -109,31 +109,31 @@ function ListingRow({
         )}
 
         {/* Actions */}
-        <View style={{ flexDirection: 'row', gap: 14, marginTop: 4 }}>
+        <View style={{ flexDirection: 'row', gap: 14, marginTop: 4, alignItems: 'center' }}>
           {tab === 'active' && (
             <>
-              <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/listings/' + listing.id + '/edit' as any); }} accessibilityLabel="Редактировать объявление">
-                <Text style={{ fontSize: 12, color: C_LOCAL.action, fontWeight: '500' }}>Редактировать</Text>
+              <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/listings/' + listing.id + '/edit' as any); }} accessibilityLabel="Редактировать объявление" style={{ minHeight: 44, justifyContent: 'center' }}>
+                <Text style={{ fontSize: 13, color: C_LOCAL.action, fontWeight: '500' }}>Редактировать</Text>
               </Pressable>
               {(listing.daysLeft ?? 99) <= 7 && (
-                <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/payment?listingId=' + listing.id + '&type=renewal' as any); }}>
-                  <Text style={{ fontSize: 12, color: C_LOCAL.warnTxt, fontWeight: '500' }}>Продлить — 3 ₾</Text>
+                <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/payment?listingId=' + listing.id + '&type=renewal' as any); }} style={{ minHeight: 44, justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 13, color: C_LOCAL.warnTxt, fontWeight: '500' }}>Продлить — 3 ₾</Text>
                 </Pressable>
               )}
             </>
           )}
           {tab === 'inactive' && (
-            <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/payment?listingId=' + listing.id + '&type=renewal' as any); }}>
-              <Text style={{ fontSize: 12, color: C_LOCAL.action, fontWeight: '500' }}>Возобновить — 3 ₾</Text>
+            <Pressable onPress={(e) => { e.stopPropagation?.(); router.push('/payment?listingId=' + listing.id + '&type=renewal' as any); }} style={{ minHeight: 44, justifyContent: 'center' }}>
+              <Text style={{ fontSize: 13, color: C_LOCAL.action, fontWeight: '500' }}>Возобновить — 3 ₾</Text>
             </Pressable>
           )}
           {tab === 'draft' && (
             <>
-              <Pressable onPress={(e) => { e.stopPropagation?.(); onPublish?.(listing.id); }}>
-                <Text style={{ fontSize: 12, color: C_LOCAL.action, fontWeight: '500' }}>Опубликовать</Text>
+              <Pressable onPress={(e) => { e.stopPropagation?.(); onPublish?.(listing.id); }} style={{ minHeight: 44, justifyContent: 'center' }}>
+                <Text style={{ fontSize: 13, color: C_LOCAL.action, fontWeight: '500' }}>Опубликовать</Text>
               </Pressable>
-              <Pressable onPress={(e) => { e.stopPropagation?.(); onDelete(listing.id); }}>
-                <Text style={{ fontSize: 12, color: C_LOCAL.muted }}>Удалить</Text>
+              <Pressable onPress={(e) => { e.stopPropagation?.(); onDelete(listing.id); }} style={{ minHeight: 44, justifyContent: 'center' }}>
+                <Text style={{ fontSize: 13, color: C_LOCAL.muted }}>Удалить</Text>
               </Pressable>
             </>
           )}
@@ -222,7 +222,7 @@ export function MyListingsInteractive({ showBottomNav = true, listings: apiListi
             <Text style={{ fontSize: 13, color: active ? colors.primary : C_LOCAL.sub, fontWeight: active ? '600' : '400' }}>
               {label}
               {counts[key] > 0 && (
-                <Text style={{ fontSize: 12, color: active ? colors.primary : C_LOCAL.muted }}> {counts[key]}</Text>
+                <Text style={{ fontSize: 13, color: active ? colors.primary : C_LOCAL.muted }}> {counts[key]}</Text>
               )}
             </Text>
           </Pressable>
@@ -272,7 +272,7 @@ export function MyListingsInteractive({ showBottomNav = true, listings: apiListi
                 <Text style={{ fontSize: 13, color: active ? C_LOCAL.action : C_LOCAL.sub, fontWeight: active ? '600' : '400' }}>
                   {label}
                 </Text>
-                <Text style={{ fontSize: 12, color: C_LOCAL.muted, marginTop: 1 }}>{counts[key]} объявлений</Text>
+                <Text style={{ fontSize: 13, color: C_LOCAL.muted, marginTop: 1 }}>{counts[key]} объявлений</Text>
               </Pressable>
             );
           })}

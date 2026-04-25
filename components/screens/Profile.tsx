@@ -126,8 +126,8 @@ function UserHeader({
           {showEditButton && (
             <Pressable
               onPress={onEdit}
-              className="flex-row items-center gap-1 px-3 py-2 rounded-lg"
-              style={{ borderWidth: 1, borderColor: C.border }}
+              className="flex-row items-center gap-1 px-3 rounded-lg"
+              style={{ borderWidth: 1, borderColor: C.border, minHeight: 44, justifyContent: 'center' }}
             >
               <Ionicons name="pencil-outline" size={16} color={C.green} />
               <Text style={{ fontSize: 13, color: C.green, fontWeight: '600' }}>Изменить</Text>
@@ -153,19 +153,19 @@ function UserHeader({
         >
           <View className="items-center flex-1">
             <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{listingCount ?? 0}</Text>
-            <Text style={{ fontSize: 12, color: C.muted, marginTop: 1 }}>объявлений</Text>
+            <Text style={{ fontSize: 13, color: C.muted, marginTop: 1 }}>объявлений</Text>
           </View>
           <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
           <View className="items-center flex-1">
             <View className="flex-row items-center gap-1">
               <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>—</Text>
             </View>
-            <Text style={{ fontSize: 12, color: C.muted, marginTop: 1 }}>рейтинг</Text>
+            <Text style={{ fontSize: 13, color: C.muted, marginTop: 1 }}>рейтинг</Text>
           </View>
           <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
           <View className="items-center flex-1">
             <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{reviewCount ?? 0}</Text>
-            <Text style={{ fontSize: 12, color: C.muted, marginTop: 1 }}>отзывов</Text>
+            <Text style={{ fontSize: 13, color: C.muted, marginTop: 1 }}>отзывов</Text>
           </View>
         </View>
 
@@ -199,7 +199,7 @@ function ListingsSection({ listings }: { listings: any[] }) {
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
         <Text style={{ fontSize: 15, fontWeight: '700', color: C.text }}>Активные объявления</Text>
-        <Pressable onPress={() => router.push('/dashboard/listings' as any)}>
+        <Pressable onPress={() => router.push('/dashboard/listings' as any)} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 }}>
           <Text style={{ fontSize: 13, color: C.green, fontWeight: '600' }}>
             Смотреть все ({listings.length})
           </Text>
@@ -225,7 +225,7 @@ function ListingsSection({ listings }: { listings: any[] }) {
               <View style={{ width: 130, height: 90, backgroundColor: C.page }} />
             )}
             <View className="p-2 gap-0.5">
-              <Text style={{ fontSize: 12, color: C.text, fontWeight: '600' }} numberOfLines={2}>
+              <Text style={{ fontSize: 13, color: C.text, fontWeight: '600' }} numberOfLines={2}>
                 {item.title}
               </Text>
               <Text style={{ fontSize: 13, color: C.green, fontWeight: '700' }}>
@@ -279,7 +279,7 @@ function ReviewsSection({ reviews }: { reviews: any[] }) {
                   <Text style={{ fontSize: 14, fontWeight: '700', color: C.text }}>{r.name}</Text>
                   <View className="flex-row items-center gap-2 mt-0.5">
                     <StarRow rating={r.rating ?? 5} size={12} />
-                    <Text style={{ fontSize: 12, color: C.muted }}>{r.date ?? r.createdAt ?? ''}</Text>
+                    <Text style={{ fontSize: 13, color: C.muted }}>{r.date ?? r.createdAt ?? ''}</Text>
                   </View>
                 </View>
               </View>
