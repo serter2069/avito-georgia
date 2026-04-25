@@ -56,7 +56,7 @@ export default function AdminFinance() {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Header */}
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
-        <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>←</Text></Pressable>
         <Text style={{ fontSize: 17, fontWeight: '700' }}>Финансы</Text>
       </View>
 
@@ -65,17 +65,17 @@ export default function AdminFinance() {
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8' }}>
             <Text style={{ fontSize: 22, fontWeight: '800', color: colors.primary }}>₾{stats?.paymentsThisMonth?.sum ?? 0}</Text>
-            <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>Выручка за месяц</Text>
+            <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>Выручка за месяц</Text>
           </View>
           <View style={{ flex: 1, backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8' }}>
             <Text style={{ fontSize: 22, fontWeight: '800', color: colors.text }}>{stats?.paymentsThisMonth?.count ?? 0}</Text>
-            <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>Платежей за месяц</Text>
+            <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>Платежей за месяц</Text>
           </View>
         </View>
 
         <View style={{ backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8' }}>
           <Text style={{ fontSize: 22, fontWeight: '800', color: colors.text }}>₾{totalRevenue.toFixed(2)}</Text>
-          <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>Всего выручки (последние {payments.length} платежей)</Text>
+          <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>Всего выручки (последние {payments.length} платежей)</Text>
         </View>
 
         {/* Payments list */}
@@ -93,7 +93,7 @@ export default function AdminFinance() {
                   <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>
                     {p.user?.name ?? p.user?.email ?? 'Пользователь'}
                   </Text>
-                  <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
+                  <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>
                     {p.createdAt ? new Date(p.createdAt).toLocaleString('ru-RU') : ''}
                     {p.description ? ` · ${p.description}` : ''}
                   </Text>
@@ -103,7 +103,7 @@ export default function AdminFinance() {
                     ₾{(p.amount ?? 0).toFixed ? (p.amount ?? 0).toFixed(2) : p.amount}
                   </Text>
                   <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: (STATUS_COLORS[p.status] ?? colors.textSecondary) + '22' }}>
-                    <Text style={{ fontSize: 12, fontWeight: '600', color: STATUS_COLORS[p.status] ?? colors.textSecondary }}>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: STATUS_COLORS[p.status] ?? colors.textSecondary }}>
                       {STATUS_LABELS[p.status] ?? p.status}
                     </Text>
                   </View>

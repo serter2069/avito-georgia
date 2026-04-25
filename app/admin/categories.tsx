@@ -66,7 +66,7 @@ export default function AdminCategories() {
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
-        <Pressable onPress={() => router.back()} accessibilityLabel="Назад"><Text style={{ fontSize: 22 }}>←</Text></Pressable>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 22 }}>←</Text></Pressable>
         <Text style={{ fontSize: 17, fontWeight: '700' }}>Категории</Text>
       </View>
       <ScrollView contentContainerStyle={{ padding: 16, gap: 10, maxWidth: contentWidth, alignSelf: 'center', width: '100%' }}>
@@ -75,7 +75,7 @@ export default function AdminCategories() {
             <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{cat.name}</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>Бесплатных объявлений</Text>
+                <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>Бесплатных объявлений</Text>
                 <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 }}>
                   <TextInput
                     value={cat._quota}
@@ -86,7 +86,7 @@ export default function AdminCategories() {
                 </View>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>Цена (₾)</Text>
+                <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>Цена (₾)</Text>
                 <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 }}>
                   <TextInput
                     value={cat._price}
