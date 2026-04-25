@@ -59,7 +59,7 @@ function StepIndicator({ step }: { step: number }) {
                     {done ? '✓' : String(num)}
                   </Text>
                 </View>
-                <Text style={{ fontSize: 10, color: active ? C.green : C.muted, marginTop: 3, fontWeight: active ? '600' : '400' }}>
+                <Text style={{ fontSize: 12, color: active ? C.green : C.muted, marginTop: 3, fontWeight: active ? '600' : '400' }}>
                   {label}
                 </Text>
               </View>
@@ -153,13 +153,13 @@ function Step1({ onNext, selectedFiles, onFilesChange }: {
                 <Pressable
                   onPress={() => removePhoto(i)}
                   style={{
-                    position: 'absolute', top: 4, right: 4,
-                    width: 20, height: 20, borderRadius: 10,
-                    backgroundColor: 'rgba(0,0,0,0.55)',
+                    position: 'absolute', top: -6, right: -6,
+                    width: 24, height: 24, borderRadius: 12,
+                    backgroundColor: 'rgba(0,0,0,0.6)',
                     alignItems: 'center', justifyContent: 'center',
                   }}
                 >
-                  <Text style={{ color: C.white, fontSize: 11, fontWeight: '700', lineHeight: 14 }}>✕</Text>
+                  <Text style={{ color: C.white, fontSize: 12, fontWeight: '700', lineHeight: 16 }}>✕</Text>
                 </Pressable>
               </View>
             ))}
