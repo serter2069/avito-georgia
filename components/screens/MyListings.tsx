@@ -89,14 +89,14 @@ function ListingRow({
           {listing.views ? (
             <Text style={{ fontSize: 12, color: C_LOCAL.muted }}>{listing.views}</Text>
           ) : (
-            <Text style={{ fontSize: 11, color: C_LOCAL.muted }}>черновик</Text>
+            <Text style={{ fontSize: 12, color: C_LOCAL.muted }}>черновик</Text>
           )}
         </View>
 
         {/* Expiry line */}
         {tab === 'active' && listing.expiresDate && (
           <Text style={{
-            fontSize: 11,
+            fontSize: 12,
             color: urgent ? C_LOCAL.error : soon ? C_LOCAL.warnTxt : C_LOCAL.muted,
             fontWeight: (urgent || soon) ? '600' : '400',
           }}>
