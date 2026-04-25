@@ -88,7 +88,7 @@ export default function RootLayout() {
           />
         )}
 
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, overflow: 'visible' as any }}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="admin/categories" />
             <Stack.Screen name="admin/finance" />
