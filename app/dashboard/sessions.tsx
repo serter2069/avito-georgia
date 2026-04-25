@@ -34,7 +34,7 @@ export default function SessionsPage() {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Header */}
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 12 }}>
-        <Pressable onPress={() => router.back()} accessibilityLabel="Назад">
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 22, color: colors.text }}>←</Text>
         </Pressable>
         <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }}>Активные сессии</Text>
@@ -59,7 +59,7 @@ export default function SessionsPage() {
               <Pressable
                 onPress={() => handleRevoke(s.id)}
                 accessibilityLabel="Завершить сессию"
-                style={{ marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.error }}
+                style={{ marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 12, minHeight: 44, justifyContent: 'center', borderRadius: 8, borderWidth: 1, borderColor: colors.error }}
               >
                 <Text style={{ color: colors.error, fontSize: 13, fontWeight: '600' }}>Завершить</Text>
               </Pressable>

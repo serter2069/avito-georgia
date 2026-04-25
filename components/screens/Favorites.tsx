@@ -56,13 +56,14 @@ function FavCard({
         <Pressable
           onPress={handleHeart}
           accessibilityLabel="Убрать из избранного"
+          hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
           style={{
             position: 'absolute',
             top: 6,
             right: 6,
-            width: 28,
-            height: 28,
-            borderRadius: 14,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
             backgroundColor: 'rgba(255,255,255,0.88)',
             alignItems: 'center',
             justifyContent: 'center',
@@ -82,7 +83,7 @@ function FavCard({
             paddingVertical: 2,
           }}
         >
-          <Text style={{ color: colors.background, fontSize: 12, fontWeight: '600' }}>{item.photos} фото</Text>
+          <Text style={{ color: colors.background, fontSize: 13, fontWeight: '600' }}>{item.photos} фото</Text>
         </View>
       </View>
 
@@ -92,7 +93,7 @@ function FavCard({
         <Text style={{ fontSize: 13, fontWeight: '500', color: colors.text }} numberOfLines={2}>
           {item.title}
         </Text>
-        <Text style={{ fontSize: 12, color: colors.textSecondary }}>{item.city}</Text>
+        <Text style={{ fontSize: 13, color: colors.textSecondary }}>{item.city}</Text>
       </View>
     </View>
   );

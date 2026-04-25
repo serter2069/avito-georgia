@@ -28,7 +28,7 @@ function Toggle({ value, onToggle }: { value: boolean; onToggle: () => void }) {
 
 function SectionLabel({ text }: { text: string }) {
   return (
-    <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.6, paddingHorizontal: 4, paddingTop: 8, paddingBottom: 6 }}>
+    <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.6, paddingHorizontal: 4, paddingTop: 8, paddingBottom: 6 }}>
       {text}
     </Text>
   );
@@ -109,7 +109,7 @@ function NotificationsSection({ prefs, onToggle }: NotificationsSectionProps) {
           </View>
         </View>
       ))}
-      <Text style={{ fontSize: 12, color: colors.textSecondary, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>
+      <Text style={{ fontSize: 13, color: colors.textSecondary, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>
         Уведомления отправляются на email
       </Text>
     </View>

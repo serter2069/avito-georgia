@@ -48,7 +48,7 @@ function ConversationRow({ conv, isLast, isSelected, onPress }: { conv: Conversa
             <Text style={{ fontSize: 15, fontWeight: conv.unread ? '700' : '600', color: colors.text, flex: 1, marginRight: 8 }} numberOfLines={1}>
               {conv.name}
             </Text>
-            <Text style={{ fontSize: 12, color: conv.unread ? colors.primary : colors.textSecondary, flexShrink: 0 }}>
+            <Text style={{ fontSize: 13, color: conv.unread ? colors.primary : colors.textSecondary, flexShrink: 0 }}>
               {conv.time}
             </Text>
           </View>
@@ -70,7 +70,7 @@ function ConversationRow({ conv, isLast, isSelected, onPress }: { conv: Conversa
                 paddingHorizontal: 5,
                 flexShrink: 0,
               }}>
-                <Text style={{ color: colors.background, fontSize: 12, fontWeight: '700' }}>{conv.unread}</Text>
+                <Text style={{ color: colors.background, fontSize: 13, fontWeight: '700' }}>{conv.unread}</Text>
               </View>
             ) : null}
           </View>
@@ -101,7 +101,7 @@ function SearchBar({ value, onChangeText }: { value: string; onChangeText: (t: s
         style={{ flex: 1, fontSize: 15, color: colors.text, paddingVertical: 10, borderWidth: 0, backgroundColor: 'transparent', outlineWidth: 0 } as any}
       />
       {value.length > 0 && (
-        <Pressable onPress={() => onChangeText('')} accessibilityLabel="Очистить поиск" style={{ padding: 4 }}>
+        <Pressable onPress={() => onChangeText('')} accessibilityLabel="Очистить поиск" style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 16, color: colors.textSecondary, lineHeight: 18 }}>×</Text>
         </Pressable>
       )}
