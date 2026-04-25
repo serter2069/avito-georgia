@@ -43,9 +43,8 @@ export default function BottomNav({ active }: BottomNavProps) {
       borderTopWidth: 1,
       borderTopColor: '#E0E0E0',
       backgroundColor: '#FFFFFF',
-      paddingBottom: 12,
+      paddingBottom: 16,
       paddingTop: 6,
-      overflow: 'visible',
     }}>
       {TABS.map((tab) => {
         const isActive = isTabActive(tab.id, pathname, active);
@@ -58,7 +57,7 @@ export default function BottomNav({ active }: BottomNavProps) {
               accessibilityLabel={`Вкладка ${tab.label}`}
               accessibilityRole="button"
               role="button"
-              style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 44, overflow: 'visible' }}
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 44 }}
             >
               <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: -10 }}>
                 <Ionicons name="add" size={26} color="#FFFFFF" />
@@ -75,7 +74,7 @@ export default function BottomNav({ active }: BottomNavProps) {
             accessibilityLabel={`Вкладка ${tab.label}`}
             accessibilityRole="button"
             role="button"
-            style={{ flex: 1, alignItems: 'center', gap: 3, paddingTop: 2, minHeight: 44, justifyContent: 'center', overflow: 'visible' }}
+            style={{ flex: 1, alignItems: 'center', gap: 3, paddingTop: 2, minHeight: 44, justifyContent: 'center' }}
           >
             <Ionicons
               name={isActive ? tab.iconActive : tab.icon}
@@ -85,7 +84,7 @@ export default function BottomNav({ active }: BottomNavProps) {
             <Text style={{ fontSize: fontSize.xs, color: isActive ? colors.primaryDark : colors.textSecondary, fontWeight: isActive ? '600' : '400' }}>
               {tab.label}
             </Text>
-            {isActive && <View style={{ position: 'absolute', bottom: -6, width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary }} />}
+            {isActive && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary, marginTop: 1 }} />}
           </Pressable>
         );
       })}
