@@ -74,7 +74,7 @@ export default function AdminUsers() {
                 <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{u.name ?? 'Без имени'}</Text>
                 <Text style={{ fontSize: 12, color: colors.textSecondary }}>{u.email}</Text>
                 <View style={{ marginTop: 4, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: (ROLE_COLORS[u.role] ?? colors.textSecondary) + '22' }}>
-                  <Text style={{ fontSize: 11, fontWeight: '600', color: ROLE_COLORS[u.role] ?? colors.textSecondary }}>{u.role}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: ROLE_COLORS[u.role] ?? colors.textSecondary }}>{u.role}</Text>
                 </View>
               </View>
               {u.role !== 'admin' && (

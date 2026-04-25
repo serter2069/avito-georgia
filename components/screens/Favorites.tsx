@@ -82,7 +82,7 @@ function FavCard({
             paddingVertical: 2,
           }}
         >
-          <Text style={{ color: colors.background, fontSize: 10, fontWeight: '600' }}>{item.photos} фото</Text>
+          <Text style={{ color: colors.background, fontSize: 12, fontWeight: '600' }}>{item.photos} фото</Text>
         </View>
       </View>
 
@@ -92,7 +92,7 @@ function FavCard({
         <Text style={{ fontSize: 13, fontWeight: '500', color: colors.text }} numberOfLines={2}>
           {item.title}
         </Text>
-        <Text style={{ fontSize: 11, color: colors.textSecondary }}>{item.city}</Text>
+        <Text style={{ fontSize: 12, color: colors.textSecondary }}>{item.city}</Text>
       </View>
     </View>
   );

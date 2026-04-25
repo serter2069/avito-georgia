@@ -93,7 +93,7 @@ export default function AdminFinance() {
                   <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>
                     {p.user?.name ?? p.user?.email ?? 'Пользователь'}
                   </Text>
-                  <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>
+                  <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
                     {p.createdAt ? new Date(p.createdAt).toLocaleString('ru-RU') : ''}
                     {p.description ? ` · ${p.description}` : ''}
                   </Text>
@@ -103,7 +103,7 @@ export default function AdminFinance() {
                     ₾{(p.amount ?? 0).toFixed ? (p.amount ?? 0).toFixed(2) : p.amount}
                   </Text>
                   <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: (STATUS_COLORS[p.status] ?? colors.textSecondary) + '22' }}>
-                    <Text style={{ fontSize: 10, fontWeight: '600', color: STATUS_COLORS[p.status] ?? colors.textSecondary }}>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: STATUS_COLORS[p.status] ?? colors.textSecondary }}>
                       {STATUS_LABELS[p.status] ?? p.status}
                     </Text>
                   </View>

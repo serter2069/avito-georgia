@@ -174,7 +174,7 @@ function ListingCard({
             paddingVertical: 2,
           }}
         >
-          <Text style={{ color: colors.background, fontSize: 10, fontWeight: '600' }}>{listing.photos} фото</Text>
+          <Text style={{ color: colors.background, fontSize: 12, fontWeight: '600' }}>{listing.photos} фото</Text>
         </View>
       </View>
       <View style={{ padding: 8, gap: 3 }}>

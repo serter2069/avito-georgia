@@ -70,7 +70,7 @@ function ConversationRow({ conv, isLast, isSelected, onPress }: { conv: Conversa
                 paddingHorizontal: 5,
                 flexShrink: 0,
               }}>
-                <Text style={{ color: colors.background, fontSize: 11, fontWeight: '700' }}>{conv.unread}</Text>
+                <Text style={{ color: colors.background, fontSize: 12, fontWeight: '700' }}>{conv.unread}</Text>
               </View>
             ) : null}
           </View>

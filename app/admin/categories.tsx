@@ -75,7 +75,7 @@ export default function AdminCategories() {
             <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{cat.name}</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Бесплатных объявлений</Text>
+                <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>Бесплатных объявлений</Text>
                 <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 }}>
                   <TextInput
                     value={cat._quota}
@@ -86,7 +86,7 @@ export default function AdminCategories() {
                 </View>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 11, color: colors.textSecondary, marginBottom: 4 }}>Цена (₾)</Text>
+                <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>Цена (₾)</Text>
                 <View style={{ borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 }}>
                   <TextInput
                     value={cat._price}

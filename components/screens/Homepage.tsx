@@ -70,14 +70,14 @@ function ListingCard({ listing, colorIdx }: {
         </Pressable>
         {photoCount > 0 && (
           <View style={{ position: 'absolute', bottom: 6, right: 6, backgroundColor: 'rgba(0,0,0,0.52)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2 }}>
-            <Text style={{ color: '#fff', fontSize: 10, fontWeight: '600' }}>{photoCount} фото</Text>
+            <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{photoCount} фото</Text>
           </View>
         )}
       </View>
       <View style={{ padding: 10 }}>
         <Text style={{ fontSize: 13, color: colors.text, lineHeight: 18 }} numberOfLines={2}>{listing.title}</Text>
         <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text, marginTop: 4 }}>{price}</Text>
-        <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>{loc}{age ? ` · ${age}` : ''}</Text>
+        <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{loc}{age ? ` · ${age}` : ''}</Text>
       </View>
     </Pressable>
   );
@@ -343,7 +343,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
                 <View style={{ width: 48, height: 48, borderRadius: 13, backgroundColor: active ? cat.color : cat.bg, alignItems: 'center', justifyContent: 'center', borderWidth: active ? 0 : 1, borderColor: '#E8E8E8' }}>
                   <Ionicons name={cat.icon as any} size={22} color={active ? '#fff' : cat.color} />
                 </View>
-                <Text style={{ fontSize: 10, color: active ? cat.color : colors.textSecondary, fontWeight: active ? '700' : '400', textAlign: 'center' }} numberOfLines={1}>
+                <Text style={{ fontSize: 12, color: active ? cat.color : colors.textSecondary, fontWeight: active ? '700' : '400', textAlign: 'center' }} numberOfLines={1}>
                   {cat.label}
                 </Text>
               </Pressable>
@@ -428,7 +428,7 @@ export function HomepageContent({ loggedIn, showHeader = true, showBottomNav = t
                 <option value="price_asc">Дешевле</option>
                 <option value="price_desc">Дороже</option>
               </select>
-              <Text style={{ fontSize: 10, color: colors.textSecondary, marginLeft: -16, pointerEvents: 'none' as any }}>▾</Text>
+              <Text style={{ fontSize: 12, color: colors.textSecondary, marginLeft: -16, pointerEvents: 'none' as any }}>▾</Text>
             </View>
           </View>
         </View>

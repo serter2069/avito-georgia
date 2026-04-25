@@ -71,7 +71,7 @@ export default function AdminModeration() {
               <Text style={{ fontSize: 15, fontWeight: '700', color: colors.text }}>{l.title}</Text>
               <Text style={{ fontSize: 14, color: colors.textSecondary }}>{l.price} {l.currency} · {l.city?.nameRu ?? l.city?.nameEn}</Text>
               {l.description && <Text style={{ fontSize: 13, color: colors.text }} numberOfLines={3}>{l.description}</Text>}
-              <Text style={{ fontSize: 11, color: colors.textSecondary }}>
+              <Text style={{ fontSize: 12, color: colors.textSecondary }}>
                 от {l.user?.name ?? l.user?.email} · {l.createdAt ? new Date(l.createdAt).toLocaleDateString('ru-RU') : ''}
               </Text>
               <View style={{ flexDirection: 'row', gap: 10 }}>
