@@ -11,7 +11,7 @@ const C = {
   greenBg: '#E8F9F2',
   white: '#FFFFFF',
   text: '#1A1A1A',
-  muted: '#9E9E9E',
+  muted: '#767676',  // WCAG AA on white: 4.54:1 (was #9E9E9E = 2.85:1, failed)
   border: '#E8E8E8',
   page: '#F5F5F5',
   error: '#D32F2F',
@@ -153,19 +153,19 @@ function UserHeader({
         >
           <View className="items-center flex-1">
             <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{listingCount ?? 0}</Text>
-            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>объявлений</Text>
+            <Text style={{ fontSize: 12, color: C.muted, marginTop: 1 }}>объявлений</Text>
           </View>
           <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
           <View className="items-center flex-1">
             <View className="flex-row items-center gap-1">
               <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>—</Text>
             </View>
-            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>рейтинг</Text>
+            <Text style={{ fontSize: 12, color: C.muted, marginTop: 1 }}>рейтинг</Text>
           </View>
           <View style={{ width: 1, height: 30, backgroundColor: C.border }} />
           <View className="items-center flex-1">
             <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{reviewCount ?? 0}</Text>
-            <Text style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>отзывов</Text>
+            <Text style={{ fontSize: 12, color: C.muted, marginTop: 1 }}>отзывов</Text>
           </View>
         </View>
 

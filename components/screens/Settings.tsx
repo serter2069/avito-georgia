@@ -7,7 +7,7 @@ import { colors } from '../../lib/theme';
 // Custom Toggle component
 function Toggle({ value, onToggle }: { value: boolean; onToggle: () => void }) {
   return (
-    <Pressable onPress={onToggle} style={{ width: 46, height: 27, borderRadius: 14, backgroundColor: value ? colors.primary : '#D1D5DB', paddingHorizontal: 2, justifyContent: 'center' }}>
+    <Pressable onPress={onToggle} hitSlop={{ top: 9, bottom: 9, left: 0, right: 0 }} style={{ width: 46, height: 27, borderRadius: 14, backgroundColor: value ? colors.primary : '#D1D5DB', paddingHorizontal: 2, justifyContent: 'center' }}>
       <View
         style={{
           width: 23,
