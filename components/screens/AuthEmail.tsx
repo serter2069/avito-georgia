@@ -15,7 +15,7 @@ function AvitoLogo() {
       </View>
       <View style={{ flexDirection:'row', alignItems:'baseline', gap:1 }}>
         <Text style={{ fontWeight:'700', fontSize:22, color:'#1A1A1A' }}>avito</Text>
-        <Text style={{ fontWeight:'600', fontSize:16, color:'#00AA6C' }}>.ge</Text>
+        <Text style={{ fontWeight:'600', fontSize:16, color:C.green }}>.ge</Text>
       </View>
     </View>
   );
