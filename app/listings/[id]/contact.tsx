@@ -39,7 +39,7 @@ export default function ContactSellerPage() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       {/* Header */}
       <View style={{ backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: '#E8E8E8', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 }}>
-        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <Pressable onPress={() => router.back()} accessibilityLabel="Назад" style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44 }}>
           <Text style={{ fontSize: 20, color: colors.text }}>←</Text>
           <Text style={{ fontSize: 15, fontWeight: '500', color: colors.text }}>Написать продавцу</Text>
         </Pressable>

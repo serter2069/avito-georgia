@@ -42,19 +42,19 @@ function PhotoGallery({ photos, onFavPress, fav, onPhotoPress }: {
         <Pressable
           onPress={onFavPress}
           accessibilityLabel="Добавить в избранное"
-          style={{ position: 'absolute', top: 12, right: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'absolute', top: 12, right: 12, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' }}
         >
           <Text style={{ fontSize: 18, color: fav ? '#E53935' : colors.textSecondary }}>{fav ? '♥' : '♡'}</Text>
         </Pressable>
 
         {/* Counter */}
         <View style={{ position: 'absolute', bottom: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3 }}>
-          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{active + 1} / {photos.length}</Text>
+          <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>{active + 1} / {photos.length}</Text>
         </View>
 
         {/* Expand hint */}
         <View style={{ position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(0,0,0,0.45)', borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3 }}>
-          <Text style={{ color: '#fff', fontSize: 12 }}>нажмите для просмотра</Text>
+          <Text style={{ color: '#fff', fontSize: 13 }}>нажмите для просмотра</Text>
         </View>
       </Pressable>
 
@@ -166,8 +166,8 @@ function FakeMap() {
 
         {/* Address label */}
         <View style={{ position: 'absolute', bottom: 10, left: 10, right: 10, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6 }}>
-          <Text style={{ fontSize: 12, color: colors.text, fontWeight: '600' }}>Батуми, ул. Горгиладзе</Text>
-          <Text style={{ fontSize: 12, color: colors.textSecondary }}>Аджара · 500м от центра</Text>
+          <Text style={{ fontSize: 13, color: colors.text, fontWeight: '600' }}>Батуми, ул. Горгиладзе</Text>
+          <Text style={{ fontSize: 13, color: colors.textSecondary }}>Аджара · 500м от центра</Text>
         </View>
       </View>
     </View>
@@ -191,9 +191,9 @@ function SimilarListings() {
           <View key={i} style={{ flex: 1, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#E8E8E8', backgroundColor: colors.background }}>
             <ProtoImage seed={item.seed} width="100%" height={90} />
             <View style={{ padding: 8 }}>
-              <Text style={{ fontSize: 12, color: colors.text, lineHeight: 16 }} numberOfLines={2}>{item.title}</Text>
+              <Text style={{ fontSize: 13, color: colors.text, lineHeight: 16 }} numberOfLines={2}>{item.title}</Text>
               <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text, marginTop: 4 }}>{item.price}</Text>
-              <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{item.loc}</Text>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{item.loc}</Text>
             </View>
           </View>
         ))}

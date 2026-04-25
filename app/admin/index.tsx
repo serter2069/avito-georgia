@@ -10,7 +10,7 @@ function StatCard({ label, value, color = colors.primary }: { label: string; val
   return (
     <View style={{ flex: 1, minWidth: '45%', backgroundColor: colors.background, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E8E8E8' }}>
       <Text style={{ fontSize: 24, fontWeight: '800', color }}>{value}</Text>
-      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>{label}</Text>
+      <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>{label}</Text>
     </View>
   );
 }
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
             {activity.slice(0, 8).map((a, i) => (
               <View key={i} style={{ padding: 14, borderBottomWidth: i < activity.length - 1 ? 1 : 0, borderBottomColor: '#E8E8E8' }}>
                 <Text style={{ fontSize: 13, color: colors.text }}>{a.action ?? JSON.stringify(a).slice(0, 60)}</Text>
-                <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>{a.createdAt ? new Date(a.createdAt).toLocaleString('ru-RU') : ''}</Text>
+                <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{a.createdAt ? new Date(a.createdAt).toLocaleString('ru-RU') : ''}</Text>
               </View>
             ))}
           </View>
