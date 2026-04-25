@@ -242,11 +242,11 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
   return (
     <View className="bg-white">
       <View className="flex-row items-center px-4 py-3 border-b border-[#EFEFEF] gap-3">
-        <Pressable className="w-9 h-9 rounded-full bg-[#F5F5F5] items-center justify-center">
+        <Pressable className="w-11 h-11 rounded-full bg-[#F5F5F5] items-center justify-center">
           <Ionicons name="chevron-back" size={22} color="#1A1A1A"/>
         </Pressable>
         <Text className="flex-1 text-[17px] font-semibold text-[#1A1A1A]">Карта</Text>
-        <Pressable className="w-9 h-9 rounded-full bg-[#F5F5F5] items-center justify-center">
+        <Pressable className="w-11 h-11 rounded-full bg-[#F5F5F5] items-center justify-center">
           <Ionicons name="options-outline" size={20} color="#1A1A1A"/>
         </Pressable>
       </View>
@@ -256,15 +256,15 @@ export function MapMobile({ pins: apiPins }: { pins?: any[] }) {
 
         <View className="absolute top-3 left-3 bg-white rounded-full px-3 py-1.5 border border-[#E0E0E0]"
           style={{ shadowColor:'#000', shadowOffset:{width:0,height:1}, shadowOpacity:0.1, shadowRadius:3, elevation:2 }}>
-          <Text className="text-[12px] font-semibold text-[#1A1A1A]">{PINS.length} объявлений</Text>
+          <Text className="text-[13px] font-semibold text-[#1A1A1A]">{PINS.length} объявлений</Text>
         </View>
 
         <View className="absolute right-3 bottom-3 bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
           style={{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.1, shadowRadius:4, elevation:3 }}>
-          <Pressable className="w-10 h-10 items-center justify-center border-b border-[#EFEFEF]">
+          <Pressable className="w-11 h-11 items-center justify-center border-b border-[#EFEFEF]">
             <Ionicons name="add" size={20} color="#1A1A1A"/>
           </Pressable>
-          <Pressable className="w-10 h-10 items-center justify-center">
+          <Pressable className="w-11 h-11 items-center justify-center">
             <Ionicons name="remove" size={20} color="#1A1A1A"/>
           </Pressable>
         </View>
@@ -336,7 +336,7 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
       <View className="border-r border-[#EFEFEF]" style={{ width:320 }}>
         <View className="px-4 py-3 border-b border-[#EFEFEF]">
           <Text className="text-[15px] font-semibold text-[#1A1A1A]">Карта объявлений</Text>
-          <Text className="text-[12px] text-[#9E9E9E] mt-0.5">{PINS.length} объявлений</Text>
+          <Text className="text-[13px] text-[#9E9E9E] mt-0.5">{PINS.length} объявлений</Text>
         </View>
         <ScrollView contentContainerStyle={{ padding:12, paddingBottom:24 }}>
           {PINS.map(p => (
@@ -352,10 +352,10 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
 
         <View className="absolute right-4 bottom-4 bg-white rounded-xl border border-[#E0E0E0] overflow-hidden"
           style={{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.1, shadowRadius:4, elevation:3 }}>
-          <Pressable className="w-10 h-10 items-center justify-center border-b border-[#EFEFEF]">
+          <Pressable className="w-11 h-11 items-center justify-center border-b border-[#EFEFEF]">
             <Ionicons name="add" size={20} color="#1A1A1A"/>
           </Pressable>
-          <Pressable className="w-10 h-10 items-center justify-center">
+          <Pressable className="w-11 h-11 items-center justify-center">
             <Ionicons name="remove" size={20} color="#1A1A1A"/>
           </Pressable>
         </View>
@@ -400,7 +400,7 @@ export function MapDesktop({ pins: apiPins }: { pins?: any[] }) {
                       <Text className="text-white text-[13px] font-semibold">Открыть</Text>
                     </Pressable>
                     <Pressable onPress={() => setActiveId(null)}
-                      className="w-9 h-9 rounded-lg bg-[#F5F5F5] items-center justify-center">
+                      className="w-11 h-11 rounded-lg bg-[#F5F5F5] items-center justify-center">
                       <Ionicons name="close" size={18} color="#6B6B6B"/>
                     </Pressable>
                   </View>
