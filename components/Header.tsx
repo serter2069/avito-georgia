@@ -116,6 +116,7 @@ export default function Header({
 
   const [lang, setLang] = useState<Lang>('RU');
   const [internalQuery, setInternalQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const query = search?.value ?? internalQuery;
   const setQuery = search?.onChange ?? setInternalQuery;
 
@@ -164,7 +165,7 @@ export default function Header({
               flexDirection: 'row',
               alignItems: 'center',
               borderWidth: 1.5,
-              borderColor: colors.primary,
+              borderColor: searchFocused ? colors.text : colors.primary,
               borderRadius: 9,
               backgroundColor: colors.background,
               paddingHorizontal: 10,
@@ -191,8 +192,8 @@ export default function Header({
               placeholderTextColor={colors.textSecondary}
               value={query}
               onChangeText={setQuery}
-              onFocus={search?.onFocus}
-              onBlur={search?.onBlur}
+              onFocus={() => { setSearchFocused(true); search?.onFocus?.(); }}
+              onBlur={() => { setSearchFocused(false); search?.onBlur?.(); }}
             />
             {query.length > 0 && (
               <Pressable onPress={() => setQuery('')} accessibilityLabel="Очистить поиск">
