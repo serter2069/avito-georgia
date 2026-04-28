@@ -164,13 +164,25 @@ export default function Header({
               flex: 1,
               flexDirection: 'row',
               alignItems: 'center',
-              borderWidth: 1.5,
-              borderColor: searchFocused ? colors.text : colors.primary,
+              borderWidth: searchFocused ? 2 : 1.5,
+              borderColor: colors.primary,
               borderRadius: 9,
               backgroundColor: colors.background,
               paddingHorizontal: 10,
               paddingVertical: isTablet ? 8 : 10,
               gap: 8,
+              ...(searchFocused
+                ? {
+                    shadowColor: colors.primary,
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.35,
+                    shadowRadius: 4,
+                    elevation: 2,
+                    outlineColor: colors.primary,
+                    outlineOffset: 2,
+                    outlineWidth: 2,
+                  }
+                : {}),
             }}
           >
             <Ionicons name="search-outline" size={17} color={colors.textSecondary} />
